@@ -577,11 +577,28 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 <body>
 <div class="app">
   <div class="header">
-    <div class="header-date" id="headerDate"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="header-date" id="headerDate"></div>
+      <button onclick="openApiModal()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">⚙️ API設定</button>
+    </div>
     <div class="header-title">今週のきもちチェック🌱</div>
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('check')">チェック</button>
       <button class="tab-btn" onclick="switchTab('kiroku')">きろく</button>
+    </div>
+  </div>
+
+  <!-- API KEY MODAL -->
+  <div id="apiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:24px;padding:28px 24px;width:calc(100% - 48px);max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+      <div style="font-size:20px;font-weight:800;color:#2d3a50;margin-bottom:8px;">🔑 APIキー設定</div>
+      <div style="font-size:13px;color:#7a8499;margin-bottom:16px;line-height:1.6;">AnthropicのAPIキーを入力してください。<br>キーはこのブラウザのみに保存され、外部には送信されません。</div>
+      <input id="apiKeyInput" type="password" placeholder="sk-ant-..." style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#2d3a50;outline:none;margin-bottom:8px;">
+      <div id="apiKeyStatus" style="font-size:12px;margin-bottom:16px;min-height:18px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="saveApiKey()" style="flex:1;padding:13px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">保存する</button>
+        <button onclick="closeApiModal()" style="padding:13px 16px;background:#f0f2f8;color:#4a5568;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">閉じる</button>
+      </div>
     </div>
   </div>
 
@@ -705,8 +722,48 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 </div>
 
 <script>
-const API_KEY = "YOUR_API_KEY";
 const STORAGE_KEY = "mh_v2_records";
+const API_KEY_STORAGE = "mh_v2_api_key";
+
+function getApiKey() { return localStorage.getItem(API_KEY_STORAGE) || ""; }
+
+function openApiModal() {
+  const modal = document.getElementById('apiModal');
+  modal.style.display = 'flex';
+  const saved = getApiKey();
+  document.getElementById('apiKeyInput').value = saved ? '●'.repeat(20) : '';
+  document.getElementById('apiKeyStatus').textContent = saved ? '✅ APIキーが保存されています' : '';
+  document.getElementById('apiKeyStatus').style.color = '#1D9E75';
+}
+
+function closeApiModal() {
+  document.getElementById('apiModal').style.display = 'none';
+}
+
+function saveApiKey() {
+  const input = document.getElementById('apiKeyInput');
+  const val = input.value.trim();
+  if (!val || val.startsWith('●')) {
+    document.getElementById('apiKeyStatus').textContent = getApiKey() ? '✅ 既存のキーを使用します' : '❌ APIキーを入力してください';
+    document.getElementById('apiKeyStatus').style.color = getApiKey() ? '#1D9E75' : '#ef4444';
+    return;
+  }
+  if (!val.startsWith('sk-ant-')) {
+    document.getElementById('apiKeyStatus').textContent = '❌ 正しいAnthropicのAPIキーを入力してください（sk-ant- から始まります）';
+    document.getElementById('apiKeyStatus').style.color = '#ef4444';
+    return;
+  }
+  localStorage.setItem(API_KEY_STORAGE, val);
+  document.getElementById('apiKeyStatus').textContent = '✅ 保存しました！';
+  document.getElementById('apiKeyStatus').style.color = '#1D9E75';
+  setTimeout(closeApiModal, 800);
+}
+
+// モーダル外クリックで閉じる
+document.addEventListener('click', e => {
+  const modal = document.getElementById('apiModal');
+  if (e.target === modal) closeApiModal();
+});
 
 const Q_EMOJIS = {
   1: ["☀️","🌤️","☁️","🌧️","⛈️"],
@@ -841,6 +898,12 @@ function renderStep2() {
 }
 
 function goToChat() {
+  if (!getApiKey()) {
+    openApiModal();
+    document.getElementById('apiKeyStatus').textContent = '⚠️ チャットを使うにはAPIキーが必要です';
+    document.getElementById('apiKeyStatus').style.color = '#f59e0b';
+    return;
+  }
   showScreen('screen-step3');
   initChat();
 }
@@ -898,7 +961,7 @@ async function callAI(messages, isInit=false) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
+        'x-api-key': getApiKey(),
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
