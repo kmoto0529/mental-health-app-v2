@@ -130,8 +130,6 @@ textarea:focus { border-color: #1D9E75; }
 .send-btn:disabled { background: #d0d7e8; cursor: not-allowed; transform: none; }
 .human-consult-btn { width: 100%; margin-top: 8px; padding: 10px; background: transparent; border: 1.5px solid #b0b8cc; color: #7a8499; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .human-consult-btn:hover { border-color: #1D9E75; color: #1D9E75; }
-.kiroku-screen { display: none; padding: 20px; }
-.kiroku-screen.active { display: block; }
 .weekly-table-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow-x: auto; }
 .table-title { font-size: 12px; font-weight: 800; color: #1D9E75; letter-spacing: 1px; margin-bottom: 12px; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -153,6 +151,32 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 .empty-state .ei { font-size: 40px; display: block; margin-bottom: 8px; }
 .modal-section-divider { border: none; border-top: 1px solid #e8ecf4; margin: 16px 0; }
 .modal-section-title { font-size: 13px; font-weight: 800; color: #4a5568; margin-bottom: 8px; }
+/* コンテンツ */
+.content-search { width:100%; border:2px solid #e8ecf4; border-radius:14px; padding:11px 14px 11px 38px; font-family:'Nunito',sans-serif; font-size:14px; color:#2d3a50; outline:none; transition:border-color 0.2s; background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238a96aa' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.868-3.834zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") no-repeat 12px center; }
+.content-search:focus { border-color: #1D9E75; }
+.content-card { background:white; border-radius:16px; padding:16px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.06); cursor:pointer; transition:all 0.2s; border-left:4px solid #1D9E75; }
+.content-card:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+.content-card-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.content-tag { font-size:10px; font-weight:800; padding:3px 8px; border-radius:20px; background:#e6f9f2; color:#1D9E75; }
+.content-title { font-size:15px; font-weight:800; color:#2d3a50; }
+.content-desc { font-size:13px; color:#7a8499; line-height:1.5; }
+.content-empty { text-align:center; padding:40px 20px; color:#b0b8cc; font-size:14px; font-weight:700; }
+/* 匿名案内 */
+.anon-notice { background:#f0fdf8; border:1.5px solid #a7f3d0; border-radius:12px; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#065f46; line-height:1.5; font-weight:600; }
+/* 人との相談モード */
+.human-chat-panel { display:none; flex-direction:column; align-items:center; justify-content:center; padding:32px 20px; gap:12px; }
+.human-chat-panel.show { display:flex; }
+.human-chat-panel-icon { font-size:48px; }
+.human-chat-panel-text { font-size:15px; font-weight:700; color:#2d3a50; text-align:center; line-height:1.6; }
+.back-to-ai-btn { width:100%; padding:12px; background:#f0f2f8; color:#4a5568; border:none; border-radius:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:none; margin-top:8px; }
+.back-to-ai-btn.show { display:block; }
+/* 同意ダイアログ */
+.consent-dialog { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; }
+.consent-dialog.show { display:flex; }
+.consent-box { background:white; border-radius:24px; padding:28px 24px; width:calc(100% - 48px); max-width:340px; box-shadow:0 8px 40px rgba(0,0,0,0.2); }
+.consent-title { font-size:17px; font-weight:800; color:#2d3a50; margin-bottom:10px; }
+.consent-text { font-size:13px; color:#7a8499; line-height:1.6; margin-bottom:20px; }
+.consent-btns { display:flex; gap:10px; }
 </style>
 </head>
 <body>
@@ -163,9 +187,11 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
       <button onclick="openApiModal()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">⚙️ 設定</button>
     </div>
     <div class="header-title">今週のきもちチェック🌱</div>
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('check')">チェック</button>
-      <button class="tab-btn" onclick="switchTab('kiroku')">きろく</button>
+    <div class="tabs" style="gap:3px;">
+      <button class="tab-btn active" id="tab-kiroku"   onclick="switchTab('kiroku')"   style="font-size:11px;padding:9px 4px;">きろく</button>
+      <button class="tab-btn"        id="tab-chat"     onclick="switchTab('chat')"     style="font-size:11px;padding:9px 4px;">チャット</button>
+      <button class="tab-btn"        id="tab-contents" onclick="switchTab('contents')" style="font-size:11px;padding:9px 4px;">コンテンツ</button>
+      <button class="tab-btn"        id="tab-history"  onclick="switchTab('history')"  style="font-size:11px;padding:9px 4px;">過去記録</button>
     </div>
   </div>
 
@@ -187,6 +213,14 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
       <div style="font-size:12px;color:#7a8499;margin-bottom:8px;line-height:1.5;">AIの応答スタイル・ルールを編集できます</div>
       <textarea id="promptInput" rows="10" style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:12px;color:#2d3a50;outline:none;resize:vertical;line-height:1.6;box-sizing:border-box;"></textarea>
       <button onclick="resetPrompt()" style="margin-top:6px;padding:6px 14px;background:#f0f2f8;color:#4a5568;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">↩ デフォルトに戻す</button>
+
+      <hr class="modal-section-divider">
+
+      <!-- Crisp ID -->
+      <div class="modal-section-title">💬 Crisp ウェブサイトID（人との相談用）</div>
+      <div style="font-size:12px;color:#7a8499;margin-bottom:8px;line-height:1.5;"><a href="https://app.crisp.chat/" target="_blank" style="color:#1D9E75;">Crisp</a> のウェブサイトIDを入力してください</div>
+      <input id="crispIdInput" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:13px;color:#2d3a50;outline:none;margin-bottom:6px;">
+      <div id="crispIdStatus" style="font-size:12px;min-height:16px;"></div>
 
       <div style="display:flex;gap:10px;margin-top:16px;">
         <button onclick="saveAllSettings()" style="flex:1;padding:13px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">保存する</button>
@@ -258,10 +292,27 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
     <button class="btn-outline" onclick="goToKiroku()">きろくだけ見る</button>
   </div>
 
+  <!-- 同意ダイアログ -->
+  <div class="consent-dialog" id="consentDialog">
+    <div class="consent-box">
+      <div class="consent-title">💬 AIチャットの内容を共有しますか？</div>
+      <div class="consent-text">担当者がより適切にサポートできるよう、これまでのAIとの会話内容を共有することができます。共有しない場合でも相談できます。</div>
+      <div class="consent-btns">
+        <button onclick="startHumanChat(true)"  style="flex:1;padding:12px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;">共有して相談する</button>
+        <button onclick="startHumanChat(false)" style="flex:1;padding:12px;background:#f0f2f8;color:#4a5568;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">共有しない</button>
+      </div>
+      <button onclick="document.getElementById('consentDialog').classList.remove('show')" style="width:100%;margin-top:10px;padding:10px;background:transparent;border:none;color:#b0b8cc;font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+
   <!-- STEP3 -->
   <div class="screen" id="screen-step3">
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages"></div>
+      <div class="human-chat-panel" id="humanChatPanel">
+        <div class="human-chat-panel-icon">👤</div>
+        <div class="human-chat-panel-text">担当者との会話を開始しました。<br>画面右下のチャットアイコンから話しかけてね。</div>
+      </div>
       <div class="crisis-banner" id="crisisBanner">
         <div class="crisis-title">🆘 一人で抱え込まないで</div>
         <div class="crisis-text">今すぐ話せる相談窓口があるよ。<br>よりそいホットライン: 0120-279-338（24時間）</div>
@@ -271,23 +322,28 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
         <div class="escalation-title">⚠️ 先生やスクールカウンセラーへ</div>
         <div class="escalation-text" id="escalationText">この内容は、信頼できる大人に相談することをおすすめするよ。</div>
       </div>
-      <div class="counselor-msg" id="counselorMsg">
-        <div class="counselor-msg-title">👤 相談員への切り替え</div>
-        <div class="counselor-msg-text">人に話したい気持ち、大切にしてね。🌱<br>よりそいホットライン（0120-279-338）やSNS相談など、あなたのペースで使える窓口があるよ。</div>
-      </div>
       <div class="quick-replies" id="quickReplies"></div>
-      <div class="chat-input-area">
+      <div class="chat-input-area" id="aiChatInputArea">
         <div class="chat-input-row">
           <textarea class="chat-input" id="chatInput" rows="1" placeholder="メッセージを入力..." onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
         </div>
-        <button class="human-consult-btn" onclick="showCounselor()">👤 人に相談したい</button>
+        <button class="human-consult-btn" onclick="requestHumanChat()">👤 人に相談したい</button>
+        <button class="back-to-ai-btn" id="backToAiBtn" onclick="backToAiChat()">← AIチャットに戻る</button>
       </div>
     </div>
   </div>
 
-  <!-- KIROKU TAB -->
-  <div class="kiroku-screen" id="screen-kiroku">
+  <!-- CONTENTS TAB -->
+  <div class="screen" id="screen-contents">
+    <div style="padding:4px 0 12px;">
+      <input class="content-search" id="contentSearch" type="text" placeholder="検索..." oninput="filterContents(this.value)">
+    </div>
+    <div id="contentsList"></div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="screen" id="screen-history">
     <div class="weekly-table-card">
       <div class="table-title">✦ WEEKLY SUMMARY</div>
       <table>
@@ -301,9 +357,24 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 
 <script>
 // ─── 定数 ───────────────────────────────────────────
-const STORAGE_KEY     = "mh_v2_records";
-const API_KEY_STORAGE = "mh_v2_api_key";
-const PROMPT_STORAGE  = "mh_v2_system_prompt";
+const STORAGE_KEY      = "mh_v2_records";
+const API_KEY_STORAGE  = "mh_v2_api_key";
+const PROMPT_STORAGE   = "mh_v2_system_prompt";
+const CRISP_ID_STORAGE = "mh_v2_crisp_id";
+
+// ─── コンテンツデータ ─────────────────────────────────
+const CONTENTS_DATA = [
+  { id:1, tag:'友達関係', title:'友達とうまくいかないとき', desc:'グループでの疎外感、友達との喧嘩、距離の置き方。人間関係のもやもやを整理するヒント。' },
+  { id:2, tag:'勉強・受験', title:'やる気が出ないときの乗り越え方', desc:'「やらなきゃ」と思うほど動けない悪循環を断ち切る、小さな一歩の見つけ方。' },
+  { id:3, tag:'睡眠', title:'眠れない夜の対処法', desc:'スマホ依存、夜更かし、朝起きられない……睡眠の質を上げる実践的な方法。' },
+  { id:4, tag:'ストレス', title:'ストレスをため込まないために', desc:'感情の名前をつけること、日常でできる発散法、心が楽になるセルフケア。' },
+  { id:5, tag:'受験・テスト', title:'試験のプレッシャーとの向き合い方', desc:'不安な気持ちはむしろ正常。プレッシャーを味方にする考え方と準備の仕方。' },
+  { id:6, tag:'家族', title:'親との関係が難しいと感じたら', desc:'価値観のぶつかり、過干渉、伝わらない気持ち。親との距離感を考えるヒント。' },
+  { id:7, tag:'SNS・スマホ', title:'SNSとの上手な付き合い方', desc:'比べてしまう、通知が気になる、やめられない。スマホと健全な距離を保つ方法。' },
+  { id:8, tag:'自己肯定感', title:'自分に自信が持てないと感じたら', desc:'自分を責めすぎてしまう人へ。自己評価の歪みに気づいて、ありのままを認めるヒント。' },
+  { id:9, tag:'将来・進路', title:'将来が不安でたまらないとき', desc:'進路、就職、大学……「正解」がわからない不安と向き合う方法。焦らなくていい理由。' },
+  { id:10, tag:'気分の落ち込み', title:'気分が落ち込んでいるとき', desc:'何もしたくない、涙が出る、理由がわからない憂うつ。気持ちが沈む日の過ごし方。' },
+];
 
 // ─── デフォルトシステムプロンプト ─────────────────────
 const DEFAULT_SYSTEM_PROMPT = `あなたは高校生向けのメンタルサポートAIです。
@@ -367,6 +438,7 @@ const DEFAULT_SYSTEM_PROMPT = `あなたは高校生向けのメンタルサポ�
 // ─── ストレージ ───────────────────────────────────────
 function getApiKey()      { return localStorage.getItem(API_KEY_STORAGE) || ""; }
 function getSystemPrompt(){ return localStorage.getItem(PROMPT_STORAGE) || DEFAULT_SYSTEM_PROMPT; }
+function getCrispId()     { return localStorage.getItem(CRISP_ID_STORAGE) || ""; }
 
 // ─── 設定モーダル ─────────────────────────────────────
 function openApiModal() {
@@ -377,6 +449,9 @@ function openApiModal() {
   document.getElementById('apiKeyStatus').textContent = savedKey ? '✅ 保存済み' : '';
   document.getElementById('apiKeyStatus').style.color = '#1D9E75';
   document.getElementById('promptInput').value = getSystemPrompt();
+  const crispId = getCrispId();
+  document.getElementById('crispIdInput').value = crispId ? '●'.repeat(20) : '';
+  document.getElementById('crispIdStatus').textContent = crispId ? '✅ 保存済み' : '';
 }
 
 function closeApiModal() {
@@ -399,6 +474,12 @@ function saveAllSettings() {
   // システムプロンプト
   const promptVal = document.getElementById('promptInput').value.trim();
   if (promptVal) localStorage.setItem(PROMPT_STORAGE, promptVal);
+  // Crisp ID
+  const crispVal = document.getElementById('crispIdInput').value.trim();
+  if (crispVal && !crispVal.startsWith('●')) {
+    localStorage.setItem(CRISP_ID_STORAGE, crispVal);
+    document.getElementById('crispIdStatus').textContent = '✅ 保存しました';
+  }
   setTimeout(closeApiModal, 400);
 }
 
@@ -437,18 +518,27 @@ function init() {
   const d = new Date();
   document.getElementById('headerDate').textContent =
     d.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  // screen-step1をデフォルト表示（きろくタブに対応）
+  document.getElementById('screen-step1').classList.add('active');
 }
 
 // ─── タブ切り替え ────────────────────────────────────
 function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) =>
-    b.classList.toggle('active', (tab==='check' && i===0)||(tab==='kiroku' && i===1)));
-  document.querySelectorAll('.screen, .kiroku-screen').forEach(s => s.classList.remove('active'));
+  ['kiroku','chat','contents','history'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+  });
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   if (tab === 'kiroku') {
-    document.getElementById('screen-kiroku').classList.add('active');
-    renderKiroku();
-  } else {
     document.getElementById('screen-step1').classList.add('active');
+  } else if (tab === 'chat') {
+    document.getElementById('screen-step3').classList.add('active');
+    if (chatHistory.length === 0) initChat();
+  } else if (tab === 'contents') {
+    document.getElementById('screen-contents').classList.add('active');
+    renderContents('');
+  } else if (tab === 'history') {
+    document.getElementById('screen-history').classList.add('active');
+    renderKiroku();
   }
 }
 
@@ -536,19 +626,27 @@ function goToChat() {
     document.getElementById('apiKeyStatus').style.color = '#f59e0b';
     return;
   }
-  showScreen('screen-step3');
-  initChat();
+  switchTab('chat');
 }
 
-function goToKiroku() { switchTab('kiroku'); }
+function goToKiroku() { switchTab('history'); }
 
 // ─── STEP3 チャット ───────────────────────────────────
 function initChat() {
   chatHistory = [];
-  document.getElementById('chatMessages').innerHTML = '';
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML = '';
+  // 匿名案内
+  const notice = document.createElement('div');
+  notice.className = 'anon-notice';
+  notice.textContent = '🔒 この相談は匿名で、個人が特定されることはありません。安心して話してくださいね。';
+  msgs.appendChild(notice);
   document.getElementById('crisisBanner').classList.remove('show');
   document.getElementById('escalationBanner').classList.remove('show');
-  document.getElementById('counselorMsg').classList.remove('show');
+  // 人チャットモードをリセット
+  document.getElementById('aiChatInputArea').style.display = '';
+  document.getElementById('humanChatPanel').classList.remove('show');
+  document.getElementById('backToAiBtn').classList.remove('show');
 
   // Groqで初回声かけを生成
   const q1e = Q_EMOJIS[1][answers.q1];
@@ -622,7 +720,7 @@ async function callGroq(messages) {
     const text = data.choices?.[0]?.message?.content || 'ごめんね、うまく返事できなかった。';
     addAIMessage(text);
     chatHistory.push({ role: 'assistant', content: text });
-    updateQuickRepliesAfterAI();
+    updateQuickRepliesAfterAI(text);
   } catch(e) {
     hideTyping();
     addAIMessage('🌐 ネットワークエラーが発生したよ。');
@@ -682,22 +780,107 @@ function setQuickReplies(replies) {
     replies.map(r => `<button class="quick-btn" onclick="sendMessage('${r.replace(/'/g,"\\'")}')">${r}</button>`).join('');
 }
 
-function updateQuickRepliesAfterAI() {
-  const pools = [
-    ["うん、もっと話したい", "ありがとう、楽になった", "具体的に教えて"],
-    ["学校がしんどい", "友達のことで悩んでる", "眠れない夜が続いてる"],
-    ["もう少し聞いて", "大丈夫、ちょっと楽になった", "人に相談したい"]
-  ];
-  setQuickReplies(pools[Math.floor(Math.random() * pools.length)]);
+async function updateQuickRepliesAfterAI(lastAiText) {
+  // AIの返答を元に次の返答候補を動的生成
+  if (!lastAiText || !getApiKey()) {
+    setQuickReplies(["もう少し話したい", "大丈夫、ちょっと楽になった", "人に相談したい"]);
+    return;
+  }
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getApiKey()}` },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: 'AIの発言に対して、ユーザー（高校生）が次に言いそうな自然な返答候補を3つ生成してください。各候補は20文字以内の短い日本語フレーズ。カンマ区切りのみで返す。説明不要。例：うん、もっと話したい,ありがとう楽になった,具体的に教えて' },
+          { role: 'user', content: `AI:「${lastAiText.slice(0, 100)}」` }
+        ],
+        max_tokens: 80, temperature: 0.7
+      })
+    });
+    const data = await res.json();
+    const raw = (data.choices?.[0]?.message?.content || '').trim();
+    const suggestions = raw.split(',').map(s => s.trim()).filter(s => s.length > 0 && s.length <= 25).slice(0, 3);
+    if (suggestions.length >= 2) { setQuickReplies(suggestions); return; }
+  } catch(e) { /* fallback */ }
+  setQuickReplies(["もう少し話したい", "大丈夫、ちょっと楽になった", "人に相談したい"]);
 }
 
-function showCounselor() {
-  document.getElementById('counselorMsg').classList.add('show');
+function requestHumanChat() {
+  document.getElementById('consentDialog').classList.add('show');
+}
+
+function startHumanChat(shareHistory) {
+  document.getElementById('consentDialog').classList.remove('show');
+  const crispId = getCrispId();
+  if (!crispId) {
+    alert('担当者チャットの設定がまだ完了していません。⚙️設定からCrisp IDを入力してください。');
+    return;
+  }
+  // Crisp読み込み（未読み込みの場合）
+  if (!window.$crisp) {
+    window.$crisp = [];
+    window.CRISP_WEBSITE_ID = crispId;
+    const s = document.createElement('script');
+    s.src = 'https://client.crisp.chat/l.js';
+    s.async = true;
+    document.head.appendChild(s);
+  }
+  // 履歴共有
+  if (shareHistory && chatHistory.length > 0) {
+    const histText = chatHistory.map(m => `${m.role === 'user' ? 'ユーザー' : 'AI'}: ${m.content}`).join('\n');
+    window.$crisp.push(['do', 'message:send', ['text', `【AIチャット履歴】\n${histText}`]]);
+  }
+  window.$crisp.push(['do', 'chat:open']);
+  // UIを切り替え
+  document.getElementById('aiChatInputArea').style.display = 'none';
+  document.getElementById('quickReplies').innerHTML = '';
+  document.getElementById('humanChatPanel').classList.add('show');
+  document.getElementById('backToAiBtn').classList.add('show');
   scrollChat();
+}
+
+function backToAiChat() {
+  if (window.$crisp) window.$crisp.push(['do', 'chat:hide']);
+  document.getElementById('aiChatInputArea').style.display = '';
+  document.getElementById('humanChatPanel').classList.remove('show');
+  document.getElementById('backToAiBtn').classList.remove('show');
 }
 
 function escapeHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ─── コンテンツ ──────────────────────────────────────
+function renderContents(query) {
+  const q = query.toLowerCase();
+  const filtered = CONTENTS_DATA.filter(c =>
+    !q || c.title.includes(q) || c.desc.includes(q) || c.tag.includes(q)
+  );
+  const el = document.getElementById('contentsList');
+  if (!filtered.length) {
+    el.innerHTML = `<div class="content-empty">「${query}」に一致するコンテンツが見つかりませんでした</div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(c => `
+    <div class="content-card" onclick="openContent(${c.id})">
+      <div class="content-card-header">
+        <span class="content-tag">${c.tag}</span>
+      </div>
+      <div class="content-title">${c.title}</div>
+      <div class="content-desc">${c.desc}</div>
+    </div>`).join('');
+}
+
+function filterContents(val) { renderContents(val); }
+
+function openContent(id) {
+  const c = CONTENTS_DATA.find(x => x.id === id);
+  if (!c) return;
+  // 将来的には詳細画面へ遷移。現状はチャットに話題として渡す
+  switchTab('chat');
+  setTimeout(() => sendMessage(`「${c.title}」について教えて`), 300);
 }
 
 // ─── きろく ───────────────────────────────────────────
