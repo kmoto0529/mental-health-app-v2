@@ -966,7 +966,7 @@ async function callAI(messages, isInit=false) {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 512,
         system: systemPrompt,
         messages: messages
@@ -974,6 +974,18 @@ async function callAI(messages, isInit=false) {
     });
     const data = await res.json();
     hideTyping();
+    if (!res.ok) {
+      const errMsg = data.error?.message || `エラー ${res.status}`;
+      if (res.status === 401) {
+        addAIMessage('❌ APIキーが正しくないみたい。右上の⚙️からキーを確認してね。');
+      } else if (res.status === 429) {
+        addAIMessage('⏳ 少し使いすぎたみたい。しばらく待ってからまた話しかけてね。');
+      } else {
+        addAIMessage(`❌ エラーが起きたよ（${errMsg}）。右上の⚙️でAPIキーを確認してね。`);
+      }
+      console.error('API Error:', data);
+      return;
+    }
     const text = data.content?.[0]?.text || 'ごめんね、うまく返事できなかった。もう一度話しかけてみて。';
     addAIMessage(text);
     chatHistory.push({ role:'assistant', content: text });
@@ -981,7 +993,8 @@ async function callAI(messages, isInit=false) {
     updateQuickRepliesAfterAI();
   } catch(e) {
     hideTyping();
-    addAIMessage('ネットワークエラーが発生したよ。もう一度試してみてね。');
+    console.error('Network Error:', e);
+    addAIMessage('🌐 ネットワークエラーが発生したよ。インターネット接続を確認してね。');
   }
 }
 
