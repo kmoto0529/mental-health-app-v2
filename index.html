@@ -592,8 +592,8 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
   <div id="apiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;">
     <div style="background:white;border-radius:24px;padding:28px 24px;width:calc(100% - 48px);max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
       <div style="font-size:20px;font-weight:800;color:#2d3a50;margin-bottom:8px;">🔑 APIキー設定</div>
-      <div style="font-size:13px;color:#7a8499;margin-bottom:16px;line-height:1.6;">Google Gemini APIキーを入力してください。<br><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1D9E75;">aistudio.google.com</a> で無料取得できます。<br>キーはこのブラウザのみに保存されます。</div>
-      <input id="apiKeyInput" type="password" placeholder="AIza..." style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#2d3a50;outline:none;margin-bottom:8px;">
+      <div style="font-size:13px;color:#7a8499;margin-bottom:16px;line-height:1.6;">Groq APIキーを入力してください。<br><a href="https://console.groq.com/keys" target="_blank" style="color:#1D9E75;">console.groq.com</a> で無料取得できます。<br>キーはこのブラウザのみに保存されます。</div>
+      <input id="apiKeyInput" type="password" placeholder="gsk_..." style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#2d3a50;outline:none;margin-bottom:8px;">
       <div id="apiKeyStatus" style="font-size:12px;margin-bottom:16px;min-height:18px;"></div>
       <div style="display:flex;gap:10px;">
         <button onclick="saveApiKey()" style="flex:1;padding:13px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">保存する</button>
@@ -748,8 +748,8 @@ function saveApiKey() {
     document.getElementById('apiKeyStatus').style.color = getApiKey() ? '#1D9E75' : '#ef4444';
     return;
   }
-  if (!val.startsWith('AIza')) {
-    document.getElementById('apiKeyStatus').textContent = '❌ 正しいGemini APIキーを入力してください（AIza から始まります）';
+  if (!val.startsWith('gsk_')) {
+    document.getElementById('apiKeyStatus').textContent = '❌ 正しいGroq APIキーを入力してください（gsk_ から始まります）';
     document.getElementById('apiKeyStatus').style.color = '#ef4444';
     return;
   }
@@ -956,46 +956,40 @@ function buildChangeSummary() {
 async function callAI(messages, isInit=false) {
   const systemPrompt = `あなたは中高生向けのデジタルメンタルヘルス支援アプリ内で動作するAIサポーターです。ユーザーが安心して気持ちを言葉にできるよう支援し、自己理解を深め、必要に応じて人による相談や適切な情報へ自然につなぐことが目的です。AIはサポート役であり診断や断定はしない。優しく否定せず上から目線にならない。説教しない。長すぎずわかりやすく返す。質問は1〜2個に絞る。返答は3〜5文程度。やさしくフレンドリーで中高生が自然に受け取れる言葉。`;
 
-  // system_instructionをコンテンツに埋め込む方式（互換性向上）
-  const geminiMessages = [
-    { role: 'user', parts: [{ text: `[システム指示]\n${systemPrompt}\n\n[ユーザーメッセージ]\n${messages[0]?.content || ''}` }] },
-    ...messages.slice(1).map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }))
+  const groqMessages = [
+    { role: 'system', content: systemPrompt },
+    ...messages
   ];
 
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${getApiKey()}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: geminiMessages,
-          generationConfig: { maxOutputTokens: 512 }
-        })
-      }
-    );
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getApiKey()}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: groqMessages,
+        max_tokens: 512
+      })
+    });
     const data = await res.json();
     hideTyping();
     if (!res.ok) {
       const errMsg = data.error?.message || `不明なエラー`;
-      const errStatus = data.error?.status || '';
       const status = res.status;
       console.error('API Error:', status, JSON.stringify(data));
-      if (status === 400) {
-        addAIMessage(`❌ リクエストエラー(400)：${errMsg}`);
-      } else if (status === 401 || status === 403) {
-        addAIMessage(`❌ 認証エラー(${status})：APIキーを⚙️から再設定してね。`);
+      if (status === 401) {
+        addAIMessage(`❌ 認証エラー：APIキーを⚙️から再設定してね。`);
       } else if (status === 429) {
-        addAIMessage(`⏳ 429 ${errStatus}：${errMsg}`);
+        addAIMessage(`⏳ 少し使いすぎたみたい。しばらく待ってからまた話しかけてね。`);
       } else {
-        addAIMessage(`❌ エラー ${status} ${errStatus}：${errMsg}`);
+        addAIMessage(`❌ エラー ${status}：${errMsg}`);
       }
       return;
     }
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'ごめんね、うまく返事できなかった。もう一度話しかけてみて。';
+    const text = data.choices?.[0]?.message?.content || 'ごめんね、うまく返事できなかった。もう一度話しかけてみて。';
     addAIMessage(text);
     chatHistory.push({ role: 'assistant', content: text });
     checkCrisisKeywords(text);
