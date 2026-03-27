@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>きもちチェック</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -24,554 +25,140 @@ body {
   position: relative;
   overflow: hidden;
 }
-
-/* HEADER */
 .header {
   background: linear-gradient(135deg, #1D9E75, #085041);
   padding: 20px 20px 0;
   color: white;
 }
-.header-date {
-  font-size: 12px;
-  opacity: 0.85;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-.header-title {
-  font-size: 20px;
-  font-weight: 800;
-  margin: 4px 0 16px;
-}
-.tabs {
-  display: flex;
-  gap: 4px;
-}
+.header-date { font-size: 12px; opacity: 0.85; font-weight: 600; letter-spacing: 0.5px; }
+.header-title { font-size: 20px; font-weight: 800; margin: 4px 0 16px; }
+.tabs { display: flex; gap: 4px; }
 .tab-btn {
-  flex: 1;
-  padding: 10px 8px;
-  border: none;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  font-family: 'Nunito', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  border-radius: 12px 12px 0 0;
-  cursor: pointer;
-  transition: background 0.2s;
+  flex: 1; padding: 10px 8px; border: none;
+  background: rgba(255,255,255,0.15); color: white;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+  border-radius: 12px 12px 0 0; cursor: pointer; transition: background 0.2s;
 }
-.tab-btn.active {
-  background: #eef2ff;
-  color: #085041;
-}
-
-/* SCREENS */
+.tab-btn.active { background: #eef2ff; color: #085041; }
 .screen { display: none; padding: 20px; }
 .screen.active { display: block; }
-
-/* PROGRESS BARS */
-.progress-section {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 24px;
-}
-.progress-bar {
-  flex: 1;
-  height: 6px;
-  background: #dde3f0;
-  border-radius: 3px;
-  overflow: hidden;
-  transition: background 0.4s;
-}
+.progress-section { display: flex; gap: 6px; margin-bottom: 24px; }
+.progress-bar { flex: 1; height: 6px; background: #dde3f0; border-radius: 3px; overflow: hidden; transition: background 0.4s; }
 .progress-bar.done { background: #1D9E75; }
-
-/* QUESTION CARD */
-.q-card {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-}
-.q-label {
-  font-size: 15px;
-  font-weight: 700;
-  color: #2d3a50;
-  margin-bottom: 14px;
-}
-.emoji-options {
-  display: flex;
-  gap: 6px;
-  justify-content: space-between;
-}
+.q-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.q-label { font-size: 15px; font-weight: 700; color: #2d3a50; margin-bottom: 14px; }
+.emoji-options { display: flex; gap: 6px; justify-content: space-between; }
 .emoji-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 4px;
-  border: 2px solid #e8ecf4;
-  border-radius: 14px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Nunito', sans-serif;
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 4px; border: 2px solid #e8ecf4; border-radius: 14px;
+  background: white; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif;
 }
 .emoji-btn .emoji { font-size: 22px; line-height: 1; }
 .emoji-btn .label { font-size: 9.5px; font-weight: 700; color: #8a96aa; text-align: center; line-height: 1.2; }
 .emoji-btn:hover { border-color: #1D9E75; background: #f0fdf8; }
 .emoji-btn.selected { border-color: #1D9E75; background: #e6f9f2; }
 .emoji-btn.selected .label { color: #1D9E75; }
-
-/* COMMENT BOX */
-.comment-card {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-}
-.comment-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: #2d3a50;
-  margin-bottom: 10px;
-}
+.comment-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.comment-label { font-size: 14px; font-weight: 700; color: #2d3a50; margin-bottom: 10px; }
 .comment-label span { margin-right: 6px; }
-textarea {
-  width: 100%;
-  border: 2px solid #e8ecf4;
-  border-radius: 12px;
-  padding: 12px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px;
-  color: #2d3a50;
-  resize: none;
-  outline: none;
-  transition: border-color 0.2s;
-}
+textarea { width: 100%; border: 2px solid #e8ecf4; border-radius: 12px; padding: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; color: #2d3a50; resize: none; outline: none; transition: border-color 0.2s; }
 textarea:focus { border-color: #1D9E75; }
-
-/* SUBMIT BTN */
-.submit-btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 20px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.submit-btn.inactive {
-  background: #d0d7e8;
-  color: #8a96aa;
-  cursor: not-allowed;
-}
-.submit-btn.active-btn {
-  background: linear-gradient(135deg, #1D9E75, #0d7055);
-  color: white;
-  box-shadow: 0 4px 16px rgba(29,158,117,0.35);
-}
-.submit-btn.active-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(29,158,117,0.45); }
-
-/* STEP2 */
-.step2-success {
-  text-align: center;
-  padding: 24px 0 16px;
-}
+.submit-btn { width: 100%; padding: 16px; border: none; border-radius: 20px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.3s; }
+.submit-btn.inactive { background: #d0d7e8; color: #8a96aa; cursor: not-allowed; }
+.submit-btn.active-btn { background: linear-gradient(135deg, #1D9E75, #0d7055); color: white; box-shadow: 0 4px 16px rgba(29,158,117,0.35); }
+.submit-btn.active-btn:hover { transform: translateY(-2px); }
+.step2-success { text-align: center; padding: 24px 0 16px; }
 .step2-icon { font-size: 48px; }
 .step2-title { font-size: 22px; font-weight: 800; color: #2d3a50; margin-top: 8px; }
 .step2-sub { font-size: 13px; color: #7a8499; margin-top: 4px; }
-
-.compare-card {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-}
-.compare-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #8a96aa;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-bottom: 14px;
-}
-.compare-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 10px;
-}
+.compare-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.compare-title { font-size: 13px; font-weight: 700; color: #8a96aa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+.compare-row { display: flex; align-items: center; margin-bottom: 12px; gap: 10px; }
 .compare-row:last-child { margin-bottom: 0; }
 .compare-icon { font-size: 16px; width: 20px; }
 .compare-label { font-size: 13px; font-weight: 700; color: #4a5568; width: 50px; }
-.compare-emojis {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
+.compare-emojis { display: flex; align-items: center; gap: 8px; flex: 1; }
 .compare-emojis .prev { font-size: 22px; opacity: 0.5; }
 .compare-emojis .arrow { font-size: 14px; color: #b0b8cc; }
 .compare-emojis .curr { font-size: 22px; }
-.badge {
-  font-size: 10px;
-  font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 20px;
-  margin-left: auto;
-}
+.badge { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px; margin-left: auto; }
 .badge.improved { background: #e6f9f2; color: #1D9E75; }
 .badge.changed { background: #fff7e6; color: #f59e0b; }
 .badge.same { background: #f0f2f8; color: #8a96aa; }
-
-.comment-display {
-  background: white;
-  border-radius: 20px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  font-size: 14px;
-  color: #4a5568;
-}
-.comment-display .clabel {
-  font-size: 12px;
-  font-weight: 700;
-  color: #8a96aa;
-  margin-bottom: 6px;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #1D9E75, #0d7055);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 16px rgba(29,158,117,0.3);
-  transition: all 0.2s;
-}
+.comment-display { background: white; border-radius: 20px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); font-size: 14px; color: #4a5568; }
+.comment-display .clabel { font-size: 12px; font-weight: 700; color: #8a96aa; margin-bottom: 6px; }
+.btn-primary { width: 100%; padding: 16px; background: linear-gradient(135deg, #1D9E75, #0d7055); color: white; border: none; border-radius: 20px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; margin-bottom: 12px; box-shadow: 0 4px 16px rgba(29,158,117,0.3); transition: all 0.2s; }
 .btn-primary:hover { transform: translateY(-2px); }
-.btn-outline {
-  width: 100%;
-  padding: 14px;
-  background: white;
-  color: #1D9E75;
-  border: 2px solid #1D9E75;
-  border-radius: 20px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+.btn-outline { width: 100%; padding: 14px; background: white; color: #1D9E75; border: 2px solid #1D9E75; border-radius: 20px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .btn-outline:hover { background: #f0fdf8; }
-
-/* STEP3 CHAT */
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 130px);
-}
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.msg-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-}
+.chat-container { display: flex; flex-direction: column; height: calc(100vh - 130px); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 8px 0 12px; display: flex; flex-direction: column; gap: 12px; }
+.msg-row { display: flex; align-items: flex-end; gap: 8px; }
 .msg-row.user { flex-direction: row-reverse; }
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1D9E75, #085041);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-.bubble {
-  max-width: 75%;
-  padding: 12px 16px;
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.6;
-  font-weight: 600;
-}
-.bubble.ai {
-  background: white;
-  color: #2d3a50;
-  border-bottom-left-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-}
-.bubble.user {
-  background: linear-gradient(135deg, #1D9E75, #0d7055);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-/* TYPING INDICATOR */
-.typing-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.typing-dots {
-  display: flex;
-  gap: 4px;
-  padding: 12px 16px;
-  background: white;
-  border-radius: 18px;
-  border-bottom-left-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-}
-.dot {
-  width: 8px;
-  height: 8px;
-  background: #b0b8cc;
-  border-radius: 50%;
-  animation: bounce 1.2s infinite;
-}
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #1D9E75, #085041); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.6; font-weight: 600; }
+.bubble.ai { background: white; color: #2d3a50; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+.bubble.user { background: linear-gradient(135deg, #1D9E75, #0d7055); color: white; border-bottom-right-radius: 4px; }
+.qa-badge { font-size: 10px; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 10px; margin-top: 4px; display: inline-block; }
+.msg-col { display: flex; flex-direction: column; align-items: flex-start; max-width: 75%; }
+.typing-indicator { display: flex; align-items: center; gap: 8px; }
+.typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 18px; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+.dot { width: 8px; height: 8px; background: #b0b8cc; border-radius: 50%; animation: bounce 1.2s infinite; }
 .dot:nth-child(2) { animation-delay: 0.2s; }
 .dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
-}
-
-/* QUICK REPLIES */
-.quick-replies {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 0;
-}
-.quick-btn {
-  padding: 8px 14px;
-  background: white;
-  border: 2px solid #1D9E75;
-  color: #1D9E75;
-  border-radius: 20px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
+@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+.quick-replies { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 0; }
+.quick-btn { padding: 8px 14px; background: white; border: 2px solid #1D9E75; color: #1D9E75; border-radius: 20px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .quick-btn:hover { background: #1D9E75; color: white; }
-
-/* CRISIS BANNER */
-.crisis-banner {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 12px;
-  color: white;
-  display: none;
-}
+.crisis-banner { background: linear-gradient(135deg, #ff6b6b, #ee5a24); border-radius: 16px; padding: 16px; margin-bottom: 12px; color: white; display: none; }
 .crisis-banner.show { display: block; }
 .crisis-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
 .crisis-text { font-size: 13px; opacity: 0.95; line-height: 1.5; margin-bottom: 10px; }
-.crisis-btn {
-  background: white;
-  color: #ee5a24;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-/* COUNSELOR MSG */
-.counselor-msg {
-  background: #fff7e6;
-  border: 2px solid #f59e0b;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 12px;
-  display: none;
-}
+.crisis-btn { background: white; color: #ee5a24; border: none; padding: 10px 20px; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
+.escalation-banner { background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 16px; padding: 16px; margin-bottom: 12px; color: white; display: none; }
+.escalation-banner.show { display: block; }
+.escalation-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+.escalation-text { font-size: 13px; opacity: 0.95; line-height: 1.5; }
+.counselor-msg { background: #fff7e6; border: 2px solid #f59e0b; border-radius: 16px; padding: 16px; margin-bottom: 12px; display: none; }
 .counselor-msg.show { display: block; }
 .counselor-msg-title { font-size: 14px; font-weight: 800; color: #b45309; margin-bottom: 6px; }
 .counselor-msg-text { font-size: 13px; color: #78350f; line-height: 1.5; }
-
-/* CHAT INPUT */
-.chat-input-area {
-  padding-top: 10px;
-  border-top: 1px solid #e8ecf4;
-}
-.chat-input-row {
-  display: flex;
-  gap: 10px;
-  align-items: flex-end;
-}
-.chat-input {
-  flex: 1;
-  border: 2px solid #e8ecf4;
-  border-radius: 16px;
-  padding: 12px 14px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px;
-  color: #2d3a50;
-  outline: none;
-  resize: none;
-  max-height: 100px;
-  transition: border-color 0.2s;
-  line-height: 1.5;
-}
+.chat-input-area { padding-top: 10px; border-top: 1px solid #e8ecf4; }
+.chat-input-row { display: flex; gap: 10px; align-items: flex-end; }
+.chat-input { flex: 1; border: 2px solid #e8ecf4; border-radius: 16px; padding: 12px 14px; font-family: 'Nunito', sans-serif; font-size: 14px; color: #2d3a50; outline: none; resize: none; max-height: 100px; transition: border-color 0.2s; line-height: 1.5; }
 .chat-input:focus { border-color: #1D9E75; }
-.send-btn {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #1D9E75, #0d7055);
-  border: none;
-  border-radius: 14px;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.2s;
-}
+.send-btn { width: 44px; height: 44px; background: linear-gradient(135deg, #1D9E75, #0d7055); border: none; border-radius: 14px; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
 .send-btn:hover { transform: scale(1.05); }
 .send-btn:disabled { background: #d0d7e8; cursor: not-allowed; transform: none; }
-
-/* HUMAN CONSULT BTN */
-.human-consult-btn {
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px;
-  background: transparent;
-  border: 1.5px solid #b0b8cc;
-  color: #7a8499;
-  border-radius: 12px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+.human-consult-btn { width: 100%; margin-top: 8px; padding: 10px; background: transparent; border: 1.5px solid #b0b8cc; color: #7a8499; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .human-consult-btn:hover { border-color: #1D9E75; color: #1D9E75; }
-
-/* KIROKU TAB */
 .kiroku-screen { display: none; padding: 20px; }
 .kiroku-screen.active { display: block; }
-
-.weekly-table-card {
-  background: white;
-  border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  overflow-x: auto;
-}
-.table-title {
-  font-size: 12px;
-  font-weight: 800;
-  color: #1D9E75;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-th {
-  text-align: center;
-  font-weight: 800;
-  color: #8a96aa;
-  padding: 6px 4px;
-  font-size: 11px;
-}
-td {
-  text-align: center;
-  padding: 8px 4px;
-  font-size: 18px;
-}
-td.row-label {
-  text-align: left;
-  font-size: 12px;
-  font-weight: 700;
-  color: #4a5568;
-  white-space: nowrap;
-}
+.weekly-table-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow-x: auto; }
+.table-title { font-size: 12px; font-weight: 800; color: #1D9E75; letter-spacing: 1px; margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: center; font-weight: 800; color: #8a96aa; padding: 6px 4px; font-size: 11px; }
+td { text-align: center; padding: 8px 4px; font-size: 18px; }
+td.row-label { text-align: left; font-size: 12px; font-weight: 700; color: #4a5568; white-space: nowrap; }
 tr.this-week td { background: #f0fdf8; }
 tr.this-week td:first-child { border-radius: 8px 0 0 8px; }
 tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
-.star-badge { font-size: 10px; color: #1D9E75; }
-
-.week-detail-card {
-  background: white;
-  border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  border-left: 5px solid #1D9E75;
-}
+.week-detail-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-left: 5px solid #1D9E75; }
 .week-detail-card.prev { border-left-color: #94a3b8; }
 .week-detail-card.prev2 { border-left-color: #cbd5e1; }
-.week-detail-label {
-  font-size: 11px;
-  font-weight: 800;
-  color: #8a96aa;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-bottom: 8px;
-}
-.week-detail-emojis {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-.week-emoji-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #4a5568;
-}
+.week-detail-label { font-size: 11px; font-weight: 800; color: #8a96aa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.week-detail-emojis { display: flex; gap: 16px; margin-bottom: 8px; }
+.week-emoji-item { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: #4a5568; }
 .week-emoji-item .ei { font-size: 20px; }
-.week-detail-comment {
-  font-size: 13px;
-  color: #7a8499;
-  border-top: 1px solid #f0f2f8;
-  padding-top: 8px;
-  margin-top: 4px;
-  line-height: 1.5;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 32px 16px;
-  color: #b0b8cc;
-  font-size: 14px;
-  font-weight: 700;
-}
+.week-detail-comment { font-size: 13px; color: #7a8499; border-top: 1px solid #f0f2f8; padding-top: 8px; margin-top: 4px; line-height: 1.5; }
+.empty-state { text-align: center; padding: 32px 16px; color: #b0b8cc; font-size: 14px; font-weight: 700; }
 .empty-state .ei { font-size: 40px; display: block; margin-bottom: 8px; }
+.modal-section-divider { border: none; border-top: 1px solid #e8ecf4; margin: 16px 0; }
+.modal-section-title { font-size: 13px; font-weight: 800; color: #4a5568; margin-bottom: 8px; }
+.qa-status { font-size: 12px; padding: 6px 10px; border-radius: 8px; margin-top: 8px; }
+.qa-status.loaded { background: #e6f9f2; color: #1D9E75; }
+.qa-status.loading { background: #f0f2f8; color: #8a96aa; }
+.qa-status.error { background: #fef2f2; color: #ef4444; }
 </style>
 </head>
 <body>
@@ -579,7 +166,7 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
   <div class="header">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div class="header-date" id="headerDate"></div>
-      <button onclick="openApiModal()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">⚙️ API設定</button>
+      <button onclick="openApiModal()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">⚙️ 設定</button>
     </div>
     <div class="header-title">今週のきもちチェック🌱</div>
     <div class="tabs">
@@ -588,15 +175,28 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
     </div>
   </div>
 
-  <!-- API KEY MODAL -->
-  <div id="apiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;">
-    <div style="background:white;border-radius:24px;padding:28px 24px;width:calc(100% - 48px);max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
-      <div style="font-size:20px;font-weight:800;color:#2d3a50;margin-bottom:8px;">🔑 APIキー設定</div>
-      <div style="font-size:13px;color:#7a8499;margin-bottom:16px;line-height:1.6;">Groq APIキーを入力してください。<br><a href="https://console.groq.com/keys" target="_blank" style="color:#1D9E75;">console.groq.com</a> で無料取得できます。<br>キーはこのブラウザのみに保存されます。</div>
-      <input id="apiKeyInput" type="password" placeholder="gsk_..." style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#2d3a50;outline:none;margin-bottom:8px;">
-      <div id="apiKeyStatus" style="font-size:12px;margin-bottom:16px;min-height:18px;"></div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="saveApiKey()" style="flex:1;padding:13px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">保存する</button>
+  <!-- SETTINGS MODAL -->
+  <div id="apiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:24px;padding:28px 24px;width:calc(100% - 48px);max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
+      <div style="font-size:20px;font-weight:800;color:#2d3a50;margin-bottom:16px;">⚙️ 設定</div>
+
+      <!-- Groq API Key -->
+      <div class="modal-section-title">🤖 Groq APIキー</div>
+      <div style="font-size:12px;color:#7a8499;margin-bottom:8px;line-height:1.5;"><a href="https://console.groq.com/keys" target="_blank" style="color:#1D9E75;">console.groq.com</a> で無料取得（gsk_...）</div>
+      <input id="apiKeyInput" type="password" placeholder="gsk_..." style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#2d3a50;outline:none;margin-bottom:6px;">
+      <div id="apiKeyStatus" style="font-size:12px;min-height:16px;margin-bottom:4px;"></div>
+
+      <hr class="modal-section-divider">
+
+      <!-- GitHub PAT -->
+      <div class="modal-section-title">📋 GitHub PAT（QAデータ読み込み用）</div>
+      <div style="font-size:12px;color:#7a8499;margin-bottom:8px;line-height:1.5;">プライベートリポジトリから<br>QAデータを読み込むために必要です（ghp_...）</div>
+      <input id="githubPatInput" type="password" placeholder="ghp_..." style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#2d3a50;outline:none;margin-bottom:6px;">
+      <div id="githubPatStatus" style="font-size:12px;min-height:16px;margin-bottom:4px;"></div>
+      <div id="qaLoadStatus"></div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button onclick="saveAllSettings()" style="flex:1;padding:13px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">保存する</button>
         <button onclick="closeApiModal()" style="padding:13px 16px;background:#f0f2f8;color:#4a5568;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">閉じる</button>
       </div>
     </div>
@@ -609,7 +209,6 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
       <div class="progress-bar" id="pb2"></div>
       <div class="progress-bar" id="pb3"></div>
     </div>
-
     <div class="q-card">
       <div class="q-label">🏫 Q1. 学校生活への満足度は？</div>
       <div class="emoji-options" id="q1-options">
@@ -620,7 +219,6 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
         <button class="emoji-btn" onclick="selectOption(1,4)"><span class="emoji">⛈️</span><span class="label">しんどい</span></button>
       </div>
     </div>
-
     <div class="q-card">
       <div class="q-label">👫 Q2. 友人関係は良好ですか？</div>
       <div class="emoji-options" id="q2-options">
@@ -631,7 +229,6 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
         <button class="emoji-btn" onclick="selectOption(2,4)"><span class="emoji">😞</span><span class="label">しんどい</span></button>
       </div>
     </div>
-
     <div class="q-card">
       <div class="q-label">😴 Q3. 最近よく眠れていますか？</div>
       <div class="emoji-options" id="q3-options">
@@ -642,12 +239,10 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
         <button class="emoji-btn" onclick="selectOption(3,4)"><span class="emoji">🌑</span><span class="label">全然ダメ</span></button>
       </div>
     </div>
-
     <div class="comment-card">
       <div class="comment-label"><span>💬</span>ひとことコメント（任意）</div>
       <textarea id="commentInput" rows="3" placeholder="今週のこと、なんでも書いてね..."></textarea>
     </div>
-
     <button class="submit-btn inactive" id="submitBtn" onclick="submitStep1()">あと3問答えてね</button>
   </div>
 
@@ -658,17 +253,14 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
       <div class="step2-title">記録できたよ！</div>
       <div class="step2-sub">今週のきもちを保存したよ</div>
     </div>
-
     <div class="compare-card">
       <div class="compare-title">先週との比較</div>
       <div id="compareRows"></div>
     </div>
-
     <div class="comment-display" id="commentDisplay" style="display:none">
       <div class="clabel">💬 コメント</div>
       <div id="commentText"></div>
     </div>
-
     <button class="btn-primary" onclick="goToChat()">AIと話してみる →</button>
     <button class="btn-outline" onclick="goToKiroku()">きろくだけ見る</button>
   </div>
@@ -677,20 +269,20 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
   <div class="screen" id="screen-step3">
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages"></div>
-
       <div class="crisis-banner" id="crisisBanner">
         <div class="crisis-title">🆘 一人で抱え込まないで</div>
         <div class="crisis-text">今すぐ話せる相談窓口があるよ。<br>よりそいホットライン: 0120-279-338（24時間）</div>
         <button class="crisis-btn" onclick="document.getElementById('crisisBanner').classList.remove('show')">わかった、ありがとう</button>
       </div>
-
+      <div class="escalation-banner" id="escalationBanner">
+        <div class="escalation-title">⚠️ 先生やスクールカウンセラーへ</div>
+        <div class="escalation-text" id="escalationText">この内容は、信頼できる大人に相談することをおすすめするよ。</div>
+      </div>
       <div class="counselor-msg" id="counselorMsg">
         <div class="counselor-msg-title">👤 相談員への切り替え</div>
         <div class="counselor-msg-text">人に話したい気持ち、大切にしてね。🌱<br>よりそいホットライン（0120-279-338）やSNS相談など、あなたのペースで使える窓口があるよ。</div>
       </div>
-
       <div class="quick-replies" id="quickReplies"></div>
-
       <div class="chat-input-area">
         <div class="chat-input-row">
           <textarea class="chat-input" id="chatInput" rows="1" placeholder="メッセージを入力..." onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
@@ -706,14 +298,7 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
     <div class="weekly-table-card">
       <div class="table-title">✦ WEEKLY SUMMARY</div>
       <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>🏫 学校</th>
-            <th>👫 友人</th>
-            <th>😴 睡眠</th>
-          </tr>
-        </thead>
+        <thead><tr><th></th><th>🏫 学校</th><th>👫 友人</th><th>😴 睡眠</th></tr></thead>
         <tbody id="summaryTableBody"></tbody>
       </table>
     </div>
@@ -722,101 +307,257 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 </div>
 
 <script>
-const STORAGE_KEY = "mh_v2_records";
-const API_KEY_STORAGE = "mh_v2_api_key";
+// ─── 定数 ───────────────────────────────────────────
+const STORAGE_KEY       = "mh_v2_records";
+const API_KEY_STORAGE   = "mh_v2_api_key";
+const GITHUB_PAT_STORAGE = "mh_v2_github_pat";
+const GITHUB_REPO       = "kmoto0529/mental-health-qa";
+const GITHUB_FILE       = "きもちチェック_QA設計.xls";
+const IS_DEV_MODE       = new URLSearchParams(window.location.search).get('dev') === 'true';
 
-function getApiKey() { return localStorage.getItem(API_KEY_STORAGE) || ""; }
+// ─── QAデータ ────────────────────────────────────────
+let qaData         = [];   // QA一覧シート
+let aiStarterData  = [];   // AI起点トークシート
+let escalationData = [];   // エスカレーション基準シート
+let qaLoaded       = false;
 
+// ─── ストレージ ───────────────────────────────────────
+function getApiKey()    { return localStorage.getItem(API_KEY_STORAGE) || ""; }
+function getGitHubPAT() { return localStorage.getItem(GITHUB_PAT_STORAGE) || ""; }
+
+// ─── 設定モーダル ─────────────────────────────────────
 function openApiModal() {
   const modal = document.getElementById('apiModal');
   modal.style.display = 'flex';
-  const saved = getApiKey();
-  document.getElementById('apiKeyInput').value = saved ? '●'.repeat(20) : '';
-  document.getElementById('apiKeyStatus').textContent = saved ? '✅ APIキーが保存されています' : '';
+  const savedKey = getApiKey();
+  document.getElementById('apiKeyInput').value = savedKey ? '●'.repeat(20) : '';
+  document.getElementById('apiKeyStatus').textContent = savedKey ? '✅ 保存済み' : '';
   document.getElementById('apiKeyStatus').style.color = '#1D9E75';
+  const savedPat = getGitHubPAT();
+  document.getElementById('githubPatInput').value = savedPat ? '●'.repeat(20) : '';
+  document.getElementById('githubPatStatus').textContent = savedPat ? '✅ 保存済み' : '';
+  document.getElementById('githubPatStatus').style.color = '#1D9E75';
+  if (qaLoaded) {
+    document.getElementById('qaLoadStatus').innerHTML =
+      `<div class="qa-status loaded">✅ QAデータ読み込み済み（QA: ${qaData.length}件 / エスカレーション: ${escalationData.length}件）</div>`;
+  }
 }
 
 function closeApiModal() {
   document.getElementById('apiModal').style.display = 'none';
 }
 
-function saveApiKey() {
-  const input = document.getElementById('apiKeyInput');
-  const val = input.value.trim();
-  if (!val || val.startsWith('●')) {
-    document.getElementById('apiKeyStatus').textContent = getApiKey() ? '✅ 既存のキーを使用します' : '❌ APIキーを入力してください';
-    document.getElementById('apiKeyStatus').style.color = getApiKey() ? '#1D9E75' : '#ef4444';
-    return;
+async function saveAllSettings() {
+  // Groq key
+  const keyVal = document.getElementById('apiKeyInput').value.trim();
+  if (keyVal && !keyVal.startsWith('●')) {
+    if (!keyVal.startsWith('gsk_')) {
+      document.getElementById('apiKeyStatus').textContent = '❌ gsk_ から始まるキーを入力してください';
+      document.getElementById('apiKeyStatus').style.color = '#ef4444';
+      return;
+    }
+    localStorage.setItem(API_KEY_STORAGE, keyVal);
+    document.getElementById('apiKeyStatus').textContent = '✅ 保存しました';
+    document.getElementById('apiKeyStatus').style.color = '#1D9E75';
   }
-  if (!val.startsWith('gsk_')) {
-    document.getElementById('apiKeyStatus').textContent = '❌ 正しいGroq APIキーを入力してください（gsk_ から始まります）';
-    document.getElementById('apiKeyStatus').style.color = '#ef4444';
-    return;
+  // GitHub PAT
+  const patVal = document.getElementById('githubPatInput').value.trim();
+  if (patVal && !patVal.startsWith('●')) {
+    if (!patVal.startsWith('ghp_') && !patVal.startsWith('github_pat_')) {
+      document.getElementById('githubPatStatus').textContent = '❌ ghp_ から始まるトークンを入力してください';
+      document.getElementById('githubPatStatus').style.color = '#ef4444';
+      return;
+    }
+    localStorage.setItem(GITHUB_PAT_STORAGE, patVal);
+    document.getElementById('githubPatStatus').textContent = '✅ 保存しました';
+    document.getElementById('githubPatStatus').style.color = '#1D9E75';
+    // QAデータを読み込む
+    document.getElementById('qaLoadStatus').innerHTML = '<div class="qa-status loading">⏳ QAデータを読み込み中...</div>';
+    await loadQAData();
   }
-  localStorage.setItem(API_KEY_STORAGE, val);
-  document.getElementById('apiKeyStatus').textContent = '✅ 保存しました！';
-  document.getElementById('apiKeyStatus').style.color = '#1D9E75';
-  setTimeout(closeApiModal, 800);
+  setTimeout(closeApiModal, 600);
 }
 
-// モーダル外クリックで閉じる
 document.addEventListener('click', e => {
   const modal = document.getElementById('apiModal');
   if (e.target === modal) closeApiModal();
 });
 
+// ─── QAデータ読み込み ────────────────────────────────
+async function loadQAData() {
+  const pat = getGitHubPAT();
+  if (!pat) return;
+  try {
+    const encoded = encodeURIComponent(GITHUB_FILE);
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${encoded}`, {
+      headers: {
+        'Authorization': `token ${pat}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (!res.ok) {
+      console.error('GitHub fetch error:', res.status);
+      document.getElementById('qaLoadStatus').innerHTML =
+        `<div class="qa-status error">❌ ファイル取得エラー (${res.status})。PATとリポジトリを確認してください。</div>`;
+      return;
+    }
+    const data = await res.json();
+    const binary = atob(data.content.replace(/\n/g, ''));
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+    const wb = XLSX.read(bytes, { type: 'array' });
+
+    // AI起点トークシート
+    if (wb.Sheets['AI起点トーク']) {
+      aiStarterData = XLSX.utils.sheet_to_json(wb.Sheets['AI起点トーク']);
+    }
+    // QA一覧シート
+    if (wb.Sheets['QA一覧']) {
+      qaData = XLSX.utils.sheet_to_json(wb.Sheets['QA一覧']);
+    }
+    // エスカレーション基準シート
+    if (wb.Sheets['エスカレーション基準']) {
+      escalationData = XLSX.utils.sheet_to_json(wb.Sheets['エスカレーション基準']);
+    }
+
+    qaLoaded = true;
+    console.log(`QA loaded: starter=${aiStarterData.length}, qa=${qaData.length}, esc=${escalationData.length}`);
+    const statusEl = document.getElementById('qaLoadStatus');
+    if (statusEl) {
+      statusEl.innerHTML = `<div class="qa-status loaded">✅ QAデータ読み込み完了（QA: ${qaData.length}件）</div>`;
+    }
+  } catch(e) {
+    console.error('QA load error:', e);
+    const statusEl = document.getElementById('qaLoadStatus');
+    if (statusEl) statusEl.innerHTML = `<div class="qa-status error">❌ 読み込みエラー: ${e.message}</div>`;
+  }
+}
+
+// ─── エスカレーション判定 ────────────────────────────
+function checkEscalation(text) {
+  // エスカレーション基準シートがあればそちらを優先
+  if (escalationData.length > 0) {
+    for (const row of escalationData) {
+      const kwStr = String(row['キーワード・状況'] || '');
+      // ・や読点でキーワードを分割
+      const kws = kwStr.split(/[・、,，\s]/).map(k => k.replace(/（.*?）/g, '').trim()).filter(k => k.length >= 2);
+      if (kws.some(k => text.includes(k))) {
+        const levelStr = String(row['対応レベル'] || '');
+        const levelNum = parseInt(levelStr.match(/\d/)?.[0] ?? '0');
+        return { level: levelNum, levelText: levelStr, action: String(row['アクション'] || '') };
+      }
+    }
+  }
+  // フォールバック：固定キーワード
+  const crisis = ['死にたい','消えたい','いなくなりたい','自傷'];
+  if (crisis.some(k => text.includes(k))) return { level: 3, levelText: 'レベル3（緊急）', action: '即時SC・担任へ通知' };
+  return null;
+}
+
+// ─── QAマッチング（スコアリング）────────────────────
+function matchQA(text) {
+  if (!qaData.length) return null;
+  let best = null;
+  let bestScore = 0;
+  for (const row of qaData) {
+    const kwStr = String(row['キーワード'] || '');
+    const kws = kwStr.split(/[,，、]/).map(k => k.trim()).filter(k => k.length >= 1);
+    if (!kws.length) continue;
+    const matched = kws.filter(k => text.includes(k));
+    const score = matched.length / kws.length;
+    if (score > bestScore && matched.length >= 1) {
+      bestScore = score;
+      best = { row, score, matched };
+    }
+  }
+  // スコア0.15以上（15%以上）でマッチとみなす
+  return best && bestScore >= 0.15 ? best : null;
+}
+
+// ─── AI起点トーク選択 ────────────────────────────────
+function selectStarterMessage() {
+  if (!aiStarterData.length) return null;
+
+  const q1diff = LAST_WEEK_DUMMY.q1 - answers.q1; // 正=改善、負=悪化
+  const q2diff = LAST_WEEK_DUMMY.q2 - answers.q2;
+  const q3diff = LAST_WEEK_DUMMY.q3 - answers.q3;
+  const hasComment = currentComment.length > 0;
+  const noChange = Math.abs(q1diff) === 0 && Math.abs(q2diff) === 0 && Math.abs(q3diff) === 0;
+
+  // 条件列のテキストで簡易マッチ
+  const conditionMap = [
+    { check: () => hasComment,        keywords: ['コメント','ひとこと'] },
+    { check: () => q3diff < -1,       keywords: ['睡眠','眠れない'] },
+    { check: () => q1diff < -0,       keywords: ['学校','学業','スコアが下'] },
+    { check: () => q2diff < -0,       keywords: ['人間関係','友達'] },
+    { check: () => noChange,          keywords: ['変化なし','大きな変化'] },
+  ];
+
+  for (const cond of conditionMap) {
+    if (!cond.check()) continue;
+    const matched = aiStarterData.find(row => {
+      const joText = String(row['条件'] || '') + String(row['タイミング'] || '');
+      return cond.keywords.some(k => joText.includes(k));
+    });
+    if (matched) {
+      let msg = String(matched['AIの発話（テンプレート）'] || '');
+      msg = msg.replace(/\{コメント内容\}/g, currentComment);
+      return msg;
+    }
+  }
+
+  // デフォルト：最初のスターター
+  let msg = String(aiStarterData[0]?.['AIの発話（テンプレート）'] || '');
+  msg = msg.replace(/\{コメント内容\}/g, currentComment);
+  return msg || null;
+}
+
+// ─── 基本データ ───────────────────────────────────────
 const Q_EMOJIS = {
   1: ["☀️","🌤️","☁️","🌧️","⛈️"],
   2: ["🥰","😊","😐","😕","😞"],
   3: ["🌙","😪","🥱","😵","🌑"]
 };
-const Q_LABELS = {1:"学校",2:"友人",3:"睡眠"};
-
 const LAST_WEEK_DUMMY = { q1: 1, q2: 3, q3: 1 };
-
 let answers = { q1: null, q2: null, q3: null };
 let currentComment = "";
 let chatHistory = [];
 let isAiTyping = false;
-let currentQuickReplies = [];
 
-// INIT
+// ─── 初期化 ───────────────────────────────────────────
 function init() {
   const d = new Date();
-  const opts = { year:'numeric', month:'long', day:'numeric', weekday:'long' };
-  document.getElementById('headerDate').textContent = d.toLocaleDateString('ja-JP', opts);
+  document.getElementById('headerDate').textContent =
+    d.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  // PATがあれば自動でQAデータ読み込み
+  if (getGitHubPAT()) loadQAData();
 }
 
-// TAB SWITCH
+// ─── タブ切り替え ────────────────────────────────────
 function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (tab==='check' && i===0)||(tab==='kiroku' && i===1)));
+  document.querySelectorAll('.tab-btn').forEach((b,i) =>
+    b.classList.toggle('active', (tab==='check' && i===0)||(tab==='kiroku' && i===1)));
   document.querySelectorAll('.screen, .kiroku-screen').forEach(s => s.classList.remove('active'));
   if (tab === 'kiroku') {
     document.getElementById('screen-kiroku').classList.add('active');
     renderKiroku();
   } else {
-    const active = getCurrentCheckScreen();
-    document.getElementById(active).classList.add('active');
+    document.getElementById('screen-step1').classList.add('active');
   }
 }
 
-function getCurrentCheckScreen() {
-  if (answers.q1 === null && answers.q2 === null && answers.q3 === null) return 'screen-step1';
-  return 'screen-step1'; // keep on step1 if not submitted
-}
-
-// STEP1 LOGIC
+// ─── STEP1 ────────────────────────────────────────────
 function selectOption(q, idx) {
   answers[`q${q}`] = idx;
-  const container = document.getElementById(`q${q}-options`);
-  container.querySelectorAll('.emoji-btn').forEach((btn, i) => btn.classList.toggle('selected', i === idx));
+  document.getElementById(`q${q}-options`).querySelectorAll('.emoji-btn')
+    .forEach((btn, i) => btn.classList.toggle('selected', i === idx));
   document.getElementById(`pb${q}`).classList.add('done');
   updateSubmitBtn();
 }
 
 function updateSubmitBtn() {
-  const answered = [answers.q1, answers.q2, answers.q3].filter(v => v !== null).length;
-  const remaining = 3 - answered;
+  const remaining = 3 - [answers.q1, answers.q2, answers.q3].filter(v => v !== null).length;
   const btn = document.getElementById('submitBtn');
   if (remaining === 0) {
     btn.className = 'submit-btn active-btn';
@@ -837,13 +578,8 @@ function submitStep1() {
 
 function saveRecord() {
   const records = loadRecords();
-  const today = new Date();
-  const weekKey = getWeekKey(today);
-  records[weekKey] = {
-    date: today.toISOString(),
-    q1: answers.q1, q2: answers.q2, q3: answers.q3,
-    comment: currentComment
-  };
+  const weekKey = getWeekKey(new Date());
+  records[weekKey] = { date: new Date().toISOString(), q1: answers.q1, q2: answers.q2, q3: answers.q3, comment: currentComment };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 }
 
@@ -855,39 +591,30 @@ function getWeekKey(d) {
   const date = new Date(d);
   const day = date.getDay();
   const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(date.setDate(diff));
-  return monday.toISOString().slice(0,10);
+  return new Date(date.setDate(diff)).toISOString().slice(0,10);
 }
 
-// STEP2
+// ─── STEP2 ────────────────────────────────────────────
 function renderStep2() {
-  const rows = document.getElementById('compareRows');
   const qs = [
-    { key:'q1', icon:'🏫', label:'学校', currIdx: answers.q1, prevIdx: LAST_WEEK_DUMMY.q1, qn:1 },
-    { key:'q2', icon:'👫', label:'友人', currIdx: answers.q2, prevIdx: LAST_WEEK_DUMMY.q2, qn:2 },
-    { key:'q3', icon:'😴', label:'睡眠', currIdx: answers.q3, prevIdx: LAST_WEEK_DUMMY.q3, qn:3 },
+    { icon:'🏫', label:'学校', currIdx: answers.q1, prevIdx: LAST_WEEK_DUMMY.q1, qn:1 },
+    { icon:'👫', label:'友人', currIdx: answers.q2, prevIdx: LAST_WEEK_DUMMY.q2, qn:2 },
+    { icon:'😴', label:'睡眠', currIdx: answers.q3, prevIdx: LAST_WEEK_DUMMY.q3, qn:3 },
   ];
-
-  rows.innerHTML = qs.map(q => {
-    const prevEmoji = Q_EMOJIS[q.qn][q.prevIdx];
-    const currEmoji = Q_EMOJIS[q.qn][q.currIdx];
-    const diff = q.prevIdx - q.currIdx; // higher index = worse
-    let badge, badgeClass;
-    if (diff > 0) { badge='改善'; badgeClass='improved'; }
-    else if (diff < 0) { badge='変化あり'; badgeClass='changed'; }
-    else { badge='変化なし'; badgeClass='same'; }
+  document.getElementById('compareRows').innerHTML = qs.map(q => {
+    const diff = q.prevIdx - q.currIdx;
+    const [badge, cls] = diff > 0 ? ['改善','improved'] : diff < 0 ? ['変化あり','changed'] : ['変化なし','same'];
     return `<div class="compare-row">
       <span class="compare-icon">${q.icon}</span>
       <span class="compare-label">${q.label}</span>
       <div class="compare-emojis">
-        <span class="prev">${prevEmoji}</span>
+        <span class="prev">${Q_EMOJIS[q.qn][q.prevIdx]}</span>
         <span class="arrow">→</span>
-        <span class="curr">${currEmoji}</span>
+        <span class="curr">${Q_EMOJIS[q.qn][q.currIdx]}</span>
       </div>
-      <span class="badge ${badgeClass}">${badge}</span>
+      <span class="badge ${cls}">${badge}</span>
     </div>`;
   }).join('');
-
   const cd = document.getElementById('commentDisplay');
   if (currentComment) {
     document.getElementById('commentText').textContent = currentComment;
@@ -900,7 +627,7 @@ function renderStep2() {
 function goToChat() {
   if (!getApiKey()) {
     openApiModal();
-    document.getElementById('apiKeyStatus').textContent = '⚠️ チャットを使うにはAPIキーが必要です';
+    document.getElementById('apiKeyStatus').textContent = '⚠️ チャットにはAPIキーが必要です';
     document.getElementById('apiKeyStatus').style.color = '#f59e0b';
     return;
   }
@@ -908,103 +635,133 @@ function goToChat() {
   initChat();
 }
 
-function goToKiroku() {
-  switchTab('kiroku');
-}
+function goToKiroku() { switchTab('kiroku'); }
 
-// STEP3 CHAT
+// ─── STEP3 チャット ───────────────────────────────────
 function initChat() {
   chatHistory = [];
   document.getElementById('chatMessages').innerHTML = '';
   document.getElementById('crisisBanner').classList.remove('show');
+  document.getElementById('escalationBanner').classList.remove('show');
   document.getElementById('counselorMsg').classList.remove('show');
 
-  const q1e = Q_EMOJIS[1][answers.q1];
-  const q2e = Q_EMOJIS[2][answers.q2];
-  const q3e = Q_EMOJIS[3][answers.q3];
-  const changes = buildChangeSummary();
-
-  const userContext = `ユーザーの今週の記録：
-- 学校生活: ${q1e}（インデックス${answers.q1}/4、0が最高）
-- 友人関係: ${q2e}（インデックス${answers.q2}/4）
-- 睡眠: ${q3e}（インデックス${answers.q3}/4）
-${currentComment ? `- コメント: 「${currentComment}」` : ''}
-先週との変化: ${changes}
-
-この記録を踏まえて、ユーザーに最初の声かけメッセージを送ってください。`;
-
-  showTyping();
-  callAI([{ role:'user', content: userContext }], true);
-
+  // AI起点トークシートからテンプレートを使用
+  const starterMsg = selectStarterMessage();
+  if (starterMsg) {
+    // テンプレートがあれば即表示（Groq不使用）
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      addAIMessage(starterMsg, false);
+      chatHistory.push({ role: 'assistant', content: starterMsg });
+      updateQuickRepliesAfterAI();
+    }, 800);
+  } else {
+    // テンプレートがなければGroqで生成
+    const q1e = Q_EMOJIS[1][answers.q1];
+    const q2e = Q_EMOJIS[2][answers.q2];
+    const q3e = Q_EMOJIS[3][answers.q3];
+    const context = `今週の記録：学校${q1e}(${answers.q1}/4)、友人${q2e}(${answers.q2}/4)、睡眠${q3e}(${answers.q3}/4)${currentComment ? `、コメント:「${currentComment}」` : ''}。先週との変化:${buildChangeSummary()}。最初の声かけをしてください。`;
+    showTyping();
+    callGroq([{ role:'user', content: context }]);
+  }
   setQuickReplies(["もう少し話したい", "学校のことを話したい", "友達のことを話したい", "眠れない理由を考えたい"]);
 }
 
 function buildChangeSummary() {
-  const qs = [
-    { label:'学校', currIdx: answers.q1, prevIdx: LAST_WEEK_DUMMY.q1 },
-    { label:'友人', currIdx: answers.q2, prevIdx: LAST_WEEK_DUMMY.q2 },
-    { label:'睡眠', currIdx: answers.q3, prevIdx: LAST_WEEK_DUMMY.q3 },
-  ];
-  return qs.map(q => {
-    const diff = q.prevIdx - q.currIdx;
-    if (diff > 0) return `${q.label}改善`;
-    if (diff < 0) return `${q.label}悪化`;
-    return `${q.label}変化なし`;
+  return [
+    { label:'学校', curr: answers.q1, prev: LAST_WEEK_DUMMY.q1 },
+    { label:'友人', curr: answers.q2, prev: LAST_WEEK_DUMMY.q2 },
+    { label:'睡眠', curr: answers.q3, prev: LAST_WEEK_DUMMY.q3 },
+  ].map(q => {
+    const d = q.prev - q.curr;
+    return d > 0 ? `${q.label}改善` : d < 0 ? `${q.label}悪化` : `${q.label}変化なし`;
   }).join('、');
 }
 
-async function callAI(messages, isInit=false) {
+// ─── メッセージ送信 ───────────────────────────────────
+function sendMessage(overrideText) {
+  if (isAiTyping) return;
+  const input = document.getElementById('chatInput');
+  const text = overrideText || input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  addUserMessage(text);
+  chatHistory.push({ role: 'user', content: text });
+  document.getElementById('quickReplies').innerHTML = '';
+
+  // ① エスカレーション判定（最優先）
+  const esc = checkEscalation(text);
+  if (esc) {
+    if (esc.level >= 3) {
+      document.getElementById('crisisBanner').classList.add('show');
+      // レベル3はAIは返答しない
+      return;
+    } else if (esc.level >= 2) {
+      document.getElementById('escalationBanner').classList.add('show');
+      document.getElementById('escalationText').textContent =
+        `この内容については、${esc.action || '信頼できる大人に相談'}することをおすすめするよ。`;
+    }
+  }
+
+  // ② QAマッチング
+  const qaMatch = matchQA(text);
+  if (qaMatch) {
+    const answer = String(qaMatch.row['AIの返答テンプレート'] || '');
+    if (answer) {
+      showTyping();
+      setTimeout(() => {
+        hideTyping();
+        addAIMessage(answer, true); // 第2引数true = QA回答
+        chatHistory.push({ role: 'assistant', content: answer });
+        checkEscalation(answer);
+        updateQuickRepliesAfterAI();
+      }, 600);
+      return;
+    }
+  }
+
+  // ③ Groq AI
+  showTyping();
+  callGroq(chatHistory.slice(-10));
+}
+
+// ─── Groq API ─────────────────────────────────────────
+async function callGroq(messages) {
   const systemPrompt = `あなたは中高生向けのデジタルメンタルヘルス支援アプリ内で動作するAIサポーターです。ユーザーが安心して気持ちを言葉にできるよう支援し、自己理解を深め、必要に応じて人による相談や適切な情報へ自然につなぐことが目的です。AIはサポート役であり診断や断定はしない。優しく否定せず上から目線にならない。説教しない。長すぎずわかりやすく返す。質問は1〜2個に絞る。返答は3〜5文程度。やさしくフレンドリーで中高生が自然に受け取れる言葉。`;
-
-  const groqMessages = [
-    { role: 'system', content: systemPrompt },
-    ...messages
-  ];
-
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getApiKey()}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: groqMessages,
-        max_tokens: 512
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getApiKey()}` },
+      body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role:'system', content: systemPrompt }, ...messages], max_tokens: 512 })
     });
     const data = await res.json();
     hideTyping();
     if (!res.ok) {
-      const errMsg = data.error?.message || `不明なエラー`;
-      const status = res.status;
-      console.error('API Error:', status, JSON.stringify(data));
-      if (status === 401) {
-        addAIMessage(`❌ 認証エラー：APIキーを⚙️から再設定してね。`);
-      } else if (status === 429) {
-        addAIMessage(`⏳ 少し使いすぎたみたい。しばらく待ってからまた話しかけてね。`);
-      } else {
-        addAIMessage(`❌ エラー ${status}：${errMsg}`);
-      }
+      const msg = res.status === 401 ? '❌ APIキーを⚙️から再設定してね。'
+                : res.status === 429 ? '⏳ 少し待ってからもう一度話しかけてね。'
+                : `❌ エラー ${res.status}：${data.error?.message || ''}`;
+      addAIMessage(msg, false);
       return;
     }
-    const text = data.choices?.[0]?.message?.content || 'ごめんね、うまく返事できなかった。もう一度話しかけてみて。';
-    addAIMessage(text);
+    const text = data.choices?.[0]?.message?.content || 'ごめんね、うまく返事できなかった。';
+    addAIMessage(text, false);
     chatHistory.push({ role: 'assistant', content: text });
-    checkCrisisKeywords(text);
     updateQuickRepliesAfterAI();
   } catch(e) {
     hideTyping();
-    console.error('Network Error:', e);
-    addAIMessage('🌐 ネットワークエラーが発生したよ。インターネット接続を確認してね。');
+    addAIMessage('🌐 ネットワークエラーが発生したよ。', false);
   }
 }
 
-function addAIMessage(text) {
+// ─── UI ヘルパー ─────────────────────────────────────
+function addAIMessage(text, isQA = false) {
   const row = document.createElement('div');
   row.className = 'msg-row';
-  row.innerHTML = `<div class="avatar">🌱</div><div class="bubble ai">${escapeHtml(text)}</div>`;
+  const badgeHtml = (IS_DEV_MODE && isQA) ? `<span class="qa-badge">📋 QA定型文</span>` : '';
+  row.innerHTML = `<div class="avatar">🌱</div><div class="msg-col"><div class="bubble ai">${escapeHtml(text)}</div>${badgeHtml}</div>`;
   document.getElementById('chatMessages').appendChild(row);
   scrollChat();
 }
@@ -1021,8 +778,7 @@ function showTyping() {
   isAiTyping = true;
   document.getElementById('sendBtn').disabled = true;
   const row = document.createElement('div');
-  row.className = 'msg-row';
-  row.id = 'typingRow';
+  row.className = 'msg-row'; row.id = 'typingRow';
   row.innerHTML = `<div class="avatar">🌱</div><div class="typing-indicator"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
   document.getElementById('chatMessages').appendChild(row);
   scrollChat();
@@ -1040,24 +796,6 @@ function scrollChat() {
   c.scrollTop = c.scrollHeight;
 }
 
-function sendMessage(overrideText) {
-  if (isAiTyping) return;
-  const input = document.getElementById('chatInput');
-  const text = overrideText || input.value.trim();
-  if (!text) return;
-  input.value = '';
-  input.style.height = 'auto';
-
-  checkCrisisKeywords(text);
-  addUserMessage(text);
-  chatHistory.push({ role:'user', content: text });
-  document.getElementById('quickReplies').innerHTML = '';
-
-  const msgs = chatHistory.slice(-10);
-  showTyping();
-  callAI(msgs);
-}
-
 function handleChatKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
@@ -1068,26 +806,17 @@ function autoResize(el) {
 }
 
 function setQuickReplies(replies) {
-  currentQuickReplies = replies;
-  const c = document.getElementById('quickReplies');
-  c.innerHTML = replies.map(r => `<button class="quick-btn" onclick="sendMessage('${r.replace(/'/g,"\\'")}')">${r}</button>`).join('');
+  document.getElementById('quickReplies').innerHTML =
+    replies.map(r => `<button class="quick-btn" onclick="sendMessage('${r.replace(/'/g,"\\'")}')">${r}</button>`).join('');
 }
 
 function updateQuickRepliesAfterAI() {
   const pools = [
-    ["うん、もっと話したい", "ありがとう、楽になった", "具体的に教えて", "他に何かできる？"],
-    ["学校がしんどい", "友達のことで悩んでる", "眠れない夜が続いてる", "話聞いてくれてありがとう"],
-    ["もう少し聞いて", "大丈夫、ちょっと楽になった", "人に相談したい", "また来るね"]
+    ["うん、もっと話したい", "ありがとう、楽になった", "具体的に教えて"],
+    ["学校がしんどい", "友達のことで悩んでる", "眠れない夜が続いてる"],
+    ["もう少し聞いて", "大丈夫、ちょっと楽になった", "人に相談したい"]
   ];
-  const pool = pools[Math.floor(Math.random() * pools.length)];
-  setQuickReplies(pool.slice(0, 3));
-}
-
-const CRISIS_KEYWORDS = ['死にたい','消えたい','自傷','限界'];
-function checkCrisisKeywords(text) {
-  if (CRISIS_KEYWORDS.some(k => text.includes(k))) {
-    document.getElementById('crisisBanner').classList.add('show');
-  }
+  setQuickReplies(pools[Math.floor(Math.random() * pools.length)]);
 }
 
 function showCounselor() {
@@ -1096,60 +825,44 @@ function showCounselor() {
 }
 
 function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
 
-// KIROKU
+// ─── きろく ───────────────────────────────────────────
 function renderKiroku() {
   const records = loadRecords();
   const today = new Date();
   const thisWeek = getWeekKey(today);
-  const lastWeek = getWeekKey(new Date(today.getTime() - 7*24*60*60*1000));
-  const twoWeeks = getWeekKey(new Date(today.getTime() - 14*24*60*60*1000));
-
-  const dummyLast = { q1: LAST_WEEK_DUMMY.q1, q2: LAST_WEEK_DUMMY.q2, q3: LAST_WEEK_DUMMY.q3, comment: '' };
-  const dummyTwo = { q1: 2, q2: 2, q3: 2, comment: '' };
-
-  const thisRec = records[thisWeek] || null;
-  const lastRec = records[lastWeek] || dummyLast;
-  const twoRec = records[twoWeeks] || dummyTwo;
-
-  // TABLE
-  const tbody = document.getElementById('summaryTableBody');
-  const rows = [
-    { label:'今週 ✦', key: thisWeek, rec: thisRec, cls:'this-week' },
-    { label:'先週', key: lastWeek, rec: lastRec, cls:'' },
-    { label:'2週前', key: twoWeeks, rec: twoRec, cls:'' },
+  const lastWeek = getWeekKey(new Date(today.getTime() - 7*86400000));
+  const twoWeeks = getWeekKey(new Date(today.getTime() - 14*86400000));
+  const dummyLast = { q1:LAST_WEEK_DUMMY.q1, q2:LAST_WEEK_DUMMY.q2, q3:LAST_WEEK_DUMMY.q3, comment:'' };
+  const dummyTwo  = { q1:2, q2:2, q3:2, comment:'' };
+  const recs = [
+    { label:'今週 ✦', rec: records[thisWeek]||null, cls:'this-week' },
+    { label:'先週',   rec: records[lastWeek]||dummyLast, cls:'' },
+    { label:'2週前',  rec: records[twoWeeks]||dummyTwo,  cls:'prev2' },
   ];
-  tbody.innerHTML = rows.map(r => {
-    if (!r.rec) return `<tr class="${r.cls}"><td class="row-label">${r.label}</td><td>－</td><td>－</td><td>－</td></tr>`;
-    return `<tr class="${r.cls}">
-      <td class="row-label">${r.label}</td>
-      <td>${Q_EMOJIS[1][r.rec.q1]}</td>
-      <td>${Q_EMOJIS[2][r.rec.q2]}</td>
-      <td>${Q_EMOJIS[3][r.rec.q3]}</td>
-    </tr>`;
-  }).join('');
-
-  // DETAIL CARDS
-  const cards = document.getElementById('weekDetailCards');
+  document.getElementById('summaryTableBody').innerHTML = recs.map(r =>
+    !r.rec ? `<tr class="${r.cls}"><td class="row-label">${r.label}</td><td>－</td><td>－</td><td>－</td></tr>`
+           : `<tr class="${r.cls}"><td class="row-label">${r.label}</td><td>${Q_EMOJIS[1][r.rec.q1]}</td><td>${Q_EMOJIS[2][r.rec.q2]}</td><td>${Q_EMOJIS[3][r.rec.q3]}</td></tr>`
+  ).join('');
   const details = [
-    { label:'今週', rec: thisRec, cls:'' },
-    { label:'先週', rec: lastRec, cls:'prev' },
-    { label:'2週前', rec: twoRec, cls:'prev2' },
+    { label:'今週', rec: records[thisWeek]||null, cls:'' },
+    { label:'先週', rec: records[lastWeek]||dummyLast, cls:'prev' },
+    { label:'2週前', rec: records[twoWeeks]||dummyTwo, cls:'prev2' },
   ];
-  cards.innerHTML = details.map(d => {
-    if (!d.rec) return `<div class="week-detail-card ${d.cls}"><div class="week-detail-label">${d.label}</div><div class="empty-state"><span class="ei">📭</span>記録なし</div></div>`;
-    return `<div class="week-detail-card ${d.cls}">
-      <div class="week-detail-label">${d.label}</div>
-      <div class="week-detail-emojis">
-        <div class="week-emoji-item"><span class="ei">${Q_EMOJIS[1][d.rec.q1]}</span>学校</div>
-        <div class="week-emoji-item"><span class="ei">${Q_EMOJIS[2][d.rec.q2]}</span>友人</div>
-        <div class="week-emoji-item"><span class="ei">${Q_EMOJIS[3][d.rec.q3]}</span>睡眠</div>
-      </div>
-      ${d.rec.comment ? `<div class="week-detail-comment">💬 ${escapeHtml(d.rec.comment)}</div>` : ''}
-    </div>`;
-  }).join('');
+  document.getElementById('weekDetailCards').innerHTML = details.map(d =>
+    !d.rec ? `<div class="week-detail-card ${d.cls}"><div class="week-detail-label">${d.label}</div><div class="empty-state"><span class="ei">📭</span>記録なし</div></div>`
+           : `<div class="week-detail-card ${d.cls}">
+               <div class="week-detail-label">${d.label}</div>
+               <div class="week-detail-emojis">
+                 <div class="week-emoji-item"><span class="ei">${Q_EMOJIS[1][d.rec.q1]}</span>学校</div>
+                 <div class="week-emoji-item"><span class="ei">${Q_EMOJIS[2][d.rec.q2]}</span>友人</div>
+                 <div class="week-emoji-item"><span class="ei">${Q_EMOJIS[3][d.rec.q3]}</span>睡眠</div>
+               </div>
+               ${d.rec.comment ? `<div class="week-detail-comment">💬 ${escapeHtml(d.rec.comment)}</div>` : ''}
+             </div>`
+  ).join('');
 }
 
 function showScreen(id) {
