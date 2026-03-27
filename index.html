@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>きもちチェック</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -99,7 +98,6 @@ textarea:focus { border-color: #1D9E75; }
 .bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.6; font-weight: 600; }
 .bubble.ai { background: white; color: #2d3a50; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
 .bubble.user { background: linear-gradient(135deg, #1D9E75, #0d7055); color: white; border-bottom-right-radius: 4px; }
-.qa-badge { font-size: 10px; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 10px; margin-top: 4px; display: inline-block; }
 .msg-col { display: flex; flex-direction: column; align-items: flex-start; max-width: 75%; }
 .typing-indicator { display: flex; align-items: center; gap: 8px; }
 .typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 18px; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
@@ -155,10 +153,6 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 .empty-state .ei { font-size: 40px; display: block; margin-bottom: 8px; }
 .modal-section-divider { border: none; border-top: 1px solid #e8ecf4; margin: 16px 0; }
 .modal-section-title { font-size: 13px; font-weight: 800; color: #4a5568; margin-bottom: 8px; }
-.qa-status { font-size: 12px; padding: 6px 10px; border-radius: 8px; margin-top: 8px; }
-.qa-status.loaded { background: #e6f9f2; color: #1D9E75; }
-.qa-status.loading { background: #f0f2f8; color: #8a96aa; }
-.qa-status.error { background: #fef2f2; color: #ef4444; }
 </style>
 </head>
 <body>
@@ -188,12 +182,11 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 
       <hr class="modal-section-divider">
 
-      <!-- GitHub PAT -->
-      <div class="modal-section-title">📋 GitHub PAT（QAデータ読み込み用）</div>
-      <div style="font-size:12px;color:#7a8499;margin-bottom:8px;line-height:1.5;">プライベートリポジトリから<br>QAデータを読み込むために必要です（ghp_...）</div>
-      <input id="githubPatInput" type="password" placeholder="ghp_..." style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#2d3a50;outline:none;margin-bottom:6px;">
-      <div id="githubPatStatus" style="font-size:12px;min-height:16px;margin-bottom:4px;"></div>
-      <div id="qaLoadStatus"></div>
+      <!-- AIプロンプト編集 -->
+      <div class="modal-section-title">📝 AIシステムプロンプト</div>
+      <div style="font-size:12px;color:#7a8499;margin-bottom:8px;line-height:1.5;">AIの応答スタイル・ルールを編集できます</div>
+      <textarea id="promptInput" rows="10" style="width:100%;border:2px solid #e8ecf4;border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:12px;color:#2d3a50;outline:none;resize:vertical;line-height:1.6;box-sizing:border-box;"></textarea>
+      <button onclick="resetPrompt()" style="margin-top:6px;padding:6px 14px;background:#f0f2f8;color:#4a5568;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">↩ デフォルトに戻す</button>
 
       <div style="display:flex;gap:10px;margin-top:16px;">
         <button onclick="saveAllSettings()" style="flex:1;padding:13px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">保存する</button>
@@ -308,22 +301,72 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 
 <script>
 // ─── 定数 ───────────────────────────────────────────
-const STORAGE_KEY       = "mh_v2_records";
-const API_KEY_STORAGE   = "mh_v2_api_key";
-const GITHUB_PAT_STORAGE = "mh_v2_github_pat";
-const GITHUB_REPO       = "kmoto0529/mental-health-qa";
-const GITHUB_FILE       = "きもちチェック_QA設計.xlsx";
-const IS_DEV_MODE       = new URLSearchParams(window.location.search).get('dev') === 'true';
+const STORAGE_KEY     = "mh_v2_records";
+const API_KEY_STORAGE = "mh_v2_api_key";
+const PROMPT_STORAGE  = "mh_v2_system_prompt";
 
-// ─── QAデータ ────────────────────────────────────────
-let qaData         = [];   // QA一覧シート
-let aiStarterData  = [];   // AI起点トークシート
-let escalationData = [];   // エスカレーション基準シート
-let qaLoaded       = false;
+// ─── デフォルトシステムプロンプト ─────────────────────
+const DEFAULT_SYSTEM_PROMPT = `あなたは高校生向けのメンタルサポートAIです。
+
+# 🎯 目的
+ユーザー（高校生）が安心して気持ちを話し、自分の考え・感情・行動を整理しながら、自分なりの一歩を見つけられるようにサポートしてください。
+あなたの役割は「問題を解決すること」ではなく、「一緒に考えて前に進むこと」です。
+
+# ⚠️ 最重要：正確に理解してから返答する
+・ユーザーの言葉を「そのまま」受け取る。勝手に別の意味に解釈しない
+・返答前に「ユーザーが何を言ったか」を正確に把握する
+・推測や思い込みで話題を変えない
+・わからないときは「どういうこと？」と確認する
+
+# 🧑‍🤝‍🧑 基本スタンス
+・まず共感する（否定・評価しない）
+・アドバイスを押し付けない
+・質問を使って気づきを引き出す
+・高校生でもわかるシンプルな言葉を使う
+・一度に話しすぎず、会話形式で進める
+・安心できるトーン（やさしい・フラット・上から目線NG）
+
+# 🧠 基本フレーム（CBTベース）
+会話は以下の流れで自然に進める：
+① 共感・受容：まず気持ちを受け止める。例：「話してくれてありがとう」「それはつらかったよね」
+② 状況整理（事実）：いつ・誰と・何があったかをシンプルに整理する
+③ 思考の可視化：そのとき頭に浮かんだ考えを聞く。例：「そのときどんなこと考えてた？」
+④ 認知のゆらぎをつくる：否定せずに「別の見方」を提示。例：「他の可能性ってありそう？」「友達が同じこと言ってたらどう思う？」
+⑤ 感情の再確認：考え方が変わると感情がどう変わるか確認。例：「最初を10としたら今はどれくらい？」
+⑥ 小さな行動：できる範囲で"超小さい一歩"を一緒に考える。例：5分だけやる・誰かに一言話す・今日は休む
+
+# 🎯 重要ルール
+・「こうすべき」は言わない
+・正解を提示しない
+・必ずユーザー自身に選ばせる
+・沈黙や短文も尊重する
+
+# 🧩 テーマ別対応
+・SNS・人間関係：「見えている事実」と「想像」を分けるサポートをする
+・恋愛：感情を否定せず、「考えすぎ」を優しく整理する
+・勉強・受験：結果ではなくプロセスを分解する
+
+# 🚨 セーフティ（最優先）
+「消えたい」「死にたい」などの発言や強い絶望・孤立の兆候があった場合：
+①まず共感 ②一人じゃないことを伝える ③現実のサポートにつなぐ
+例：「それくらいつらいんだね」「ここでも話は聞くけど、リアルの人も頼っていい」「親・先生・相談窓口に繋がることも大事」
+絶対に軽視・無視しない。
+
+# 🧠 出力スタイル
+・短め（2〜4文程度）
+・質問を1つ含める
+・やさしい口調
+・絵文字は基本使わない（必要なら最小限）
+
+# 🧩 NG行動
+・説教・正論で押す・専門用語の多用・長文すぎる説明・一方的な解決策提示
+
+# 🎯 ゴール
+ユーザーが「少し気持ちが軽くなる」「自分の考えに気づく」「小さな行動を決められる」この状態を目指す。`;
 
 // ─── ストレージ ───────────────────────────────────────
-function getApiKey()    { return localStorage.getItem(API_KEY_STORAGE) || ""; }
-function getGitHubPAT() { return localStorage.getItem(GITHUB_PAT_STORAGE) || ""; }
+function getApiKey()      { return localStorage.getItem(API_KEY_STORAGE) || ""; }
+function getSystemPrompt(){ return localStorage.getItem(PROMPT_STORAGE) || DEFAULT_SYSTEM_PROMPT; }
 
 // ─── 設定モーダル ─────────────────────────────────────
 function openApiModal() {
@@ -333,21 +376,14 @@ function openApiModal() {
   document.getElementById('apiKeyInput').value = savedKey ? '●'.repeat(20) : '';
   document.getElementById('apiKeyStatus').textContent = savedKey ? '✅ 保存済み' : '';
   document.getElementById('apiKeyStatus').style.color = '#1D9E75';
-  const savedPat = getGitHubPAT();
-  document.getElementById('githubPatInput').value = savedPat ? '●'.repeat(20) : '';
-  document.getElementById('githubPatStatus').textContent = savedPat ? '✅ 保存済み' : '';
-  document.getElementById('githubPatStatus').style.color = '#1D9E75';
-  if (qaLoaded) {
-    document.getElementById('qaLoadStatus').innerHTML =
-      `<div class="qa-status loaded">✅ QAデータ読み込み済み（QA: ${qaData.length}件 / エスカレーション: ${escalationData.length}件）</div>`;
-  }
+  document.getElementById('promptInput').value = getSystemPrompt();
 }
 
 function closeApiModal() {
   document.getElementById('apiModal').style.display = 'none';
 }
 
-async function saveAllSettings() {
+function saveAllSettings() {
   // Groq key
   const keyVal = document.getElementById('apiKeyInput').value.trim();
   if (keyVal && !keyVal.startsWith('●')) {
@@ -360,22 +396,15 @@ async function saveAllSettings() {
     document.getElementById('apiKeyStatus').textContent = '✅ 保存しました';
     document.getElementById('apiKeyStatus').style.color = '#1D9E75';
   }
-  // GitHub PAT
-  const patVal = document.getElementById('githubPatInput').value.trim();
-  if (patVal && !patVal.startsWith('●')) {
-    if (!patVal.startsWith('ghp_') && !patVal.startsWith('github_pat_')) {
-      document.getElementById('githubPatStatus').textContent = '❌ ghp_ から始まるトークンを入力してください';
-      document.getElementById('githubPatStatus').style.color = '#ef4444';
-      return;
-    }
-    localStorage.setItem(GITHUB_PAT_STORAGE, patVal);
-    document.getElementById('githubPatStatus').textContent = '✅ 保存しました';
-    document.getElementById('githubPatStatus').style.color = '#1D9E75';
-    // QAデータを読み込む
-    document.getElementById('qaLoadStatus').innerHTML = '<div class="qa-status loading">⏳ QAデータを読み込み中...</div>';
-    await loadQAData();
-  }
-  setTimeout(closeApiModal, 600);
+  // システムプロンプト
+  const promptVal = document.getElementById('promptInput').value.trim();
+  if (promptVal) localStorage.setItem(PROMPT_STORAGE, promptVal);
+  setTimeout(closeApiModal, 400);
+}
+
+function resetPrompt() {
+  document.getElementById('promptInput').value = DEFAULT_SYSTEM_PROMPT;
+  localStorage.removeItem(PROMPT_STORAGE);
 }
 
 document.addEventListener('click', e => {
@@ -383,135 +412,13 @@ document.addEventListener('click', e => {
   if (e.target === modal) closeApiModal();
 });
 
-// ─── QAデータ読み込み ────────────────────────────────
-async function loadQAData() {
-  const pat = getGitHubPAT();
-  if (!pat) return;
-  try {
-    const encoded = encodeURIComponent(GITHUB_FILE);
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${encoded}`, {
-      headers: {
-        'Authorization': `token ${pat}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-    if (!res.ok) {
-      console.error('GitHub fetch error:', res.status);
-      document.getElementById('qaLoadStatus').innerHTML =
-        `<div class="qa-status error">❌ ファイル取得エラー (${res.status})。PATとリポジトリを確認してください。</div>`;
-      return;
-    }
-    const data = await res.json();
-    const binary = atob(data.content.replace(/\n/g, ''));
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-
-    const wb = XLSX.read(bytes, { type: 'array' });
-
-    // AI起点トークシート
-    if (wb.Sheets['AI起点トーク']) {
-      aiStarterData = XLSX.utils.sheet_to_json(wb.Sheets['AI起点トーク']);
-    }
-    // QA一覧シート
-    if (wb.Sheets['QA一覧']) {
-      qaData = XLSX.utils.sheet_to_json(wb.Sheets['QA一覧']);
-    }
-    // エスカレーション基準シート
-    if (wb.Sheets['エスカレーション基準']) {
-      escalationData = XLSX.utils.sheet_to_json(wb.Sheets['エスカレーション基準']);
-    }
-
-    qaLoaded = true;
-    console.log(`QA loaded: starter=${aiStarterData.length}, qa=${qaData.length}, esc=${escalationData.length}`);
-    const statusEl = document.getElementById('qaLoadStatus');
-    if (statusEl) {
-      statusEl.innerHTML = `<div class="qa-status loaded">✅ QAデータ読み込み完了（QA: ${qaData.length}件）</div>`;
-    }
-  } catch(e) {
-    console.error('QA load error:', e);
-    const statusEl = document.getElementById('qaLoadStatus');
-    if (statusEl) statusEl.innerHTML = `<div class="qa-status error">❌ 読み込みエラー: ${e.message}</div>`;
-  }
-}
-
 // ─── エスカレーション判定 ────────────────────────────
 function checkEscalation(text) {
-  // エスカレーション基準シートがあればそちらを優先
-  if (escalationData.length > 0) {
-    for (const row of escalationData) {
-      const kwStr = String(row['キーワード・状況'] || '');
-      // ・や読点でキーワードを分割
-      const kws = kwStr.split(/[・、,，\s]/).map(k => k.replace(/（.*?）/g, '').trim()).filter(k => k.length >= 2);
-      if (kws.some(k => text.includes(k))) {
-        const levelStr = String(row['対応レベル'] || '');
-        const levelNum = parseInt(levelStr.match(/\d/)?.[0] ?? '0');
-        return { level: levelNum, levelText: levelStr, action: String(row['アクション'] || '') };
-      }
-    }
-  }
-  // フォールバック：固定キーワード
   const crisis = ['死にたい','消えたい','いなくなりたい','自傷'];
   if (crisis.some(k => text.includes(k))) return { level: 3, levelText: 'レベル3（緊急）', action: '即時SC・担任へ通知' };
   return null;
 }
 
-// ─── QAマッチング（スコアリング）────────────────────
-function matchQA(text) {
-  if (!qaData.length) return null;
-  let best = null;
-  let bestScore = 0;
-  for (const row of qaData) {
-    const kwStr = String(row['キーワード'] || '');
-    const kws = kwStr.split(/[,，、]/).map(k => k.trim()).filter(k => k.length >= 1);
-    if (!kws.length) continue;
-    const matched = kws.filter(k => text.includes(k));
-    const score = matched.length / kws.length;
-    if (score > bestScore && matched.length >= 1) {
-      bestScore = score;
-      best = { row, score, matched };
-    }
-  }
-  // スコア0.15以上（15%以上）でマッチとみなす
-  return best && bestScore >= 0.15 ? best : null;
-}
-
-// ─── AI起点トーク選択 ────────────────────────────────
-function selectStarterMessage() {
-  if (!aiStarterData.length) return null;
-
-  const q1diff = LAST_WEEK_DUMMY.q1 - answers.q1; // 正=改善、負=悪化
-  const q2diff = LAST_WEEK_DUMMY.q2 - answers.q2;
-  const q3diff = LAST_WEEK_DUMMY.q3 - answers.q3;
-  const hasComment = currentComment.length > 0;
-  const noChange = Math.abs(q1diff) === 0 && Math.abs(q2diff) === 0 && Math.abs(q3diff) === 0;
-
-  // 条件列のテキストで簡易マッチ
-  const conditionMap = [
-    { check: () => hasComment,        keywords: ['コメント','ひとこと'] },
-    { check: () => q3diff < -1,       keywords: ['睡眠','眠れない'] },
-    { check: () => q1diff < -0,       keywords: ['学校','学業','スコアが下'] },
-    { check: () => q2diff < -0,       keywords: ['人間関係','友達'] },
-    { check: () => noChange,          keywords: ['変化なし','大きな変化'] },
-  ];
-
-  for (const cond of conditionMap) {
-    if (!cond.check()) continue;
-    const matched = aiStarterData.find(row => {
-      const joText = String(row['条件'] || '') + String(row['タイミング'] || '');
-      return cond.keywords.some(k => joText.includes(k));
-    });
-    if (matched) {
-      let msg = String(matched['AIの発話（テンプレート）'] || '');
-      msg = msg.replace(/\{コメント内容\}/g, currentComment);
-      return msg;
-    }
-  }
-
-  // デフォルト：最初のスターター
-  let msg = String(aiStarterData[0]?.['AIの発話（テンプレート）'] || '');
-  msg = msg.replace(/\{コメント内容\}/g, currentComment);
-  return msg || null;
-}
 
 // ─── 基本データ ───────────────────────────────────────
 const Q_EMOJIS = {
@@ -530,8 +437,6 @@ function init() {
   const d = new Date();
   document.getElementById('headerDate').textContent =
     d.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
-  // PATがあれば自動でQAデータ読み込み
-  if (getGitHubPAT()) loadQAData();
 }
 
 // ─── タブ切り替え ────────────────────────────────────
@@ -645,26 +550,13 @@ function initChat() {
   document.getElementById('escalationBanner').classList.remove('show');
   document.getElementById('counselorMsg').classList.remove('show');
 
-  // AI起点トークシートからテンプレートを使用
-  const starterMsg = selectStarterMessage();
-  if (starterMsg) {
-    // テンプレートがあれば即表示（Groq不使用）
-    showTyping();
-    setTimeout(() => {
-      hideTyping();
-      addAIMessage(starterMsg, false);
-      chatHistory.push({ role: 'assistant', content: starterMsg });
-      updateQuickRepliesAfterAI();
-    }, 800);
-  } else {
-    // テンプレートがなければGroqで生成
-    const q1e = Q_EMOJIS[1][answers.q1];
-    const q2e = Q_EMOJIS[2][answers.q2];
-    const q3e = Q_EMOJIS[3][answers.q3];
-    const context = `今週の記録：学校${q1e}(${answers.q1}/4)、友人${q2e}(${answers.q2}/4)、睡眠${q3e}(${answers.q3}/4)${currentComment ? `、コメント:「${currentComment}」` : ''}。先週との変化:${buildChangeSummary()}。最初の声かけをしてください。`;
-    showTyping();
-    callGroq([{ role:'user', content: context }]);
-  }
+  // Groqで初回声かけを生成
+  const q1e = Q_EMOJIS[1][answers.q1];
+  const q2e = Q_EMOJIS[2][answers.q2];
+  const q3e = Q_EMOJIS[3][answers.q3];
+  const context = `今週の記録：学校${q1e}(${answers.q1}/4)、友人${q2e}(${answers.q2}/4)、睡眠${q3e}(${answers.q3}/4)${currentComment ? `、コメント:「${currentComment}」` : ''}。先週との変化:${buildChangeSummary()}。最初の声かけをしてください。`;
+  showTyping();
+  callGroq([{ role:'user', content: context }]);
   setQuickReplies(["もう少し話したい", "学校のことを話したい", "友達のことを話したい", "眠れない理由を考えたい"]);
 }
 
@@ -697,7 +589,6 @@ function sendMessage(overrideText) {
   if (esc) {
     if (esc.level >= 3) {
       document.getElementById('crisisBanner').classList.add('show');
-      // レベル3はAIは返答しない
       return;
     } else if (esc.level >= 2) {
       document.getElementById('escalationBanner').classList.add('show');
@@ -706,92 +597,18 @@ function sendMessage(overrideText) {
     }
   }
 
-  // ② QAマッチング
-  const qaMatch = matchQA(text);
-  if (qaMatch) {
-    const answer = String(qaMatch.row['AIの返答テンプレート'] || '');
-    if (answer) {
-      showTyping();
-      setTimeout(() => {
-        hideTyping();
-        addAIMessage(answer, true); // 第2引数true = QA回答
-        chatHistory.push({ role: 'assistant', content: answer });
-        checkEscalation(answer);
-        updateQuickRepliesAfterAI();
-      }, 600);
-      return;
-    }
-  }
-
-  // ③ Groq AI
+  // ② Groq AI
   showTyping();
   callGroq(chatHistory.slice(-10));
 }
 
 // ─── Groq API ─────────────────────────────────────────
 async function callGroq(messages) {
-  const systemPrompt = `あなたは高校生向けのメンタルサポートAIです。
-
-# 🎯 目的
-ユーザー（高校生）が安心して気持ちを話し、自分の考え・感情・行動を整理しながら、自分なりの一歩を見つけられるようにサポートしてください。
-あなたの役割は「問題を解決すること」ではなく、「一緒に考えて前に進むこと」です。
-
-# ⚠️ 最重要：正確に理解してから返答する
-・ユーザーの言葉を「そのまま」受け取る。勝手に別の意味に解釈しない
-・返答前に「ユーザーが何を言ったか」を正確に把握する
-・推測や思い込みで話題を変えない
-・わからないときは「どういうこと？」と確認する
-
-# 🧑‍🤝‍🧑 基本スタンス
-・まず共感する（否定・評価しない）
-・アドバイスを押し付けない
-・質問を使って気づきを引き出す
-・高校生でもわかるシンプルな言葉を使う
-・一度に話しすぎず、会話形式で進める
-・安心できるトーン（やさしい・フラット・上から目線NG）
-
-# 🧠 基本フレーム（CBTベース）
-会話は以下の流れで自然に進める：
-① 共感・受容：まず気持ちを受け止める。例：「話してくれてありがとう」「それはつらかったよね」
-② 状況整理（事実）：いつ・誰と・何があったかをシンプルに整理する
-③ 思考の可視化：そのとき頭に浮かんだ考えを聞く。例：「そのときどんなこと考えてた？」
-④ 認知のゆらぎをつくる：否定せずに「別の見方」を提示。例：「他の可能性ってありそう？」「友達が同じこと言ってたらどう思う？」
-⑤ 感情の再確認：考え方が変わると感情がどう変わるか確認。例：「最初を10としたら今はどれくらい？」
-⑥ 小さな行動：できる範囲で"超小さい一歩"を一緒に考える。例：5分だけやる・誰かに一言話す・今日は休む
-
-# 🎯 重要ルール
-・「こうすべき」は言わない
-・正解を提示しない
-・必ずユーザー自身に選ばせる
-・沈黙や短文も尊重する
-
-# 🧩 テーマ別対応
-・SNS・人間関係：「見えている事実」と「想像」を分けるサポートをする
-・恋愛：感情を否定せず、「考えすぎ」を優しく整理する
-・勉強・受験：結果ではなくプロセスを分解する
-
-# 🚨 セーフティ（最優先）
-「消えたい」「死にたい」などの発言や強い絶望・孤立の兆候があった場合：
-①まず共感 ②一人じゃないことを伝える ③現実のサポートにつなぐ
-例：「それくらいつらいんだね」「ここでも話は聞くけど、リアルの人も頼っていい」「親・先生・相談窓口に繋がることも大事」
-絶対に軽視・無視しない。
-
-# 🧠 出力スタイル
-・短め（2〜4文程度）
-・質問を1つ含める
-・やさしい口調
-・絵文字は基本使わない（必要なら最小限）
-
-# 🧩 NG行動
-・説教・正論で押す・専門用語の多用・長文すぎる説明・一方的な解決策提示
-
-# 🎯 ゴール
-ユーザーが「少し気持ちが軽くなる」「自分の考えに気づく」「小さな行動を決められる」この状態を目指す。`;
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getApiKey()}` },
-      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role:'system', content: systemPrompt }, ...messages], max_tokens: 512 })
+      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role:'system', content: getSystemPrompt() }, ...messages], max_tokens: 512 })
     });
     const data = await res.json();
     hideTyping();
@@ -799,25 +616,24 @@ async function callGroq(messages) {
       const msg = res.status === 401 ? '❌ APIキーを⚙️から再設定してね。'
                 : res.status === 429 ? '⏳ 少し待ってからもう一度話しかけてね。'
                 : `❌ エラー ${res.status}：${data.error?.message || ''}`;
-      addAIMessage(msg, false);
+      addAIMessage(msg);
       return;
     }
     const text = data.choices?.[0]?.message?.content || 'ごめんね、うまく返事できなかった。';
-    addAIMessage(text, false);
+    addAIMessage(text);
     chatHistory.push({ role: 'assistant', content: text });
     updateQuickRepliesAfterAI();
   } catch(e) {
     hideTyping();
-    addAIMessage('🌐 ネットワークエラーが発生したよ。', false);
+    addAIMessage('🌐 ネットワークエラーが発生したよ。');
   }
 }
 
 // ─── UI ヘルパー ─────────────────────────────────────
-function addAIMessage(text, isQA = false) {
+function addAIMessage(text) {
   const row = document.createElement('div');
   row.className = 'msg-row';
-  const badgeHtml = (IS_DEV_MODE && isQA) ? `<span class="qa-badge">📋 QA定型文</span>` : '';
-  row.innerHTML = `<div class="avatar">🌱</div><div class="msg-col"><div class="bubble ai">${escapeHtml(text)}</div>${badgeHtml}</div>`;
+  row.innerHTML = `<div class="avatar">🌱</div><div class="msg-col"><div class="bubble ai">${escapeHtml(text)}</div></div>`;
   document.getElementById('chatMessages').appendChild(row);
   scrollChat();
 }
