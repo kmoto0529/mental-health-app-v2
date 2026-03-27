@@ -956,11 +956,14 @@ function buildChangeSummary() {
 async function callAI(messages, isInit=false) {
   const systemPrompt = `あなたは中高生向けのデジタルメンタルヘルス支援アプリ内で動作するAIサポーターです。ユーザーが安心して気持ちを言葉にできるよう支援し、自己理解を深め、必要に応じて人による相談や適切な情報へ自然につなぐことが目的です。AIはサポート役であり診断や断定はしない。優しく否定せず上から目線にならない。説教しない。長すぎずわかりやすく返す。質問は1〜2個に絞る。返答は3〜5文程度。やさしくフレンドリーで中高生が自然に受け取れる言葉。`;
 
-  // Gemini用にroleを変換（assistant → model）
-  const geminiMessages = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
+  // system_instructionをコンテンツに埋め込む方式（互換性向上）
+  const geminiMessages = [
+    { role: 'user', parts: [{ text: `[システム指示]\n${systemPrompt}\n\n[ユーザーメッセージ]\n${messages[0]?.content || ''}` }] },
+    ...messages.slice(1).map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }))
+  ];
 
   try {
     const res = await fetch(
@@ -969,7 +972,6 @@ async function callAI(messages, isInit=false) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
           contents: geminiMessages,
           generationConfig: { maxOutputTokens: 512 }
         })
@@ -979,16 +981,17 @@ async function callAI(messages, isInit=false) {
     hideTyping();
     if (!res.ok) {
       const errMsg = data.error?.message || `不明なエラー`;
+      const errStatus = data.error?.status || '';
       const status = res.status;
-      console.error('API Error:', status, data);
+      console.error('API Error:', status, JSON.stringify(data));
       if (status === 400) {
-        addAIMessage(`❌ リクエストエラー(400)：APIキーかリクエスト内容を確認してね。\n詳細: ${errMsg}`);
+        addAIMessage(`❌ リクエストエラー(400)：${errMsg}`);
       } else if (status === 401 || status === 403) {
-        addAIMessage(`❌ 認証エラー(${status})：APIキーが正しくないみたい。右上の⚙️から再設定してね。`);
+        addAIMessage(`❌ 認証エラー(${status})：APIキーを⚙️から再設定してね。`);
       } else if (status === 429) {
-        addAIMessage(`⏳ レート制限(429)：少し待ってからもう一度試してね。`);
+        addAIMessage(`⏳ 429 ${errStatus}：${errMsg}`);
       } else {
-        addAIMessage(`❌ エラー ${status}：${errMsg}`);
+        addAIMessage(`❌ エラー ${status} ${errStatus}：${errMsg}`);
       }
       return;
     }
