@@ -164,12 +164,7 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 /* 匿名案内 */
 .anon-notice { background:#f0fdf8; border:1.5px solid #a7f3d0; border-radius:12px; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#065f46; line-height:1.5; font-weight:600; }
 /* 人との相談モード */
-.human-chat-panel { display:none; flex-direction:column; align-items:center; justify-content:center; padding:32px 20px; gap:12px; }
-.human-chat-panel.show { display:flex; }
-.human-chat-panel-icon { font-size:48px; }
-.human-chat-panel-text { font-size:15px; font-weight:700; color:#2d3a50; text-align:center; line-height:1.6; }
-.back-to-ai-btn { width:100%; padding:12px; background:#f0f2f8; color:#4a5568; border:none; border-radius:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:none; margin-top:8px; }
-.back-to-ai-btn.show { display:block; }
+.back-to-ai-btn { width:100%; padding:12px; background:#f0f2f8; color:#4a5568; border:none; border-radius:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; margin-top:8px; flex-shrink:0; }
 /* 同意ダイアログ */
 .consent-dialog { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; }
 .consent-dialog.show { display:flex; }
@@ -308,28 +303,31 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
   <!-- STEP3 -->
   <div class="screen" id="screen-step3">
     <div class="chat-container">
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="human-chat-panel" id="humanChatPanel">
-        <div class="human-chat-panel-icon">👤</div>
-        <div class="human-chat-panel-text">担当者との会話を開始しました。<br>画面右下のチャットアイコンから話しかけてね。</div>
-      </div>
-      <div class="crisis-banner" id="crisisBanner">
-        <div class="crisis-title">🆘 一人で抱え込まないで</div>
-        <div class="crisis-text">今すぐ話せる相談窓口があるよ。<br>よりそいホットライン: 0120-279-338（24時間）</div>
-        <button class="crisis-btn" onclick="document.getElementById('crisisBanner').classList.remove('show')">わかった、ありがとう</button>
-      </div>
-      <div class="escalation-banner" id="escalationBanner">
-        <div class="escalation-title">⚠️ 先生やスクールカウンセラーへ</div>
-        <div class="escalation-text" id="escalationText">この内容は、信頼できる大人に相談することをおすすめするよ。</div>
-      </div>
-      <div class="quick-replies" id="quickReplies"></div>
-      <div class="chat-input-area" id="aiChatInputArea">
-        <div class="chat-input-row">
-          <textarea class="chat-input" id="chatInput" rows="1" placeholder="メッセージを入力..." onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      <!-- AI チャット -->
+      <div id="aiChatArea" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="crisis-banner" id="crisisBanner">
+          <div class="crisis-title">🆘 一人で抱え込まないで</div>
+          <div class="crisis-text">今すぐ話せる相談窓口があるよ。<br>よりそいホットライン: 0120-279-338（24時間）</div>
+          <button class="crisis-btn" onclick="document.getElementById('crisisBanner').classList.remove('show')">わかった、ありがとう</button>
         </div>
-        <button class="human-consult-btn" onclick="requestHumanChat()">👤 人に相談したい</button>
-        <button class="back-to-ai-btn" id="backToAiBtn" onclick="backToAiChat()">← AIチャットに戻る</button>
+        <div class="escalation-banner" id="escalationBanner">
+          <div class="escalation-title">⚠️ 先生やスクールカウンセラーへ</div>
+          <div class="escalation-text" id="escalationText">この内容は、信頼できる大人に相談することをおすすめするよ。</div>
+        </div>
+        <div class="quick-replies" id="quickReplies"></div>
+        <div class="chat-input-area" id="aiChatInputArea">
+          <div class="chat-input-row">
+            <textarea class="chat-input" id="chatInput" rows="1" placeholder="メッセージを入力..." onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+          </div>
+          <button class="human-consult-btn" onclick="requestHumanChat()">👤 人に相談したい</button>
+        </div>
+      </div>
+      <!-- 人チャット（iframe埋め込み） -->
+      <div id="humanChatArea" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <iframe id="crispFrame" src="" style="flex:1;border:none;border-radius:16px;" allow="microphone; camera"></iframe>
+        <button class="back-to-ai-btn show" onclick="backToAiChat()">← AIチャットに戻る</button>
       </div>
     </div>
   </div>
@@ -644,9 +642,9 @@ function initChat() {
   document.getElementById('crisisBanner').classList.remove('show');
   document.getElementById('escalationBanner').classList.remove('show');
   // 人チャットモードをリセット
-  document.getElementById('aiChatInputArea').style.display = '';
-  document.getElementById('humanChatPanel').classList.remove('show');
-  document.getElementById('backToAiBtn').classList.remove('show');
+  document.getElementById('aiChatArea').style.display = 'flex';
+  document.getElementById('humanChatArea').style.display = 'none';
+  document.getElementById('crispFrame').src = '';
 
   // Groqで初回声かけを生成
   const q1e = Q_EMOJIS[1][answers.q1];
@@ -818,34 +816,29 @@ function startHumanChat(shareHistory) {
     alert('担当者チャットの設定がまだ完了していません。⚙️設定からCrisp IDを入力してください。');
     return;
   }
-  // Crisp読み込み（未読み込みの場合）
-  if (!window.$crisp) {
-    window.$crisp = [];
-    window.CRISP_WEBSITE_ID = crispId;
-    const s = document.createElement('script');
-    s.src = 'https://client.crisp.chat/l.js';
-    s.async = true;
-    document.head.appendChild(s);
-  }
-  // 履歴共有
+  // iframeにCrisp埋め込みURLをセット
+  let url = `https://go.crisp.chat/chat/embed/?website_id=${crispId}`;
+  document.getElementById('crispFrame').src = url;
+  // 履歴共有の場合：AI側チャットに履歴サマリーを表示
   if (shareHistory && chatHistory.length > 0) {
-    const histText = chatHistory.map(m => `${m.role === 'user' ? 'ユーザー' : 'AI'}: ${m.content}`).join('\n');
-    window.$crisp.push(['do', 'message:send', ['text', `【AIチャット履歴】\n${histText}`]]);
+    const histText = chatHistory.map(m => `${m.role === 'user' ? 'あなた' : 'AI'}: ${m.content}`).join('\n');
+    const note = document.createElement('div');
+    note.style.cssText = 'background:#f0f2f8;border-radius:10px;padding:10px 14px;font-size:11px;color:#7a8499;line-height:1.5;margin-bottom:8px;white-space:pre-wrap;max-height:80px;overflow-y:auto;';
+    note.textContent = '📋 AIとの会話履歴を担当者に共有しました\n' + histText;
+    document.getElementById('humanChatArea').insertBefore(note, document.getElementById('crispFrame'));
   }
-  window.$crisp.push(['do', 'chat:open']);
-  // UIを切り替え
-  document.getElementById('aiChatInputArea').style.display = 'none';
-  document.getElementById('quickReplies').innerHTML = '';
-  document.getElementById('humanChatPanel').classList.add('show');
-  document.getElementById('backToAiBtn').classList.add('show');
-  scrollChat();
+  // UI切り替え
+  document.getElementById('aiChatArea').style.display = 'none';
+  document.getElementById('humanChatArea').style.display = 'flex';
 }
 
 function backToAiChat() {
-  if (window.$crisp) window.$crisp.push(['do', 'chat:hide']);
-  document.getElementById('aiChatInputArea').style.display = '';
-  document.getElementById('humanChatPanel').classList.remove('show');
-  document.getElementById('backToAiBtn').classList.remove('show');
+  document.getElementById('crispFrame').src = '';
+  // 履歴ノートがあれば削除
+  const note = document.getElementById('humanChatArea').querySelector('div');
+  if (note) note.remove();
+  document.getElementById('humanChatArea').style.display = 'none';
+  document.getElementById('aiChatArea').style.display = 'flex';
 }
 
 function escapeHtml(str) {
