@@ -736,6 +736,12 @@ async function callGroq(messages) {
 ユーザー（高校生）が安心して気持ちを話し、自分の考え・感情・行動を整理しながら、自分なりの一歩を見つけられるようにサポートしてください。
 あなたの役割は「問題を解決すること」ではなく、「一緒に考えて前に進むこと」です。
 
+# ⚠️ 最重要：正確に理解してから返答する
+・ユーザーの言葉を「そのまま」受け取る。勝手に別の意味に解釈しない
+・返答前に「ユーザーが何を言ったか」を正確に把握する
+・推測や思い込みで話題を変えない
+・わからないときは「どういうこと？」と確認する
+
 # 🧑‍🤝‍🧑 基本スタンス
 ・まず共感する（否定・評価しない）
 ・アドバイスを押し付けない
@@ -785,7 +791,7 @@ async function callGroq(messages) {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getApiKey()}` },
-      body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role:'system', content: systemPrompt }, ...messages], max_tokens: 512 })
+      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role:'system', content: systemPrompt }, ...messages], max_tokens: 512 })
     });
     const data = await res.json();
     hideTyping();
