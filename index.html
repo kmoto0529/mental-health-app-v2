@@ -161,6 +161,14 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 .content-title { font-size:15px; font-weight:800; color:#2d3a50; }
 .content-desc { font-size:13px; color:#7a8499; line-height:1.5; }
 .content-empty { text-align:center; padding:40px 20px; color:#b0b8cc; font-size:14px; font-weight:700; }
+/* 記事ビュー */
+.article-tag { font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; background:#e6f9f2; color:#1D9E75; display:inline-block; margin-bottom:10px; }
+.article-title { font-size:20px; font-weight:800; color:#2d3a50; margin-bottom:16px; line-height:1.4; }
+.article-section { margin-bottom:20px; }
+.article-section h3 { font-size:14px; font-weight:800; color:#1D9E75; margin-bottom:8px; }
+.article-section p { font-size:14px; color:#4a5568; line-height:1.7; }
+.article-section ul { padding-left:18px; }
+.article-section ul li { font-size:14px; color:#4a5568; line-height:1.8; }
 /* 匿名案内 */
 .anon-notice { background:#f0fdf8; border:1.5px solid #a7f3d0; border-radius:12px; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#065f46; line-height:1.5; font-weight:600; }
 /* 人との相談モード */
@@ -334,10 +342,22 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 
   <!-- CONTENTS TAB -->
   <div class="screen" id="screen-contents">
-    <div style="padding:4px 0 12px;">
-      <input class="content-search" id="contentSearch" type="text" placeholder="検索..." oninput="filterContents(this.value)">
+    <!-- 一覧ビュー -->
+    <div id="contentsListView">
+      <div style="padding:4px 0 12px;">
+        <input class="content-search" id="contentSearch" type="text" placeholder="検索..." oninput="filterContents(this.value)">
+      </div>
+      <div id="contentsList"></div>
     </div>
-    <div id="contentsList"></div>
+    <!-- 記事ビュー -->
+    <div id="contentsArticleView" style="display:none;">
+      <button onclick="closeArticle()" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:#1D9E75;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;padding:4px 0 16px;">← 一覧に戻る</button>
+      <div id="articleContent"></div>
+      <div style="margin-top:24px;padding:16px;background:#f0fdf8;border-radius:16px;text-align:center;">
+        <div style="font-size:13px;color:#4a5568;margin-bottom:10px;">このテーマについてAIに相談してみませんか？</div>
+        <button id="articleChatBtn" onclick="" style="padding:12px 24px;background:linear-gradient(135deg,#1D9E75,#0d7055);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;">💬 AIに相談する</button>
+      </div>
+    </div>
   </div>
 
   <!-- HISTORY TAB -->
@@ -362,16 +382,26 @@ const CRISP_ID_STORAGE = "mh_v2_crisp_id";
 
 // ─── コンテンツデータ ─────────────────────────────────
 const CONTENTS_DATA = [
-  { id:1, tag:'友達関係', title:'友達とうまくいかないとき', desc:'グループでの疎外感、友達との喧嘩、距離の置き方。人間関係のもやもやを整理するヒント。' },
-  { id:2, tag:'勉強・受験', title:'やる気が出ないときの乗り越え方', desc:'「やらなきゃ」と思うほど動けない悪循環を断ち切る、小さな一歩の見つけ方。' },
-  { id:3, tag:'睡眠', title:'眠れない夜の対処法', desc:'スマホ依存、夜更かし、朝起きられない……睡眠の質を上げる実践的な方法。' },
-  { id:4, tag:'ストレス', title:'ストレスをため込まないために', desc:'感情の名前をつけること、日常でできる発散法、心が楽になるセルフケア。' },
-  { id:5, tag:'受験・テスト', title:'試験のプレッシャーとの向き合い方', desc:'不安な気持ちはむしろ正常。プレッシャーを味方にする考え方と準備の仕方。' },
-  { id:6, tag:'家族', title:'親との関係が難しいと感じたら', desc:'価値観のぶつかり、過干渉、伝わらない気持ち。親との距離感を考えるヒント。' },
-  { id:7, tag:'SNS・スマホ', title:'SNSとの上手な付き合い方', desc:'比べてしまう、通知が気になる、やめられない。スマホと健全な距離を保つ方法。' },
-  { id:8, tag:'自己肯定感', title:'自分に自信が持てないと感じたら', desc:'自分を責めすぎてしまう人へ。自己評価の歪みに気づいて、ありのままを認めるヒント。' },
-  { id:9, tag:'将来・進路', title:'将来が不安でたまらないとき', desc:'進路、就職、大学……「正解」がわからない不安と向き合う方法。焦らなくていい理由。' },
-  { id:10, tag:'気分の落ち込み', title:'気分が落ち込んでいるとき', desc:'何もしたくない、涙が出る、理由がわからない憂うつ。気持ちが沈む日の過ごし方。' },
+  { id:1, tag:'友達関係', title:'友達とうまくいかないとき', desc:'グループでの疎外感、友達との喧嘩、距離の置き方。人間関係のもやもやを整理するヒント。',
+    article: `<div class="article-section"><h3>😔 こんな気持ち、感じていない？</h3><p>「グループの会話についていけない」「なんか避けられてる気がする」「友達に合わせてばかりで疲れた」——そういうモヤモヤ、すごく多くの人が感じているよ。</p></div><div class="article-section"><h3>💡 人間関係がうまくいかない理由</h3><ul><li>相手の気持ちを「想像」しすぎてしまう</li><li>自分の気持ちを言葉にできていない</li><li>「嫌われたくない」という気持ちが強すぎる</li></ul></div><div class="article-section"><h3>🌱 今日からできること</h3><ul><li>まずは「自分がどう感じているか」を紙に書き出す</li><li>相手の行動の「最悪な解釈」以外を考えてみる</li><li>信頼できる1人に気持ちを話してみる</li></ul></div><div class="article-section"><h3>📌 覚えておいてほしいこと</h3><p>全員に好かれる必要はないよ。自分を大切にしてくれる人と、少しずつ関係を深めていけば十分。</p></div>` },
+  { id:2, tag:'勉強・受験', title:'やる気が出ないときの乗り越え方', desc:'「やらなきゃ」と思うほど動けない悪循環を断ち切る、小さな一歩の見つけ方。',
+    article: `<div class="article-section"><h3>😓 「やらなきゃ」なのに動けない...</h3><p>机に向かっても集中できない、スマホばかり見てしまう——これは意志が弱いわけじゃなくて、脳が「報酬」を見つけられていないサインだよ。</p></div><div class="article-section"><h3>💡 やる気が出ない本当の理由</h3><ul><li>ゴールが大きすぎて「どこから手をつけていいかわからない」</li><li>疲れや睡眠不足で脳のエネルギーが足りない</li><li>「失敗したくない」という恐怖が邪魔している</li></ul></div><div class="article-section"><h3>🌱 「2分ルール」を試してみよう</h3><p>「2分だけやる」と決めて始める。人間の脳は始めてしまうと続けやすくなる（作業興奮）。2分後にやめてもOK——でも多くの場合、続けられるよ。</p></div><div class="article-section"><h3>📌 タスクを小さく分解する</h3><ul><li>「英語を勉強する」→「単語帳を5個見る」に変える</li><li>できたら自分をちゃんと褒める</li></ul></div>` },
+  { id:3, tag:'睡眠', title:'眠れない夜の対処法', desc:'スマホ依存、夜更かし、朝起きられない……睡眠の質を上げる実践的な方法。',
+    article: `<div class="article-section"><h3>🌙 眠れない夜、つらいよね</h3><p>布団に入ってもいろんなことを考えてしまう、スマホが手放せない、朝になっても眠れなかった——そんな夜が続くと、心も体も消耗してしまうよ。</p></div><div class="article-section"><h3>💡 眠れない主な原因</h3><ul><li>スマホのブルーライトが睡眠ホルモンを妨げる</li><li>考えすぎ・不安による脳の興奮状態</li><li>昼夜逆転した体内時計のズレ</li></ul></div><div class="article-section"><h3>🌱 今夜から試せること</h3><ul><li>寝る1時間前にスマホを伏せる（通知オフだけでも効果あり）</li><li>4-7-8呼吸：4秒吸う→7秒止める→8秒かけて吐く</li><li>「明日の心配」は紙に書き出して「もう考えなくていい」と置いておく</li></ul></div><div class="article-section"><h3>📌 朝の光を浴びよう</h3><p>起きたらすぐ窓を開けて光を浴びる。体内時計がリセットされて、夜に自然な眠気が来やすくなるよ。</p></div>` },
+  { id:4, tag:'ストレス', title:'ストレスをため込まないために', desc:'感情の名前をつけること、日常でできる発散法、心が楽になるセルフケア。',
+    article: `<div class="article-section"><h3>😤 ストレスって何？</h3><p>ストレスは「心と体への負荷」のこと。適度なストレスは成長につながるけど、ため込みすぎると心身に影響が出てくるよ。</p></div><div class="article-section"><h3>💡 ストレスをため込むパターン</h3><ul><li>「大したことない」と感情を抑えてしまう</li><li>一人で全部解決しようとする</li><li>発散する時間・場所がない</li></ul></div><div class="article-section"><h3>🌱 感情に名前をつけてみよう</h3><p>「なんかしんどい」を「悲しい」「怖い」「悔しい」など具体的な言葉に変えるだけで、気持ちが少し落ち着くよ。これを「感情のラベリング」と言うよ。</p></div><div class="article-section"><h3>📌 日常でできる発散法</h3><ul><li>10分歩く（有酸素運動はストレスホルモンを下げる）</li><li>好きな音楽を大きめの音で聴く</li><li>誰かに話す（解決策じゃなく、聞いてもらうだけでもOK）</li></ul></div>` },
+  { id:5, tag:'受験・テスト', title:'試験のプレッシャーとの向き合い方', desc:'不安な気持ちはむしろ正常。プレッシャーを味方にする考え方と準備の仕方。',
+    article: `<div class="article-section"><h3>😰 試験前の不安は「正常」</h3><p>試験前に緊張したり、不安になったりするのは、脳が「大事な場面だ」と認識しているサイン。全く緊張しない人はほとんどいないよ。</p></div><div class="article-section"><h3>💡 プレッシャーが強くなりすぎる理由</h3><ul><li>「失敗したらどうしよう」という最悪の結果ばかり想像してしまう</li><li>「絶対に〇〇しなきゃ」という強すぎるルール</li><li>準備不足による自信のなさ</li></ul></div><div class="article-section"><h3>🌱 不安を「エネルギー」に変える</h3><p>「緊張している＝やる気がある証拠」と捉え直してみよう。研究では「これはワクワクだ」と言葉にするだけで、パフォーマンスが上がることがわかっているよ。</p></div><div class="article-section"><h3>📌 テスト前日にやること</h3><ul><li>新しいことをやらない（今まで覚えたことを信じる）</li><li>7〜8時間の睡眠を確保する</li><li>「できることをやった」と自分に言い聞かせる</li></ul></div>` },
+  { id:6, tag:'家族', title:'親との関係が難しいと感じたら', desc:'価値観のぶつかり、過干渉、伝わらない気持ち。親との距離感を考えるヒント。',
+    article: `<div class="article-section"><h3>😞 家にいるのがつらいと感じることある？</h3><p>親と価値観が合わない、干渉されすぎる、自分の気持ちが伝わらない——家族との関係は、外に出しにくい悩みのひとつだよ。</p></div><div class="article-section"><h3>💡 親との摩擦が起きやすい理由</h3><ul><li>親は「心配」から言っているが、あなたには「否定」に聞こえる</li><li>世代による価値観の違い</li><li>あなた自身が自立していく過程で起きる自然な変化</li></ul></div><div class="article-section"><h3>🌱 関係を少し楽にするヒント</h3><ul><li>「相手を変えよう」より「自分の反応を変える」方が早い</li><li>伝えるとき：「〇〇されると、私は△△な気持ちになる」という言い方にする</li><li>物理的に距離をとる時間（自分の部屋、図書館など）を作る</li></ul></div><div class="article-section"><h3>📌 一人で抱え込まないで</h3><p>どうしてもつらい場合は、スクールカウンセラーや信頼できる先生に話してみてね。家の中のことを話せる場所は必ずあるよ。</p></div>` },
+  { id:7, tag:'SNS・スマホ', title:'SNSとの上手な付き合い方', desc:'比べてしまう、通知が気になる、やめられない。スマホと健全な距離を保つ方法。',
+    article: `<div class="article-section"><h3>📱 SNSを見てモヤっとすること、ない？</h3><p>「みんな楽しそうなのに自分だけ」「いいね数が気になって仕方ない」——SNSは楽しいはずなのに、見るたびに疲れてしまうことあるよね。</p></div><div class="article-section"><h3>💡 SNSで自己評価が下がる仕組み</h3><p>SNSには「良い瞬間」しか投稿されない。つまり、他人のハイライトと自分の日常を比べているんだ。これはそもそも不公平な比較だよ。</p></div><div class="article-section"><h3>🌱 スマホと距離を置くコツ</h3><ul><li>通知をオフにする（特に夜）</li><li>スマホを部屋の外に置いて寝る</li><li>「SNSを見る時間」を1日30分と決める</li><li>フォローを整理する（見てしんどくなるアカウントはミュート）</li></ul></div><div class="article-section"><h3>📌 大切なこと</h3><p>スマホを使う「量」より「どう使っているか」が大事。能動的に楽しむ（動画を作る、友達と話す）のと、受動的に流し見するのでは、気分の変化が全然違うよ。</p></div>` },
+  { id:8, tag:'自己肯定感', title:'自分に自信が持てないと感じたら', desc:'自分を責めすぎてしまう人へ。自己評価の歪みに気づいて、ありのままを認めるヒント。',
+    article: `<div class="article-section"><h3>😔 自分のことが好きになれない...</h3><p>「どうせ自分なんか」「また失敗した、やっぱりダメだ」——自分を責める声が頭の中でうるさいとき、すごく消耗するよね。</p></div><div class="article-section"><h3>💡 自己肯定感が低くなる仕組み</h3><ul><li>完璧主義：「100点以外は失敗」という基準</li><li>マイナスの証拠集め：うまくいったことを無視して失敗だけ記憶する</li><li>他人の評価を自分の価値と混同してしまう</li></ul></div><div class="article-section"><h3>🌱 今日試してほしいこと</h3><ul><li>「今日できた小さなこと」を3つ書く（起きた、ご飯食べた、でもOK）</li><li>自分に厳しいとき「友達が同じことを言ってきたらなんて返す？」と考える</li><li>「〇〇できないダメな自分」→「〇〇が苦手な自分もいる」と言い換える</li></ul></div><div class="article-section"><h3>📌 自己肯定感は「育てるもの」</h3><p>自信は最初からあるものじゃなくて、小さな成功体験を積み重ねて育てていくもの。焦らなくていいよ。</p></div>` },
+  { id:9, tag:'将来・進路', title:'将来が不安でたまらないとき', desc:'進路、就職、大学……「正解」がわからない不安と向き合う方法。焦らなくていい理由。',
+    article: `<div class="article-section"><h3>🤔 将来のこと、考えるほど怖くなる？</h3><p>「進路どうしよう」「やりたいことが見つからない」「みんなはもう決まってるのに自分だけ」——将来への不安は、真剣に考えている証拠でもあるよ。</p></div><div class="article-section"><h3>💡 将来が怖くなる理由</h3><ul><li>「正解」を探しているから（実は正解は一つじゃない）</li><li>遠い未来を今すぐ決めようとしている</li><li>他人と自分を比べてしまっている</li></ul></div><div class="article-section"><h3>🌱 「今できること」に集中しよう</h3><p>将来は今の積み重ねでしかない。遠い未来を心配するより「今週やれること」を一つ決める方が、ずっと建設的だよ。</p></div><div class="article-section"><h3>📌 やりたいことがない人へ</h3><ul><li>「嫌いなこと」を消していくのも一つの方法</li><li>興味のあることを「試しにやってみる」を繰り返す</li><li>20歳で人生を全部決めなくていい——ほとんどの大人も途中で変わっているよ</li></ul></div>` },
+  { id:10, tag:'気分の落ち込み', title:'気分が落ち込んでいるとき', desc:'何もしたくない、涙が出る、理由がわからない憂うつ。気持ちが沈む日の過ごし方。',
+    article: `<div class="article-section"><h3>😢 理由もなく落ち込む日、ある</h3><p>特に何もなかったのに涙が出る、何もしたくない、楽しいはずのことが楽しくない——そんな日は誰にでもある。自分がおかしいわけじゃないよ。</p></div><div class="article-section"><h3>💡 気分が落ち込む主な理由</h3><ul><li>睡眠不足・疲労の蓄積</li><li>ストレスが限界に近づいているサイン</li><li>季節・天気・ホルモンバランスの変化</li></ul></div><div class="article-section"><h3>🌱 落ち込んだ日の過ごし方</h3><ul><li>無理に元気にしようとしない（感情に抵抗するとかえって長引く）</li><li>「今日はしんどい日」と認めて、休む許可を自分に出す</li><li>外に少しだけ出る（5分でも光と空気を浴びるだけで違う）</li><li>温かい飲み物を飲む、好きな音楽を聴くなどの小さなセルフケア</li></ul></div><div class="article-section"><h3>🚨 こんなときは相談して</h3><p>2週間以上ほぼ毎日気分が沈んでいる、食欲がない、眠れないが続く場合は、スクールカウンセラーや医師への相談も考えてみてね。</p></div>` },
 ];
 
 // ─── デフォルトシステムプロンプト ─────────────────────
@@ -871,9 +901,20 @@ function filterContents(val) { renderContents(val); }
 function openContent(id) {
   const c = CONTENTS_DATA.find(x => x.id === id);
   if (!c) return;
-  // 将来的には詳細画面へ遷移。現状はチャットに話題として渡す
-  switchTab('chat');
-  setTimeout(() => sendMessage(`「${c.title}」について教えて`), 300);
+  document.getElementById('articleContent').innerHTML =
+    `<span class="article-tag">${c.tag}</span><div class="article-title">${c.title}</div>${c.article}`;
+  document.getElementById('articleChatBtn').onclick = () => {
+    switchTab('chat');
+    setTimeout(() => sendMessage(`「${c.title}」について教えて`), 300);
+  };
+  document.getElementById('contentsListView').style.display = 'none';
+  document.getElementById('contentsArticleView').style.display = 'block';
+  document.getElementById('screen-contents').scrollTop = 0;
+}
+
+function closeArticle() {
+  document.getElementById('contentsArticleView').style.display = 'none';
+  document.getElementById('contentsListView').style.display = 'block';
 }
 
 // ─── きろく ───────────────────────────────────────────
