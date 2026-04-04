@@ -1,0 +1,67 @@
+import { useState } from 'react';
+import { supabase } from '../supabase';
+
+export default function Login() {
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setError('メールアドレスまたはパスワードが違います');
+    setLoading(false);
+  }
+
+  return (
+    <div style={styles.wrap}>
+      <div style={styles.card}>
+        <div style={styles.logo}>🌱</div>
+        <h1 style={styles.title}>きもちチェック</h1>
+        <p style={styles.sub}>教員ダッシュボード</p>
+        <form onSubmit={handleLogin} style={styles.form}>
+          <label style={styles.label}>メールアドレス</label>
+          <input
+            style={styles.input}
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="teacher@school.jp"
+            required
+            autoComplete="email"
+          />
+          <label style={styles.label}>パスワード</label>
+          <input
+            style={styles.input}
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete="current-password"
+          />
+          {error && <p style={styles.error}>{error}</p>}
+          <button style={{ ...styles.btn, opacity: loading ? 0.7 : 1 }} type="submit" disabled={loading}>
+            {loading ? 'ログイン中...' : 'ログイン'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+const styles = {
+  wrap: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f4f8', padding: '20px' },
+  card: { background: 'white', borderRadius: '24px', padding: '40px 36px', width: '100%', maxWidth: '400px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' },
+  logo: { fontSize: '40px', textAlign: 'center', marginBottom: '8px' },
+  title: { fontSize: '22px', fontWeight: '800', textAlign: 'center', color: '#2d3a50', margin: '0 0 4px' },
+  sub: { fontSize: '13px', color: '#8a96aa', textAlign: 'center', marginBottom: '32px' },
+  form: { display: 'flex', flexDirection: 'column', gap: '6px' },
+  label: { fontSize: '13px', fontWeight: '700', color: '#4a5568', marginTop: '10px' },
+  input: { padding: '12px 14px', border: '2px solid #e8ecf4', borderRadius: '12px', fontSize: '15px', outline: 'none', transition: 'border-color 0.2s' },
+  error: { fontSize: '13px', color: '#ef4444', fontWeight: '600', marginTop: '4px' },
+  btn: { marginTop: '20px', padding: '14px', background: 'linear-gradient(135deg,#1D9E75,#0d7055)', color: 'white', border: 'none', borderRadius: '14px', fontSize: '16px', fontWeight: '800', cursor: 'pointer' },
+};
