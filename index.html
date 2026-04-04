@@ -173,6 +173,21 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 .anon-notice { background:#f0fdf8; border:1.5px solid #a7f3d0; border-radius:12px; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#065f46; line-height:1.5; font-weight:600; }
 /* 人との相談モード */
 .back-to-ai-btn { width:100%; padding:12px; background:#f0f2f8; color:#4a5568; border:none; border-radius:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; margin-top:8px; flex-shrink:0; }
+/* セットアップ画面 */
+.setup-overlay { display:none; position:fixed; inset:0; background:#eef2ff; z-index:3000; overflow-y:auto; padding:40px 24px 40px; }
+.setup-overlay.show { display:block; }
+.setup-logo { font-size:40px; text-align:center; margin-bottom:8px; }
+.setup-title { font-size:22px; font-weight:800; color:#2d3a50; text-align:center; margin-bottom:6px; }
+.setup-sub { font-size:13px; color:#7a8499; text-align:center; margin-bottom:32px; line-height:1.6; }
+.setup-label { font-size:14px; font-weight:700; color:#2d3a50; margin-bottom:6px; }
+.setup-hint { font-size:12px; color:#8a96aa; margin-bottom:8px; }
+.setup-input { width:100%; border:2px solid #e8ecf4; border-radius:14px; padding:13px 16px; font-family:'Nunito',sans-serif; font-size:16px; color:#2d3a50; outline:none; transition:border-color 0.2s; margin-bottom:20px; letter-spacing:2px; }
+.setup-input:focus { border-color:#1D9E75; }
+.setup-input.name { letter-spacing:0; }
+.setup-error { font-size:13px; color:#ef4444; margin-bottom:12px; min-height:18px; font-weight:600; }
+.setup-btn { width:100%; padding:16px; background:linear-gradient(135deg,#1D9E75,#0d7055); color:white; border:none; border-radius:20px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; cursor:pointer; box-shadow:0 4px 16px rgba(29,158,117,0.35); transition:all 0.2s; }
+.setup-btn:disabled { background:#d0d7e8; box-shadow:none; cursor:not-allowed; }
+.setup-anon { background:#f0fdf8; border:1.5px solid #a7f3d0; border-radius:12px; padding:10px 14px; margin-top:16px; font-size:12px; color:#065f46; line-height:1.5; font-weight:600; }
 /* 同意ダイアログ */
 .consent-dialog { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; }
 .consent-dialog.show { display:flex; }
@@ -183,6 +198,22 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 </style>
 </head>
 <body>
+<!-- セットアップ画面（初回のみ） -->
+<div class="setup-overlay" id="setupOverlay">
+  <div class="setup-logo">🌱</div>
+  <div class="setup-title">きもちチェックへようこそ</div>
+  <div class="setup-sub">はじめに、クラスコードと<br>あなたの名前（または出席番号）を入力してね</div>
+  <div class="setup-label">クラスコード <span style="color:#ef4444">*</span></div>
+  <div class="setup-hint">担任の先生から教えてもらった6文字のコード</div>
+  <input class="setup-input" id="setupClassCode" type="text" maxlength="6" placeholder="TEST01" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()">
+  <div class="setup-label">なまえ / 出席番号（任意）</div>
+  <div class="setup-hint">先生があなたを確認するために使います。入力しなくてもOK。</div>
+  <input class="setup-input name" id="setupName" type="text" maxlength="20" placeholder="例: 山田太郎 または 出席番号12">
+  <div class="setup-error" id="setupError"></div>
+  <button class="setup-btn" id="setupSubmitBtn" onclick="submitSetup()">はじめる →</button>
+  <div class="setup-anon">🔒 入力した情報は担任の先生のみ確認できます。AIとの会話内容は記録されません。</div>
+</div>
+
 <div class="app">
   <div class="header">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -373,12 +404,113 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // ─── 定数 ───────────────────────────────────────────
 const STORAGE_KEY      = "mh_v2_records";
 const API_KEY_STORAGE  = "mh_v2_api_key";
 const PROMPT_STORAGE   = "mh_v2_system_prompt";
 const CRISP_ID_STORAGE = "mh_v2_crisp_id";
+const STUDENT_ID_KEY   = "mh_v2_student_id";
+const CLASS_ID_KEY     = "mh_v2_class_id";
+
+// ─── Supabase ───────────────────────────────────────
+const SB_URL = "https://djodctopyiwiphypfiwh.supabase.co";
+const SB_KEY = "sb_publishable_-nwWNGk8bZXrwwNplPEOIA_6dALsE5m";
+let sb = null;
+
+function initSupabase() {
+  if (window.supabase) sb = window.supabase.createClient(SB_URL, SB_KEY);
+}
+
+function getStudentId() { return localStorage.getItem(STUDENT_ID_KEY); }
+function getClassId()   { return localStorage.getItem(CLASS_ID_KEY); }
+
+// ─── セットアップ ────────────────────────────────────
+function showSetupScreen() {
+  document.getElementById('setupOverlay').classList.add('show');
+}
+function hideSetupScreen() {
+  document.getElementById('setupOverlay').classList.remove('show');
+}
+
+async function submitSetup() {
+  const code = document.getElementById('setupClassCode').value.trim().toUpperCase();
+  const name = document.getElementById('setupName').value.trim();
+  const errEl = document.getElementById('setupError');
+  const btn   = document.getElementById('setupSubmitBtn');
+  errEl.textContent = '';
+
+  if (code.length !== 6) {
+    errEl.textContent = 'クラスコードは6文字で入力してください';
+    return;
+  }
+  if (!sb) { errEl.textContent = 'ネットワークに接続してから試してください'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '確認中...';
+
+  // クラスコード照合
+  const { data: cls, error: clsErr } = await sb
+    .from('classes').select('id').eq('class_code', code).maybeSingle();
+
+  if (clsErr || !cls) {
+    errEl.textContent = 'クラスコードが見つかりません。担任の先生に確認してください。';
+    btn.disabled = false; btn.textContent = 'はじめる →'; return;
+  }
+
+  // 学生登録
+  const { data: stu, error: stuErr } = await sb
+    .from('students').insert({ class_id: cls.id, display_name: name || null })
+    .select('id').single();
+
+  if (stuErr) {
+    errEl.textContent = '登録中にエラーが発生しました。もう一度お試しください。';
+    btn.disabled = false; btn.textContent = 'はじめる →'; return;
+  }
+
+  localStorage.setItem(STUDENT_ID_KEY, stu.id);
+  localStorage.setItem(CLASS_ID_KEY, cls.id);
+  btn.textContent = '登録完了！';
+  setTimeout(hideSetupScreen, 600);
+}
+
+// ─── Supabase 同期ユーティリティ ─────────────────────
+async function syncMoodRecord(avgScore, tags, dateStr, detail) {
+  if (!sb || !getStudentId()) return;
+  try {
+    await sb.from('mood_records').upsert(
+      { student_id: getStudentId(), score: avgScore, tags: tags, recorded_at: dateStr, detail: detail },
+      { onConflict: 'student_id,recorded_at' }
+    );
+  } catch(e) { /* サイレント失敗 */ }
+}
+
+let currentSessionId = null;
+let sessionMsgCount  = 0;
+
+async function createChatSession() {
+  if (!sb || !getStudentId()) return;
+  const today = new Date().toISOString().slice(0,10);
+  try {
+    const { data } = await sb.from('chat_sessions')
+      .insert({ student_id: getStudentId(), session_date: today, message_count: 0 })
+      .select('id').single();
+    if (data) { currentSessionId = data.id; sessionMsgCount = 0; }
+  } catch(e) {}
+}
+
+async function updateChatSession(crisis) {
+  if (!sb || !currentSessionId) return;
+  const upd = { message_count: sessionMsgCount };
+  if (crisis) upd.crisis_detected = true;
+  try { await sb.from('chat_sessions').update(upd).eq('id', currentSessionId); } catch(e) {}
+}
+
+async function logConsultation() {
+  if (!sb || !getStudentId()) return;
+  try { await sb.from('consultation_logs').insert({ student_id: getStudentId() }); } catch(e) {}
+}
 
 // ─── コンテンツデータ ─────────────────────────────────
 const CONTENTS_DATA = [
@@ -546,8 +678,9 @@ function init() {
   const d = new Date();
   document.getElementById('headerDate').textContent =
     d.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
-  // screen-step1をデフォルト表示（きろくタブに対応）
   document.getElementById('screen-step1').classList.add('active');
+  initSupabase();
+  if (!getStudentId()) showSetupScreen();
 }
 
 // ─── タブ切り替え ────────────────────────────────────
@@ -604,6 +737,17 @@ function saveRecord() {
   const weekKey = getWeekKey(new Date());
   records[weekKey] = { date: new Date().toISOString(), q1: answers.q1, q2: answers.q2, q3: answers.q3, comment: currentComment };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+
+  // Supabase同期（スコア: 0=最良→5点、4=最悪→1点）
+  const s1 = 5 - answers.q1, s2 = 5 - answers.q2, s3 = 5 - answers.q3;
+  const avgScore = Math.max(1, Math.round((s1 + s2 + s3) / 3));
+  const tags = [];
+  if (answers.q1 >= 3) tags.push('school');
+  if (answers.q2 >= 3) tags.push('friend');
+  if (answers.q3 >= 3) tags.push('self');
+  const detail = { school: s1, friend: s2, sleep: s3 };
+  const today = new Date().toISOString().slice(0,10);
+  syncMoodRecord(avgScore, tags, today, detail);
 }
 
 function loadRecords() {
@@ -662,6 +806,9 @@ function goToKiroku() { switchTab('history'); }
 // ─── STEP3 チャット ───────────────────────────────────
 function initChat() {
   chatHistory = [];
+  currentSessionId = null;
+  sessionMsgCount  = 0;
+  createChatSession();
   const msgs = document.getElementById('chatMessages');
   msgs.innerHTML = '';
   // 匿名案内
@@ -708,6 +855,7 @@ function sendMessage(overrideText) {
 
   addUserMessage(text);
   chatHistory.push({ role: 'user', content: text });
+  sessionMsgCount++;
   document.getElementById('quickReplies').innerHTML = '';
 
   // ① エスカレーション判定（最優先）
@@ -715,6 +863,7 @@ function sendMessage(overrideText) {
   if (esc) {
     if (esc.level >= 3) {
       document.getElementById('crisisBanner').classList.add('show');
+      updateChatSession(true);
       return;
     } else if (esc.level >= 2) {
       document.getElementById('escalationBanner').classList.add('show');
@@ -841,6 +990,7 @@ function requestHumanChat() {
 
 function startHumanChat(shareHistory) {
   document.getElementById('consentDialog').classList.remove('show');
+  logConsultation();
   const crispId = getCrispId();
   if (!crispId) {
     alert('担当者チャットの設定がまだ完了していません。⚙️設定からCrisp IDを入力してください。');
