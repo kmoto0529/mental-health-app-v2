@@ -702,7 +702,12 @@ function switchTab(tab) {
   });
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   if (tab === 'kiroku') {
-    document.getElementById('screen-step1').classList.add('active');
+    if (hasRecordedToday()) {
+      document.getElementById('screen-step2').classList.add('active');
+      renderStep2FromSaved();
+    } else {
+      document.getElementById('screen-step1').classList.add('active');
+    }
   } else if (tab === 'chat') {
     document.getElementById('screen-step3').classList.add('active');
     if (chatHistory.length === 0) initChat();
