@@ -476,11 +476,11 @@ async function submitSetup() {
 }
 
 // ─── Supabase 同期ユーティリティ ─────────────────────
-async function syncMoodRecord(avgScore, tags, dateStr, detail) {
+async function syncMoodRecord(avgScore, tags, dateStr, detail, comment) {
   if (!sb || !getStudentId()) return;
   try {
     await sb.from('mood_records').upsert(
-      { student_id: getStudentId(), score: avgScore, tags: tags, recorded_at: dateStr, detail: detail },
+      { student_id: getStudentId(), score: avgScore, tags: tags, recorded_at: dateStr, detail: detail, comment: comment || null },
       { onConflict: 'student_id,recorded_at' }
     );
   } catch(e) { /* サイレント失敗 */ }
@@ -764,7 +764,7 @@ function saveRecord() {
   if (answers.q3 >= 3) tags.push('self');
   const detail = { school: s1, friend: s2, sleep: s3 };
   const today = new Date().toISOString().slice(0,10);
-  syncMoodRecord(avgScore, tags, today, detail);
+  syncMoodRecord(avgScore, tags, today, detail, currentComment);
 }
 
 function loadRecords() {

@@ -55,6 +55,7 @@ CREATE TABLE mood_records (
   score       INT NOT NULL CHECK (score BETWEEN 1 AND 5),
   tags        TEXT[],           -- ['school','friend','family','self','other']
   detail      JSONB,            -- 各項目スコア例: {"school":4,"friend":5,"sleep":2}
+  comment     TEXT,             -- ひとことコメント（教員ダッシュボードで閲覧可）
   recorded_at DATE NOT NULL,    -- 記録日（1日1件）
   created_at  TIMESTAMPTZ DEFAULT now(),
   UNIQUE (student_id, recorded_at)

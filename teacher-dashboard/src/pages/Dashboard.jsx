@@ -48,9 +48,9 @@ export default function Dashboard() {
 
     const stuIds = (stuData || []).map(s => s.id);
 
-    // 気分記録 + detail (学校/友人/睡眠)
+    // 気分記録 + detail + comment
     const { data: moodData } = await supabase
-      .from('mood_records').select('student_id, score, detail, recorded_at')
+      .from('mood_records').select('student_id, score, detail, comment, recorded_at')
       .in('student_id', stuIds).gte('recorded_at', sinceStr).order('recorded_at');
 
     // 未解決アラート
@@ -79,6 +79,7 @@ export default function Dashboard() {
         recentRecords: records,
         latestScore: latest?.score ?? null,
         latestDetail: latest?.detail ?? null,
+        latestComment: latest?.comment ?? null,
         latestDate: latest?.recorded_at ?? null,
         alerts,
         maxAlertLevel: alerts.length > 0 ? Math.max(...alerts.map(a => a.level)) : 0,
@@ -198,6 +199,9 @@ export default function Dashboard() {
                       </div>
                     </div>
 
+                    {s.latestComment && (
+                      <div style={styles.studentComment}>💬 {s.latestComment}</div>
+                    )}
                     {s.latestDate && (
                       <div style={styles.studentDate}>最終記録: {s.latestDate}</div>
                     )}
@@ -250,5 +254,6 @@ const styles = {
   scoreEmoji: { fontSize: '24px', lineHeight: 1 },
   scoreSmall: { fontSize: '18px', fontWeight: '800', lineHeight: 1 },
   scoreLabel: { fontSize: '10px', color: '#8a96aa', fontWeight: '700', marginTop: '2px' },
+  studentComment: { fontSize: '13px', color: '#4a5568', background: '#f8f9fb', borderRadius: '8px', padding: '6px 10px', marginTop: '8px', lineHeight: '1.5' },
   studentDate: { fontSize: '11px', color: '#b0b8cc', marginTop: '6px' },
 };
