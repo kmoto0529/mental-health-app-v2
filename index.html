@@ -220,7 +220,7 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
       <div class="header-date" id="headerDate"></div>
       <button onclick="openApiModal()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">⚙️ 設定</button>
     </div>
-    <div class="header-title">今週のきもちチェック🌱</div>
+    <div class="header-title">今日のきもちチェック🌱</div>
     <div class="tabs" style="gap:3px;">
       <button class="tab-btn active" id="tab-kiroku"   onclick="switchTab('kiroku')"   style="font-size:11px;padding:9px 4px;">きろく</button>
       <button class="tab-btn"        id="tab-chat"     onclick="switchTab('chat')"     style="font-size:11px;padding:9px 4px;">チャット</button>
@@ -394,7 +394,7 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
   <!-- HISTORY TAB -->
   <div class="screen" id="screen-history">
     <div class="weekly-table-card">
-      <div class="table-title">✦ WEEKLY SUMMARY</div>
+      <div class="table-title">✦ DAILY SUMMARY — 直近7日</div>
       <table>
         <thead><tr><th></th><th>🏫 学校</th><th>👫 友人</th><th>😴 睡眠</th></tr></thead>
         <tbody id="summaryTableBody"></tbody>
@@ -674,6 +674,13 @@ let chatHistory = [];
 let isAiTyping = false;
 
 // ─── 初期化 ───────────────────────────────────────────
+function getTodayKey() { return new Date().toISOString().slice(0,10); }
+
+function hasRecordedToday() {
+  const records = loadRecords();
+  return !!records[getTodayKey()];
+}
+
 function init() {
   const d = new Date();
   document.getElementById('headerDate').textContent =
@@ -681,6 +688,11 @@ function init() {
   document.getElementById('screen-step1').classList.add('active');
   initSupabase();
   if (!getStudentId()) showSetupScreen();
+  else if (hasRecordedToday()) {
+    // 今日の記録済み → 完了画面を表示
+    showScreen('screen-step2');
+    renderStep2FromSaved();
+  }
 }
 
 // ─── タブ切り替え ────────────────────────────────────
@@ -734,8 +746,8 @@ function submitStep1() {
 
 function saveRecord() {
   const records = loadRecords();
-  const weekKey = getWeekKey(new Date());
-  records[weekKey] = { date: new Date().toISOString(), q1: answers.q1, q2: answers.q2, q3: answers.q3, comment: currentComment };
+  const todayKey = getTodayKey();
+  records[todayKey] = { date: new Date().toISOString(), q1: answers.q1, q2: answers.q2, q3: answers.q3, comment: currentComment };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 
   // Supabase同期（スコア: 0=最良→5点、4=最悪→1点）
@@ -763,12 +775,42 @@ function getWeekKey(d) {
 
 // ─── STEP2 ────────────────────────────────────────────
 function renderStep2() {
+  const records = loadRecords();
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const prevRec = records[yesterday.toISOString().slice(0,10)];
+  renderStep2WithPrev(prevRec?.q1 ?? null, prevRec?.q2 ?? null, prevRec?.q3 ?? null);
+}
+
+function renderStep2FromSaved() {
+  const records = loadRecords();
+  const todayRec = records[getTodayKey()];
+  if (!todayRec) return;
+  answers = { q1: todayRec.q1, q2: todayRec.q2, q3: todayRec.q3 };
+  currentComment = todayRec.comment || '';
+  // 前日の記録を取得
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const prevRec = records[yesterday.toISOString().slice(0,10)];
+  const prevQ1 = prevRec ? prevRec.q1 : null;
+  const prevQ2 = prevRec ? prevRec.q2 : null;
+  const prevQ3 = prevRec ? prevRec.q3 : null;
+  renderStep2WithPrev(prevQ1, prevQ2, prevQ3);
+}
+
+function renderStep2WithPrev(prevQ1, prevQ2, prevQ3) {
   const qs = [
-    { icon:'🏫', label:'学校', currIdx: answers.q1, prevIdx: LAST_WEEK_DUMMY.q1, qn:1 },
-    { icon:'👫', label:'友人', currIdx: answers.q2, prevIdx: LAST_WEEK_DUMMY.q2, qn:2 },
-    { icon:'😴', label:'睡眠', currIdx: answers.q3, prevIdx: LAST_WEEK_DUMMY.q3, qn:3 },
+    { icon:'🏫', label:'学校', currIdx: answers.q1, prevIdx: prevQ1, qn:1 },
+    { icon:'👫', label:'友人', currIdx: answers.q2, prevIdx: prevQ2, qn:2 },
+    { icon:'😴', label:'睡眠', currIdx: answers.q3, prevIdx: prevQ3, qn:3 },
   ];
   document.getElementById('compareRows').innerHTML = qs.map(q => {
+    if (q.prevIdx === null) {
+      return `<div class="compare-row">
+        <span class="compare-icon">${q.icon}</span>
+        <span class="compare-label">${q.label}</span>
+        <div class="compare-emojis"><span class="curr">${Q_EMOJIS[q.qn][q.currIdx]}</span></div>
+        <span class="badge same">初回</span>
+      </div>`;
+    }
     const diff = q.prevIdx - q.currIdx;
     const [badge, cls] = diff > 0 ? ['改善','improved'] : diff < 0 ? ['変化あり','changed'] : ['変化なし','same'];
     return `<div class="compare-row">
@@ -1067,32 +1109,23 @@ function closeArticle() {
   document.getElementById('contentsListView').style.display = 'block';
 }
 
-// ─── きろく ───────────────────────────────────────────
+// ─── きろく（直近7日表示）────────────────────────────
 function renderKiroku() {
   const records = loadRecords();
-  const today = new Date();
-  const thisWeek = getWeekKey(today);
-  const lastWeek = getWeekKey(new Date(today.getTime() - 7*86400000));
-  const twoWeeks = getWeekKey(new Date(today.getTime() - 14*86400000));
-  const dummyLast = { q1:LAST_WEEK_DUMMY.q1, q2:LAST_WEEK_DUMMY.q2, q3:LAST_WEEK_DUMMY.q3, comment:'' };
-  const dummyTwo  = { q1:2, q2:2, q3:2, comment:'' };
-  const recs = [
-    { label:'今週 ✦', rec: records[thisWeek]||null, cls:'this-week' },
-    { label:'先週',   rec: records[lastWeek]||dummyLast, cls:'' },
-    { label:'2週前',  rec: records[twoWeeks]||dummyTwo,  cls:'prev2' },
-  ];
-  document.getElementById('summaryTableBody').innerHTML = recs.map(r =>
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    const label = i === 0 ? '今日 ✦' : i === 1 ? '昨日' : `${d.getMonth()+1}/${d.getDate()}`;
+    days.push({ key, label, rec: records[key] || null, cls: i === 0 ? 'this-week' : '' });
+  }
+  document.getElementById('summaryTableBody').innerHTML = days.map(r =>
     !r.rec ? `<tr class="${r.cls}"><td class="row-label">${r.label}</td><td>－</td><td>－</td><td>－</td></tr>`
            : `<tr class="${r.cls}"><td class="row-label">${r.label}</td><td>${Q_EMOJIS[1][r.rec.q1]}</td><td>${Q_EMOJIS[2][r.rec.q2]}</td><td>${Q_EMOJIS[3][r.rec.q3]}</td></tr>`
   ).join('');
-  const details = [
-    { label:'今週', rec: records[thisWeek]||null, cls:'' },
-    { label:'先週', rec: records[lastWeek]||dummyLast, cls:'prev' },
-    { label:'2週前', rec: records[twoWeeks]||dummyTwo, cls:'prev2' },
-  ];
-  document.getElementById('weekDetailCards').innerHTML = details.map(d =>
-    !d.rec ? `<div class="week-detail-card ${d.cls}"><div class="week-detail-label">${d.label}</div><div class="empty-state"><span class="ei">📭</span>記録なし</div></div>`
-           : `<div class="week-detail-card ${d.cls}">
+  document.getElementById('weekDetailCards').innerHTML = days.map(d =>
+    !d.rec ? `<div class="week-detail-card ${d.cls === 'this-week' ? '' : 'prev'}"><div class="week-detail-label">${d.label}</div><div class="empty-state"><span class="ei">📭</span>記録なし</div></div>`
+           : `<div class="week-detail-card ${d.cls === 'this-week' ? '' : 'prev'}">
                <div class="week-detail-label">${d.label}</div>
                <div class="week-detail-emojis">
                  <div class="week-emoji-item"><span class="ei">${Q_EMOJIS[1][d.rec.q1]}</span>学校</div>
