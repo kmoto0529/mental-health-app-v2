@@ -18,11 +18,16 @@ export default function Login() {
     if (authErr) { setError('メールアドレスまたはパスワードが違います'); setLoading(false); return; }
 
     // 初回ログインチェック
-    const { data: teacher } = await supabase
+    const { data: teacher, error: tErr } = await supabase
       .from('teachers').select('password_changed').eq('id', data.user.id).maybeSingle();
+
+    console.log('[DEBUG] user id:', data.user.id);
+    console.log('[DEBUG] teacher:', teacher, 'error:', tErr);
 
     if (teacher && !teacher.password_changed) {
       setNeedsChange(true);
+      setLoading(false);
+      return;
     }
     setLoading(false);
   }
