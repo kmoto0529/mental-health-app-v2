@@ -500,8 +500,6 @@ async function handleLogin() {
 
   // パスワード照合
   const pwHash = await hashPassword(pw);
-  console.log('[DEBUG] input hash:', pwHash);
-  console.log('[DEBUG] db hash:   ', stu.password_hash);
   if (stu.password_hash !== pwHash) {
     errEl.textContent = 'パスワードが違います';
     btn.disabled = false; btn.textContent = 'ログイン'; return;

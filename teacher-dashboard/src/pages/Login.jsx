@@ -6,14 +6,64 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [needsChange, setNeedsChange] = useState(false);
+  const [newPw, setNewPw]       = useState('');
+  const [newPwConfirm, setNewPwConfirm] = useState('');
 
   async function handleLogin(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError('メールアドレスまたはパスワードが違います');
+    const { data, error: authErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (authErr) { setError('メールアドレスまたはパスワードが違います'); setLoading(false); return; }
+
+    // 初回ログインチェック
+    const { data: teacher } = await supabase
+      .from('teachers').select('password_changed').eq('id', data.user.id).maybeSingle();
+
+    if (teacher && !teacher.password_changed) {
+      setNeedsChange(true);
+    }
     setLoading(false);
+  }
+
+  async function handleChangePassword(e) {
+    e.preventDefault();
+    setError('');
+    if (newPw.length < 6) { setError('6文字以上で入力してください'); return; }
+    if (newPw !== newPwConfirm) { setError('パスワードが一致しません'); return; }
+
+    setLoading(true);
+    const { error: pwErr } = await supabase.auth.updateUser({ password: newPw });
+    if (pwErr) { setError('パスワード変更に失敗しました。もう一度お試しください。'); setLoading(false); return; }
+
+    // フラグ更新
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from('teachers').update({ password_changed: true }).eq('id', user.id);
+    setNeedsChange(false);
+    setLoading(false);
+  }
+
+  if (needsChange) {
+    return (
+      <div style={styles.wrap}>
+        <div style={styles.card}>
+          <div style={styles.logo}>🔑</div>
+          <h1 style={styles.title}>パスワードを変更</h1>
+          <p style={styles.sub}>セキュリティのため、初回ログイン時にパスワードを変更してください</p>
+          <form onSubmit={handleChangePassword} style={styles.form}>
+            <label style={styles.label}>新しいパスワード</label>
+            <input style={styles.input} type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="6文字以上" required />
+            <label style={styles.label}>もう一度入力</label>
+            <input style={styles.input} type="password" value={newPwConfirm} onChange={e => setNewPwConfirm(e.target.value)} placeholder="確認用" required />
+            {error && <p style={styles.error}>{error}</p>}
+            <button style={{ ...styles.btn, opacity: loading ? 0.7 : 1 }} type="submit" disabled={loading}>
+              {loading ? '変更中...' : 'パスワードを変更する'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
   }
 
   return (
