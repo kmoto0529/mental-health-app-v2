@@ -198,20 +198,38 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
 </style>
 </head>
 <body>
-<!-- セットアップ画面（初回のみ） -->
+<!-- ログイン画面 -->
 <div class="setup-overlay" id="setupOverlay">
-  <div class="setup-logo">🌱</div>
-  <div class="setup-title">きもちチェックへようこそ</div>
-  <div class="setup-sub">はじめに、クラスコードと<br>あなたの名前（または出席番号）を入力してね</div>
-  <div class="setup-label">クラスコード <span style="color:#ef4444">*</span></div>
-  <div class="setup-hint">担任の先生から教えてもらった6文字のコード</div>
-  <input class="setup-input" id="setupClassCode" type="text" maxlength="6" placeholder="TEST01" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()">
-  <div class="setup-label">なまえ / 出席番号（任意）</div>
-  <div class="setup-hint">先生があなたを確認するために使います。入力しなくてもOK。</div>
-  <input class="setup-input name" id="setupName" type="text" maxlength="20" placeholder="例: 山田太郎 または 出席番号12">
-  <div class="setup-error" id="setupError"></div>
-  <button class="setup-btn" id="setupSubmitBtn" onclick="submitSetup()">はじめる →</button>
-  <div class="setup-anon">🔒 入力した情報は担任の先生のみ確認できます。AIとの会話内容は記録されません。</div>
+  <!-- ログインフォーム -->
+  <div id="loginView">
+    <div class="setup-logo">🌱</div>
+    <div class="setup-title">きもちチェック</div>
+    <div class="setup-sub">クラスコードと出席番号、<br>パスワードを入力してログインしてね</div>
+    <div class="setup-label">クラスコード <span style="color:#ef4444">*</span></div>
+    <div class="setup-hint">担任の先生から教えてもらった6文字のコード</div>
+    <input class="setup-input" id="loginClassCode" type="text" maxlength="6" placeholder="TEST01" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()">
+    <div class="setup-label">出席番号 <span style="color:#ef4444">*</span></div>
+    <input class="setup-input name" id="loginStudentNumber" type="text" maxlength="10" placeholder="例: 12">
+    <div class="setup-label">パスワード <span style="color:#ef4444">*</span></div>
+    <input class="setup-input name" id="loginPassword" type="password" placeholder="••••••••">
+    <div class="setup-error" id="loginError"></div>
+    <button class="setup-btn" id="loginBtn" onclick="handleLogin()">ログイン</button>
+    <div class="setup-anon">🔒 入力した情報は担任の先生のみ確認できます。AIとの会話内容は記録されません。</div>
+  </div>
+
+  <!-- パスワード変更フォーム（初回ログイン時） -->
+  <div id="changePwView" style="display:none;">
+    <div class="setup-logo">🔑</div>
+    <div class="setup-title">パスワードを変更しよう</div>
+    <div class="setup-sub">セキュリティのため、自分だけのパスワードに変更してね。<br>変更後は先生もあなたのパスワードを知りません。</div>
+    <div class="setup-label">新しいパスワード <span style="color:#ef4444">*</span></div>
+    <div class="setup-hint">6文字以上で設定してね</div>
+    <input class="setup-input name" id="newPassword" type="password" placeholder="新しいパスワード">
+    <div class="setup-label">もう一度入力 <span style="color:#ef4444">*</span></div>
+    <input class="setup-input name" id="newPasswordConfirm" type="password" placeholder="確認用">
+    <div class="setup-error" id="changePwError"></div>
+    <button class="setup-btn" onclick="handleChangePassword()">パスワードを変更する</button>
+  </div>
 </div>
 
 <div class="app">
@@ -324,6 +342,7 @@ tr.this-week td:last-child { border-radius: 0 8px 8px 0; }
     </div>
     <button class="btn-primary" onclick="goToChat()">AIと話してみる →</button>
     <button class="btn-outline" onclick="goToKiroku()">きろくだけ見る</button>
+    <button class="btn-outline" onclick="editTodayRecord()" style="margin-top:8px;border-color:#8a96aa;color:#8a96aa;">きもちを修正する</button>
   </div>
 
   <!-- 同意ダイアログ -->
@@ -426,53 +445,105 @@ function initSupabase() {
 function getStudentId() { return localStorage.getItem(STUDENT_ID_KEY); }
 function getClassId()   { return localStorage.getItem(CLASS_ID_KEY); }
 
-// ─── セットアップ ────────────────────────────────────
+// ─── ログイン ────────────────────────────────────────
 function showSetupScreen() {
   document.getElementById('setupOverlay').classList.add('show');
+  document.getElementById('loginView').style.display = '';
+  document.getElementById('changePwView').style.display = 'none';
 }
 function hideSetupScreen() {
   document.getElementById('setupOverlay').classList.remove('show');
 }
 
-async function submitSetup() {
-  const code = document.getElementById('setupClassCode').value.trim().toUpperCase();
-  const name = document.getElementById('setupName').value.trim();
-  const errEl = document.getElementById('setupError');
-  const btn   = document.getElementById('setupSubmitBtn');
+// シンプルなハッシュ（SHA-256）
+async function hashPassword(pw) {
+  const data = new TextEncoder().encode(pw);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+let pendingStudentId = null;
+let pendingClassId   = null;
+
+async function handleLogin() {
+  const code    = document.getElementById('loginClassCode').value.trim().toUpperCase();
+  const stuNum  = document.getElementById('loginStudentNumber').value.trim();
+  const pw      = document.getElementById('loginPassword').value;
+  const errEl   = document.getElementById('loginError');
+  const btn     = document.getElementById('loginBtn');
   errEl.textContent = '';
 
-  if (code.length !== 6) {
-    errEl.textContent = 'クラスコードは6文字で入力してください';
-    return;
-  }
+  if (code.length !== 6) { errEl.textContent = 'クラスコードは6文字で入力してください'; return; }
+  if (!stuNum) { errEl.textContent = '出席番号を入力してください'; return; }
+  if (!pw)     { errEl.textContent = 'パスワードを入力してください'; return; }
   if (!sb) { errEl.textContent = 'ネットワークに接続してから試してください'; return; }
 
   btn.disabled = true;
-  btn.textContent = '確認中...';
+  btn.textContent = 'ログイン中...';
 
   // クラスコード照合
-  const { data: cls, error: clsErr } = await sb
+  const { data: cls } = await sb
     .from('classes').select('id').eq('class_code', code).maybeSingle();
-
-  if (clsErr || !cls) {
-    errEl.textContent = 'クラスコードが見つかりません。担任の先生に確認してください。';
-    btn.disabled = false; btn.textContent = 'はじめる →'; return;
+  if (!cls) {
+    errEl.textContent = 'クラスコードが見つかりません';
+    btn.disabled = false; btn.textContent = 'ログイン'; return;
   }
 
-  // 学生登録
-  const { data: stu, error: stuErr } = await sb
-    .from('students').insert({ class_id: cls.id, display_name: name || null })
-    .select('id').single();
-
-  if (stuErr) {
-    errEl.textContent = '登録中にエラーが発生しました。もう一度お試しください。';
-    btn.disabled = false; btn.textContent = 'はじめる →'; return;
+  // 出席番号で学生検索
+  const { data: stu } = await sb
+    .from('students').select('id, password_hash, password_changed')
+    .eq('class_id', cls.id).eq('student_number', stuNum).maybeSingle();
+  if (!stu) {
+    errEl.textContent = '出席番号が見つかりません。先生に確認してください。';
+    btn.disabled = false; btn.textContent = 'ログイン'; return;
   }
 
+  // パスワード照合
+  const pwHash = await hashPassword(pw);
+  if (stu.password_hash !== pwHash) {
+    errEl.textContent = 'パスワードが違います';
+    btn.disabled = false; btn.textContent = 'ログイン'; return;
+  }
+
+  // 初回ログイン → パスワード変更画面
+  if (!stu.password_changed) {
+    pendingStudentId = stu.id;
+    pendingClassId   = cls.id;
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('changePwView').style.display = '';
+    btn.disabled = false; btn.textContent = 'ログイン';
+    return;
+  }
+
+  // ログイン成功
   localStorage.setItem(STUDENT_ID_KEY, stu.id);
   localStorage.setItem(CLASS_ID_KEY, cls.id);
-  btn.textContent = '登録完了！';
-  setTimeout(hideSetupScreen, 600);
+  btn.textContent = 'ログイン完了！';
+  setTimeout(hideSetupScreen, 400);
+}
+
+async function handleChangePassword() {
+  const pw1   = document.getElementById('newPassword').value;
+  const pw2   = document.getElementById('newPasswordConfirm').value;
+  const errEl = document.getElementById('changePwError');
+  errEl.textContent = '';
+
+  if (pw1.length < 6) { errEl.textContent = '6文字以上で入力してください'; return; }
+  if (pw1 !== pw2)     { errEl.textContent = 'パスワードが一致しません'; return; }
+
+  const pwHash = await hashPassword(pw1);
+  const { error } = await sb.from('students').update({
+    password_hash: pwHash,
+    password_changed: true,
+  }).eq('id', pendingStudentId);
+
+  if (error) { errEl.textContent = 'エラーが発生しました。もう一度お試しください。'; return; }
+
+  localStorage.setItem(STUDENT_ID_KEY, pendingStudentId);
+  localStorage.setItem(CLASS_ID_KEY, pendingClassId);
+  pendingStudentId = null;
+  pendingClassId   = null;
+  hideSetupScreen();
 }
 
 // ─── Supabase 同期ユーティリティ ─────────────────────
@@ -836,6 +907,24 @@ function renderStep2WithPrev(prevQ1, prevQ2, prevQ3) {
   } else {
     cd.style.display = 'none';
   }
+}
+
+function editTodayRecord() {
+  // 今日の記録を読み込んで入力画面に戻す
+  const records = loadRecords();
+  const todayRec = records[getTodayKey()];
+  if (todayRec) {
+    answers = { q1: todayRec.q1, q2: todayRec.q2, q3: todayRec.q3 };
+    document.getElementById('commentInput').value = todayRec.comment || '';
+    // 選択状態を復元
+    for (let q = 1; q <= 3; q++) {
+      document.getElementById(`q${q}-options`).querySelectorAll('.emoji-btn')
+        .forEach((btn, i) => btn.classList.toggle('selected', i === answers[`q${q}`]));
+      document.getElementById(`pb${q}`).classList.add('done');
+    }
+    updateSubmitBtn();
+  }
+  showScreen('screen-step1');
 }
 
 function goToChat() {
