@@ -4508,6 +4508,32 @@ function openForestInfoModal() {
 // ---------- Monthly Mood Calendar ----------
 let moodCalendarMonth = null; // 'YYYY-MM'
 
+// 現在の連続記録日数（今日から遡って、途切れるまで）
+// 今日記録がなければ、昨日を起点に数える（まだ今日が終わってないので優しく）
+function calcCurrentMoodStreak() {
+  if (!state.moods || state.moods.length === 0) return 0;
+  const dateSet = new Set(state.moods.map(m => m.date));
+  const todayStr = todayKey();
+  let streak = 0;
+  let cursor = new Date();
+  if (!dateSet.has(todayStr)) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  while (true) {
+    const y = cursor.getFullYear();
+    const m = String(cursor.getMonth() + 1).padStart(2, '0');
+    const d = String(cursor.getDate()).padStart(2, '0');
+    const key = `${y}-${m}-${d}`;
+    if (dateSet.has(key)) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 function openMoodCalendarModal(monthKey) {
   if (!monthKey) {
     const d = new Date();
@@ -4529,7 +4555,7 @@ function renderMoodCalendarModal() {
 
   // Calculate month stats
   const monthMoods = state.moods.filter(x => x.date.startsWith(moodCalendarMonth));
-  const avg = monthMoods.length ? Math.round(monthMoods.reduce((a, b) => a + b.score, 0) / monthMoods.length * 10) / 10 : 0;
+  const streakDays = calcCurrentMoodStreak();
 
   const cells = [];
   // Leading empties
@@ -4556,7 +4582,7 @@ function renderMoodCalendarModal() {
       <div class="modal-body">
         <div class="cal-stats">
           <div><span class="cal-stats-n">${monthMoods.length}</span>日 記録</div>
-          <div><span class="cal-stats-n">${avg || '-'}</span>平均</div>
+          <div><span class="cal-stats-n">${streakDays}</span>日 継続</div>
         </div>
         <div class="cal-weekdays">
           <span style="color: var(--danger);">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span style="color: #4a82c4;">土</span>
