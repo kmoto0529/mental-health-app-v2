@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>森ビジュアル プレビュー v2（31日・7段階） — Aside</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Serif+JP:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF6F0;
+    --bg-card: #FFFFFF;
+    --bg-soft: #F3EDE3;
+    --text: #3D342A;
+    --text-soft: #8B7F70;
+    --text-muted: #B3A896;
+    --accent: #C68B5E;
+    --accent-soft: #E8D5C0;
+    --accent-deep: #A06B45;
+    --divider: #EBE3D5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    padding: 24px 16px 80px;
+    max-width: 820px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: var(--text-soft);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 32px 0 12px;
+    color: var(--text-soft);
+  }
+
+  .day-selector {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 560px) {
+    .day-selector { grid-template-columns: repeat(6, 1fr); }
+  }
+  .day-btn {
+    padding: 6px 2px;
+    border: 1px solid var(--accent-soft);
+    background: var(--bg-card);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-soft);
+    transition: all .15s;
+    font-weight: 500;
+  }
+  .day-btn:hover { background: var(--bg-soft); }
+  .day-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .day-btn.highlighted {
+    border-color: var(--accent-deep);
+    color: var(--accent-deep);
+  }
+
+  .hero-preview {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #FFFEF9 0%, #F5EFE3 55%, #EFE0C9 100%);
+    box-shadow: 0 2px 12px rgba(61, 52, 42, 0.08);
+    margin-bottom: 18px;
+  }
+  .hero-preview svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .hero-progress {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 14px 20px;
+    background: linear-gradient(180deg, rgba(255,254,249,0) 0%, rgba(255,254,249,0.78) 55%, rgba(255,254,249,0.92) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .hero-day {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    color: var(--text-soft);
+    letter-spacing: 0.06em;
+  }
+  .hero-day strong {
+    font-size: 22px;
+    color: var(--accent-deep);
+    font-weight: 500;
+    margin-right: 2px;
+  }
+  .hero-stage {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    color: var(--text);
+    letter-spacing: 0.08em;
+  }
+  .hero-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .stage-legend {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.9;
+    box-shadow: 0 2px 8px rgba(61, 52, 42, 0.05);
+  }
+  .stage-legend strong { color: var(--text); font-family: 'Noto Serif JP', serif; font-weight: 500; }
+
+  .samples-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 560px) {
+    .samples-grid { grid-template-columns: 1fr; }
+  }
+  .sample-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(61, 52, 42, 0.05);
+  }
+  .sample-svg-wrap {
+    position: relative;
+    width: 100%;
+    height: 170px;
+    background: linear-gradient(180deg, #FFFEF9 0%, #F5EFE3 55%, #EFE0C9 100%);
+    overflow: hidden;
+  }
+  .sample-svg-wrap svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .sample-meta {
+    padding: 10px 14px 12px;
+    text-align: center;
+  }
+  .sample-day-label {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .sample-stage-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  /* Subtle animations */
+  svg .f-anim-grass {
+    transform-origin: center bottom;
+    animation: grassSway 9s ease-in-out infinite;
+  }
+  @keyframes grassSway {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(0.8deg); }
+  }
+  svg .f-anim-water {
+    animation: waterFlow 6s ease-in-out infinite;
+  }
+  @keyframes waterFlow {
+    0%, 100% { transform: translateX(0); opacity: 0.75; }
+    50% { transform: translateX(2px); opacity: 0.88; }
+  }
+  svg .f-anim-bird {
+    animation: birdFloat 14s ease-in-out infinite;
+  }
+  @keyframes birdFloat {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(4px, -2px); }
+  }
+  svg .f-anim-light {
+    animation: lightPulse 8s ease-in-out infinite;
+  }
+  @keyframes lightPulse {
+    0%, 100% { opacity: 0.06; }
+    50% { opacity: 0.12; }
+  }
+</style>
+</head>
+<body>
+
+<h1>森ビジュアル プレビュー v2</h1>
+<div class="subtitle">31日・7段階。毎日ちょっとずつ変わる森。</div>
+
+<h2>Day を選んで確認</h2>
+<div class="day-selector" id="daySelector"></div>
+<div class="hero-preview">
+  <div id="heroSvgMount"></div>
+  <div class="hero-progress">
+    <div class="hero-stage" id="heroStage">はじまりの土</div>
+  </div>
+</div>
+
+<div class="stage-legend">
+  <div><strong>Stage 1</strong> はじまりの土（Day 1〜3）</div>
+  <div><strong>Stage 2</strong> 芽吹き（Day 4〜7）</div>
+  <div><strong>Stage 3</strong> 若草の野（Day 8〜12）</div>
+  <div><strong>Stage 4</strong> 木立のはじまり（Day 13〜17）</div>
+  <div><strong>Stage 5</strong> 小さな森（Day 18〜22）</div>
+  <div><strong>Stage 6</strong> 水辺の森（Day 23〜27）</div>
+  <div><strong>Stage 7</strong> 静かな森（Day 28〜31）</div>
+</div>
+
+<h2>主要サンプル（Day 1 / 7 / 14 / 21 / 28 / 31）</h2>
+<div class="samples-grid" id="samplesGrid"></div>
+
+<script>
+const FOREST_STAGE_NAMES = {
+  1: 'はじまりの土',
+  2: '芽吹き',
+  3: '若草の野',
+  4: '木立のはじまり',
+  5: '小さな森',
+  6: '水辺の森',
+  7: '静かな森'
+};
+
+function calcForestStage(day) {
+  if (day >= 28) return 7;
+  if (day >= 23) return 6;
+  if (day >= 18) return 5;
+  if (day >= 13) return 4;
+  if (day >= 8)  return 3;
+  if (day >= 4)  return 2;
+  return 1;
+}
+
+function nextStageDaysAway(day) {
+  const thresholds = [4, 8, 13, 18, 23, 28, 31];
+  for (const t of thresholds) if (day < t) return t - day;
+  return 0;
+}
+
+const FOREST_DAY_ELEMENTS = [
+  // Stage 1: はじまりの土
+  { day: 1, svg: `<g class="f-earth"><path d="M0,178 Q100,173 200,176 T400,178 L400,260 L0,260 Z" fill="url(#f-earth-grad)"/><path d="M0,184 Q100,180 200,182 T400,184" stroke="#B89878" stroke-width="0.5" fill="none" opacity="0.45"/><circle cx="80"  cy="198" r="0.8" fill="#8B6F4E" opacity="0.4"/><circle cx="180" cy="204" r="0.6" fill="#8B6F4E" opacity="0.3"/><circle cx="280" cy="200" r="0.8" fill="#8B6F4E" opacity="0.4"/><circle cx="340" cy="206" r="0.6" fill="#8B6F4E" opacity="0.3"/></g>` },
+  { day: 1, svg: `<g class="f-seed"><ellipse cx="200" cy="178" rx="2.2" ry="1.4" fill="#6B5434"/></g>` },
+  { day: 2, svg: `<g class="f-seed-crack"><path d="M199,177 L201,179" stroke="#3D342A" stroke-width="0.4" opacity="0.7"/><ellipse cx="200" cy="177" rx="3" ry="0.8" fill="#8B6F4E" opacity="0.4"/></g>` },
+  { day: 3, svg: `<g class="f-sprout-first"><path d="M200,177 Q200,172 199.5,168" stroke="#6F8660" stroke-width="0.9" fill="none"/><ellipse cx="198" cy="167" rx="2" ry="1.2" fill="#8FA274" transform="rotate(-30 198 167)"/><ellipse cx="201" cy="166" rx="2" ry="1.2" fill="#8FA274" transform="rotate(25 201 166)"/></g>` },
+  // Stage 2: 芽吹き
+  { day: 4, svg: `<g class="f-sprout-taller"><path d="M200,177 Q200,167 199,160" stroke="#6F8660" stroke-width="1" fill="none"/><ellipse cx="196" cy="159" rx="2.8" ry="1.6" fill="#8FA274" transform="rotate(-30 196 159)"/><ellipse cx="202" cy="157" rx="2.8" ry="1.6" fill="#8FA274" transform="rotate(25 202 157)"/></g>` },
+  { day: 5, svg: `<g class="f-grass-1 f-anim-grass"><path d="M180,178 L180,172 M185,178 L186,170 M215,178 L215,172 M220,177 L219,170" stroke="#7A9A6B" stroke-width="0.6" stroke-linecap="round" fill="none"/></g>` },
+  { day: 6, svg: `<g class="f-grass-2 f-anim-grass"><path d="M160,178 L160,172 M165,178 L164,171 M170,177 L171,171 M230,178 L230,173 M235,178 L234,171 M240,177 L241,171" stroke="#7A9A6B" stroke-width="0.55" stroke-linecap="round" fill="none"/></g>` },
+  { day: 7, svg: `<g class="f-flower-yellow-1"><line x1="150" y1="177" x2="150" y2="172" stroke="#7A9A6B" stroke-width="0.4"/><circle cx="150" cy="171" r="1.4" fill="#E8C97A"/><circle cx="150" cy="171" r="0.5" fill="#C9A24A"/><line x1="250" y1="177" x2="250" y2="172" stroke="#7A9A6B" stroke-width="0.4"/><circle cx="250" cy="171" r="1.4" fill="#E8C97A"/><circle cx="250" cy="171" r="0.5" fill="#C9A24A"/></g>` },
+  // Stage 3: 若草の野
+  { day: 8, svg: `<g class="f-grass-field f-anim-grass"><path d="M60,178 Q200,174 340,178 L340,184 L60,184 Z" fill="#8FA274" opacity="0.4"/><g stroke="#7A9A6B" stroke-width="0.55" stroke-linecap="round" fill="none"><path d="M70,178 L70,173 M78,178 L79,171 M86,178 L85,172"/><path d="M110,178 L110,172 M118,178 L117,173 M126,178 L127,172"/><path d="M280,178 L280,173 M288,178 L289,172 M296,178 L295,172"/><path d="M320,178 L320,172 M328,178 L327,173"/></g></g>` },
+  { day: 9, svg: `<g class="f-rock-small"><ellipse cx="125" cy="184" rx="4" ry="2" fill="#9B8F80"/><ellipse cx="123" cy="183" rx="2" ry="1" fill="#B5A897"/></g>` },
+  { day: 10, svg: `<g class="f-flower-pink"><line x1="95" y1="176" x2="95" y2="172" stroke="#7A9A6B" stroke-width="0.4"/><circle cx="95" cy="171" r="1.3" fill="#E8C7D4"/><circle cx="95" cy="171" r="0.4" fill="#C89AA8"/><line x1="290" y1="176" x2="290" y2="172" stroke="#7A9A6B" stroke-width="0.4"/><circle cx="290" cy="171" r="1.3" fill="#E8C7D4"/><circle cx="290" cy="171" r="0.4" fill="#C89AA8"/></g>` },
+  { day: 11, svg: `<g class="f-bush-1"><ellipse cx="90" cy="173" rx="10" ry="5" fill="#6F8A62"/><ellipse cx="85" cy="170" rx="4" ry="3" fill="#86A178"/><ellipse cx="95" cy="170" rx="4" ry="3" fill="#86A178"/></g>` },
+  { day: 12, svg: `<g class="f-path-hint"><path d="M150,215 Q200,208 250,212 Q300,215 340,220" stroke="#C9A98A" stroke-width="3" fill="none" opacity="0.35" stroke-linecap="round"/></g>` },
+  // Stage 4: 木立のはじまり
+  { day: 13, svg: `<g class="f-sapling-1"><rect x="244" y="148" width="2.5" height="30" rx="1" fill="#8B6F4E"/><ellipse cx="245" cy="144" rx="10" ry="9" fill="#7A9A6B"/><ellipse cx="240" cy="141" rx="5" ry="4" fill="#7A9A6B" opacity="0.85"/><ellipse cx="250" cy="143" rx="5" ry="4" fill="#90AA7C" opacity="0.85"/></g>` },
+  { day: 14, svg: `<g class="f-mountain-far"><path d="M0,135 Q50,110 100,120 Q150,95 200,110 Q250,93 300,107 Q350,97 400,115 L400,145 L0,145 Z" fill="url(#f-mountain-grad)" opacity="0.5"/></g>` },
+  { day: 15, svg: `<g class="f-sapling-2"><rect x="320" y="152" width="2.3" height="26" rx="1" fill="#8B6F4E"/><ellipse cx="321" cy="148" rx="9" ry="8" fill="#7A9A6B"/><ellipse cx="316" cy="146" rx="4" ry="3" fill="#86A178" opacity="0.8"/></g>` },
+  { day: 16, svg: `<g class="f-bush-2"><ellipse cx="60" cy="174" rx="11" ry="5" fill="#6F8A62"/><ellipse cx="56" cy="171" rx="4" ry="3" fill="#86A178"/><ellipse cx="64" cy="171" rx="4" ry="3" fill="#86A178"/></g>` },
+  { day: 17, svg: `<g class="f-bg-trees-hint"><ellipse cx="50" cy="148" rx="14" ry="4" fill="#6F8A62" opacity="0.32"/><ellipse cx="370" cy="150" rx="18" ry="4" fill="#6F8A62" opacity="0.32"/><ellipse cx="150" cy="146" rx="11" ry="3.5" fill="#5F7E55" opacity="0.28"/></g>` },
+  // Stage 5: 小さな森
+  { day: 18, svg: `<g class="f-tree-medium-1"><rect x="128" y="135" width="3" height="43" rx="1" fill="#6B5434"/><polygon points="129.5,102 117,128 142,128" fill="#5F7E55"/><polygon points="129.5,112 115,138 144,138" fill="#6B8E62"/><polygon points="129.5,126 113,148 146,148" fill="#708F66"/></g>` },
+  { day: 18, svg: `<g class="f-light-first f-anim-light" opacity="0.08"><path d="M260,20 L210,150" stroke="#FFFEF9" stroke-width="24"/></g>` },
+  { day: 19, svg: `<g class="f-rock-large"><ellipse cx="270" cy="216" rx="9" ry="4" fill="#8A7E6F"/><ellipse cx="267" cy="214" rx="4" ry="2" fill="#A89B89"/></g>` },
+  { day: 20, svg: `<g class="f-path-clear"><path d="M150,215 Q200,206 250,211 Q300,214 340,220" stroke="#C9A98A" stroke-width="6" fill="none" opacity="0.55" stroke-linecap="round"/><path d="M150,215 Q200,206 250,211 Q300,214 340,220" stroke="#D4B89C" stroke-width="3" fill="none" opacity="0.75" stroke-linecap="round"/></g>` },
+  { day: 21, svg: `<g class="f-tree-medium-2"><rect x="355" y="130" width="3.2" height="48" rx="1" fill="#7A5D3F"/><ellipse cx="356.5" cy="120" rx="18" ry="14" fill="#7A9A6B"/><ellipse cx="348" cy="115" rx="8" ry="6" fill="#8CAA7C"/><ellipse cx="364" cy="118" rx="9" ry="7" fill="#8CAA7C"/></g>` },
+  { day: 22, svg: `<g class="f-sun-rays f-anim-light"><path d="M290,20 L245,150" stroke="#FFFEF9" stroke-width="18" opacity="0.07"/><path d="M320,20 L290,140" stroke="#FFFEF9" stroke-width="12" opacity="0.05"/></g>` },
+  // Stage 6: 水辺の森
+  { day: 23, svg: `<g class="f-stream-start f-anim-water"><path d="M0,228 Q80,221 140,225 Q200,229 260,223 Q330,218 400,225 L400,236 Q330,232 260,235 Q200,239 140,235 Q80,231 0,239 Z" fill="url(#f-water-grad)" opacity="0.7"/><path d="M20,226 Q80,222 140,225" stroke="#FFFFFF" stroke-width="0.7" fill="none" opacity="0.55"/></g>` },
+  { day: 23, svg: `<g class="f-bird-1 f-anim-bird" opacity="0.7"><path d="M110,50 Q113,47 116,50 M116,50 Q119,47 122,50" stroke="#3D342A" stroke-width="0.8" fill="none" stroke-linecap="round"/></g>` },
+  { day: 24, svg: `<g class="f-water-stones"><ellipse cx="75" cy="224" rx="5" ry="2" fill="#9B8F80"/><ellipse cx="73" cy="222.5" rx="2.5" ry="0.9" fill="#B5A897"/><ellipse cx="205" cy="228" rx="4" ry="1.8" fill="#9B8F80"/><ellipse cx="345" cy="222" rx="6" ry="2.5" fill="#9B8F80"/></g>` },
+  { day: 25, svg: `<g class="f-water-reflection f-anim-water"><path d="M180,228 Q220,230 260,226" stroke="#FFFFFF" stroke-width="0.55" fill="none" opacity="0.45"/><path d="M290,228 Q340,223 380,229" stroke="#FFFFFF" stroke-width="0.65" fill="none" opacity="0.5"/><path d="M40,232 Q80,230 120,233" stroke="#FFFFFF" stroke-width="0.5" fill="none" opacity="0.4"/></g>` },
+  { day: 26, svg: `<g class="f-bird-2 f-anim-bird" opacity="0.65"><path d="M140,58 Q142,55 144,58 M144,58 Q146,55 148,58" stroke="#3D342A" stroke-width="0.7" fill="none" stroke-linecap="round"/></g>` },
+  { day: 27, svg: `<g class="f-water-flowers"><line x1="45" y1="218" x2="45" y2="214" stroke="#7A9A6B" stroke-width="0.4"/><circle cx="45" cy="213" r="1.3" fill="#E8C7D4"/><circle cx="45" cy="213" r="0.4" fill="#C89AA8"/><line x1="220" y1="220" x2="220" y2="216" stroke="#7A9A6B" stroke-width="0.4"/><circle cx="220" cy="215" r="1.3" fill="#E8C97A"/><circle cx="220" cy="215" r="0.4" fill="#C9A24A"/><line x1="360" y1="218" x2="360" y2="214" stroke="#7A9A6B" stroke-width="0.4"/><circle cx="360" cy="213" r="1.2" fill="#E8C7D4"/></g>` },
+  // Stage 7: 静かな森
+  { day: 28, svg: `<g class="f-rabbit"><ellipse cx="175" cy="178" rx="4.5" ry="3" fill="#D8C8B8"/><circle cx="171" cy="175.5" r="2.2" fill="#D8C8B8"/><ellipse cx="170" cy="172" rx="0.8" ry="2.2" fill="#D8C8B8"/><ellipse cx="172.5" cy="172" rx="0.8" ry="2.2" fill="#D8C8B8"/><ellipse cx="170" cy="172" rx="0.3" ry="1.2" fill="#E8C7D4" opacity="0.8"/><circle cx="170" cy="175.5" r="0.4" fill="#3D342A"/><circle cx="179.5" cy="177" r="1" fill="#F8F3E8"/></g>` },
+  { day: 29, svg: `<g class="f-deer"><ellipse cx="215" cy="198" rx="9" ry="4.5" fill="#A88866"/><ellipse cx="215" cy="200" rx="7" ry="2" fill="#8A6E52" opacity="0.5"/><line x1="208" y1="202" x2="207" y2="210" stroke="#8A6E52" stroke-width="1.3" stroke-linecap="round"/><line x1="212" y1="202" x2="211" y2="210" stroke="#8A6E52" stroke-width="1.3" stroke-linecap="round"/><line x1="219" y1="202" x2="220" y2="210" stroke="#8A6E52" stroke-width="1.3" stroke-linecap="round"/><line x1="223" y1="202" x2="224" y2="210" stroke="#8A6E52" stroke-width="1.3" stroke-linecap="round"/><path d="M224,197 Q228,192 229,188" stroke="#A88866" stroke-width="2.6" stroke-linecap="round" fill="none"/><ellipse cx="231" cy="186" rx="2.8" ry="1.8" fill="#A88866"/><circle cx="232" cy="186" r="0.3" fill="#3D342A"/></g>` },
+  { day: 30, svg: `<g class="f-bird-flock f-anim-bird" opacity="0.68"><path d="M170,55 Q172,52 174,55 M174,55 Q176,52 178,55" stroke="#3D342A" stroke-width="0.7" fill="none" stroke-linecap="round"/><path d="M195,62 Q197,59 199,62 M199,62 Q201,59 203,62" stroke="#3D342A" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M225,50 Q227,47 229,50 M229,50 Q231,47 233,50" stroke="#3D342A" stroke-width="0.65" fill="none" stroke-linecap="round"/></g>` },
+  { day: 31, svg: `<g class="f-final-light f-anim-light" opacity="0.1"><ellipse cx="200" cy="100" rx="140" ry="40" fill="#FFFEF9" opacity="0.5"/><path d="M350,15 L300,155" stroke="#FFFEF9" stroke-width="14"/></g>` },
+];
+
+function renderForestSvg(day) {
+  const d = Math.max(0, Math.min(31, day || 0));
+  const stage = calcForestStage(d);
+  const visibleElements = FOREST_DAY_ELEMENTS
+    .filter(e => e.day <= d)
+    .map(e => e.svg)
+    .join('\n');
+  const skyAndClouds = `<rect width="400" height="180" fill="url(#f-sky-grad)"/>
+    <ellipse cx="80" cy="32" rx="30" ry="4.5" fill="white" opacity="0.5"/>
+    <ellipse cx="74" cy="34" rx="20" ry="3" fill="white" opacity="0.38"/>`;
+  return `
+    <svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" data-stage="${stage}" data-day="${d}">
+      <defs>
+        <linearGradient id="f-sky-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFFEF9"/>
+          <stop offset="60%" stop-color="#F5EFE3"/>
+          <stop offset="100%" stop-color="#EFE0C9"/>
+        </linearGradient>
+        <linearGradient id="f-earth-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#D4B89C"/>
+          <stop offset="100%" stop-color="#A8876A"/>
+        </linearGradient>
+        <linearGradient id="f-water-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#CDE0E3"/>
+          <stop offset="100%" stop-color="#9CB8BE"/>
+        </linearGradient>
+        <linearGradient id="f-mountain-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#B9BFB3"/>
+          <stop offset="100%" stop-color="#9DA798"/>
+        </linearGradient>
+      </defs>
+      ${skyAndClouds}
+      ${visibleElements}
+    </svg>
+  `;
+}
+
+// ---- Day selector ----
+const highlightedDays = new Set([1, 7, 14, 21, 28, 31]);
+const daySelector = document.getElementById('daySelector');
+let currentDay = 1;
+
+for (let d = 1; d <= 31; d++) {
+  const btn = document.createElement('button');
+  btn.className = 'day-btn' + (highlightedDays.has(d) ? ' highlighted' : '');
+  btn.textContent = 'Day ' + d;
+  btn.dataset.day = d;
+  btn.addEventListener('click', () => setCurrentDay(d));
+  daySelector.appendChild(btn);
+}
+
+function setCurrentDay(d) {
+  currentDay = d;
+  document.querySelectorAll('.day-btn').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.day) === d);
+  });
+  document.getElementById('heroSvgMount').innerHTML = renderForestSvg(d);
+  document.getElementById('heroStage').textContent = FOREST_STAGE_NAMES[calcForestStage(d)];
+}
+
+setCurrentDay(1);
+
+// ---- Samples ----
+const sampleDays = [1, 7, 14, 21, 28, 31];
+const samplesGrid = document.getElementById('samplesGrid');
+sampleDays.forEach(d => {
+  const card = document.createElement('div');
+  card.className = 'sample-card';
+  card.innerHTML = `
+    <div class="sample-svg-wrap">${renderForestSvg(d)}</div>
+    <div class="sample-meta">
+      <div class="sample-day-label">Day ${d}</div>
+      <div class="sample-stage-label">${FOREST_STAGE_NAMES[calcForestStage(d)]}</div>
+    </div>
+  `;
+  samplesGrid.appendChild(card);
+});
+</script>
+</body>
+</html>
