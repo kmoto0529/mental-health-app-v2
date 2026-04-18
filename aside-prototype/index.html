@@ -4756,7 +4756,7 @@ ${(state.goal.subgoals || []).length > 0 ? `【すでに設定済み（重複し
         required: ['suggestions']
       },
       temperature: 0.8,
-      maxOutputTokens: 400
+      maxOutputTokens: 600
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
@@ -5508,7 +5508,7 @@ ${d.emotionBefore.label}（強さ ${d.emotionBefore.score}/10）${goalBlock}
         required: ['alternatives']
       },
       temperature: 0.9,
-      maxOutputTokens: 800
+      maxOutputTokens: 1200
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
@@ -6657,8 +6657,8 @@ choicesは毎ターン3〜4個必ず提示する。各選択肢は12文字以内
 選択肢は「決めつけ」「誘導」を避け、ユーザーがどれも選ばない自由も尊重する。
 会話が深まってきても、choicesは3-4個を必ず含める（ユーザー負担を下げるため）。`;
 
-// Gemini API 呼び出し（503 High demand / 429 Rate limit は自動リトライ）
-async function fetchGeminiWithRetry(url, body, maxRetries = 2) {
+// Gemini API 呼び出し（503 High demand / 429 Rate limit は自動リトライ・最大3回）
+async function fetchGeminiWithRetry(url, body, maxRetries = 3) {
   const retriableStatuses = [429, 500, 502, 503, 504];
   let lastRes;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -6724,7 +6724,10 @@ async function callAi(session, isInitial = false) {
     intro += `\n\nこれが対話の始まりです。${state.nickname}さんに、やさしく声をかけて最初のメッセージを送ってください。`;
     context.push({ role: 'user', parts: [{ text: intro }] });
   } else {
-    context.push(...session.messages.map(m => ({
+    // ラリーが長くなっても安定させるため、直近80メッセージ（約40ラリー）までに絞る
+    // Gemini Flash は1Mトークン対応だが、毎回全履歴送ると応答が遅くなる・コスト増のため
+    const recentMessages = session.messages.slice(-80);
+    context.push(...recentMessages.map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }]
     })));
@@ -6744,7 +6747,7 @@ async function callAi(session, isInitial = false) {
         required: ['message', 'choices']
       },
       temperature: 0.9,
-      maxOutputTokens: 600
+      maxOutputTokens: 1024
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
