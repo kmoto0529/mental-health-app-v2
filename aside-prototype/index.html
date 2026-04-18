@@ -2832,11 +2832,6 @@ body {
   <div id="modalContent"></div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="debug-bar" id="debugBar">
-  <span>proto</span>
-  <button onclick="App.dev.triggerCrisis()">crisis</button>
-  <button onclick="App.dev.reset()">reset</button>
-</div>
 
 <script>
 // ============================================================
@@ -4867,8 +4862,8 @@ function viewMoodCheck() {
       <textarea class="mood-comment" id="moodComment" rows="3" maxlength="200" placeholder="なんとなく疲れた、とか">${moodDraft.comment}</textarea>
       <div class="mood-footer">
         <button class="btn btn-primary" data-act="save-mood" id="saveMoodBtn" ${moodDraft.score === null ? 'disabled' : ''}>保存する</button>
-        <button class="btn btn-secondary mt-12" data-act="save-mood-to-chat" id="saveMoodToChatBtn" ${moodDraft.score === null ? 'disabled' : ''}>保存してAsideと話す</button>
-        <button class="btn btn-ghost mt-12" data-act="skip-mood-to-chat">スキップしてAsideと話す</button>
+        <button class="btn btn-secondary" style="margin-top: 20px;" data-act="save-mood-to-chat" id="saveMoodToChatBtn" ${moodDraft.score === null ? 'disabled' : ''}>保存してAsideと話す</button>
+        <button class="btn btn-ghost" style="margin-top: 14px;" data-act="skip-mood-to-chat">スキップしてAsideと話す</button>
       </div>
     </div>
   `;
