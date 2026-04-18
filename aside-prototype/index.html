@@ -6487,9 +6487,8 @@ async function sendUserMessage(text, inputMethod) {
     console.error('[Aside] AI call failed:', err);
     window.__lastAsideError = String(err && err.message || err);
     chatState.isTyping = false;
-    toast('AIエラー: ' + window.__lastAsideError.slice(0, 80));
     const fallback = getFallbackReply(s);
-    s.messages.push({ role: 'assistant', content: fallback.message + '\n\n（※ 接続に問題があったみたい。例文で続けるね）\nエラー: ' + window.__lastAsideError.slice(0, 120), choices: fallback.choices, timestamp: Date.now() });
+    s.messages.push({ role: 'assistant', content: fallback.message + '\n\n（※ 少し接続が不安定みたい。また試してみてね）', choices: fallback.choices, timestamp: Date.now() });
     chatState.currentChoices = fallback.choices;
     saveState();
     render();
@@ -6518,9 +6517,8 @@ async function sendInitialAi(opts = {}) {
     console.error('[Aside] AI call failed:', err);
     window.__lastAsideError = String(err && err.message || err);
     chatState.isTyping = false;
-    toast('AIエラー: ' + window.__lastAsideError.slice(0, 80));
     const fb = getInitialFallback();
-    s.messages.push({ role: 'assistant', content: fb.message + '\n\nエラー: ' + window.__lastAsideError.slice(0, 120), choices: fb.choices, timestamp: Date.now() });
+    s.messages.push({ role: 'assistant', content: fb.message, choices: fb.choices, timestamp: Date.now() });
     chatState.currentChoices = fb.choices;
     saveState();
     render();
@@ -6697,8 +6695,13 @@ async function callAi(session, isInitial = false) {
     }
     return parsed;
   } catch (e) {
-    // Fallback: treat as plain message
-    return { message: text.slice(0, 300), choices: ['もう少し話す', 'うまく言えない'] };
+    // Truncated/invalid JSON - try to salvage the message field
+    const match = text.match(/"message"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/);
+    if (match && match[1]) {
+      const salvaged = match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+      return { message: salvaged.slice(0, 300), choices: ['もう少し話す', 'うまく言えない'] };
+    }
+    return { message: 'ちょっと考え中...\nまた少しあとで話しかけてみてね。', choices: ['もう少し話す', 'うまく言えない'] };
   }
 }
 
