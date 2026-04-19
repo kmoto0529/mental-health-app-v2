@@ -521,10 +521,14 @@ body {
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid var(--divider);
-  background: rgba(250, 246, 240, 0.92);
+  background: rgba(250, 246, 240, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
 }
 .chat-back {
   width: 36px; height: 36px;
@@ -1544,6 +1548,24 @@ body {
   gap: 8px;
 }
 .reflect-widget-area .alt-card { margin-bottom: 0; }
+.alt-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 2px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: none;
+}
+.alt-divider::before,
+.alt-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--divider);
+}
+.alt-divider span { flex-shrink: 0; }
 .reflect-alt-actions {
   margin-top: 6px;
   display: flex;
@@ -5325,9 +5347,12 @@ function renderReflectWidget(w) {
   if (w.type === 'alternatives') {
     const d = reflectState.draft;
     const isLatestAlt = reflectState.messages.filter(m => m.widget && m.widget.type === 'alternatives').slice(-1)[0] === reflectState.messages[reflectState.messages.length - 1];
+    const newCount = w.newCount || 0;
+    const firstNewIndex = newCount > 0 ? (w.data.length - newCount) : -1;
     return `
       <div class="reflect-widget-area">
-        ${w.data.map((alt) => `
+        ${w.data.map((alt, idx) => `
+          ${idx === firstNewIndex ? '<div class="alt-divider"><span>あたらしい見方</span></div>' : ''}
           <div class="alt-card ${d.alternativesPicked.includes(alt.uid) ? 'picked' : ''}" data-alt-pick="${escapeAttr(alt.uid)}">
             ${alt.tag ? `<span class="alt-card-tag">${escapeHtml(alt.tag)}</span>` : ''}
             <div class="alt-card-text">${escapeHtml(alt.text)}</div>
@@ -5455,7 +5480,7 @@ async function generateAndShowAlternatives(isRegen = false) {
   const previous = isRegen ? [...(reflectState.draft.alternativesAI || [])] : [];
   try {
     const result = await callAiForAlternatives(reflectState.draft, { previous });
-    const freshAlts = (result.alternatives || []).map(a => ({ ...a, uid: uid() }));
+    const freshAlts = (result.alternatives || []).map(a => ({ ...a, uid: uid(), isNew: isRegen }));
     if (isRegen) {
       reflectState.draft.alternativesAI = [...(reflectState.draft.alternativesAI || []), ...freshAlts];
       // Keep existing picks so user doesn't lose them
@@ -5466,9 +5491,9 @@ async function generateAndShowAlternatives(isRegen = false) {
     reflectState.aiLoading = false;
     pushReflectAi(
       isRegen
-        ? 'じゃあ、別の角度でもう3つ考えてみたよ。\n前のも下に残してあるから、どれでも選んでみて。'
+        ? 'じゃあ、別の角度でもう3つ追加したよ。\n前の見方の下に並べてあるから、どれでも選んでみて。'
         : '3つ考えてみたよ。\n気になるのがあれば選んでみて。組み合わせたり、自分の言葉で書いてもOK。',
-      { type: 'alternatives', data: freshAlts }
+      { type: 'alternatives', data: [...reflectState.draft.alternativesAI], newCount: isRegen ? freshAlts.length : 0 }
     );
     saveState();
     render();
@@ -5479,14 +5504,14 @@ async function generateAndShowAlternatives(isRegen = false) {
     reflectState.aiError = String(err.message || err).slice(0, 120);
     const fb = getFallbackAlternatives(reflectState.draft).map(a => ({ ...a, uid: uid() }));
     if (isRegen) {
-      reflectState.draft.alternativesAI = [...(reflectState.draft.alternativesAI || []), ...fb];
+      reflectState.draft.alternativesAI = [...(reflectState.draft.alternativesAI || []), ...fb.map(a => ({ ...a, isNew: true }))];
     } else {
       reflectState.draft.alternativesAI = fb;
       reflectState.draft.alternativesPicked = [];
     }
     pushReflectAi(
       '（※ AI接続に問題があったみたい。例文で続けるね）\n気になるのがあれば選んでみて。',
-      { type: 'alternatives', data: fb }
+      { type: 'alternatives', data: [...reflectState.draft.alternativesAI], newCount: isRegen ? fb.length : 0 }
     );
     saveState();
     render();
