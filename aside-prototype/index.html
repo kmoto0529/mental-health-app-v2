@@ -5346,7 +5346,7 @@ function renderReflectWidget(w) {
   }
   if (w.type === 'alternatives') {
     const d = reflectState.draft;
-    const isLatestAlt = reflectState.messages.filter(m => m.widget && m.widget.type === 'alternatives').slice(-1)[0] === reflectState.messages[reflectState.messages.length - 1];
+    const isLatestAlt = reflectState.messages.filter(m => m.widget && (m.widget.type === 'alternatives' || m.widget.type === 'alt-error')).slice(-1)[0] === reflectState.messages[reflectState.messages.length - 1];
     const newCount = w.newCount || 0;
     const firstNewIndex = newCount > 0 ? (w.data.length - newCount) : -1;
     return `
@@ -5360,8 +5360,22 @@ function renderReflectWidget(w) {
         `).join('')}
         ${isLatestAlt ? `
           <div class="reflect-alt-actions">
+            ${w.showRetry ? `<button class="btn btn-secondary" data-act="reflect-alt-retry">🔄 もう一度AIに聞く</button>` : ''}
             <button class="btn btn-ghost" data-act="reflect-alt-regen">＋ 他の見方も聞く</button>
             <button class="btn btn-primary" data-act="reflect-alt-confirm">この見方で進む</button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+  if (w.type === 'alt-error') {
+    const isLatestAlt = reflectState.messages.filter(m => m.widget && (m.widget.type === 'alternatives' || m.widget.type === 'alt-error')).slice(-1)[0] === reflectState.messages[reflectState.messages.length - 1];
+    return `
+      <div class="reflect-widget-area">
+        ${isLatestAlt ? `
+          <div class="reflect-alt-actions">
+            <button class="btn btn-primary" data-act="reflect-alt-retry">🔄 もう一度AIに聞く</button>
+            <button class="btn btn-ghost" data-act="reflect-alt-confirm">ここまでの見方で進む</button>
           </div>
         ` : ''}
       </div>
@@ -5502,17 +5516,22 @@ async function generateAndShowAlternatives(isRegen = false) {
     console.error('[Aside] alt gen failed:', err);
     reflectState.aiLoading = false;
     reflectState.aiError = String(err.message || err).slice(0, 120);
-    const fb = getFallbackAlternatives(reflectState.draft).map(a => ({ ...a, uid: uid() }));
     if (isRegen) {
-      reflectState.draft.alternativesAI = [...(reflectState.draft.alternativesAI || []), ...fb.map(a => ({ ...a, isNew: true }))];
+      // 既に3件以上ある場合は fallback を注入せず、ユーザーに再試行を提示する
+      pushReflectAi(
+        'AIに少し接続しづらいみたい。\n何度か試すと繋がることが多いよ。',
+        { type: 'alt-error' }
+      );
     } else {
+      // 初回失敗時のみ fallback を挿入（まだ一つも見方がない状態を避けるため）
+      const fb = getFallbackAlternatives(reflectState.draft).map(a => ({ ...a, uid: uid() }));
       reflectState.draft.alternativesAI = fb;
       reflectState.draft.alternativesPicked = [];
+      pushReflectAi(
+        'AIの応答が取れなかったから、いったん例文を置いておくね。\n気になるのがあれば選んでみて。もう一度AIに聞くこともできるよ。',
+        { type: 'alternatives', data: [...reflectState.draft.alternativesAI], newCount: 0, showRetry: true }
+      );
     }
-    pushReflectAi(
-      '（※ AI接続に問題があったみたい。例文で続けるね）\n気になるのがあれば選んでみて。',
-      { type: 'alternatives', data: [...reflectState.draft.alternativesAI], newCount: isRegen ? fb.length : 0 }
-    );
     saveState();
     render();
     scrollReflectToBottom();
@@ -5656,8 +5675,7 @@ ${d.emotionBefore.label}（強さ ${d.emotionBefore.score}/10）${goalBlock}
 
 上記について、別の捉え方を3つ提案してください。${previousBlock}`;
 
-  const model = state.apiModel || 'gemini-2.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+  const buildUrl = (model) => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
 
   const body = {
     systemInstruction: { parts: [{ text: buildSystemPrompt(systemPrompt) }] },
@@ -5692,7 +5710,7 @@ ${d.emotionBefore.label}（強さ ${d.emotionBefore.score}/10）${goalBlock}
     ]
   };
 
-  const res = await fetchGeminiWithRetry(url, body);
+  const { res } = await fetchGeminiRobust(buildUrl, body);
   if (!res.ok) {
     const t = await res.text();
     throw new Error(`Gemini ${res.status}: ${t.slice(0, 200)}`);
@@ -5700,6 +5718,7 @@ ${d.emotionBefore.label}（強さ ${d.emotionBefore.score}/10）${goalBlock}
   const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) throw new Error('Empty response');
+  // JSONパース失敗をリトライ可能にするため、例外をそのまま投げる
   return JSON.parse(text);
 }
 
@@ -6554,6 +6573,12 @@ function handleAction(act, el, e) {
     case 'reflect-alt-regen':
       handleReflectRegenerateAlternatives();
       break;
+    case 'reflect-alt-retry': {
+      // AI接続エラー後に手動再試行
+      const hasAlts = reflectState.draft && (reflectState.draft.alternativesAI || []).length > 0;
+      generateAndShowAlternatives(hasAlts);
+      break;
+    }
     case 'reflect-show-report':
       handleReflectShowReport();
       break;
@@ -7039,9 +7064,10 @@ choicesは毎ターン3〜4個必ず提示する。各選択肢は12文字以内
 - 代わりに「少し黙りたい」「別のことを話したい」など、会話内で休める選択肢を入れる`;
 
 // Gemini API 呼び出し（503 High demand / 429 Rate limit は自動リトライ・最大3回）
-async function fetchGeminiWithRetry(url, body, maxRetries = 3) {
-  const retriableStatuses = [429, 500, 502, 503, 504];
+async function fetchGeminiWithRetry(url, body, maxRetries = 5) {
+  const retriableStatuses = [408, 429, 500, 502, 503, 504];
   let lastRes;
+  let lastErr;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       lastRes = await fetch(url, {
@@ -7051,19 +7077,49 @@ async function fetchGeminiWithRetry(url, body, maxRetries = 3) {
       });
       if (lastRes.ok) return lastRes;
       if (!retriableStatuses.includes(lastRes.status)) return lastRes;
-      // retriable: wait and retry
+      // retriable: 指数バックオフ + ジッター（同時リトライ衝突回避）
       if (attempt < maxRetries) {
-        const delayMs = 1200 * Math.pow(2, attempt); // 1.2s, 2.4s
+        const base = 1500 * Math.pow(1.8, attempt); // 1.5s, 2.7s, 4.9s, 8.8s, 15.8s
+        const jitter = Math.random() * 500;
+        const delayMs = Math.min(20000, base + jitter);
+        console.warn(`[Aside] Gemini ${lastRes.status} retry ${attempt + 1}/${maxRetries} in ${Math.round(delayMs)}ms`);
         await new Promise(r => setTimeout(r, delayMs));
       }
     } catch (netErr) {
-      // Network error - retry if attempts left
+      lastErr = netErr;
       if (attempt === maxRetries) throw netErr;
-      const delayMs = 1200 * Math.pow(2, attempt);
+      const base = 1500 * Math.pow(1.8, attempt);
+      const jitter = Math.random() * 500;
+      const delayMs = Math.min(20000, base + jitter);
+      console.warn(`[Aside] Gemini network error retry ${attempt + 1}/${maxRetries} in ${Math.round(delayMs)}ms:`, netErr.message);
       await new Promise(r => setTimeout(r, delayMs));
     }
   }
   return lastRes;
+}
+
+// gemini-2.5-flash で失敗したら gemini-2.5-flash-lite に自動フォールバック
+async function fetchGeminiRobust(buildUrl, body) {
+  const models = [
+    state.apiModel || 'gemini-2.5-flash',
+    'gemini-2.5-flash-lite'
+  ];
+  let lastError;
+  for (const model of models) {
+    try {
+      const url = buildUrl(model);
+      const res = await fetchGeminiWithRetry(url, body);
+      if (res.ok) return { res, model };
+      // 4xx（キー不正等）は別モデルでも失敗する可能性が高いので即return
+      if (res.status >= 400 && res.status < 500 && res.status !== 429) return { res, model };
+      lastError = new Error(`Gemini ${res.status}`);
+      console.warn(`[Aside] Model ${model} failed, falling back to next...`);
+    } catch (err) {
+      lastError = err;
+      console.warn(`[Aside] Model ${model} threw, trying next...`, err.message);
+    }
+  }
+  throw lastError || new Error('All models failed');
 }
 
 async function callAi(session, isInitial = false) {
@@ -7141,10 +7197,9 @@ async function callAi(session, isInitial = false) {
     ]
   };
 
-  const model = state.apiModel || 'gemini-2.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+  const buildUrl = (m) => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
 
-  const res = await fetchGeminiWithRetry(url, body);
+  const { res } = await fetchGeminiRobust(buildUrl, body);
   if (!res.ok) {
     const errText = await res.text();
     throw new Error(`Gemini API ${res.status}: ${errText.slice(0, 200)}`);
