@@ -1573,6 +1573,16 @@ body {
   gap: 6px;
 }
 .reflect-alt-actions .btn { width: 100%; }
+.alt-limit-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 8px 12px;
+  background: var(--bg-soft);
+  border-radius: 8px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
 
 /* ---------- Letter Report ---------- */
 .letter-screen {
@@ -5194,6 +5204,9 @@ function renderMsg(m) {
 // ---------- Reflection (CBTふりかえり・会話ベース) ----------
 const REFLECT_PHASES = ['event', 'thoughts', 'emotion_before', 'score_before', 'alternatives', 'emotion_after', 'score_after', 'done'];
 
+// もやもや整理「別の見方」の最大数（初期3個＋+ボタン1回で計6個まで）
+const MAX_ALTERNATIVES = 6;
+
 const REFLECT_EVENT_CHOICES = ['人と話していて', '仕事や学校で', '家でひとりで', 'SNSを見ていて', '自分の中で', 'うまく言えない'];
 const REFLECT_THOUGHT_CHOICES = ['自分はダメだ', 'うまくいかない', '迷惑かけてる', '理解されない', 'もう限界', 'うまく言えない'];
 
@@ -5349,6 +5362,8 @@ function renderReflectWidget(w) {
     const isLatestAlt = reflectState.messages.filter(m => m.widget && (m.widget.type === 'alternatives' || m.widget.type === 'alt-error')).slice(-1)[0] === reflectState.messages[reflectState.messages.length - 1];
     const newCount = w.newCount || 0;
     const firstNewIndex = newCount > 0 ? (w.data.length - newCount) : -1;
+    const totalAlts = (d.alternativesAI || []).length;
+    const canAddMore = totalAlts < MAX_ALTERNATIVES;
     return `
       <div class="reflect-widget-area">
         ${w.data.map((alt, idx) => `
@@ -5361,7 +5376,7 @@ function renderReflectWidget(w) {
         ${isLatestAlt ? `
           <div class="reflect-alt-actions">
             ${w.showRetry ? `<button class="btn btn-secondary" data-act="reflect-alt-retry">🔄 もう一度AIに聞く</button>` : ''}
-            <button class="btn btn-ghost" data-act="reflect-alt-regen">＋ 他の見方も聞く</button>
+            ${canAddMore ? `<button class="btn btn-ghost" data-act="reflect-alt-regen">＋ 他の見方も聞く（あと${MAX_ALTERNATIVES - totalAlts}個）</button>` : `<div class="alt-limit-note">見方は${MAX_ALTERNATIVES}個まで。この中から選んでみよう。</div>`}
             <button class="btn btn-primary" data-act="reflect-alt-confirm">この見方で進む</button>
           </div>
         ` : ''}
@@ -5369,12 +5384,15 @@ function renderReflectWidget(w) {
     `;
   }
   if (w.type === 'alt-error') {
+    const d = reflectState.draft;
     const isLatestAlt = reflectState.messages.filter(m => m.widget && (m.widget.type === 'alternatives' || m.widget.type === 'alt-error')).slice(-1)[0] === reflectState.messages[reflectState.messages.length - 1];
+    const totalAlts = (d && d.alternativesAI || []).length;
+    const canAddMore = totalAlts < MAX_ALTERNATIVES;
     return `
       <div class="reflect-widget-area">
         ${isLatestAlt ? `
           <div class="reflect-alt-actions">
-            <button class="btn btn-primary" data-act="reflect-alt-retry">🔄 もう一度AIに聞く</button>
+            ${canAddMore ? `<button class="btn btn-primary" data-act="reflect-alt-retry">🔄 もう一度AIに聞く</button>` : `<div class="alt-limit-note">見方は${MAX_ALTERNATIVES}個まで集まったよ。</div>`}
             <button class="btn btn-ghost" data-act="reflect-alt-confirm">ここまでの見方で進む</button>
           </div>
         ` : ''}
@@ -5539,6 +5557,11 @@ async function generateAndShowAlternatives(isRegen = false) {
 }
 
 async function handleReflectRegenerateAlternatives() {
+  const total = (reflectState.draft && reflectState.draft.alternativesAI || []).length;
+  if (total >= MAX_ALTERNATIVES) {
+    toast(`見方は最大${MAX_ALTERNATIVES}個までだよ`);
+    return;
+  }
   pushReflectUser('他の見方も聞いてみたい');
   render();
   scrollReflectToBottom();
