@@ -3237,7 +3237,8 @@ async function generateLlmGreeting(messageType, ctx) {
         required: ['message']
       },
       temperature: 0.85,
-      maxOutputTokens: 200
+      maxOutputTokens: 400,
+      thinkingConfig: { thinkingBudget: 0 }
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
@@ -4921,7 +4922,8 @@ ${(state.goal.subgoals || []).length > 0 ? `【すでに設定済み（重複し
         required: ['suggestions']
       },
       temperature: 0.8,
-      maxOutputTokens: 600
+      maxOutputTokens: 1200,
+      thinkingConfig: { thinkingBudget: 0 }
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
@@ -5723,7 +5725,8 @@ ${d.emotionBefore.label}（強さ ${d.emotionBefore.score}/10）${goalBlock}
         required: ['alternatives']
       },
       temperature: 0.9,
-      maxOutputTokens: 1200
+      maxOutputTokens: 2400,
+      thinkingConfig: { thinkingBudget: 0 }
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
@@ -7194,7 +7197,8 @@ async function callAi(session, isInitial = false) {
         required: ['message', 'choices']
       },
       temperature: 0.9,
-      maxOutputTokens: 1024
+      maxOutputTokens: 2048,
+      thinkingConfig: { thinkingBudget: 0 }
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
