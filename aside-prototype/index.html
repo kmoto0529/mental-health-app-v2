@@ -5710,7 +5710,7 @@ ${d.emotionBefore.label}（強さ ${d.emotionBefore.score}/10）${goalBlock}
     ]
   };
 
-  const { res } = await fetchGeminiRobust(buildUrl, body);
+  const { res } = await fetchGeminiSingle(buildUrl, body);
   if (!res.ok) {
     const t = await res.text();
     throw new Error(`Gemini ${res.status}: ${t.slice(0, 200)}`);
@@ -7098,28 +7098,12 @@ async function fetchGeminiWithRetry(url, body, maxRetries = 5) {
   return lastRes;
 }
 
-// gemini-2.5-flash で失敗したら gemini-2.5-flash-lite に自動フォールバック
-async function fetchGeminiRobust(buildUrl, body) {
-  const models = [
-    state.apiModel || 'gemini-2.5-flash',
-    'gemini-2.5-flash-lite'
-  ];
-  let lastError;
-  for (const model of models) {
-    try {
-      const url = buildUrl(model);
-      const res = await fetchGeminiWithRetry(url, body);
-      if (res.ok) return { res, model };
-      // 4xx（キー不正等）は別モデルでも失敗する可能性が高いので即return
-      if (res.status >= 400 && res.status < 500 && res.status !== 429) return { res, model };
-      lastError = new Error(`Gemini ${res.status}`);
-      console.warn(`[Aside] Model ${model} failed, falling back to next...`);
-    } catch (err) {
-      lastError = err;
-      console.warn(`[Aside] Model ${model} threw, trying next...`, err.message);
-    }
-  }
-  throw lastError || new Error('All models failed');
+// 単一モデルでのリトライ。429/503は同プロジェクト内で共通に効くため、モデル切替は行わない
+async function fetchGeminiSingle(buildUrl, body) {
+  const model = state.apiModel || 'gemini-2.5-flash';
+  const url = buildUrl(model);
+  const res = await fetchGeminiWithRetry(url, body);
+  return { res, model };
 }
 
 async function callAi(session, isInitial = false) {
@@ -7199,7 +7183,7 @@ async function callAi(session, isInitial = false) {
 
   const buildUrl = (m) => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
 
-  const { res } = await fetchGeminiRobust(buildUrl, body);
+  const { res } = await fetchGeminiSingle(buildUrl, body);
   if (!res.ok) {
     const errText = await res.text();
     throw new Error(`Gemini API ${res.status}: ${errText.slice(0, 200)}`);
