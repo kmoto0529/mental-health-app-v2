@@ -4896,26 +4896,27 @@ let moodCalendarMonth = null; // 'YYYY-MM'
 
 // 現在の連続記録日数（今日から遡って、途切れるまで）
 // 今日記録がなければ、昨日を起点に数える（まだ今日が終わってないので優しく）
+// 注意: todayKey() は朝6時境界なので、cursor もそれに合わせて初期化する
 function calcCurrentMoodStreak() {
   if (!state.moods || state.moods.length === 0) return 0;
   const dateSet = new Set(state.moods.map(m => m.date));
   const todayStr = todayKey();
-  let streak = 0;
-  let cursor = new Date();
+  // todayStr（YYYY-MM-DD）から Date を組み立て（朝6時境界で日付が決まるため、実時刻ではなくこれを基準に進める）
+  const [ty, tm, td] = todayStr.split('-').map(Number);
+  let cursor = new Date(ty, tm - 1, td);
   if (!dateSet.has(todayStr)) {
     cursor.setDate(cursor.getDate() - 1);
   }
-  while (true) {
-    const y = cursor.getFullYear();
-    const m = String(cursor.getMonth() + 1).padStart(2, '0');
-    const d = String(cursor.getDate()).padStart(2, '0');
-    const key = `${y}-${m}-${d}`;
-    if (dateSet.has(key)) {
-      streak++;
-      cursor.setDate(cursor.getDate() - 1);
-    } else {
-      break;
-    }
+  const formatKey = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  let streak = 0;
+  while (dateSet.has(formatKey(cursor))) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
   }
   return streak;
 }
