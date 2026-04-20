@@ -2497,6 +2497,8 @@ body {
 
 /* 4-tab bottom nav adjustments */
 .bottom-nav-4 .nav-btn { font-size: 9.5px; }
+.bottom-nav-5 .nav-btn { font-size: 9px; padding: 10px 4px; gap: 3px; }
+.bottom-nav-5 .nav-btn svg { width: 20px; height: 20px; }
 
 /* ---------- Forest Hero (v2: 31 days) ---------- */
 .forest-hero {
@@ -2758,6 +2760,186 @@ body {
 .cal-cell.today {
   box-shadow: 0 0 0 2px var(--accent);
 }
+.cal-cell.clickable { cursor: pointer; }
+.cal-cell.clickable:active { transform: scale(0.95); }
+
+/* ---------- カレンダー画面 追加要素 ---------- */
+.cal-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.cal-month-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  flex: 1;
+  text-align: center;
+}
+.cal-legend {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.cal-legend-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.cal-legend-dot.today-dot { box-shadow: 0 0 0 2px var(--accent); background: var(--bg); }
+.cal-legend-dot.mood-dot { background: var(--accent-soft); }
+
+.today-cta-card {
+  background: linear-gradient(135deg, var(--sage-soft, var(--accent-soft)), var(--bg-card));
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: transform .15s var(--ease);
+}
+.today-cta-card:active { transform: scale(0.98); }
+.today-cta-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 17px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.today-cta-sub {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.today-cta-btn {
+  font-size: 13px;
+  color: var(--accent-deep);
+  font-weight: 500;
+}
+
+.today-mood-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-lg);
+  margin-bottom: 20px;
+}
+.today-mood-icon { font-size: 32px; line-height: 1; }
+.today-mood-text { flex: 1; min-width: 0; }
+.today-mood-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+.today-mood-value {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.today-mood-comment {
+  font-weight: 400;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+.today-mood-edit {
+  font-size: 12px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+/* ---------- 今日のアクション（ホーム） ---------- */
+.today-actions-section {
+  margin-bottom: 24px;
+}
+.today-actions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+.today-actions-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+.today-actions-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+.today-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.action-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+.action-card:active { transform: scale(0.98); }
+.action-card:not(.done):hover { box-shadow: var(--shadow-soft); }
+.action-card.done {
+  background: var(--bg-soft);
+  opacity: 0.75;
+  cursor: default;
+}
+.action-card-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft);
+  border-radius: 50%;
+  flex-shrink: 0;
+  color: var(--accent-deep);
+}
+.action-card.done .action-card-icon {
+  background: var(--sage-soft, var(--accent-soft));
+  color: var(--accent);
+}
+.action-card-emoji { font-size: 18px; }
+.action-card-icon svg { width: 18px; height: 18px; }
+.action-card-body { flex: 1; min-width: 0; }
+.action-card-label {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.action-card-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.action-card.done .action-card-label {
+  text-decoration: line-through;
+  color: var(--text-soft);
+}
+.action-card-arrow {
+  font-size: 20px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
 .cal-day {
   font-size: 12px;
   color: var(--text-soft);
@@ -2800,6 +2982,35 @@ body {
   padding: 2px 6px;
 }
 .mood-strip-more:hover { text-decoration: underline; }
+
+/* ---------- きろくタブ切り替え ---------- */
+.history-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  background: var(--bg-soft);
+  padding: 4px;
+  border-radius: 999px;
+}
+.history-tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease);
+  letter-spacing: 0.02em;
+}
+.history-tab.active {
+  background: var(--bg-card);
+  color: var(--accent-deep);
+  font-weight: 500;
+  box-shadow: var(--shadow-soft);
+}
 
 /* ---------- Insights (週次・月次レポート) ---------- */
 .insights-tabs {
@@ -3674,6 +3885,7 @@ function render() {
     App.currentScreen === 'history' ? viewHistory() :
     App.currentScreen === 'historyDetail' ? viewHistoryDetail() :
     App.currentScreen === 'insights' ? viewInsights() :
+    App.currentScreen === 'calendar' ? viewCalendar() :
     App.currentScreen === 'settings' ? viewSettings() :
     viewWelcome()
   );
@@ -3807,17 +4019,44 @@ function renderProfileGroup(key, label) {
 }
 
 // ---------- Home ----------
-// ---------- Tab: 目標進捗 (Goal) ----------
+// ---------- Tab: 目標 + 今日の行動 (Goal) ----------
+function didToday(timestampField) {
+  const today = todayKey();
+  return (arr) => arr.some(item => {
+    const ts = item[timestampField];
+    if (!ts) return false;
+    const d = new Date(ts);
+    if (d.getHours() < DAY_BOUNDARY_HOUR) d.setDate(d.getDate() - 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}` === today;
+  });
+}
+
 function viewGoal() {
   const today = todayKey();
   const todayMood = state.moods.find(m => m.date === today);
-  const last7 = last7Days();
   // Lazy daily login check
   if (!state.forest) state.forest = newForest();
   if (state.lastLoginDate !== today) {
     dailyPetLogin();
     logEngagement();
   }
+
+  // 今日の行動達成状況
+  const moodDone = !!todayMood;
+  const didTodayByTs = didToday('startedAt');
+  const chatDone = didTodayByTs(state.sessions || []);
+  const reflectDone = didTodayByTs(state.reflections || []);
+  const actions = [
+    { id: 'mood', label: 'きもちチェック', sub: '30秒で今の気分を記録', done: moodDone, act: 'goto-mood', icon: '💭' },
+    { id: 'chat', label: 'Asideと話す', sub: 'ひとことでもOK、何でも話して', done: chatDone, act: 'goto-talk', icon: '💬' },
+    { id: 'reflect', label: 'もやもや整理', sub: '出来事→考え→気持ち→別の見方', done: reflectDone, act: 'start-reflect', icon: '✨' }
+  ];
+  const allDone = actions.every(a => a.done);
+  const pendingCount = actions.filter(a => !a.done).length;
+
   return `
     <div class="screen active">
       <div class="home-header">
@@ -3828,47 +4067,28 @@ function viewGoal() {
       </div>
       <div class="home-content">
 
-        ${renderForestHero()}
-
         ${state.goal ? renderGoalSummary() : renderGoalSetupCard()}
 
-        <div class="mood-strip-wrap">
-          <div class="mood-strip-header">
-            <span class="mood-strip-title">きもちの1週間</span>
-            <button class="mood-strip-more" data-act="mood-calendar">カレンダー ›</button>
+        <div class="today-actions-section">
+          <div class="today-actions-header">
+            <div class="today-actions-title">きょうのアクション</div>
+            <div class="today-actions-meta">${allDone ? '✨ すべて完了' : `あと${pendingCount}個`}</div>
           </div>
-          <div class="mood-strip">
-            ${last7.map(d => {
-              const m = state.moods.find(mo => mo.date === d);
-              const isToday = d === today;
-              const cls = isToday ? 'today' : (m ? 'active' : '');
-              return `
-                <div class="mood-strip-item">
-                  <div class="mood-strip-dot ${cls}">${m ? MOODS.find(x => x.score === m.score).emoji : (isToday ? '·' : '')}</div>
-                  <div class="mood-strip-date">${d.slice(5).replace('-', '/')}</div>
+          <div class="today-actions-list">
+            ${actions.map(a => `
+              <div class="action-card ${a.done ? 'done' : ''}" ${a.done ? '' : `data-act="${a.act}"`}>
+                <div class="action-card-icon">${a.done ? icon('check') : `<span class="action-card-emoji">${a.icon}</span>`}</div>
+                <div class="action-card-body">
+                  <div class="action-card-label">${escapeHtml(a.label)}</div>
+                  <div class="action-card-sub">${a.done ? '今日はできたね' : escapeHtml(a.sub)}</div>
                 </div>
-              `;
-            }).join('')}
+                ${a.done ? '' : '<div class="action-card-arrow">›</div>'}
+              </div>
+            `).join('')}
           </div>
         </div>
 
-        ${todayMood ? `
-          <div class="today-card">
-            <div class="today-emoji">${MOODS.find(x => x.score === todayMood.score).emoji}</div>
-            <div class="today-text">
-              <div class="today-label">きょうのきもち</div>
-              <div class="today-comment">${escapeHtml(todayMood.comment || MOODS.find(x => x.score === todayMood.score).label)}</div>
-            </div>
-          </div>
-        ` : `
-          <div class="card" style="background: var(--sage-soft);">
-            <div class="card-title">きょうのきもちチェック、まだだよ</div>
-            <div class="card-body">30秒くらい。気分を選んで、気が向いたらひとこと添えてみて。</div>
-            <div class="card-action">
-              <button class="btn btn-secondary" data-act="goto-mood">きもちチェックする</button>
-            </div>
-          </div>
-        `}
+        ${renderForestHero()}
       </div>
       ${bottomNav('goal')}
     </div>
@@ -5904,16 +6124,24 @@ function getBarTone(before, after) {
 }
 
 // ---------- History ----------
+let historyFilter = 'chat'; // 'chat' | 'reflect'
+
 function viewHistory() {
-  const items = [
-    ...state.sessions.map(s => ({ kind: 'chat', id: s.id, ts: s.startedAt, data: s })),
-    ...state.reflections.map(r => ({ kind: 'reflect', id: r.id, ts: r.startedAt, data: r }))
-  ].sort((a, b) => b.ts - a.ts);
+  const chatItems = state.sessions.map(s => ({ kind: 'chat', id: s.id, ts: s.startedAt, data: s })).sort((a, b) => b.ts - a.ts);
+  const reflectItems = state.reflections.map(r => ({ kind: 'reflect', id: r.id, ts: r.startedAt, data: r })).sort((a, b) => b.ts - a.ts);
+  const items = historyFilter === 'chat' ? chatItems : reflectItems;
+  const emptyMsg = historyFilter === 'chat'
+    ? { emoji: '💬', text: 'まだAsideとの会話記録はないよ。<br>ホームの「Asideと話す」から始めてみて。' }
+    : { emoji: '✨', text: 'まだもやもや整理の記録はないよ。<br>ホームの「もやもや整理」から始めてみて。' };
 
   return `
     <div class="screen active">
       <div class="page-header">
         <div class="page-title">きろく</div>
+      </div>
+      <div class="history-tabs">
+        <button class="history-tab ${historyFilter === 'chat' ? 'active' : ''}" data-act="history-tab-chat">AIと会話（${chatItems.length}）</button>
+        <button class="history-tab ${historyFilter === 'reflect' ? 'active' : ''}" data-act="history-tab-reflect">もやもや整理（${reflectItems.length}）</button>
       </div>
       <div class="card" style="margin-bottom: 16px;" data-act="goto-insights">
         <div class="card-title">週次・月次レポート</div>
@@ -5925,8 +6153,8 @@ function viewHistory() {
       <div class="history-list">
         ${items.length === 0 ? `
           <div class="empty">
-            <div class="empty-emoji">🌱</div>
-            <div class="empty-text">まだ記録はないね。<br>気が向いたら、Asideと話してみて。</div>
+            <div class="empty-emoji">${emptyMsg.emoji}</div>
+            <div class="empty-text">${emptyMsg.text}</div>
           </div>
         ` : items.map(item => {
           if (item.kind === 'chat') {
@@ -6065,6 +6293,98 @@ function viewSettings() {
       ${bottomNav('settings')}
     </div>
   `;
+}
+
+// ---------- Calendar Tab（カレンダー画面） ----------
+let calendarMonth = null; // 'YYYY-MM'
+
+function viewCalendar() {
+  const todayStr = todayKey();
+  const todayMood = state.moods.find(m => m.date === todayStr);
+  if (!calendarMonth) {
+    const d = new Date();
+    calendarMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+  const [yStr, mStr] = calendarMonth.split('-');
+  const y = Number(yStr), m = Number(mStr);
+  const firstDay = new Date(y, m - 1, 1);
+  const lastDay = new Date(y, m, 0);
+  const daysInMonth = lastDay.getDate();
+  const startWeekday = firstDay.getDay();
+
+  const monthMoods = state.moods.filter(x => x.date.startsWith(calendarMonth));
+  const streakDays = calcCurrentMoodStreak();
+
+  const cells = [];
+  for (let i = 0; i < startWeekday; i++) cells.push('<div class="cal-cell empty"></div>');
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateKey = `${calendarMonth}-${String(d).padStart(2, '0')}`;
+    const mood = state.moods.find(x => x.date === dateKey);
+    const isToday = dateKey === todayStr;
+    const isPast = dateKey < todayStr;
+    const clickable = isToday;
+    cells.push(`
+      <div class="cal-cell ${mood ? 'has-mood' : ''} ${isToday ? 'today' : ''} ${clickable ? 'clickable' : ''}" ${clickable ? `data-act="goto-mood"` : ''} title="${mood ? MOODS.find(x => x.score === mood.score).label : ''}">
+        <div class="cal-day">${d}</div>
+        <div class="cal-mood">${mood ? MOODS.find(x => x.score === mood.score).emoji : ''}</div>
+      </div>
+    `);
+  }
+
+  return `
+    <div class="screen active">
+      <div class="page-header">
+        <div class="page-title">カレンダー</div>
+      </div>
+      <div class="home-content">
+        ${todayMood ? `
+          <div class="today-mood-card">
+            <div class="today-mood-icon">${MOODS.find(x => x.score === todayMood.score).emoji}</div>
+            <div class="today-mood-text">
+              <div class="today-mood-label">きょうのきもち</div>
+              <div class="today-mood-value">${MOODS.find(x => x.score === todayMood.score).label}${todayMood.comment ? `<span class="today-mood-comment">・${escapeHtml(todayMood.comment)}</span>` : ''}</div>
+            </div>
+            <button class="btn btn-ghost today-mood-edit" data-act="goto-mood">修正</button>
+          </div>
+        ` : `
+          <div class="today-cta-card" data-act="goto-mood">
+            <div class="today-cta-title">きょうのきもち、どう？</div>
+            <div class="today-cta-sub">30秒でOK。気分を選んで、ひとこと添えてみて。</div>
+            <div class="today-cta-btn">きもちをチェックする ›</div>
+          </div>
+        `}
+
+        <div class="cal-month-nav">
+          <button class="cal-nav-btn" data-act="cal-prev" aria-label="前の月">‹</button>
+          <div class="cal-month-title">${y}年 ${m}月</div>
+          <button class="cal-nav-btn" data-act="cal-next" aria-label="次の月">›</button>
+        </div>
+
+        <div class="cal-stats">
+          <div><span class="cal-stats-n">${monthMoods.length}</span>日 記録</div>
+          <div><span class="cal-stats-n">${streakDays}</span>日 継続</div>
+        </div>
+
+        <div class="cal-weekdays">
+          <span style="color: var(--danger);">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span style="color: #4a82c4;">土</span>
+        </div>
+        <div class="cal-grid">${cells.join('')}</div>
+
+        <div class="cal-legend">
+          <div><span class="cal-legend-dot today-dot"></span>今日</div>
+          <div><span class="cal-legend-dot mood-dot"></span>記録あり</div>
+        </div>
+      </div>
+      ${bottomNav('calendar')}
+    </div>
+  `;
+}
+
+function shiftCalendarMonth(delta) {
+  const [y, m] = calendarMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  calendarMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  render();
 }
 
 // ---------- Insights (週次・月次レポート) ----------
@@ -6207,9 +6527,10 @@ function viewInsights() {
 // ---------- Bottom Nav ----------
 function bottomNav(active) {
   return `
-    <div class="bottom-nav bottom-nav-4">
+    <div class="bottom-nav bottom-nav-5">
       <button class="nav-btn ${active === 'goal' ? 'active' : ''}" data-act="goto-goal">${icon('home')}<span>ホーム</span></button>
       <button class="nav-btn ${active === 'talk' ? 'active' : ''}" data-act="goto-talk">${icon('chat')}<span>はなす</span></button>
+      <button class="nav-btn ${active === 'calendar' ? 'active' : ''}" data-act="goto-calendar">${icon('calendar')}<span>カレンダー</span></button>
       <button class="nav-btn ${active === 'history' ? 'active' : ''}" data-act="goto-history">${icon('book')}<span>きろく</span></button>
       <button class="nav-btn ${active === 'settings' ? 'active' : ''}" data-act="goto-settings">${icon('settings')}<span>せってい</span></button>
     </div>
@@ -6237,7 +6558,9 @@ function icon(name) {
     'chat': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
     'plus': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
     'pencil': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
-    'arrow-up': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>'
+    'arrow-up': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+    'calendar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    'check': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
   };
   return ico[name] || '';
 }
@@ -6555,6 +6878,11 @@ function handleAction(act, el, e) {
       break;
     }
     case 'goto-history': App.go('history'); break;
+    case 'history-tab-chat': historyFilter = 'chat'; render(); break;
+    case 'history-tab-reflect': historyFilter = 'reflect'; render(); break;
+    case 'goto-calendar': App.go('calendar'); break;
+    case 'cal-prev': shiftCalendarMonth(-1); break;
+    case 'cal-next': shiftCalendarMonth(1); break;
     case 'goto-insights': App.go('insights'); break;
     case 'insights-week': insightsRange = 'week'; render(); break;
     case 'insights-month': insightsRange = 'month'; render(); break;
