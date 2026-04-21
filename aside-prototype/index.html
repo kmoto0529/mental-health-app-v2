@@ -3396,6 +3396,68 @@ body {
   letter-spacing: 0.02em;
 }
 
+/* ---------- テーマ選択モーダル（ラジオ型） ---------- */
+.theme-radio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.theme-radio-card {
+  position: relative;
+  padding: 14px 16px;
+  background: var(--bg-soft);
+  border: 1.5px solid transparent;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.theme-radio-card:active { transform: scale(0.98); }
+.theme-radio-card.selected {
+  background: linear-gradient(135deg, #F4E8D3, var(--bg-card));
+  border-color: var(--accent);
+  box-shadow: 0 2px 10px rgba(198, 139, 94, 0.14);
+}
+.theme-radio-badge {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--accent-deep);
+  background: var(--bg-card);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+.theme-radio-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.theme-radio-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.theme-radio-cta {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: transform .15s var(--ease);
+}
+.theme-radio-cta:active { transform: scale(0.97); }
+
 /* ---------- 方向性ゴール（今の方向） ---------- */
 .direction-goal-screen {
   padding: 24px 8px;
@@ -8607,33 +8669,44 @@ function renderWeekThemeProgressMessage(count) {
   return '少しずつ、このテーマに触れられているね。\n自分のペースで続けてみよう。';
 }
 
+let selectedWeeklyTheme = null; // ラジオ選択中のキー（モーダル内で管理）
+let _lastSuggest = null;        // モーダルが開く時点の suggestThemes結果を固定（再クリック時の変動防止）
+
 function openThemeSelectionModal() {
-  const s = suggestThemes();
+  _lastSuggest = suggestThemes();
+  selectedWeeklyTheme = null;
+  renderThemeSelectionModal();
+}
+
+function renderThemeSelectionModal() {
+  const s = _lastSuggest;
+  if (!s) return;
   const recommend = s.recommend;
   const alts = s.alts;
-  const reason = s.reason;
+  // おすすめ＋候補を同じ扱いで並べる（おすすめにはラベルだけ付ける）
+  const allThemes = [
+    { ...recommend, isRecommend: true },
+    ...alts.map(a => ({ ...a, isRecommend: false }))
+  ];
   openModal(`
     <div class="modal theme-modal">
       <div class="modal-title">今週のテーマを選ぼう</div>
       <div class="modal-body">
-        <div class="theme-reason">${escapeHtml(reason)}\n今週はこんなテーマはどう？</div>
+        <div class="theme-reason">${escapeHtml(s.reason)}\n気になるものをタップしてね。</div>
 
-        <div class="theme-section-label">おすすめ</div>
-        <div class="theme-rec-card" data-act="week-theme-accept" data-key="${recommend.key}">
-          <div class="theme-rec-title">${escapeHtml(recommend.title)}</div>
-          <div class="theme-rec-desc">${escapeHtml(recommend.description)}</div>
-          <div class="theme-rec-cta">このテーマでやってみる ›</div>
+        <div class="theme-radio-list">
+          ${allThemes.map(t => {
+            const isSelected = selectedWeeklyTheme === t.key;
+            return `
+              <div class="theme-radio-card ${isSelected ? 'selected' : ''}" data-act="theme-radio-pick" data-key="${t.key}">
+                ${t.isRecommend ? '<div class="theme-radio-badge">おすすめ</div>' : ''}
+                <div class="theme-radio-title">${escapeHtml(t.title)}</div>
+                <div class="theme-radio-desc">${escapeHtml(t.description)}</div>
+                ${isSelected ? `<button class="theme-radio-cta" data-act="theme-radio-confirm">このテーマでやってみる ›</button>` : ''}
+              </div>
+            `;
+          }).join('')}
         </div>
-
-        ${alts.length > 0 ? `
-          <div class="theme-section-label" style="margin-top:16px;">他の候補</div>
-          ${alts.map(a => `
-            <div class="theme-alt-card" data-act="week-theme-accept" data-key="${a.key}">
-              <div class="theme-alt-title">${escapeHtml(a.title)}</div>
-              <div class="theme-alt-desc">${escapeHtml(a.description)}</div>
-            </div>
-          `).join('')}
-        ` : ''}
       </div>
       <div class="modal-actions">
         <button class="btn btn-ghost" data-act="week-theme-skip">今週は決めない</button>
@@ -8716,31 +8789,37 @@ function renderThemeChangeModal() {
     return;
   }
 
-  // STEP2: 理由に応じた提案
-  const s = suggestChangeByReason(themeChangeReason);
+  // STEP2: 理由に応じた提案（ラジオ型）
+  if (!_lastSuggest || _lastSuggest.__fromChange !== themeChangeReason) {
+    _lastSuggest = suggestChangeByReason(themeChangeReason);
+    _lastSuggest.__fromChange = themeChangeReason;
+    selectedWeeklyTheme = null;
+  }
+  const s = _lastSuggest;
   const reasonMeta = CHANGE_REASONS.find(r => r.id === themeChangeReason);
+  const allThemes = [
+    { ...s.recommend, isRecommend: true },
+    ...s.alts.map(a => ({ ...a, isRecommend: false }))
+  ];
   openModal(`
     <div class="modal theme-modal">
       <div class="modal-title">見直しの提案</div>
       <div class="modal-body">
-        <div class="theme-reason">${escapeHtml(reasonMeta ? reasonMeta.hint : s.reason)}</div>
+        <div class="theme-reason">${escapeHtml(reasonMeta ? reasonMeta.hint : s.reason)}\n気になるものをタップしてね。</div>
 
-        <div class="theme-section-label" style="margin-top:16px;">おすすめ</div>
-        <div class="theme-rec-card" data-act="week-theme-accept" data-key="${s.recommend.key}">
-          <div class="theme-rec-title">${escapeHtml(s.recommend.title)}</div>
-          <div class="theme-rec-desc">${escapeHtml(s.recommend.description)}</div>
-          <div class="theme-rec-cta">このテーマに変える ›</div>
+        <div class="theme-radio-list">
+          ${allThemes.map(t => {
+            const isSelected = selectedWeeklyTheme === t.key;
+            return `
+              <div class="theme-radio-card ${isSelected ? 'selected' : ''}" data-act="theme-radio-pick" data-key="${t.key}">
+                ${t.isRecommend ? '<div class="theme-radio-badge">おすすめ</div>' : ''}
+                <div class="theme-radio-title">${escapeHtml(t.title)}</div>
+                <div class="theme-radio-desc">${escapeHtml(t.description)}</div>
+                ${isSelected ? `<button class="theme-radio-cta" data-act="theme-radio-confirm">このテーマに変える ›</button>` : ''}
+              </div>
+            `;
+          }).join('')}
         </div>
-
-        ${s.alts.length > 0 ? `
-          <div class="theme-section-label" style="margin-top:16px;">他の候補</div>
-          ${s.alts.map(a => `
-            <div class="theme-alt-card" data-act="week-theme-accept" data-key="${a.key}">
-              <div class="theme-alt-title">${escapeHtml(a.title)}</div>
-              <div class="theme-alt-desc">${escapeHtml(a.description)}</div>
-            </div>
-          `).join('')}
-        ` : ''}
       </div>
       <div class="modal-actions">
         <button class="btn btn-ghost" data-act="theme-change-back">戻る</button>
@@ -10781,19 +10860,43 @@ function handleAction(act, el, e) {
       openThemeSelectionModal();
       break;
     case 'week-theme-change-open':
+      _lastSuggest = null; selectedWeeklyTheme = null;
       openThemeChangeModal();
       break;
     case 'theme-change-reason':
       themeChangeReason = el.dataset.id;
       themeChangeStep = 1;
+      _lastSuggest = null; selectedWeeklyTheme = null;
       renderThemeChangeModal();
       break;
     case 'theme-change-back':
       themeChangeStep = 0;
       themeChangeReason = null;
+      _lastSuggest = null; selectedWeeklyTheme = null;
       renderThemeChangeModal();
       break;
+    case 'theme-radio-pick': {
+      const k = el.dataset.key;
+      selectedWeeklyTheme = (selectedWeeklyTheme === k) ? null : k;
+      // 再描画（モーダル内のみ）
+      if (themeChangeStep === 1 && themeChangeReason) {
+        renderThemeChangeModal();
+      } else {
+        renderThemeSelectionModal();
+      }
+      break;
+    }
+    case 'theme-radio-confirm': {
+      if (!selectedWeeklyTheme) { toast('タップで選んでね'); return; }
+      acceptTheme(selectedWeeklyTheme);
+      selectedWeeklyTheme = null;
+      _lastSuggest = null;
+      themeChangeStep = 0;
+      themeChangeReason = null;
+      break;
+    }
     case 'week-theme-accept':
+      // レポート末尾など、直接採用パスは引き続き有効
       acceptTheme(el.dataset.key);
       break;
     case 'week-theme-skip': {
