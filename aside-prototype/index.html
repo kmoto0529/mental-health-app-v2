@@ -599,6 +599,18 @@ body {
   cursor: pointer;
   padding: 8px;
 }
+.chat-to-reflect {
+  background: var(--accent-soft);
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--accent-deep);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+.chat-to-reflect:active { transform: scale(0.95); }
 
 .goal-context-pill {
   margin: 0 16px 8px;
@@ -2781,6 +2793,12 @@ body {
 }
 .cal-cell.empty { background: transparent; }
 .cal-cell.has-mood { background: var(--accent-soft); }
+/* 気分スコア別のセル色 */
+.cal-cell.mood-1 { background: #D8D3CE; } /* つらい: クールニュートラル */
+.cal-cell.mood-2 { background: #E8DCD2; } /* いまいち: ウォームミュート */
+.cal-cell.mood-3 { background: #EFDFC8; } /* ふつう: 中間 */
+.cal-cell.mood-4 { background: #F2CCA2; } /* まあいい: 暖色強 */
+.cal-cell.mood-5 { background: #EFB37A; } /* とてもいい: ブライト */
 .cal-cell.today {
   box-shadow: 0 0 0 2px var(--accent);
 }
@@ -3361,6 +3379,120 @@ body {
   padding: 0 8px;
 }
 .rescue-continue .btn { width: 100%; }
+
+/* ---------- 空状態 改善 ---------- */
+.empty.empty-action {
+  padding: 40px 20px 24px;
+}
+.empty-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 0 8px;
+}
+.empty-actions .btn { width: 100%; }
+
+/* ---------- 人格カードの役割タグ ---------- */
+.persona-role-tag {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin: 2px 0 6px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+.persona-recommend {
+  font-size: 11px;
+  color: var(--text-soft);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.persona-change-note-outer {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 16px 0 4px;
+  letter-spacing: 0.05em;
+}
+.talk-persona-role-tag {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--accent-deep);
+  background: rgba(255,255,255,0.6);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.cal-empty-hint {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--sage-soft, var(--accent-soft)), var(--bg-card));
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--accent-deep);
+  line-height: 1.7;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* ---------- カレンダー 直近7日スパークライン ---------- */
+.cal-mood-sparkline {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.cal-mood-sparkline-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.cal-mood-sparkline-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-spark-item { text-align: center; min-width: 0; }
+.cal-spark-dot {
+  width: 100%;
+  max-width: 36px;
+  aspect-ratio: 1;
+  margin: 0 auto 4px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  background: var(--bg);
+  border: 1px solid var(--divider);
+}
+.cal-spark-dot.no-mood { color: var(--text-muted); }
+.cal-spark-dot.mood-1 { background: #D8D3CE; border-color: #D8D3CE; }
+.cal-spark-dot.mood-2 { background: #E8DCD2; border-color: #E8DCD2; }
+.cal-spark-dot.mood-3 { background: #EFDFC8; border-color: #EFDFC8; }
+.cal-spark-dot.mood-4 { background: #F2CCA2; border-color: #F2CCA2; }
+.cal-spark-dot.mood-5 { background: #EFB37A; border-color: #EFB37A; }
+.cal-spark-date {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+.cal-mood-summary {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--divider);
+  line-height: 1.6;
+}
 .cal-day {
   font-size: 12px;
   color: var(--text-soft);
@@ -3524,6 +3656,32 @@ body {
 }
 .insights-highlight-text {
   font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.insights-trends {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.insights-trend {
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.insights-trend-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.insights-trend-text {
+  font-size: 12px;
   line-height: 1.7;
   color: var(--text);
 }
@@ -4013,6 +4171,8 @@ const PERSONAS = [
     id: 'mina',
     name: 'ミナ',
     age: 27,
+    roleTag: 'やさしく受け止める',
+    recommendWhen: '言葉にならない気持ちをそっと置きたいとき',
     tagline: 'やさしく、温かく寄り添う',
     bg: '雑貨店で働きながら、休日はカフェ巡りや手紙を書くのが好き。植物を育てるのが趣味で、ゆっくりした時間を大切にしている。',
     specialty: '気持ちを言葉にするのが難しい時の聞き役',
@@ -4025,6 +4185,8 @@ const PERSONAS = [
     id: 'ken',
     name: 'ケン',
     age: 34,
+    roleTag: '頭の中を整理する',
+    recommendWhen: '考えがぐるぐるして落ち着かないとき',
     tagline: '冷静に整理してくれる兄貴分',
     bg: 'デザイン系の仕事を自分のペースで続けている。読書とランニングが習慣。物事を順序立てて考えるのが得意で、人の話を整理して返すのが上手い。',
     specialty: '頭の中がごちゃごちゃした時の整理役',
@@ -4037,6 +4199,8 @@ const PERSONAS = [
     id: 'haru',
     name: 'ハル',
     age: 26,
+    roleTag: '近い目線で一緒に話す',
+    recommendWhen: '誰かとゆるく気持ちを共有したいとき',
     tagline: '感覚派・親しみやすい少し先輩',
     bg: 'フリーランスでイラストを描いている。音楽と散歩と猫が好き。自分のペースを大事にしながら、日々いろいろ工夫して生きている。',
     specialty: '近い感覚で気持ちを受け取ってくれる話し相手',
@@ -4049,6 +4213,8 @@ const PERSONAS = [
     id: 'nori',
     name: 'ノリ',
     age: 48,
+    roleTag: '焦らず、じっくり聴く',
+    recommendWhen: '落ち着いてゆっくり話したい夜',
     tagline: '落ち着いた話し相手',
     bg: '小さな喫茶店を営んでいる。クラシック音楽と古い本が好きで、ゆっくり人の話を聴く時間を大切にしている。',
     specialty: '焦らずじっくり話したい時の相手',
@@ -4396,12 +4562,13 @@ function viewOnboarding() {
               </div>
               <div class="persona-info">
                 <div class="persona-name"><strong>${escapeHtml(p.name)}</strong> <span class="persona-age">${p.age}歳</span></div>
+                <div class="persona-role-tag">${escapeHtml(p.roleTag)}</div>
                 <div class="persona-tagline">${escapeHtml(p.tagline)}</div>
-                <div class="persona-bg">${escapeHtml(p.bg)}</div>
-                <div class="persona-specialty">得意: ${escapeHtml(p.specialty)}</div>
+                <div class="persona-recommend">${p.id === suggestedId ? '✨ おすすめ理由：' : ''}${escapeHtml(p.recommendWhen)}</div>
               </div>
             </label>
           `).join('')}
+          <div class="persona-change-note-outer">あとから「せってい」でいつでも変えられるよ</div>
         </div>
         <div class="onb-footer">
           <button class="btn btn-primary" data-act="onb-persona-next">つぎへ</button>
@@ -4615,7 +4782,7 @@ function viewTalk() {
                 <div class="talk-persona-name">${escapeHtml(persona.name)}${persona.name !== persona.originalName ? `<span class="talk-persona-original">（${escapeHtml(persona.originalName)}）</span>` : ''}<span class="talk-persona-age">${persona.age}歳</span></div>
                 <button class="talk-persona-rename-btn" data-act="persona-rename" aria-label="呼び方を変える">${icon('pencil')}</button>
               </div>
-              <div class="talk-persona-tag">${escapeHtml(persona.tagline)}</div>
+              <div class="talk-persona-role-tag">${escapeHtml(persona.roleTag || persona.tagline)}</div>
             </div>
           </div>
         </div>
@@ -5856,6 +6023,7 @@ function startNewChatSession() {
     id: uid(),
     startedAt: Date.now(),
     endedAt: null,
+    personaId: state.selectedPersonaId || 'haru',
     moodCheckId: todayMood ? todayMood.id : null,
     moodScore: todayMood ? todayMood.score : null,
     messages: []
@@ -5903,6 +6071,7 @@ function viewChat() {
           <div class="chat-name">${escapeHtml(getCurrentPersona().name)}</div>
           <div class="chat-status">きいてるよ</div>
         </div>
+        ${s.messages.filter(m => m.role === 'user').length >= 2 ? `<button class="chat-to-reflect" data-act="chat-to-reflect" aria-label="この話を整理する">✨ 整理</button>` : ''}
         <button class="chat-end" data-act="chat-end">おわる</button>
       </div>
       <div class="chat-messages" id="chatMessages">
@@ -6638,7 +6807,8 @@ function viewReflectReport() {
       </div>
 
       <div class="letter-footer">
-        <button class="btn btn-primary" data-act="report-home">ホームに戻る</button>
+        <button class="btn btn-primary" data-act="reflect-to-chat">この内容で${escapeHtml(getCurrentPersona().name)}と話す</button>
+        <button class="btn btn-secondary" data-act="report-home">ホームに戻る</button>
         <button class="btn btn-ghost" data-act="report-share">書き出してコピー</button>
       </div>
     </div>
@@ -6657,9 +6827,19 @@ function viewHistory() {
   const chatItems = state.sessions.map(s => ({ kind: 'chat', id: s.id, ts: s.startedAt, data: s })).sort((a, b) => b.ts - a.ts);
   const reflectItems = state.reflections.map(r => ({ kind: 'reflect', id: r.id, ts: r.startedAt, data: r })).sort((a, b) => b.ts - a.ts);
   const items = historyFilter === 'chat' ? chatItems : reflectItems;
-  const emptyMsg = historyFilter === 'chat'
-    ? { emoji: '💬', text: 'まだAsideとの会話記録はないよ。<br>ホームの「Asideと話す」から始めてみて。' }
-    : { emoji: '✨', text: 'まだもやもや整理の記録はないよ。<br>ホームの「もやもや整理」から始めてみて。' };
+  const emptyCta = historyFilter === 'chat'
+    ? {
+        emoji: '💬',
+        text: 'まだAsideとの会話記録はないよ。',
+        primary: { label: '1分で話してみる', act: 'start-chat' },
+        secondary: { label: '選ぶだけで始める', act: 'goto-talk' }
+      }
+    : {
+        emoji: '✨',
+        text: 'まだもやもや整理の記録はないよ。',
+        primary: { label: '最初のもやもや整理をやってみる', act: 'start-reflect' },
+        secondary: { label: 'はなす画面から始める', act: 'goto-talk' }
+      };
 
   return `
     <div class="screen active">
@@ -6681,9 +6861,13 @@ function viewHistory() {
       </div>
       <div class="history-list">
         ${items.length === 0 ? `
-          <div class="empty">
-            <div class="empty-emoji">${emptyMsg.emoji}</div>
-            <div class="empty-text">${emptyMsg.text}</div>
+          <div class="empty empty-action">
+            <div class="empty-emoji">${emptyCta.emoji}</div>
+            <div class="empty-text">${emptyCta.text}</div>
+            <div class="empty-actions">
+              <button class="btn btn-primary" data-act="${emptyCta.primary.act}">${escapeHtml(emptyCta.primary.label)}</button>
+              <button class="btn btn-ghost" data-act="${emptyCta.secondary.act}">${escapeHtml(emptyCta.secondary.label)}</button>
+            </div>
           </div>
         ` : items.map(item => {
           if (item.kind === 'chat') {
@@ -6933,6 +7117,68 @@ const RESCUE_FLOWS = {
         isExit: true
       }
     ]
+  },
+  words: {
+    title: '気持ちをことばにしたい',
+    steps: [
+      {
+        prompt: '近い気持ちを選んでみて',
+        choices: ['悲しい', '不安', 'いらいら', 'さみしい', '焦り', 'しんどい', '混ざってる', 'わからない']
+      },
+      {
+        prompt: 'その気持ちに近いのは？',
+        choices: ['胸がつまる', 'そわそわする', '何もしたくない', '誰かにわかってほしい', 'ちょっと休みたい']
+      },
+      {
+        mode: 'response',
+        build: (picks) => {
+          const emotion = picks[0] || '';
+          const body = picks[1] || '';
+          if (emotion === 'わからない' || emotion === '混ざってる') {
+            return `今日は、はっきりした理由より「なんとなく苦しい」が近そうだね。\n言葉にならないこと自体に、ちゃんと意味があるよ。`;
+          }
+          if (emotion === '不安' && (body === 'そわそわする' || body === '何もしたくない')) {
+            return `不安と疲れが混ざっていそうだね。\n無理に分けなくていい、そのまま置いて大丈夫。`;
+          }
+          if (emotion === 'いらいら') {
+            return `「${emotion}」と「${body}」、両方あっていいよ。\n感じてること、そのまま認めていい。`;
+          }
+          if (body === '誰かにわかってほしい') {
+            return `${emotion}い気持ちを、わかってほしいって思えてること自体が大事。\n言葉にできたね。`;
+          }
+          return `「${emotion}」で「${body}」、そんな感じなんだね。\nここまでたどりつけたの、十分だよ。`;
+        }
+      },
+      {
+        prompt: 'このあと、どうしよう？',
+        choices: ['このまま話す', 'きもちチェックに残す', '今日はここまで'],
+        isExit: true
+      }
+    ]
+  },
+  night: {
+    title: '眠る前に整えたい',
+    steps: [
+      {
+        prompt: '今の夜に近いのは？',
+        choices: ['今日のことを引きずってる', '明日のことが不安', '頭が休まらない', 'なんとなく落ち着かない']
+      },
+      {
+        mode: 'response',
+        build: (picks) => {
+          const pick = picks[0] || '';
+          if (pick === '明日のことが不安') return `夜は考えが大きくなりやすいよね。\nいまは答えを出す時間じゃなくて大丈夫。\n明日の自分に任せていい。`;
+          if (pick === '今日のことを引きずってる') return `今日のこと、ちゃんと頑張った証拠でもあるよ。\n引きずるのはそれだけ真剣だったから。`;
+          if (pick === '頭が休まらない') return `考えが止まらない夜、あるよね。\n体だけでも先に休ませてあげよう。`;
+          return `夜は心が敏感になりやすい時間。\nいまは「落ち着かないまま」でも大丈夫。`;
+        }
+      },
+      {
+        prompt: '今夜は、どうしよう？',
+        choices: ['10秒呼吸する', '今日を一言だけ置いて寝る', '明日にまわすメモを残す'],
+        isExit: true
+      }
+    ]
   }
 };
 
@@ -7031,12 +7277,31 @@ function viewCalendar() {
     const isToday = dateKey === todayStr;
     const isPast = dateKey < todayStr;
     const clickable = isToday;
+    const moodClass = mood ? `mood-${mood.score}` : '';
     cells.push(`
-      <div class="cal-cell ${mood ? 'has-mood' : ''} ${isToday ? 'today' : ''} ${clickable ? 'clickable' : ''}" ${clickable ? `data-act="goto-mood"` : ''} title="${mood ? MOODS.find(x => x.score === mood.score).label : ''}">
+      <div class="cal-cell ${mood ? 'has-mood' : ''} ${moodClass} ${isToday ? 'today' : ''} ${clickable ? 'clickable' : ''}" ${clickable ? `data-act="goto-mood"` : ''} title="${mood ? MOODS.find(x => x.score === mood.score).label : ''}">
         <div class="cal-day">${d}</div>
         <div class="cal-mood">${mood ? MOODS.find(x => x.score === mood.score).emoji : ''}</div>
       </div>
     `);
+  }
+
+  // 直近7日の気分サマリ（スパーク表示）
+  const last7Dates = [];
+  for (let i = 6; i >= 0; i--) {
+    const dt = new Date();
+    dt.setDate(dt.getDate() - i);
+    last7Dates.push(dt.toISOString().slice(0, 10));
+  }
+  const last7Moods = last7Dates.map(dk => state.moods.find(m => m.date === dk));
+  const recordedLast7 = last7Moods.filter(Boolean);
+  let moodSummaryText = '';
+  if (recordedLast7.length >= 3) {
+    const avg = recordedLast7.reduce((s, m) => s + m.score, 0) / recordedLast7.length;
+    if (avg >= 4) moodSummaryText = 'この1週間は、まあまあ良い日が多そう。';
+    else if (avg >= 3) moodSummaryText = 'この1週間は、だいたい「ふつう」の日々。';
+    else if (avg >= 2) moodSummaryText = 'この1週間は、少し重い日が多いかも。無理しないで。';
+    else moodSummaryText = 'つらい日が続いてるね。レスキューも使っていいよ。';
   }
 
   return `
@@ -7068,10 +7333,30 @@ function viewCalendar() {
           <button class="cal-nav-btn" data-act="cal-next" aria-label="次の月">›</button>
         </div>
 
-        <div class="cal-stats">
-          <div><span class="cal-stats-n">${monthMoods.length}</span>日 記録</div>
-          <div><span class="cal-stats-n">${streakDays}</span>日 継続</div>
-        </div>
+        ${state.moods.length === 0 ? `
+          <div class="cal-empty-hint">
+            今日からで大丈夫。記録するたび、ここに気持ちがたまっていくよ。
+          </div>
+        ` : `
+          <div class="cal-stats">
+            <div><span class="cal-stats-n">${monthMoods.length}</span>日 記録</div>
+            <div><span class="cal-stats-n">${streakDays}</span>日 継続</div>
+          </div>
+          <div class="cal-mood-sparkline">
+            <div class="cal-mood-sparkline-label">直近7日</div>
+            <div class="cal-mood-sparkline-row">
+              ${last7Moods.map((m, i) => {
+                const dt = new Date(last7Dates[i]);
+                const dayLabel = (dt.getMonth() + 1) + '/' + dt.getDate();
+                return `<div class="cal-spark-item">
+                  <div class="cal-spark-dot ${m ? `mood-${m.score}` : 'no-mood'}">${m ? MOODS.find(x => x.score === m.score).emoji : '·'}</div>
+                  <div class="cal-spark-date">${dayLabel}</div>
+                </div>`;
+              }).join('')}
+            </div>
+            ${moodSummaryText ? `<div class="cal-mood-summary">${escapeHtml(moodSummaryText)}</div>` : ''}
+          </div>
+        `}
 
         <div class="cal-weekdays">
           <span style="color: var(--danger);">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span style="color: #4a82c4;">土</span>
@@ -7167,11 +7452,92 @@ function computeInsights(days) {
     highlights.push('この期間はほとんど記録がないね。少しずつ、戻ってこれた日からでいい。');
   }
 
+  // ===== 傾向理解（Trends） =====
+  const trends = [];
+
+  // 1. 落ち込みやすい時間帯（moods を checkedAt の時間帯でビン化）
+  const bins = { 'morning': [], 'afternoon': [], 'evening': [], 'night': [] };
+  (state.moods || []).forEach(m => {
+    if (!periodDates.includes(m.date) || !m.checkedAt) return;
+    const h = new Date(m.checkedAt).getHours();
+    if (h < 11) bins.morning.push(m.score);
+    else if (h < 16) bins.afternoon.push(m.score);
+    else if (h < 21) bins.evening.push(m.score);
+    else bins.night.push(m.score);
+  });
+  const binAvgs = Object.entries(bins).map(([k, arr]) => ({ k, avg: arr.length ? arr.reduce((s, x) => s + x, 0) / arr.length : null, count: arr.length }));
+  const filledBins = binAvgs.filter(b => b.avg !== null && b.count >= 2);
+  if (filledBins.length >= 2) {
+    const lowest = filledBins.reduce((a, b) => a.avg < b.avg ? a : b);
+    const highest = filledBins.reduce((a, b) => a.avg > b.avg ? a : b);
+    const timeLabel = { morning: '朝', afternoon: '昼', evening: '夕方', night: '夜' };
+    if (lowest.avg < 3 && highest.avg - lowest.avg >= 0.6) {
+      trends.push({ icon: '⏰', text: `${timeLabel[lowest.k]}のほうが重く感じやすいみたい（${timeLabel[highest.k]}は比較的軽め）。` });
+    }
+  }
+
+  // 2. よく話しているテーマ
+  const topics = {};
+  sessions.forEach(s => {
+    if (s.topicStart) topics[s.topicStart] = (topics[s.topicStart] || 0) + 1;
+  });
+  const topTopic = Object.entries(topics).sort((a, b) => b[1] - a[1])[0];
+  if (topTopic && topTopic[1] >= 2) {
+    trends.push({ icon: '💬', text: `よく話したテーマは「${topTopic[0]}」（${topTopic[1]}回）。そこに今のフォーカスがあるのかも。` });
+  }
+
+  // 3. 整理後の気分改善率
+  if (reflections.length >= 2) {
+    const rate = Math.round((reflectionImprovements / reflections.length) * 100);
+    if (rate >= 50) {
+      trends.push({ icon: '✨', text: `ふりかえり後に気分が軽くなった割合は${rate}%。整理するのが合っている傾向。` });
+    } else if (rate < 30 && reflections.length >= 3) {
+      trends.push({ icon: '🌱', text: `ふりかえりだけでは気分が変わりにくい時期かも。話す・休むも混ぜてみて。` });
+    }
+  }
+
+  // 4. 相性の良いAI人格（ラリー数ベース）
+  const personaRallies = {};
+  sessions.forEach(s => {
+    const pid = s.personaId || state.selectedPersonaId;
+    if (!pid) return;
+    const rally = (s.messages || []).filter(m => m.role === 'user').length;
+    if (!personaRallies[pid]) personaRallies[pid] = { total: 0, count: 0 };
+    personaRallies[pid].total += rally;
+    personaRallies[pid].count += 1;
+  });
+  const personaAvgs = Object.entries(personaRallies).map(([pid, v]) => ({ pid, avg: v.total / v.count, count: v.count }))
+    .filter(p => p.count >= 2)
+    .sort((a, b) => b.avg - a.avg);
+  if (personaAvgs.length > 0 && personaAvgs[0].avg >= 4) {
+    const p = PERSONAS.find(x => x.id === personaAvgs[0].pid);
+    if (p) {
+      const displayName = (state.personaNames && state.personaNames[p.id]) || p.name;
+      trends.push({ icon: '🫶', text: `${displayName}との会話で平均${Math.round(personaAvgs[0].avg)}ラリー続いている。相性よさそう。` });
+    }
+  }
+
+  // 5. 続けられた日数（既存の longestStreak を活用）
+  if (longestStreak >= 5) {
+    trends.push({ icon: '📿', text: `${longestStreak}日連続で記録できた日があった。続ける力がちゃんとある。` });
+  }
+
+  // 6. コメント量の変化（前半 vs 後半）
+  const sortedComments = moods.filter(m => m.comment && m.comment.trim()).sort((a, b) => a.date < b.date ? -1 : 1);
+  if (sortedComments.length >= 4) {
+    const mid = Math.floor(sortedComments.length / 2);
+    const avgFirst = sortedComments.slice(0, mid).reduce((s, m) => s + m.comment.length, 0) / mid;
+    const avgLast = sortedComments.slice(mid).reduce((s, m) => s + m.comment.length, 0) / (sortedComments.length - mid);
+    if (avgLast > avgFirst * 1.4) {
+      trends.push({ icon: '✍️', text: `ひとことの文字数が後半ほど増えている。言葉にする力が育ってるね。` });
+    }
+  }
+
   return {
     days, checkinDays, moodAvg, longestStreak,
     sessionCount: sessions.length, reflectionCount: reflections.length,
     deepestRally, reflectionImprovements, bestMood, commentDays: commentDays.length,
-    highlights
+    highlights, trends
   };
 }
 
@@ -7220,6 +7586,18 @@ function viewInsights() {
           </div>
         `).join('')}
       </div>
+
+      ${ins.trends && ins.trends.length > 0 ? `
+        <div class="insights-section-title">気づき・傾向</div>
+        <div class="insights-trends">
+          ${ins.trends.map(t => `
+            <div class="insights-trend">
+              <div class="insights-trend-icon">${t.icon}</div>
+              <div class="insights-trend-text">${escapeHtml(t.text)}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
 
         <div class="insights-section-title">この${insightsRange === 'month' ? '1ヶ月' : '1週間'}を次に活かす</div>
         <div class="card">
@@ -7664,21 +8042,33 @@ function handleAction(act, el, e) {
     }
     case 'rescue-exit': {
       const choice = el.dataset.choice;
-      if (choice === 'もう少し話す' || choice === '一言だけ話す') {
+      if (choice === 'もう少し話す' || choice === '一言だけ話す' || choice === 'このまま話す') {
         chatState.session = null;
         App.go('chat');
         setTimeout(() => sendInitialAi(), 300);
-      } else if (choice === '30秒できもちチェック') {
+      } else if (choice === '30秒できもちチェック' || choice === 'きもちチェックに残す') {
         moodDraft = { score: null, comment: '' };
         App.go('mood');
       } else if (choice === 'もやもや整理に進む') {
         startNewReflection();
         App.go('reflect');
-      } else if (choice === '深呼吸する（10秒）') {
+      } else if (choice === '深呼吸する（10秒）' || choice === '10秒呼吸する') {
         toast('吸って… 止めて… はいて… 10秒やってみよう');
-        setTimeout(() => App.go('goal'), 500);
+        setTimeout(() => App.go('goal'), 600);
+      } else if (choice === '今日を一言だけ置いて寝る') {
+        // きもちチェックのコメント欄に誘導
+        moodDraft = { score: null, comment: '' };
+        App.go('mood');
+        setTimeout(() => {
+          const mc = document.getElementById('moodComment');
+          if (mc) { mc.placeholder = '今日をひとことだけ…'; mc.focus(); }
+        }, 300);
+      } else if (choice === '明日にまわすメモを残す') {
+        // もやもや整理に誘導（出来事ベースで明日に繰り越すイメージ）
+        startNewReflection();
+        App.go('reflect');
       } else {
-        // 「今日はここで終わる」など
+        // 「今日はここで終わる」「今日はここまで」など
         toast('お疲れさま。またいつでもどうぞ。');
         setTimeout(() => App.go('goal'), 400);
       }
@@ -7735,6 +8125,31 @@ function handleAction(act, el, e) {
       startNewReflection();
       App.go('reflect');
       break;
+    case 'chat-to-reflect': {
+      // 会話内容を引き継いでもやもや整理へ
+      const s = chatState.session;
+      if (!s) { App.go('goal'); return; }
+      const userMsgs = s.messages.filter(m => m.role === 'user');
+      // 最初の1〜2発話を出来事のヒントに
+      const eventHint = userMsgs.slice(0, 2).map(m => m.content).join(' ').slice(0, 100);
+      startNewReflection();
+      reflectState.draft.event = eventHint;
+      reflectState.draft.fromChatSessionId = s.id;
+      App.go('reflect');
+      toast('会話の内容を整理に引き継いだよ');
+      break;
+    }
+    case 'reflect-to-chat': {
+      // もやもや整理の内容を引き継いでチャットへ
+      const id = reflectState.reportId || state.currentReflectionId;
+      const r = state.reflections.find(x => x.id === id);
+      chatState.session = null;
+      startNewChatSession();
+      if (r) chatState.session.fromReflection = { event: r.event, thoughts: r.thoughts };
+      App.go('chat');
+      setTimeout(() => sendInitialAi({ fromReflection: true }), 300);
+      break;
+    }
     case 'reflect-back':
       if (reflectState.draft && reflectState.phase && reflectState.phase !== 'event') {
         if (!confirm('ふりかえりの途中だけど、やめる？')) return;
@@ -8123,6 +8538,7 @@ async function sendInitialAi(opts = {}) {
   if (!s || s.messages.length > 0) { render(); return; }
   if (opts.fromMoodSave) s.fromMoodSave = true;
   if (opts.topic) s.topicStart = opts.topic;
+  if (opts.fromReflection) s.fromReflectionFlag = true;
   chatState.isTyping = true;
   render();
   try {
@@ -8336,6 +8752,9 @@ async function callAi(session, isInitial = false) {
     }
     if (session.topicStart) {
       intro += `\n\n【テーマ】${state.nickname}さんは「${session.topicStart}」をテーマに話すことを選びました。このテーマに関して「最近どんなことがありましたか？」のような開き方で、やさしく先に一言かけてください。ただし具体的な出来事を推測・決めつけしない。相手が話し始めやすいよう、緩やかな入口を提示するイメージで。`;
+    }
+    if (session.fromReflectionFlag && session.fromReflection) {
+      intro += `\n\n【もやもや整理からの継続】${state.nickname}さんは直前にもやもや整理を完了し、その内容をもとに話すことを選びました。整理した内容: 出来事「${session.fromReflection.event || ''}」、そのとき浮かんだ考え「${session.fromReflection.thoughts || ''}」。この流れを踏まえて、整理できたことを軽く受けとめてから、いま話したいことを自然に引き出す最初の一言をかけてください。ただし整理内容を詳しく繰り返さないこと。`;
     }
     if (todayMood && todayMood.comment && todayMood.comment.trim()) {
       intro += `\n\n【最重要・最優先】${state.nickname}さんは「ひとこと」に「${todayMood.comment.trim()}」と書いています。この一文がその人の今の気持ちの核です。まずこの内容を最優先の話題として受けとめ、ここから会話を始めてください。スコア（${todayMood.score}/5）は補助情報にすぎません。決して「${MOODS.find(x => x.score === todayMood.score).label}なんだね」のようにスコアから話を始めないこと。ひとことの内容を拾って、そこを起点に寄り添う最初の一言をかけてください。`;
