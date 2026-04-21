@@ -3272,6 +3272,183 @@ body {
   margin-bottom: 4px;
 }
 
+/* ---------- 夜レスキュー専用 ---------- */
+.night-screen {
+  background: linear-gradient(180deg, #F7EFE2 0%, #EDE3D2 100%);
+}
+.night-screen .page-header {
+  background: transparent;
+}
+.night-content {
+  padding: 24px 24px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.night-step {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  margin-bottom: -8px;
+}
+.night-head {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+.night-sub {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.8;
+}
+.night-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+.night-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.night-choice-btn {
+  padding: 18px 20px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.5;
+  transition: all .15s var(--ease);
+  box-shadow: 0 2px 6px rgba(139, 127, 112, 0.04);
+}
+.night-choice-btn:active { transform: scale(0.98); background: var(--accent-soft); }
+.night-choice-btn.night-choice-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  color: #fff;
+  border-color: var(--accent);
+}
+.night-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.night-actions .btn { width: 100%; }
+.night-ack-bubble {
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(139, 127, 112, 0.06);
+  animation: slideUp .5s var(--ease);
+}
+.night-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  line-height: 1.7;
+}
+.night-textarea:focus { border-color: var(--accent); }
+.night-memo-echo {
+  font-size: 12px;
+  color: var(--text-soft);
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  line-height: 1.6;
+}
+
+.night-hero {
+  text-align: center;
+  padding: 40px 16px 24px;
+}
+.night-hero-moon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: moonFloat 6s ease-in-out infinite;
+}
+@keyframes moonFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.night-hero-head {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: 0.04em;
+}
+.night-hero-sub {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.9;
+  margin-bottom: 16px;
+}
+.night-hero-note {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 4px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- 呼吸アニメーション ---------- */
+.breath-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 40px 0 20px;
+  min-height: 320px;
+}
+.breath-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--accent-soft), var(--accent));
+  box-shadow: 0 0 40px rgba(198, 139, 94, 0.18);
+  animation: breath 10.5s cubic-bezier(.45,.05,.55,.95) infinite;
+  opacity: 0.82;
+}
+@keyframes breath {
+  0%   { transform: scale(0.65); opacity: 0.55; }
+  38%  { transform: scale(1); opacity: 0.85; }   /* 吸う → 広がる */
+  57%  { transform: scale(1); opacity: 0.85; }   /* そのまま */
+  100% { transform: scale(0.65); opacity: 0.55; }/* はいて → 縮む */
+}
+.breath-phrase {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 26px;
+  color: var(--text);
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+.breath-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
 /* ---------- ミニ体験（オンボ直後） ---------- */
 .mini-response {
   display: flex;
@@ -4518,6 +4695,7 @@ function render() {
     App.currentScreen === 'miniExperience' ? viewMiniExperience() :
     App.currentScreen === 'rescue' ? viewRescue() :
     App.currentScreen === 'rescueFlow' ? viewRescueFlow() :
+    App.currentScreen === 'nightRescue' ? viewNightRescue() :
     App.currentScreen === 'settings' ? viewSettings() :
     viewWelcome()
   );
@@ -7396,6 +7574,403 @@ function viewRescueFlow() {
   `;
 }
 
+// ---------- 眠る前に整えたい（夜レスキュー フル実装） ----------
+let nightState = null;
+
+function newNightState() {
+  return {
+    phase: 'entry',      // entry / state / ack / choose / a1/a2/a3/a4 / b1/b2/b3/b4/b5 / c1/c2/c3/c4/c5/c6
+    startedAt: Date.now(),
+    stateChoice: null,   // drag / tomorrow / nohalt / unsettled
+    branch: null,        // 'A' / 'B' / 'C'
+    bLabel: null,        // Bの一言ラベル
+    bMemo: '',           // B任意入力
+    cTheme: null,        // Cテーマ
+    cHandoff: null,      // C渡し方
+    cMemo: '',           // C任意メモ
+    done: false
+  };
+}
+
+const NIGHT_STATE_OPTIONS = [
+  { id: 'drag', label: '今日のことを引きずってる' },
+  { id: 'tomorrow', label: '明日のことが不安' },
+  { id: 'nohalt', label: '頭が休まらない' },
+  { id: 'unsettled', label: 'なんとなく落ち着かない' }
+];
+
+const NIGHT_ACK = {
+  drag: { heading: 'まだ今日が終わってない感じなんだね。', body: '夜は、昼よりも気持ちが残りやすいよね。\n今は整理しきらなくても大丈夫。' },
+  tomorrow: { heading: '明日のことが先に来てるんだね。', body: '夜は、明日の不安が少し大きく見えやすい。\n今は答えを出す時間じゃなくていいよ。' },
+  nohalt: { heading: '頭が、まだ働き続けてるんだね。', body: '止めようとしても止まらない時ってあるよね。\n今は少しだけ、回転をゆるめよう。' },
+  unsettled: { heading: 'はっきりしないけど、落ち着かない夜なんだね。', body: '理由がはっきりしなくても大丈夫。\n今夜は、少し静かになればそれで十分。' }
+};
+
+const NIGHT_B_LABELS = ['つかれた', 'がんばった', '不安だった', 'もやもやした', 'さみしかった', 'なんとか過ごした', 'ことばにしにくい'];
+const NIGHT_B_ACK = {
+  'つかれた': '今日は、つかれた日だったんだね。\nここに置いておけるだけでも十分だよ。',
+  'がんばった': '今日もちゃんと過ごしてきたんだね。\n今夜は、がんばりを閉じて休もう。',
+  '不安だった': '不安を抱えたまま過ごしてたんだね。\n今、少し外に出せたのは大きいよ。',
+  'もやもやした': '言葉にしきらないまま過ごしてたんだね。\n今夜は、それを置いておけば十分。',
+  'さみしかった': 'さみしさを抱えた日だったんだね。\n言葉にできただけで、ちゃんと届いているよ。',
+  'なんとか過ごした': '今日は「なんとか過ごした」日だったんだね。\nその一言で、十分伝わってるよ。',
+  'ことばにしにくい': 'まだうまく言えなくても大丈夫。\n置こうとしたこと自体で十分だよ。'
+};
+
+const NIGHT_C_THEMES = ['明日の予定', '人間関係', '仕事 / 学校', '失敗や後悔', '将来の不安', 'その他'];
+const NIGHT_C_HANDOFFS = ['思い出して考える', 'まず事実だけ整理する', '誰かに相談する', '今は保留でいい', 'ひとこと残す'];
+
+function viewNightRescue() {
+  const s = nightState || (nightState = newNightState());
+  const p = s.phase;
+
+  if (p === 'entry') {
+    return nightShell({
+      title: '眠る前に整えたい',
+      backAct: 'night-exit-home',
+      body: `
+        <div class="night-hero">
+          <div class="night-hero-moon">🌙</div>
+          <div class="night-hero-head">眠る前に整えたい</div>
+          <div class="night-hero-sub">今夜は、考えを片づけなくていい。<br>少しだけ静かにしてから寝よう。</div>
+          <div class="night-hero-note">1〜3分でOK</div>
+        </div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-entry-start">はじめる</button>
+        </div>
+      `
+    });
+  }
+
+  if (p === 'state') {
+    return nightShell({
+      title: '眠る前に整えたい',
+      backAct: 'night-back',
+      step: 'STEP 1 / 3',
+      body: `
+        <div class="night-head">今の夜に近いのはどれ？</div>
+        <div class="night-sub">ぴったりじゃなくて大丈夫。<br>近いものをひとつ選んでみて。</div>
+        <div class="night-choices">
+          ${NIGHT_STATE_OPTIONS.map(o => `
+            <button class="night-choice-btn" data-act="night-state-pick" data-id="${o.id}">${escapeHtml(o.label)}</button>
+          `).join('')}
+        </div>
+      `
+    });
+  }
+
+  if (p === 'ack') {
+    const ack = NIGHT_ACK[s.stateChoice] || NIGHT_ACK.unsettled;
+    return nightShell({
+      title: '眠る前に整えたい',
+      backAct: 'night-back',
+      step: 'STEP 2 / 3',
+      body: `
+        <div class="night-head">${escapeHtml(ack.heading)}</div>
+        <div class="night-ack-bubble">${escapeHtml(ack.body).replace(/\n/g, '<br>')}</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-ack-next">つぎへ</button>
+        </div>
+      `
+    });
+  }
+
+  if (p === 'choose') {
+    return nightShell({
+      title: '眠る前に整えたい',
+      backAct: 'night-back',
+      step: 'STEP 3 / 3',
+      body: `
+        <div class="night-head">今夜は、どうしよう？</div>
+        <div class="night-choices">
+          <button class="night-choice-btn night-choice-primary" data-act="night-branch" data-branch="A">🫧 10秒呼吸する</button>
+          <button class="night-choice-btn" data-act="night-branch" data-branch="B">📝 今日を一言だけ置いて寝る</button>
+          <button class="night-choice-btn" data-act="night-branch" data-branch="C">🗂 明日にまわすメモを残す</button>
+        </div>
+      `
+    });
+  }
+
+  // ===== 分岐A: 呼吸 =====
+  if (p === 'a1') {
+    return nightShell({
+      title: '10秒呼吸する',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">いったん、呼吸だけで大丈夫。</div>
+        <div class="night-sub">答えを出さなくていいよ。<br>今は少しゆるめよう。</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-a-start">はじめる</button>
+        </div>
+      `
+    });
+  }
+  if (p === 'a2') {
+    return nightShell({
+      title: '呼吸',
+      backAct: 'night-back',
+      body: `
+        <div class="breath-stage">
+          <div class="breath-circle"></div>
+          <div class="breath-phrase" id="breathPhrase">すって</div>
+          <div class="breath-sub">ゆっくりで大丈夫</div>
+        </div>
+        <div class="night-actions">
+          <button class="btn btn-ghost" data-act="night-a-skip">スキップ</button>
+        </div>
+      `,
+      onMount: 'breath'
+    });
+  }
+  if (p === 'a3') {
+    return nightShell({
+      title: '10秒呼吸する',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">少しだけ、呼吸できたね。</div>
+        <div class="night-sub">今すぐ眠れなくても大丈夫。<br>少し静かになれば、それで十分。</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-finish" data-kind="home">今日はここで終わる</button>
+          <button class="btn btn-secondary" data-act="night-switch-b">今日を一言だけ置く</button>
+          <button class="btn btn-secondary" data-act="night-switch-c">明日にまわすメモを残す</button>
+        </div>
+      `
+    });
+  }
+
+  // ===== 分岐B: 一言 =====
+  if (p === 'b1') {
+    return nightShell({
+      title: '今日を一言だけ置く',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">今日を、ひとことで置いていこう。</div>
+        <div class="night-sub">うまくまとまらなくても大丈夫。<br>ひとことだけでいいよ。</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-b-next">つぎへ</button>
+        </div>
+      `
+    });
+  }
+  if (p === 'b2') {
+    return nightShell({
+      title: '今日を一言だけ置く',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">今日に近いひとことを選んでみて。</div>
+        <div class="night-choices">
+          ${NIGHT_B_LABELS.map(l => `
+            <button class="night-choice-btn" data-act="night-b-pick" data-label="${escapeAttr(l)}">${escapeHtml(l)}</button>
+          `).join('')}
+        </div>
+        <div class="night-note">選ぶだけでも大丈夫</div>
+      `
+    });
+  }
+  if (p === 'b3') {
+    return nightShell({
+      title: '今日を一言だけ置く',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">よければ、ひとことだけ足してみる？</div>
+        <textarea class="night-textarea" id="nightBMemo" maxlength="40" rows="2" placeholder="今日はこれだけ置いて寝る"></textarea>
+        <div class="night-note">最大40文字／任意</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-b-memo-save">これで置いておく</button>
+          <button class="btn btn-ghost" data-act="night-b-memo-skip">入れずに進む</button>
+        </div>
+      `
+    });
+  }
+  if (p === 'b4') {
+    const ackText = NIGHT_B_ACK[s.bLabel] || 'ここに置いておけるだけでも十分だよ。';
+    return nightShell({
+      title: '今日を一言だけ置く',
+      backAct: 'night-back',
+      body: `
+        <div class="night-ack-bubble">${escapeHtml(ackText).replace(/\n/g, '<br>')}</div>
+        ${s.bMemo ? `<div class="night-memo-echo">「${escapeHtml(s.bMemo)}」</div>` : ''}
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-b-next2">つぎへ</button>
+        </div>
+      `
+    });
+  }
+  if (p === 'b5') {
+    return nightShell({
+      title: '今日を一言だけ置く',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">今夜はここまでで大丈夫。</div>
+        <div class="night-sub">今日は置いて、休むほうを選ぼう。<br>続きはまた明日でもいい。</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-finish" data-kind="home">眠る準備に戻る</button>
+          <button class="btn btn-secondary" data-act="night-switch-c">明日にまわすメモも残す</button>
+          <button class="btn btn-ghost" data-act="night-finish" data-kind="chat">もう少しだけ話す</button>
+        </div>
+      `
+    });
+  }
+
+  // ===== 分岐C: 明日にまわすメモ =====
+  if (p === 'c1') {
+    return nightShell({
+      title: '明日にまわすメモ',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">今夜考え続けなくていいように、メモを置こう。</div>
+        <div class="night-sub">忘れない形にして、<br>続きは明日の自分に渡そう。</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-c-next">つぎへ</button>
+        </div>
+      `
+    });
+  }
+  if (p === 'c2') {
+    return nightShell({
+      title: '明日にまわすメモ',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">どんなことを置いておく？</div>
+        <div class="night-choices">
+          ${NIGHT_C_THEMES.map(t => `
+            <button class="night-choice-btn" data-act="night-c-theme" data-theme="${escapeAttr(t)}">${escapeHtml(t)}</button>
+          `).join('')}
+        </div>
+        <div class="night-note">ひとつ選べば大丈夫</div>
+      `
+    });
+  }
+  if (p === 'c3') {
+    return nightShell({
+      title: '明日にまわすメモ',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">明日の自分に、どう渡す？</div>
+        <div class="night-choices">
+          ${NIGHT_C_HANDOFFS.map(h => `
+            <button class="night-choice-btn" data-act="night-c-handoff" data-handoff="${escapeAttr(h)}">${escapeHtml(h)}</button>
+          `).join('')}
+        </div>
+      `
+    });
+  }
+  if (p === 'c4') {
+    return nightShell({
+      title: '明日にまわすメモ',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">よければ、短く残しておこう。</div>
+        <textarea class="night-textarea" id="nightCMemo" maxlength="50" rows="2" placeholder="明日の朝に返信だけ考える"></textarea>
+        <div class="night-note">最大50文字／任意</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-c-memo-save">メモを置く</button>
+          <button class="btn btn-ghost" data-act="night-c-memo-skip">入れずに進む</button>
+        </div>
+      `
+    });
+  }
+  if (p === 'c5') {
+    const msg = 'ちゃんと明日の自分に渡せたね。\n今夜の役目は、抱え続けることじゃなくて置いておくことだよ。';
+    return nightShell({
+      title: '明日にまわすメモ',
+      backAct: 'night-back',
+      body: `
+        <div class="night-ack-bubble">${escapeHtml(msg).replace(/\n/g, '<br>')}</div>
+        ${s.cTheme ? `<div class="night-memo-echo">テーマ：${escapeHtml(s.cTheme)}／渡し方：${escapeHtml(s.cHandoff || '—')}${s.cMemo ? `<br>「${escapeHtml(s.cMemo)}」` : ''}</div>` : ''}
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-c-next2">つぎへ</button>
+        </div>
+      `
+    });
+  }
+  if (p === 'c6') {
+    return nightShell({
+      title: '明日にまわすメモ',
+      backAct: 'night-back',
+      body: `
+        <div class="night-head">今日はここまでにしよう。</div>
+        <div class="night-sub">考え続ける代わりに、預けることができたね。<br>今夜は休むことを優先していいよ。</div>
+        <div class="night-actions">
+          <button class="btn btn-primary" data-act="night-finish" data-kind="home">眠る準備に戻る</button>
+          <button class="btn btn-secondary" data-act="night-switch-a">10秒呼吸する</button>
+          <button class="btn btn-secondary" data-act="night-switch-b">今日を一言だけ置く</button>
+        </div>
+      `
+    });
+  }
+
+  // fallback
+  return nightShell({ title: '眠る前に整えたい', backAct: 'night-exit-home', body: '<div class="night-head">ここまでで大丈夫。</div><div class="night-actions"><button class="btn btn-primary" data-act="night-finish" data-kind="home">ホームに戻る</button></div>' });
+}
+
+function nightShell(opts) {
+  return `
+    <div class="screen active night-screen">
+      <div class="page-header insights-header">
+        <button class="chat-back" data-act="${opts.backAct || 'night-back'}">${icon('arrow-left')}</button>
+        <div class="page-title">${escapeHtml(opts.title || '眠る前に整えたい')}</div>
+      </div>
+      <div class="home-content night-content">
+        ${opts.step ? `<div class="night-step">${escapeHtml(opts.step)}</div>` : ''}
+        ${opts.body}
+      </div>
+    </div>
+  `;
+}
+
+// 呼吸アニメーション（a2表示時に呼ばれる）
+let _breathTimer = null;
+function startBreathAnimation() {
+  if (_breathTimer) { clearInterval(_breathTimer); _breathTimer = null; }
+  const phrase = document.getElementById('breathPhrase');
+  if (!phrase) return;
+  const cycle = ['すって', 'そのまま', 'はいて'];
+  let t = 0;
+  let idx = 0;
+  phrase.textContent = cycle[idx];
+  const maxT = 15000; // 15秒
+  const startTs = Date.now();
+  _breathTimer = setInterval(() => {
+    const elapsed = Date.now() - startTs;
+    if (elapsed >= maxT) {
+      clearInterval(_breathTimer); _breathTimer = null;
+      // 自動で a3 へ
+      if (nightState && nightState.phase === 'a2') {
+        nightState.phase = 'a3';
+        render();
+      }
+      return;
+    }
+    // 吸う4秒・止める2秒・吐く5秒の1サイクル → 簡略化して3段階ループ
+    const phase = Math.floor((elapsed / 3500)) % 3;
+    if (phase !== idx) {
+      idx = phase;
+      phrase.textContent = cycle[idx];
+    }
+  }, 200);
+}
+
+function saveNightRescueHistory() {
+  if (!state.nightRescueHistory) state.nightRescueHistory = [];
+  if (!nightState) return;
+  state.nightRescueHistory.push({
+    startedAt: nightState.startedAt,
+    endedAt: Date.now(),
+    stateChoice: nightState.stateChoice,
+    branch: nightState.branch,
+    bLabel: nightState.bLabel,
+    bMemo: nightState.bMemo,
+    cTheme: nightState.cTheme,
+    cHandoff: nightState.cHandoff,
+    cMemo: nightState.cMemo,
+    done: nightState.done
+  });
+  // レスキュー全般と同じく直近使用としても記録
+  state.lastRescueExit = { flowId: 'night', ts: Date.now(), exitChoice: nightState.branch ? `branch-${nightState.branch}` : 'exit' };
+  saveState();
+}
+
 // ---------- Calendar Tab（カレンダー画面） ----------
 let calendarMonth = null; // 'YYYY-MM'
 
@@ -8161,6 +8736,12 @@ function handleAction(act, el, e) {
     }
     case 'rescue-start': {
       const id = el.dataset.rescue;
+      // 夜レスキューは専用フル実装へ
+      if (id === 'night') {
+        nightState = newNightState();
+        App.go('nightRescue');
+        break;
+      }
       if (!RESCUE_FLOWS[id]) { toast('このメニューは近日公開だよ'); return; }
       rescueState = { flowId: id, stepIdx: 0, picks: [] };
       App.go('rescueFlow');
@@ -8188,8 +8769,126 @@ function handleAction(act, el, e) {
       break;
     }
     case 'goto-rescue-night': {
-      rescueState = { flowId: 'night', stepIdx: 0, picks: [] };
-      App.go('rescueFlow');
+      nightState = newNightState();
+      App.go('nightRescue');
+      break;
+    }
+    // ===== 夜レスキュー =====
+    case 'night-entry-start':
+      nightState.phase = 'state'; render(); break;
+    case 'night-state-pick': {
+      nightState.stateChoice = el.dataset.id;
+      nightState.phase = 'ack';
+      render();
+      break;
+    }
+    case 'night-ack-next':
+      nightState.phase = 'choose'; render(); break;
+    case 'night-branch': {
+      const b = el.dataset.branch;
+      nightState.branch = b;
+      if (b === 'A') nightState.phase = 'a1';
+      else if (b === 'B') nightState.phase = 'b1';
+      else if (b === 'C') nightState.phase = 'c1';
+      render();
+      break;
+    }
+    // 分岐A
+    case 'night-a-start':
+      nightState.phase = 'a2';
+      render();
+      setTimeout(startBreathAnimation, 100);
+      break;
+    case 'night-a-skip':
+      if (_breathTimer) { clearInterval(_breathTimer); _breathTimer = null; }
+      nightState.phase = 'a3';
+      render();
+      break;
+    // 分岐B
+    case 'night-b-next': nightState.phase = 'b2'; render(); break;
+    case 'night-b-pick':
+      nightState.bLabel = el.dataset.label;
+      nightState.phase = 'b3';
+      render();
+      break;
+    case 'night-b-memo-save': {
+      const v = document.getElementById('nightBMemo');
+      nightState.bMemo = (v && v.value || '').trim().slice(0, 40);
+      nightState.phase = 'b4';
+      render();
+      break;
+    }
+    case 'night-b-memo-skip':
+      nightState.bMemo = '';
+      nightState.phase = 'b4';
+      render();
+      break;
+    case 'night-b-next2':
+      nightState.phase = 'b5';
+      render();
+      break;
+    // 分岐C
+    case 'night-c-next': nightState.phase = 'c2'; render(); break;
+    case 'night-c-theme':
+      nightState.cTheme = el.dataset.theme;
+      nightState.phase = 'c3';
+      render();
+      break;
+    case 'night-c-handoff':
+      nightState.cHandoff = el.dataset.handoff;
+      nightState.phase = 'c4';
+      render();
+      break;
+    case 'night-c-memo-save': {
+      const v = document.getElementById('nightCMemo');
+      nightState.cMemo = (v && v.value || '').trim().slice(0, 50);
+      nightState.phase = 'c5';
+      render();
+      break;
+    }
+    case 'night-c-memo-skip':
+      nightState.cMemo = '';
+      nightState.phase = 'c5';
+      render();
+      break;
+    case 'night-c-next2':
+      nightState.phase = 'c6';
+      render();
+      break;
+    // 分岐切替（画面 a3/b5/c6 から他の導線へ乗り換え）
+    case 'night-switch-a': nightState.branch = 'A'; nightState.phase = 'a1'; render(); break;
+    case 'night-switch-b': nightState.branch = 'B'; nightState.phase = 'b1'; render(); break;
+    case 'night-switch-c': nightState.branch = 'C'; nightState.phase = 'c1'; render(); break;
+    // 戻る
+    case 'night-back': {
+      const p = nightState && nightState.phase;
+      const back = {
+        state: 'entry', ack: 'state', choose: 'ack',
+        a1: 'choose', a2: 'a1', a3: 'a2',
+        b1: 'choose', b2: 'b1', b3: 'b2', b4: 'b3', b5: 'b4',
+        c1: 'choose', c2: 'c1', c3: 'c2', c4: 'c3', c5: 'c4', c6: 'c5'
+      };
+      if (back[p]) { nightState.phase = back[p]; render(); }
+      else { App.go('rescue'); }
+      break;
+    }
+    case 'night-exit-home':
+      if (_breathTimer) { clearInterval(_breathTimer); _breathTimer = null; }
+      App.go('goal');
+      break;
+    case 'night-finish': {
+      if (_breathTimer) { clearInterval(_breathTimer); _breathTimer = null; }
+      const kind = el.dataset.kind;
+      nightState.done = true;
+      saveNightRescueHistory();
+      if (kind === 'chat') {
+        chatState.session = null;
+        App.go('chat');
+        setTimeout(() => sendInitialAi(), 300);
+      } else {
+        toast('おやすみなさい。');
+        setTimeout(() => App.go('goal'), 400);
+      }
       break;
     }
     case 'goto-rescue-words': {

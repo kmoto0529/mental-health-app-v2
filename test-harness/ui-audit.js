@@ -203,6 +203,15 @@ const gotoRescue = async (page) => { await page.evaluate(() => { rescueState = {
 const gotoRescueFlow = async (page) => { await page.evaluate(() => { rescueState = { flowId: 'fuzzy', stepIdx: 0, picks: [] }; App.go('rescueFlow'); }); };
 const gotoMiniExp = async (page) => { await page.evaluate(() => { miniExpState = { phase: 'pick', moodScore: null }; App.go('miniExperience'); }); };
 const gotoMiniExpResponse = async (page) => { await page.evaluate(() => { miniExpState = { phase: 'response', moodScore: 3 }; App.go('miniExperience'); }); };
+const gotoNightEntry = async (page) => { await page.evaluate(() => { nightState = newNightState(); App.go('nightRescue'); }); };
+const gotoNightState = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.phase = 'state'; App.go('nightRescue'); }); };
+const gotoNightAck = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.stateChoice = 'tomorrow'; nightState.phase = 'ack'; App.go('nightRescue'); }); };
+const gotoNightChoose = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.stateChoice = 'nohalt'; nightState.phase = 'choose'; App.go('nightRescue'); }); };
+const gotoNightBreath = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.branch = 'A'; nightState.phase = 'a2'; App.go('nightRescue'); }); };
+const gotoNightBLabel = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.branch = 'B'; nightState.phase = 'b2'; App.go('nightRescue'); }); };
+const gotoNightBAck = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.branch = 'B'; nightState.bLabel = 'つかれた'; nightState.bMemo = 'とにかく疲れた日'; nightState.phase = 'b4'; App.go('nightRescue'); }); };
+const gotoNightCTheme = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.branch = 'C'; nightState.phase = 'c2'; App.go('nightRescue'); }); };
+const gotoNightCAck = async (page) => { await page.evaluate(() => { nightState = newNightState(); nightState.branch = 'C'; nightState.cTheme = '人間関係'; nightState.cHandoff = 'まず事実だけ整理する'; nightState.cMemo = '明日の朝に事実だけ書き出す'; nightState.phase = 'c5'; App.go('nightRescue'); }); };
 
 async function main() {
   const browser = await chromium.launch();
@@ -229,7 +238,16 @@ async function main() {
     { name: '12_rescue', go: gotoRescue },
     { name: '13_rescue_flow', go: gotoRescueFlow },
     { name: '14_mini_exp_pick', go: gotoMiniExp },
-    { name: '15_mini_exp_response', go: gotoMiniExpResponse }
+    { name: '15_mini_exp_response', go: gotoMiniExpResponse },
+    { name: '16_night_entry', go: gotoNightEntry },
+    { name: '17_night_state', go: gotoNightState },
+    { name: '18_night_ack', go: gotoNightAck },
+    { name: '19_night_choose', go: gotoNightChoose },
+    { name: '20_night_breath', go: gotoNightBreath },
+    { name: '21_night_b_label', go: gotoNightBLabel },
+    { name: '22_night_b_ack', go: gotoNightBAck },
+    { name: '23_night_c_theme', go: gotoNightCTheme },
+    { name: '24_night_c_ack', go: gotoNightCAck }
   ];
 
   const allResults = [];
