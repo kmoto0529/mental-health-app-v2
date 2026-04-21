@@ -53,6 +53,8 @@ body {
   width: 100%;
   max-width: 420px;
   min-height: 100vh;
+  min-height: 100dvh;
+  min-height: var(--app-h, 100dvh);
   margin: 0 auto;
   background: var(--bg);
   position: relative;
@@ -63,7 +65,7 @@ body {
 
 @media (min-width: 421px) {
   body { padding: 20px 0; background: linear-gradient(180deg, #F5EDE1, #EDE3D2); }
-  #app { min-height: calc(100vh - 40px); border-radius: 32px; box-shadow: 0 20px 60px rgba(61,52,42,.15); overflow: hidden; }
+  #app { min-height: calc(100vh - 40px); min-height: calc(var(--app-h, 100dvh) - 40px); border-radius: 32px; box-shadow: 0 20px 60px rgba(61,52,42,.15); overflow: hidden; }
 }
 
 .screen {
@@ -71,9 +73,13 @@ body {
   flex-direction: column;
   flex: 1;
   min-height: 100vh;
+  min-height: 100dvh;
+  min-height: var(--app-h, 100dvh);
   animation: fadeIn .35s var(--ease);
 }
-@media (min-width: 421px) { .screen { min-height: calc(100vh - 40px); } }
+@media (min-width: 421px) {
+  .screen { min-height: calc(100vh - 40px); min-height: calc(var(--app-h, 100dvh) - 40px); }
+}
 .screen.active { display: flex; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -512,9 +518,22 @@ body {
 .chat-screen {
   display: flex;
   flex-direction: column;
+  flex: 0 0 auto;
   height: 100vh;
+  height: 100dvh;
+  height: var(--app-h, 100dvh);
+  min-height: 0;
+  max-height: var(--app-h, 100dvh);
+  overflow: hidden;
 }
-@media (min-width: 421px) { .chat-screen { height: calc(100vh - 40px); } }
+@media (min-width: 421px) {
+  .chat-screen {
+    height: calc(100vh - 40px);
+    height: calc(var(--app-h, 100dvh) - 40px);
+    max-height: calc(var(--app-h, 100dvh) - 40px);
+  }
+}
+.chat-screen .chat-messages { min-height: 0; }
 
 .chat-header {
   display: flex;
@@ -787,6 +806,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.page-header.insights-header {
+  justify-content: flex-start;
+  gap: 14px;
 }
 .page-title {
   font-family: 'Noto Serif JP', serif;
@@ -2984,6 +3007,9 @@ body {
 .mood-strip-more:hover { text-decoration: underline; }
 
 /* ---------- きろくタブ切り替え ---------- */
+.history-topbar {
+  padding: 0 20px;
+}
 .history-tabs {
   display: flex;
   gap: 6px;
@@ -6140,15 +6166,17 @@ function viewHistory() {
       <div class="page-header">
         <div class="page-title">きろく</div>
       </div>
-      <div class="history-tabs">
-        <button class="history-tab ${historyFilter === 'chat' ? 'active' : ''}" data-act="history-tab-chat">AIと会話（${chatItems.length}）</button>
-        <button class="history-tab ${historyFilter === 'reflect' ? 'active' : ''}" data-act="history-tab-reflect">もやもや整理（${reflectItems.length}）</button>
-      </div>
-      <div class="card" style="margin-bottom: 16px;" data-act="goto-insights">
-        <div class="card-title">週次・月次レポート</div>
-        <div class="card-body">頑張れたことや良いポイントをまとめて、次の目標に活かそう。</div>
-        <div class="card-action">
-          <button class="btn btn-secondary" data-act="goto-insights">レポートを見る ›</button>
+      <div class="history-topbar">
+        <div class="history-tabs">
+          <button class="history-tab ${historyFilter === 'chat' ? 'active' : ''}" data-act="history-tab-chat">AIと会話（${chatItems.length}）</button>
+          <button class="history-tab ${historyFilter === 'reflect' ? 'active' : ''}" data-act="history-tab-reflect">もやもや整理（${reflectItems.length}）</button>
+        </div>
+        <div class="card" style="margin-bottom: 16px;" data-act="goto-insights">
+          <div class="card-title">週次・月次レポート</div>
+          <div class="card-body">頑張れたことや良いポイントをまとめて、次の目標に活かそう。</div>
+          <div class="card-action">
+            <button class="btn btn-secondary" data-act="goto-insights">レポートを見る ›</button>
+          </div>
         </div>
       </div>
       <div class="history-list">
@@ -6475,16 +6503,17 @@ function viewInsights() {
   const avgLabel = ins.moodAvg !== null ? (MOODS.find(x => x.score === Math.round(ins.moodAvg))?.label || '') : '';
   return `
     <div class="screen active">
-      <div class="page-header" style="display:flex; align-items:center; gap:12px;">
+      <div class="page-header insights-header">
         <button class="chat-back" data-act="back-home">${icon('arrow-left')}</button>
-        <div class="page-title" style="margin:0;">レポート</div>
+        <div class="page-title">レポート</div>
       </div>
-      <div class="insights-tabs">
-        <button class="insights-tab ${insightsRange === 'week' ? 'active' : ''}" data-act="insights-week">週次（7日）</button>
-        <button class="insights-tab ${insightsRange === 'month' ? 'active' : ''}" data-act="insights-month">月次（30日）</button>
-      </div>
+      <div class="home-content">
+        <div class="insights-tabs">
+          <button class="insights-tab ${insightsRange === 'week' ? 'active' : ''}" data-act="insights-week">週次（7日）</button>
+          <button class="insights-tab ${insightsRange === 'month' ? 'active' : ''}" data-act="insights-month">月次（30日）</button>
+        </div>
 
-      <div class="insights-stats">
+        <div class="insights-stats">
         <div class="insights-stat">
           <div class="insights-stat-num">${ins.checkinDays}<span class="insights-stat-unit">/${ins.days}日</span></div>
           <div class="insights-stat-label">きもち記録</div>
@@ -6513,11 +6542,12 @@ function viewInsights() {
         `).join('')}
       </div>
 
-      <div class="insights-section-title">この${insightsRange === 'month' ? '1ヶ月' : '1週間'}を次に活かす</div>
-      <div class="card">
-        <div class="card-body">ここで見えた「続けられたこと」や「気持ちが軽くなった瞬間」を目標に反映させよう。</div>
-        <div class="card-action">
-          <button class="btn btn-primary" data-act="insights-to-goal">目標を見直す</button>
+        <div class="insights-section-title">この${insightsRange === 'month' ? '1ヶ月' : '1週間'}を次に活かす</div>
+        <div class="card">
+          <div class="card-body">ここで見えた「続けられたこと」や「気持ちが軽くなった瞬間」を目標に反映させよう。</div>
+          <div class="card-action">
+            <button class="btn btn-primary" data-act="insights-to-goal">目標を見直す</button>
+          </div>
         </div>
       </div>
       ${bottomNav('history')}
@@ -7711,6 +7741,19 @@ function escapeAttr(s) {
 // ============================================================
 // Boot
 // ============================================================
+
+// モバイルの100vh問題対策: 実ビューポート高を --app-h に設定し、resize/orientationchangeで追従
+function updateAppHeight() {
+  const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  document.documentElement.style.setProperty('--app-h', `${h}px`);
+}
+updateAppHeight();
+window.addEventListener('resize', updateAppHeight, { passive: true });
+window.addEventListener('orientationchange', updateAppHeight);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateAppHeight);
+}
+
 loadState();
 if (state.onboarded) {
   App.currentScreen = 'home';
