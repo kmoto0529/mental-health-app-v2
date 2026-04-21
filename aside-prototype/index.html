@@ -3396,6 +3396,159 @@ body {
   letter-spacing: 0.02em;
 }
 
+/* ---------- 方向性ゴール（今の方向） ---------- */
+.direction-goal-screen {
+  padding: 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.direction-goal-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+.direction-goal-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+.direction-goal-hint {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+.direction-goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.direction-goal-option {
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.direction-goal-option:active { transform: scale(0.98); }
+.direction-goal-option.selected {
+  background: linear-gradient(135deg, var(--accent-soft), var(--bg-card));
+  border-color: var(--accent);
+  box-shadow: 0 2px 10px rgba(198, 139, 94, 0.14);
+}
+.direction-goal-option-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.direction-goal-option-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.direction-goal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.direction-goal-actions .btn { width: 100%; }
+
+.direction-confirm {
+  text-align: center;
+  padding: 40px 20px 24px;
+}
+.direction-confirm-icon { font-size: 44px; margin-bottom: 18px; }
+.direction-confirm-lead {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  margin-bottom: 10px;
+}
+.direction-confirm-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.direction-confirm-desc {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+.direction-confirm-actions .btn { width: 100%; }
+
+/* ホームのカード */
+.direction-goal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.direction-goal-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.direction-goal-card-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+.direction-goal-card-edit {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text-soft);
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.direction-goal-card-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.direction-goal-card-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.direction-goal-card-empty {
+  position: relative;
+  padding: 14px 44px 16px 16px;
+  cursor: pointer;
+  border-left: 3px solid var(--accent-soft);
+}
+.direction-goal-card-empty:active { transform: scale(0.98); }
+.direction-goal-card-empty-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  margin: 6px 0 3px;
+}
+.direction-goal-card-empty-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.direction-goal-card-empty .week-theme-arrow {
+  color: var(--accent);
+  opacity: 0.7;
+}
+
 /* ---------- 変更理由選択 ---------- */
 .theme-change-reasons {
   display: flex;
@@ -5349,6 +5502,8 @@ function render() {
     App.currentScreen === 'insights' ? viewInsights() :
     App.currentScreen === 'calendar' ? viewCalendar() :
     App.currentScreen === 'miniExperience' ? viewMiniExperience() :
+    App.currentScreen === 'directionGoalSetup' ? viewDirectionGoalSetup() :
+    App.currentScreen === 'directionGoalConfirm' ? viewDirectionGoalConfirm() :
     App.currentScreen === 'rescue' ? viewRescue() :
     App.currentScreen === 'rescueFlow' ? viewRescueFlow() :
     App.currentScreen === 'nightRescue' ? viewNightRescue() :
@@ -5618,6 +5773,7 @@ function viewGoal() {
           </div>
         `}
 
+        ${renderDirectionGoalCard()}
         ${renderWeekThemeCard()}
 
         ${subCtas.length > 0 ? `
@@ -8027,6 +8183,10 @@ function viewSettings() {
             <div class="setting-label">呼び名</div>
             <div class="setting-value">${escapeHtml(state.nickname)}</div>
           </div>
+          <div class="setting-row" data-act="direction-goal-open">
+            <div class="setting-label">今の方向</div>
+            <div class="setting-value">${(() => { const g = getCurrentDirectionGoal(); return g ? escapeHtml(g.title.slice(0, 14) + (g.title.length > 14 ? '…' : '')) : (state.directionGoal && state.directionGoal.status === 'skipped' ? '未設定' : '決める'); })()}</div>
+          </div>
         </div>
         <div class="setting-group">
           <div class="setting-group-title">話し相手</div>
@@ -8611,6 +8771,160 @@ function acceptTheme(themeKey) {
   render();
 }
 
+// ---------- 方向性ゴール（今の方向）のビュー関数 ----------
+
+let directionGoalSelection = null; // 画面内で選択中のキー
+
+function viewDirectionGoalSetup() {
+  const current = getCurrentDirectionGoal();
+  const selected = directionGoalSelection || (current ? current.key : null);
+  const isChange = !!current && !!state.directionGoal && state.directionGoal.status === 'active';
+  return `
+    <div class="screen active onb">
+      <div class="direction-goal-screen">
+        <div class="direction-goal-label">${isChange ? '今の方向を見直す' : 'STEP 6 / 6'}</div>
+        <div class="direction-goal-title">このアプリで、<br>どんな方向に進みたい？</div>
+        <div class="direction-goal-hint">ぴったり決まっていなくても大丈夫。<br>今の気分に近いものを選んでみてね。</div>
+
+        <div class="direction-goal-list">
+          ${DIRECTION_GOALS.map(g => `
+            <div class="direction-goal-option ${selected === g.key ? 'selected' : ''}" data-act="direction-goal-pick" data-key="${g.key}">
+              <div class="direction-goal-option-title">${escapeHtml(g.title)}</div>
+              <div class="direction-goal-option-desc">${escapeHtml(g.description)}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="direction-goal-actions">
+          <button class="btn btn-primary" data-act="direction-goal-confirm" ${selected ? '' : 'disabled'}>これで進む</button>
+          <button class="btn btn-ghost" data-act="direction-goal-skip">あとで決める</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function viewDirectionGoalConfirm() {
+  const g = getCurrentDirectionGoal();
+  if (!g) { App.go('goal'); return ''; }
+  return `
+    <div class="screen active onb">
+      <div class="direction-confirm">
+        <div class="direction-confirm-icon">🧭</div>
+        <div class="direction-confirm-lead">今の方向を決めたよ。</div>
+        <div class="direction-confirm-title">${escapeHtml(g.title)}</div>
+        <div class="direction-confirm-desc">毎日じゃなくて大丈夫。<br>少しずつ、この方向で使っていこう。</div>
+        <div class="direction-confirm-actions">
+          <button class="btn btn-primary" data-act="direction-goal-done">ホームへ</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDirectionGoalCard() {
+  const g = getCurrentDirectionGoal();
+  if (!g) {
+    if (state.directionGoal && state.directionGoal.status === 'skipped') {
+      return `
+        <div class="direction-goal-card direction-goal-card-empty" data-act="direction-goal-open">
+          <div class="direction-goal-card-label">今の方向</div>
+          <div class="direction-goal-card-empty-title">方向を決める</div>
+          <div class="direction-goal-card-empty-sub">使いながら、ゆっくり見つけていい</div>
+          <div class="week-theme-arrow">›</div>
+        </div>
+      `;
+    }
+    return '';
+  }
+  return `
+    <div class="direction-goal-card">
+      <div class="direction-goal-card-top">
+        <div class="direction-goal-card-label">今の方向</div>
+        <button class="direction-goal-card-edit" data-act="direction-goal-open">見直す</button>
+      </div>
+      <div class="direction-goal-card-title">${escapeHtml(g.title)}</div>
+      <div class="direction-goal-card-sub">少しずつ、この方向で使っていこう。</div>
+    </div>
+  `;
+}
+
+// ---------- 方向性ゴール（今の方向） ----------
+
+const DIRECTION_GOALS = [
+  {
+    key: 'organize_feelings',
+    title: '気持ちを整理できるようになりたい',
+    description: 'もやもやした時に、少しずつ言葉にできるようになりたい',
+    // 相性の良いテーマキー（THEME_CATALOG 側のキー）
+    preferredThemeKeys: ['thought_once', 'thought_when_spin', 'thought_event_feeling', 'mood_one_word']
+  },
+  {
+    key: 'reduce_overthinking',
+    title: '考えすぎる時間を少し減らしたい',
+    description: '頭の中がぐるぐるする時に、少しだけ楽になりたい',
+    preferredThemeKeys: ['thought_when_spin', 'night_reset', 'rescue_30sec', 'thought_once']
+  },
+  {
+    key: 'understand_my_feelings',
+    title: '自分の気持ちをわかるようになりたい',
+    description: 'なんとなくの気分を、少しずつ見つけられるようになりたい',
+    preferredThemeKeys: ['mood_one_word', 'mood_twice', 'mood_night']
+  },
+  {
+    key: 'have_place_to_rely',
+    title: 'しんどい時に頼れる場所を持ちたい',
+    description: 'ひとりで抱え込みすぎないようにしたい',
+    preferredThemeKeys: ['talk_one_line', 'talk_fuzzy_day', 'rescue_use', 'rescue_30sec']
+  },
+  {
+    key: 'not_sure_yet',
+    title: 'まだよくわからない',
+    description: '使いながら見つけていきたい',
+    preferredThemeKeys: ['mood_one_word', 'mood_twice', 'rescue_use', 'talk_choose']
+  }
+];
+
+function getCurrentDirectionGoal() {
+  if (!state.directionGoal || !state.directionGoal.key || state.directionGoal.status === 'archived') return null;
+  return DIRECTION_GOALS.find(g => g.key === state.directionGoal.key) || null;
+}
+
+function selectDirectionGoal(key, changeReason) {
+  const goalDef = DIRECTION_GOALS.find(g => g.key === key);
+  if (!goalDef) return;
+  const old = state.directionGoal;
+  const now = Date.now();
+  // 変更履歴に残す
+  if (old && old.key && old.key !== key) {
+    if (!state.directionGoalHistory) state.directionGoalHistory = [];
+    state.directionGoalHistory.push({
+      oldKey: old.key,
+      oldTitle: old.title,
+      newKey: key,
+      newTitle: goalDef.title,
+      reason: changeReason || '',
+      changedAt: now
+    });
+  }
+  state.directionGoal = {
+    key: goalDef.key,
+    title: goalDef.title,
+    description: goalDef.description,
+    status: 'active',
+    selectedAt: old && old.key === key ? old.selectedAt : now,
+    changedAt: old && old.key !== key ? now : null
+  };
+  state.directionGoalPromptShown = true;
+  saveState();
+}
+
+function skipDirectionGoal() {
+  state.directionGoal = { status: 'skipped', skippedAt: Date.now() };
+  state.directionGoalPromptShown = true;
+  saveState();
+}
+
 // ---------- 今週の小さなテーマ ----------
 
 // テーマカタログ：category = A(記録) / B(会話) / C(整理) / D(レスキュー)
@@ -8747,6 +9061,19 @@ function suggestThemes() {
     recommendKey = 'mood_one_word'; ruleKey = 'default';
   }
 
+  // ゴール別バイアス：方向性ゴールが設定されていれば、preferredThemeKeysを優先
+  const goalDef = getCurrentDirectionGoal();
+  if (goalDef && goalDef.preferredThemeKeys && goalDef.preferredThemeKeys.length > 0) {
+    // ルールベースの推奨がゴールとズレていれば、ゴール優先に寄せる
+    if (!goalDef.preferredThemeKeys.includes(recommendKey)) {
+      // ルールのruleKey を維持しつつ、推奨キーを書き換え（重いルールだけ尊重）
+      const forceRule = ['heavy_stress', 'few_usage', 'night_heavy'];
+      if (!forceRule.includes(ruleKey)) {
+        recommendKey = goalDef.preferredThemeKeys[0];
+      }
+    }
+  }
+
   // P2-A: 過去4週間のテーマ履歴から同カテゴリ連続を避ける
   const history = (state.weekThemeHistory || []).slice(-4).reverse();
   const recentCats = history.map(h => h.category).filter(Boolean);
@@ -8762,23 +9089,34 @@ function suggestThemes() {
   const recommend = THEME_CATALOG.find(t => t.key === recommendKey);
   const reason = pickReason(ruleKey, personaId);
 
-  // 候補2つ（カテゴリが被らないように）
+  // 候補2つ
   const alts = [];
-  const catsUsed = new Set([recommend.category]);
-  ['A', 'B', 'C', 'D'].forEach(cat => {
-    if (alts.length >= 2) return;
-    if (catsUsed.has(cat)) return;
-    // 同カテゴリの中で、最近履歴にないものを優先
-    const pool = THEME_CATALOG.filter(t => t.category === cat && t.key !== recommendKey);
-    const recentKeys = new Set(history.map(h => h.key));
-    const candidate = pool.find(t => !recentKeys.has(t.key)) || pool[0];
-    if (candidate) {
-      alts.push(candidate);
-      catsUsed.add(cat);
-    }
-  });
+  // ゴールがあれば、preferredThemeKeys の中から recommend 以外を先に出す
+  if (goalDef && goalDef.preferredThemeKeys) {
+    goalDef.preferredThemeKeys.forEach(k => {
+      if (alts.length >= 2) return;
+      if (k === recommendKey) return;
+      const t = THEME_CATALOG.find(x => x.key === k);
+      if (t && !alts.find(a => a.key === t.key)) alts.push(t);
+    });
+  }
+  // 足りなければカテゴリ分散で補う
+  const recentKeys = new Set(history.map(h => h.key));
+  if (alts.length < 2) {
+    const catsUsed = new Set([recommend.category, ...alts.map(a => a.category)]);
+    ['A', 'B', 'C', 'D'].forEach(cat => {
+      if (alts.length >= 2) return;
+      if (catsUsed.has(cat)) return;
+      const pool = THEME_CATALOG.filter(t => t.category === cat && t.key !== recommendKey && !alts.find(a => a.key === t.key));
+      const candidate = pool.find(t => !recentKeys.has(t.key)) || pool[0];
+      if (candidate) {
+        alts.push(candidate);
+        catsUsed.add(cat);
+      }
+    });
+  }
 
-  return { recommend, alts, reason, ruleKey, personaId };
+  return { recommend, alts, reason, ruleKey, personaId, goalKey: goalDef ? goalDef.key : null };
 }
 
 // 今週のテーマに対する進捗カウント
@@ -10309,7 +10647,12 @@ function handleAction(act, el, e) {
       break;
     }
     case 'mini-skip': {
-      App.go('goal');
+      if (!state.directionGoalPromptShown) {
+        directionGoalSelection = null;
+        App.go('directionGoalSetup');
+      } else {
+        App.go('goal');
+      }
       break;
     }
     case 'mini-save-mood': {
@@ -10346,9 +10689,48 @@ function handleAction(act, el, e) {
       break;
     }
     case 'mini-go-home': {
+      // 方向性ゴール未設定なら、セットアップを挟む
+      if (!state.directionGoalPromptShown) {
+        directionGoalSelection = null;
+        App.go('directionGoalSetup');
+      } else {
+        App.go('goal');
+      }
+      break;
+    }
+    // ===== 方向性ゴール =====
+    case 'direction-goal-pick':
+      directionGoalSelection = el.dataset.key;
+      render();
+      break;
+    case 'direction-goal-confirm': {
+      if (!directionGoalSelection) { toast('ひとつ選んでね'); return; }
+      const wasChange = !!getCurrentDirectionGoal();
+      selectDirectionGoal(directionGoalSelection);
+      directionGoalSelection = null;
+      if (wasChange) {
+        // 見直し経由：そのままホームへ（または設定画面に戻る）
+        toast('今の方向を見直したよ');
+        App.go('goal');
+      } else {
+        App.go('directionGoalConfirm');
+      }
+      break;
+    }
+    case 'direction-goal-skip': {
+      skipDirectionGoal();
+      directionGoalSelection = null;
+      toast('あとから決められるよ');
       App.go('goal');
       break;
     }
+    case 'direction-goal-done':
+      App.go('goal');
+      break;
+    case 'direction-goal-open':
+      directionGoalSelection = state.directionGoal && state.directionGoal.key ? state.directionGoal.key : null;
+      App.go('directionGoalSetup');
+      break;
     // レスキュー
     case 'goto-rescue': {
       rescueState = { flowId: null, stepIdx: 0, picks: [] };
