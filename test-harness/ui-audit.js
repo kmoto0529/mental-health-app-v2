@@ -199,6 +199,10 @@ const gotoHistoryDetailReflect = async (page) => { await page.evaluate(() => { h
 const gotoInsights = async (page) => { await page.evaluate(() => { App.go('insights'); }); };
 const gotoSettings = async (page) => { await page.evaluate(() => { App.go('settings'); }); };
 const gotoMood = async (page) => { await page.evaluate(() => { moodDraft = { score: null, comment: '' }; App.go('mood'); }); };
+const gotoRescue = async (page) => { await page.evaluate(() => { rescueState = { flowId: null, stepIdx: 0, picks: [] }; App.go('rescue'); }); };
+const gotoRescueFlow = async (page) => { await page.evaluate(() => { rescueState = { flowId: 'fuzzy', stepIdx: 0, picks: [] }; App.go('rescueFlow'); }); };
+const gotoMiniExp = async (page) => { await page.evaluate(() => { miniExpState = { phase: 'pick', moodScore: null }; App.go('miniExperience'); }); };
+const gotoMiniExpResponse = async (page) => { await page.evaluate(() => { miniExpState = { phase: 'response', moodScore: 3 }; App.go('miniExperience'); }); };
 
 async function main() {
   const browser = await chromium.launch();
@@ -221,7 +225,11 @@ async function main() {
     { name: '08_history_detail_reflect', go: gotoHistoryDetailReflect },
     { name: '09_insights', go: gotoInsights },
     { name: '10_settings', go: gotoSettings },
-    { name: '11_mood', go: gotoMood }
+    { name: '11_mood', go: gotoMood },
+    { name: '12_rescue', go: gotoRescue },
+    { name: '13_rescue_flow', go: gotoRescueFlow },
+    { name: '14_mini_exp_pick', go: gotoMiniExp },
+    { name: '15_mini_exp_response', go: gotoMiniExpResponse }
   ];
 
   const allResults = [];

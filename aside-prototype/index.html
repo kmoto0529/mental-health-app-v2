@@ -2963,6 +2963,403 @@ body {
   color: var(--text-muted);
   flex-shrink: 0;
 }
+
+/* ---------- ホーム刷新（v3: きもちチェック主役） ---------- */
+.today-hint {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  margin: 8px 4px 12px;
+  line-height: 1.6;
+}
+.today-main-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  border-radius: var(--r-lg);
+  color: #fff;
+  cursor: pointer;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 14px rgba(198, 139, 94, 0.18);
+  transition: transform .15s var(--ease);
+}
+.today-main-cta:active { transform: scale(0.98); }
+.today-main-icon {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.today-main-body { flex: 1; min-width: 0; }
+.today-main-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 17px;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.today-main-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.88);
+  letter-spacing: 0.02em;
+}
+.today-main-arrow {
+  font-size: 22px;
+  color: #fff;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+.today-all-done {
+  text-align: center;
+  padding: 32px 20px;
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--divider);
+  margin-bottom: 12px;
+}
+.today-all-done-icon { font-size: 32px; margin-bottom: 8px; }
+.today-all-done-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.home-rescue-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--sage-soft, var(--accent-soft));
+  border-radius: var(--r-md);
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: transform .15s var(--ease);
+}
+.home-rescue-card:active { transform: scale(0.98); }
+.home-rescue-emoji {
+  font-size: 22px;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sage-soft, var(--accent-soft));
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.home-rescue-body { flex: 1; min-width: 0; }
+.home-rescue-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.home-rescue-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.home-rescue-card .today-main-arrow {
+  color: var(--accent-deep);
+  opacity: 0.6;
+}
+
+.home-subcta-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.home-subcta-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: transform .15s var(--ease);
+}
+.home-subcta-btn:active { transform: scale(0.97); }
+.home-subcta-icon { font-size: 16px; }
+
+.home-goal-compact {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  cursor: pointer;
+}
+.home-goal-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+.home-goal-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ---------- はなす画面（v3 改造） ---------- */
+.talk-rescue-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--sage-soft, var(--accent-soft)), var(--bg-card));
+  border: 1px solid var(--sage-soft, var(--accent-soft));
+  border-radius: var(--r-md);
+  cursor: pointer;
+  margin-top: 16px;
+  transition: transform .15s var(--ease);
+}
+.talk-rescue-card:active { transform: scale(0.98); }
+.talk-rescue-emoji {
+  font-size: 22px;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.talk-rescue-body { flex: 1; min-width: 0; }
+.talk-rescue-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-deep);
+  margin-bottom: 2px;
+}
+.talk-rescue-sub {
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+.talk-rescue-card .today-main-arrow {
+  color: var(--accent-deep);
+  opacity: 0.6;
+}
+
+.talk-section-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-soft);
+  margin: 20px 4px 8px;
+  letter-spacing: 0.06em;
+}
+.talk-entry-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: transform .15s var(--ease);
+}
+.talk-entry-card:active { transform: scale(0.98); }
+.talk-entry-icon {
+  font-size: 20px;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.talk-entry-body { flex: 1; min-width: 0; }
+.talk-entry-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.talk-entry-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.talk-entry-card .today-main-arrow {
+  color: var(--text-muted);
+}
+
+.topic-picker {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 4px 0 12px;
+  margin-bottom: 8px;
+}
+.topic-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--accent-soft);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.topic-chip:active { transform: scale(0.95); background: var(--accent-soft); }
+
+/* ---------- ミニ体験（オンボ直後） ---------- */
+.mini-response {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 40px 0 24px;
+  animation: slideUp .5s var(--ease);
+}
+.mini-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.mini-bubble {
+  flex: 1;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border-radius: 4px 20px 20px 20px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+.mini-next-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 24px 0 12px;
+  letter-spacing: 0.06em;
+}
+.mini-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 8px;
+}
+.mini-actions .btn { width: 100%; }
+
+/* ---------- レスキュー ---------- */
+.rescue-intro {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.rescue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rescue-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+.rescue-card:active { transform: scale(0.98); }
+.rescue-card:not(.rescue-card-disabled):hover { box-shadow: var(--shadow-soft); }
+.rescue-card-disabled { opacity: 0.5; cursor: default; }
+.rescue-emoji {
+  font-size: 28px;
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sage-soft, var(--accent-soft));
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.rescue-body { flex: 1; min-width: 0; }
+.rescue-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.rescue-coming {
+  font-family: inherit;
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  background: var(--bg-soft);
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.rescue-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.rescue-arrow {
+  font-size: 22px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.rescue-step-indicator {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+.rescue-prompt {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.rescue-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rescue-choice-btn {
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s var(--ease);
+}
+.rescue-choice-btn:active { transform: scale(0.98); background: var(--accent-soft); }
+.rescue-response {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px 0 24px;
+  animation: slideUp .5s var(--ease);
+}
+.rescue-continue {
+  padding: 0 8px;
+}
+.rescue-continue .btn { width: 100%; }
 .cal-day {
   font-size: 12px;
   color: var(--text-soft);
@@ -3912,6 +4309,9 @@ function render() {
     App.currentScreen === 'historyDetail' ? viewHistoryDetail() :
     App.currentScreen === 'insights' ? viewInsights() :
     App.currentScreen === 'calendar' ? viewCalendar() :
+    App.currentScreen === 'miniExperience' ? viewMiniExperience() :
+    App.currentScreen === 'rescue' ? viewRescue() :
+    App.currentScreen === 'rescueFlow' ? viewRescueFlow() :
     App.currentScreen === 'settings' ? viewSettings() :
     viewWelcome()
   );
@@ -3951,12 +4351,12 @@ function viewOnboarding() {
     return `
       <div class="screen active onb">
         <div class="onb-step">STEP 1 / 4</div>
-        <div class="onb-title">呼び名を教えて。</div>
-        <div class="onb-hint">なんでもいいよ。本名じゃなくて大丈夫。あだ名・イニシャル・好きな名前、どれでも。</div>
+        <div class="onb-title">呼び名を教えて</div>
+        <div class="onb-hint">本名じゃなくて大丈夫。あだ名でも、イニシャルでもOK。<br>あとで変えられるよ。</div>
         <input type="text" class="input" id="onbNickname" placeholder="たとえば「たろう」" value="${state.nickname || ''}" maxlength="20">
-        <div class="input-hint">いつでも設定から変えられるよ</div>
         <div class="onb-footer">
           <button class="btn btn-primary" data-act="onb-next">つぎへ</button>
+          <button class="btn btn-ghost" data-act="onb-nickname-skip">あとで決める</button>
         </div>
       </div>
     `;
@@ -3966,12 +4366,10 @@ function viewOnboarding() {
       <div class="screen active onb onb-profile">
         <div class="onb-step">STEP 2 / 4</div>
         <div class="onb-title">ちょっとだけ、<br>教えてくれる？</div>
-        <div class="onb-hint">近い話し相手を選ぶのに使うよ。答えたくなければスキップでOK。</div>
+        <div class="onb-hint">話しやすい相手を選ぶ参考にするだけ。<br>答えなくても使えるよ。</div>
 
-        ${renderProfileGroup('age', '年齢')}
-        ${renderProfileGroup('gender', '性別')}
-        ${renderProfileGroup('occupation', '今のステータス')}
-        ${renderProfileGroup('medicalHistory', 'メンタルでの通院歴')}
+        ${renderProfileGroup('age', '年代')}
+        ${renderProfileGroup('occupation', '今のモード')}
 
         <div class="onb-footer">
           <button class="btn btn-primary" data-act="onb-profile-next">つぎへ</button>
@@ -4075,13 +4473,29 @@ function viewGoal() {
   const didTodayByTs = didToday('startedAt');
   const chatDone = didTodayByTs(state.sessions || []);
   const reflectDone = didTodayByTs(state.reflections || []);
-  const actions = [
-    { id: 'mood', label: 'きもちチェック', sub: '30秒で今の気分を記録', done: moodDone, act: 'goto-mood', icon: '💭' },
-    { id: 'chat', label: 'Asideと話す', sub: 'ひとことでもOK、何でも話して', done: chatDone, act: 'goto-talk', icon: '💬' },
-    { id: 'reflect', label: 'もやもや整理', sub: '出来事→考え→気持ち→別の見方', done: reflectDone, act: 'start-reflect', icon: '✨' }
-  ];
-  const allDone = actions.every(a => a.done);
-  const pendingCount = actions.filter(a => !a.done).length;
+  const allDone = moodDone && chatDone && reflectDone;
+
+  // 今日のひとこと・おすすめアクション
+  let todayHint, mainAction;
+  if (!moodDone) {
+    todayHint = '今日はまず、30秒できもちチェック。';
+    mainAction = { label: '30秒できもちをチェック', sub: '選ぶだけでも大丈夫', act: 'goto-mood', icon: '💭' };
+  } else if (!chatDone) {
+    todayHint = '話してみたい気分なら、ひとことから。';
+    mainAction = { label: 'Asideと話す', sub: 'ひとことでもOK、何でも', act: 'goto-talk', icon: '💬' };
+  } else if (!reflectDone) {
+    todayHint = '頭がもやもやしているなら、整理もできるよ。';
+    mainAction = { label: 'もやもやを整理する', sub: '出来事→考え→気持ち→別の見方', act: 'start-reflect', icon: '✨' };
+  } else {
+    todayHint = '今日はもう十分。自分をほめていい日。';
+    mainAction = null;
+  }
+
+  const subCtas = [];
+  if (!moodDone && mainAction && mainAction.act !== 'goto-talk') subCtas.push({ label: 'Asideと話す', act: 'goto-talk', icon: '💬' });
+  if (!moodDone && mainAction && mainAction.act !== 'start-reflect') subCtas.push({ label: 'もやもや整理', act: 'start-reflect', icon: '✨' });
+  if (moodDone && !chatDone) subCtas.push({ label: 'もやもや整理', act: 'start-reflect', icon: '✨' });
+  if (moodDone && chatDone && !reflectDone) {}
 
   return `
     <div class="screen active">
@@ -4093,26 +4507,61 @@ function viewGoal() {
       </div>
       <div class="home-content">
 
-        ${state.goal ? renderGoalSummary() : renderGoalSetupCard()}
+        <div class="today-hint">${escapeHtml(todayHint)}</div>
 
-        <div class="today-actions-section">
-          <div class="today-actions-header">
-            <div class="today-actions-title">きょうのアクション</div>
-            <div class="today-actions-meta">${allDone ? '✨ すべて完了' : `あと${pendingCount}個`}</div>
+        ${mainAction ? `
+          <div class="today-main-cta" data-act="${mainAction.act}">
+            <div class="today-main-icon">${mainAction.icon}</div>
+            <div class="today-main-body">
+              <div class="today-main-label">${escapeHtml(mainAction.label)}</div>
+              <div class="today-main-sub">${escapeHtml(mainAction.sub)}</div>
+            </div>
+            <div class="today-main-arrow">›</div>
           </div>
-          <div class="today-actions-list">
-            ${actions.map(a => `
-              <div class="action-card ${a.done ? 'done' : ''}" ${a.done ? '' : `data-act="${a.act}"`}>
-                <div class="action-card-icon">${a.done ? icon('check') : `<span class="action-card-emoji">${a.icon}</span>`}</div>
-                <div class="action-card-body">
-                  <div class="action-card-label">${escapeHtml(a.label)}</div>
-                  <div class="action-card-sub">${a.done ? '今日はできたね' : escapeHtml(a.sub)}</div>
-                </div>
-                ${a.done ? '' : '<div class="action-card-arrow">›</div>'}
-              </div>
+        ` : `
+          <div class="today-all-done">
+            <div class="today-all-done-icon">✨</div>
+            <div class="today-all-done-text">今日はこれだけで大丈夫。<br>明日もまた、無理なく。</div>
+          </div>
+        `}
+
+        <div class="home-rescue-card" data-act="goto-rescue">
+          <div class="home-rescue-emoji">🌫</div>
+          <div class="home-rescue-body">
+            <div class="home-rescue-title">今すぐ少し楽になる</div>
+            <div class="home-rescue-sub">なんとなくしんどい時に、30秒〜3分</div>
+          </div>
+          <div class="today-main-arrow">›</div>
+        </div>
+
+        ${subCtas.length > 0 ? `
+          <div class="home-subcta-row">
+            ${subCtas.map(s => `
+              <button class="home-subcta-btn" data-act="${s.act}">
+                <span class="home-subcta-icon">${s.icon}</span>
+                <span>${escapeHtml(s.label)}</span>
+              </button>
             `).join('')}
           </div>
-        </div>
+        ` : ''}
+
+        ${todayMood ? `
+          <div class="today-mood-card" style="margin-top: 20px;">
+            <div class="today-mood-icon">${MOODS.find(x => x.score === todayMood.score).emoji}</div>
+            <div class="today-mood-text">
+              <div class="today-mood-label">きょうのきもち</div>
+              <div class="today-mood-value">${MOODS.find(x => x.score === todayMood.score).label}${todayMood.comment ? `<span class="today-mood-comment">・${escapeHtml(todayMood.comment)}</span>` : ''}</div>
+            </div>
+            <button class="btn btn-ghost today-mood-edit" data-act="goto-mood">修正</button>
+          </div>
+        ` : ''}
+
+        ${state.goal ? `
+          <div class="home-goal-compact" data-act="goto-goal-detail">
+            <div class="home-goal-label">ありたい姿</div>
+            <div class="home-goal-text">${escapeHtml(state.goal.aspiration || '')}</div>
+          </div>
+        ` : ''}
 
         ${renderForestHero()}
       </div>
@@ -4122,6 +4571,18 @@ function viewGoal() {
 }
 
 // ---------- Tab: AIと会話 (Talk) ----------
+const TOPIC_OPTIONS = [
+  { id: 'work', label: '学校 / 仕事', emoji: '🏫' },
+  { id: 'relation', label: '人間関係', emoji: '🤝' },
+  { id: 'love', label: '恋愛', emoji: '💞' },
+  { id: 'sns', label: 'SNS', emoji: '📱' },
+  { id: 'future', label: '将来', emoji: '🧭' },
+  { id: 'family', label: '家族', emoji: '🏠' },
+  { id: 'fuzzy', label: 'なんとなくしんどい', emoji: '🌫' },
+  { id: 'sleep', label: '眠れない', emoji: '🌙' },
+  { id: 'tired', label: 'つかれた', emoji: '😮‍💨' }
+];
+
 function viewTalk() {
   const persona = getCurrentPersona();
   return `
@@ -4154,25 +4615,61 @@ function viewTalk() {
                 <button class="talk-persona-rename-btn" data-act="persona-rename" aria-label="呼び方を変える">${icon('pencil')}</button>
               </div>
               <div class="talk-persona-tag">${escapeHtml(persona.tagline)}</div>
-              <div class="talk-persona-specialty">得意: ${escapeHtml(persona.specialty)}</div>
             </div>
           </div>
         </div>
 
-        <div class="cta-big" data-act="start-chat">
-          <div class="cta-big-label">${escapeHtml(persona.name.toUpperCase())} と はなす</div>
-          <div class="cta-big-title">ちょっと話してみる？</div>
-          <div class="cta-big-sub">選ぶだけでも、ひとことでも。なんでもいいよ。</div>
+        <div class="talk-rescue-card" data-act="goto-rescue">
+          <div class="talk-rescue-emoji">🌫</div>
+          <div class="talk-rescue-body">
+            <div class="talk-rescue-title">今すぐ少し楽になる</div>
+            <div class="talk-rescue-sub">状態に合わせて30秒〜3分の入口を選べる</div>
+          </div>
+          <div class="today-main-arrow">›</div>
         </div>
 
-        <div class="cta-big" data-act="start-reflect" style="background: linear-gradient(135deg, #EEE6D5, #DCC9AE);">
-          <div class="cta-big-label">ふりかえる</div>
-          <div class="cta-big-title">もやもやを整理する</div>
-          <div class="cta-big-sub">出来事→考え→気持ち→別の見方。${escapeHtml(persona.name)}が一緒に。</div>
+        <div class="talk-section-title">話す</div>
+
+        <div class="talk-entry-card" data-act="start-chat">
+          <div class="talk-entry-icon">💬</div>
+          <div class="talk-entry-body">
+            <div class="talk-entry-title">ひとこと話す</div>
+            <div class="talk-entry-sub">短文でもOK。なんでもいいよ。</div>
+          </div>
+          <div class="today-main-arrow">›</div>
+        </div>
+
+        <div class="talk-entry-card" data-act="toggle-topic-picker" id="topicPickerToggle">
+          <div class="talk-entry-icon">🎯</div>
+          <div class="talk-entry-body">
+            <div class="talk-entry-title">選んで話す</div>
+            <div class="talk-entry-sub">テーマを選ぶと、${escapeHtml(persona.name)}が先に一言かけてくれる。</div>
+          </div>
+          <div class="today-main-arrow">›</div>
+        </div>
+
+        ${talkTopicPickerOpen ? `
+          <div class="topic-picker">
+            ${TOPIC_OPTIONS.map(t => `
+              <button class="topic-chip" data-act="start-chat-topic" data-topic="${t.id}">
+                <span>${t.emoji}</span>
+                <span>${escapeHtml(t.label)}</span>
+              </button>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <div class="talk-entry-card" data-act="start-reflect">
+          <div class="talk-entry-icon">✨</div>
+          <div class="talk-entry-body">
+            <div class="talk-entry-title">もやもやを整理する</div>
+            <div class="talk-entry-sub">出来事→考え→気持ち→別の見方の流れで。</div>
+          </div>
+          <div class="today-main-arrow">›</div>
         </div>
 
         ${state.reflections.length > 0 ? `
-          <div class="card">
+          <div class="card" style="margin-top:16px;">
             <div class="card-title">このまえのふりかえり</div>
             <div class="card-body">${escapeHtml(state.reflections[state.reflections.length - 1].event.slice(0, 60))}</div>
             <div class="card-action">
@@ -4185,6 +4682,8 @@ function viewTalk() {
     </div>
   `;
 }
+
+let talkTopicPickerOpen = false;
 
 // ---------- Goal card rendering ----------
 function renderGoalSetupCard() {
@@ -6324,6 +6823,185 @@ function viewSettings() {
   `;
 }
 
+// ---------- Mini Experience（オンボーディング直後の即価値体験） ----------
+let miniExpState = { phase: 'pick', moodScore: null };
+
+function viewMiniExperience() {
+  const persona = getCurrentPersona();
+  const greet = state.nickname && state.nickname !== 'あなた' ? state.nickname : 'あなた';
+  if (miniExpState.phase === 'pick') {
+    return `
+      <div class="screen active onb">
+        <div class="onb-title" style="margin-top:24px;">まず、いまの気分を<br>教えてくれる？</div>
+        <div class="onb-hint">30秒でOK。選ぶだけで大丈夫。</div>
+        <div class="mood-picker" style="margin-top: 24px;">
+          ${MOODS.map(m => `
+            <button class="mood-option" data-act="mini-pick" data-score="${m.score}">
+              <span>${m.emoji}</span>
+              <span class="mood-option-label">${m.label}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="onb-footer">
+          <button class="btn btn-ghost" data-act="mini-skip">今日はスキップ</button>
+        </div>
+      </div>
+    `;
+  }
+  // phase === 'response'
+  const mood = MOODS.find(x => x.score === miniExpState.moodScore) || MOODS[2];
+  const response = mood.score <= 2
+    ? `そっか、「${mood.label}」なんだね。\n${greet}、ここまで来てくれてありがとう。\n今日はこれだけで十分だよ。`
+    : mood.score === 3
+    ? `「${mood.label}」の日、あるよね。\nなんとなくでも大丈夫、${greet}のペースでいいよ。`
+    : `「${mood.label}」って感じなんだね。\n${greet}、いい一日を過ごせそうな気配があるね。`;
+  return `
+    <div class="screen active onb">
+      <div class="mini-response">
+        <div class="mini-avatar" style="background: radial-gradient(circle at 35% 35%, ${persona.avatarAccent}, ${persona.avatarColor});">
+          <span>${persona.initial}</span>
+        </div>
+        <div class="mini-bubble">${escapeHtml(response).replace(/\n/g, '<br>')}</div>
+      </div>
+      <div class="mini-next-hint">次の一歩、選んでみて</div>
+      <div class="mini-actions">
+        <button class="btn btn-primary" data-act="mini-go-chat">${escapeHtml(persona.name)}ともう少し話す</button>
+        <button class="btn btn-secondary" data-act="mini-save-mood">このきもちを記録する</button>
+        <button class="btn btn-ghost" data-act="mini-go-home">今日はここまで</button>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- レスキュー機能 ----------
+let rescueState = { flowId: null, stepIdx: 0, picks: [] };
+
+const RESCUE_MENU = [
+  { id: 'fuzzy', emoji: '🌫', title: 'なんとなくしんどい', sub: '理由がはっきりしない重さを、そっと置きにくる' },
+  { id: 'spin', emoji: '🌀', title: '頭がぐるぐるする', sub: '回ってしまう考えを1つにしぼる' },
+  { id: 'words', emoji: '💭', title: '気持ちをことばにしたい', sub: '感情はあるけど言葉にならない時に' },
+  { id: 'night', emoji: '🌙', title: '眠る前に整えたい', sub: '夜の不安や反芻をほどく' }
+];
+
+// 実装済みフロー（P0は2本）
+const RESCUE_FLOWS = {
+  fuzzy: {
+    title: 'なんとなくしんどい',
+    steps: [
+      {
+        prompt: 'いま近いのはどれ？',
+        choices: ['つかれた', 'もやもやする', 'さみしい', '不安', 'いらいら', 'よくわからない']
+      },
+      {
+        mode: 'response',
+        build: (picks) => {
+          const pick = picks[0] || '';
+          if (pick === 'よくわからない') return 'そっか、まだ言葉にならなくても大丈夫。\n今日は「よくわからない」日なんだね。\n無理に整理しなくていいよ。';
+          if (pick === 'つかれた') return '今日も、よく動いたんだね。\n疲れを感じてるって気づけただけで、十分だよ。';
+          if (pick === 'さみしい') return 'さみしい気持ち、そっと置いていいよ。\n言葉にできたこと自体が、ちゃんと大事。';
+          if (pick === 'いらいら') return 'いらいらするって、自分を守ってるサインでもあるよ。\n無理に抑えなくて大丈夫。';
+          if (pick === '不安') return '不安がふわっと大きく感じる日、あるよね。\n少しだけ、ここで一緒に置いてみよう。';
+          return `「${pick}」、いま感じているんだね。\n今日は無理に整理しなくていいよ。`;
+        }
+      },
+      {
+        prompt: 'このあと、どうしよう？',
+        choices: ['もう少し話す', '30秒できもちチェック', '今日はここで終わる'],
+        isExit: true
+      }
+    ]
+  },
+  spin: {
+    title: '頭がぐるぐるする',
+    steps: [
+      {
+        prompt: 'いま一番近いのは？',
+        choices: ['同じことを何度も考える', '相手の言葉が気になる', 'この先が不安', '失敗を引きずっている', '何から考えればいいか分からない']
+      },
+      {
+        prompt: 'まず一つだけ選ぶとしたら？',
+        choices: ['その出来事そのもの', '自分の反応', '相手のこと', '次にどうするか', 'うまく言えない']
+      },
+      {
+        mode: 'response',
+        build: (picks) => `いったん、そのことだけにしぼろう。\nほかのことは横に置いて大丈夫。\nいまは整理だけしようか。`
+      },
+      {
+        prompt: 'このあと、どうしよう？',
+        choices: ['もやもや整理に進む', '一言だけ話す', '深呼吸する（10秒）'],
+        isExit: true
+      }
+    ]
+  }
+};
+
+function viewRescue() {
+  return `
+    <div class="screen active">
+      <div class="page-header insights-header">
+        <button class="chat-back" data-act="back-home">${icon('arrow-left')}</button>
+        <div class="page-title">今すぐ少し楽になる</div>
+      </div>
+      <div class="home-content">
+        <div class="rescue-intro">いまの状態に近いものを選んでね。30秒〜3分で終わるよ。</div>
+        <div class="rescue-list">
+          ${RESCUE_MENU.map(r => {
+            const available = !!RESCUE_FLOWS[r.id];
+            return `
+              <div class="rescue-card ${available ? '' : 'rescue-card-disabled'}" ${available ? `data-act="rescue-start" data-rescue="${r.id}"` : ''}>
+                <div class="rescue-emoji">${r.emoji}</div>
+                <div class="rescue-body">
+                  <div class="rescue-title">${escapeHtml(r.title)}${available ? '' : ' <span class="rescue-coming">近日</span>'}</div>
+                  <div class="rescue-sub">${escapeHtml(r.sub)}</div>
+                </div>
+                ${available ? '<div class="rescue-arrow">›</div>' : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+      ${bottomNav('talk')}
+    </div>
+  `;
+}
+
+function viewRescueFlow() {
+  const flow = RESCUE_FLOWS[rescueState.flowId];
+  if (!flow) { App.go('rescue'); return ''; }
+  const step = flow.steps[rescueState.stepIdx];
+  const persona = getCurrentPersona();
+  const prompt = step.mode === 'response' ? step.build(rescueState.picks) : step.prompt;
+  return `
+    <div class="screen active">
+      <div class="page-header insights-header">
+        <button class="chat-back" data-act="rescue-back">${icon('arrow-left')}</button>
+        <div class="page-title">${escapeHtml(flow.title)}</div>
+      </div>
+      <div class="home-content">
+        <div class="rescue-step-indicator">STEP ${rescueState.stepIdx + 1} / ${flow.steps.length}</div>
+        ${step.mode === 'response' ? `
+          <div class="rescue-response">
+            <div class="mini-avatar" style="background: radial-gradient(circle at 35% 35%, ${persona.avatarAccent}, ${persona.avatarColor});">
+              <span>${persona.initial}</span>
+            </div>
+            <div class="mini-bubble">${escapeHtml(prompt).replace(/\n/g, '<br>')}</div>
+          </div>
+          <div class="rescue-continue">
+            <button class="btn btn-primary" data-act="rescue-next">つづける</button>
+          </div>
+        ` : `
+          <div class="rescue-prompt">${escapeHtml(prompt)}</div>
+          <div class="rescue-choices">
+            ${step.choices.map(c => `
+              <button class="rescue-choice-btn" data-act="${step.isExit ? 'rescue-exit' : 'rescue-pick'}" data-choice="${escapeAttr(c)}">${escapeHtml(c)}</button>
+            `).join('')}
+          </div>
+        `}
+      </div>
+    </div>
+  `;
+}
+
 // ---------- Calendar Tab（カレンダー画面） ----------
 let calendarMonth = null; // 'YYYY-MM'
 
@@ -6834,12 +7512,20 @@ function handleAction(act, el, e) {
       render();
       break;
     }
+    case 'onb-nickname-skip': {
+      // あとで決める：仮名で進める
+      if (!state.nickname) state.nickname = 'あなた';
+      saveState();
+      onbStep = 1;
+      render();
+      break;
+    }
     case 'onb-profile-next': {
       state.profile = {
         age: onbProfileDraft.age || 'hide',
-        gender: onbProfileDraft.gender || 'hide',
+        gender: 'hide',
         occupation: onbProfileDraft.occupation || 'other',
-        medicalHistory: onbProfileDraft.medicalHistory || 'hide'
+        medicalHistory: 'hide'
       };
       state.selectedPersonaId = suggestPersonaFromProfile(state.profile);
       state.selectedPersonaIdExplicit = false;
@@ -6875,9 +7561,9 @@ function handleAction(act, el, e) {
       dailyPetLogin();
       saveState();
       onbStep = 0;
-      App.go('goal');
-      const p = getCurrentPersona();
-      toast(`はじめまして、${state.nickname}。${p.name}だよ。`);
+      // 即ミニ体験へ（ホームではなく）
+      miniExpState = { phase: 'pick', moodScore: null };
+      App.go('miniExperience');
       break;
     }
     case 'onb-skip': {
@@ -6888,9 +7574,113 @@ function handleAction(act, el, e) {
       dailyPetLogin();
       saveState();
       onbStep = 0;
+      miniExpState = { phase: 'pick', moodScore: null };
+      App.go('miniExperience');
+      break;
+    }
+    // ミニ体験
+    case 'mini-pick': {
+      const score = Number(el.dataset.score);
+      miniExpState.moodScore = score;
+      miniExpState.phase = 'response';
+      render();
+      break;
+    }
+    case 'mini-skip': {
       App.go('goal');
-      const p = getCurrentPersona();
-      toast(`はじめまして、${state.nickname}。${p.name}だよ。`);
+      break;
+    }
+    case 'mini-save-mood': {
+      // 選んだ気分をそのまま記録
+      if (miniExpState.moodScore) {
+        state.moods.push({
+          id: uid(),
+          date: todayKey(),
+          score: miniExpState.moodScore,
+          comment: '',
+          checkedAt: Date.now()
+        });
+        saveState();
+        toast('きもちを記録したよ');
+      }
+      App.go('goal');
+      break;
+    }
+    case 'mini-go-chat': {
+      // 選んだ気分を記録してチャットへ
+      if (miniExpState.moodScore && !state.moods.find(m => m.date === todayKey())) {
+        state.moods.push({
+          id: uid(),
+          date: todayKey(),
+          score: miniExpState.moodScore,
+          comment: '',
+          checkedAt: Date.now()
+        });
+        saveState();
+      }
+      chatState.session = null;
+      App.go('chat');
+      setTimeout(() => sendInitialAi({ fromMoodSave: true }), 300);
+      break;
+    }
+    case 'mini-go-home': {
+      App.go('goal');
+      break;
+    }
+    // レスキュー
+    case 'goto-rescue': {
+      rescueState = { flowId: null, stepIdx: 0, picks: [] };
+      App.go('rescue');
+      break;
+    }
+    case 'rescue-start': {
+      const id = el.dataset.rescue;
+      if (!RESCUE_FLOWS[id]) { toast('このメニューは近日公開だよ'); return; }
+      rescueState = { flowId: id, stepIdx: 0, picks: [] };
+      App.go('rescueFlow');
+      break;
+    }
+    case 'rescue-pick': {
+      rescueState.picks.push(el.dataset.choice);
+      rescueState.stepIdx++;
+      render();
+      break;
+    }
+    case 'rescue-next': {
+      rescueState.stepIdx++;
+      render();
+      break;
+    }
+    case 'rescue-back': {
+      if (rescueState.stepIdx > 0) {
+        rescueState.stepIdx--;
+        rescueState.picks.pop();
+        render();
+      } else {
+        App.go('rescue');
+      }
+      break;
+    }
+    case 'rescue-exit': {
+      const choice = el.dataset.choice;
+      if (choice === 'もう少し話す' || choice === '一言だけ話す') {
+        chatState.session = null;
+        App.go('chat');
+        setTimeout(() => sendInitialAi(), 300);
+      } else if (choice === '30秒できもちチェック') {
+        moodDraft = { score: null, comment: '' };
+        App.go('mood');
+      } else if (choice === 'もやもや整理に進む') {
+        startNewReflection();
+        App.go('reflect');
+      } else if (choice === '深呼吸する（10秒）') {
+        toast('吸って… 止めて… はいて… 10秒やってみよう');
+        setTimeout(() => App.go('goal'), 500);
+      } else {
+        // 「今日はここで終わる」など
+        toast('お疲れさま。またいつでもどうぞ。');
+        setTimeout(() => App.go('goal'), 400);
+      }
       break;
     }
     case 'goto-home':
@@ -6925,6 +7715,21 @@ function handleAction(act, el, e) {
       App.go('chat');
       setTimeout(() => sendInitialAi(), 300);
       break;
+    case 'toggle-topic-picker':
+      talkTopicPickerOpen = !talkTopicPickerOpen;
+      render();
+      break;
+    case 'start-chat-topic': {
+      const topicId = el.dataset.topic;
+      const topic = TOPIC_OPTIONS.find(t => t.id === topicId);
+      chatState.session = null;
+      startNewChatSession();
+      chatState.session.topicStart = topic ? topic.label : null;
+      talkTopicPickerOpen = false;
+      App.go('chat');
+      setTimeout(() => sendInitialAi({ topic: topic ? topic.label : null }), 300);
+      break;
+    }
     case 'start-reflect':
       startNewReflection();
       App.go('reflect');
@@ -7316,6 +8121,7 @@ async function sendInitialAi(opts = {}) {
   const s = chatState.session;
   if (!s || s.messages.length > 0) { render(); return; }
   if (opts.fromMoodSave) s.fromMoodSave = true;
+  if (opts.topic) s.topicStart = opts.topic;
   chatState.isTyping = true;
   render();
   try {
@@ -7526,6 +8332,9 @@ async function callAi(session, isInitial = false) {
     }
     if (session.fromMoodSave) {
       intro += `\n\n（${state.nickname}さんはきもちチェックを終えたあと、自分から「Asideと話したい」を選んでくれました。きもちの変化があれば、それを自然に話題に取り入れて、最初の一言をかけてください。ただし無理に分析せず、相手のペースに合わせること。）`;
+    }
+    if (session.topicStart) {
+      intro += `\n\n【テーマ】${state.nickname}さんは「${session.topicStart}」をテーマに話すことを選びました。このテーマに関して「最近どんなことがありましたか？」のような開き方で、やさしく先に一言かけてください。ただし具体的な出来事を推測・決めつけしない。相手が話し始めやすいよう、緩やかな入口を提示するイメージで。`;
     }
     if (todayMood && todayMood.comment && todayMood.comment.trim()) {
       intro += `\n\n【最重要・最優先】${state.nickname}さんは「ひとこと」に「${todayMood.comment.trim()}」と書いています。この一文がその人の今の気持ちの核です。まずこの内容を最優先の話題として受けとめ、ここから会話を始めてください。スコア（${todayMood.score}/5）は補助情報にすぎません。決して「${MOODS.find(x => x.score === todayMood.score).label}なんだね」のようにスコアから話を始めないこと。ひとことの内容を拾って、そこを起点に寄り添う最初の一言をかけてください。`;
