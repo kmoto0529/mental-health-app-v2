@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Aside — 認知行動療法アプリ</title>
+<title>Aside — 気持ちを整えるアプリ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Serif+JP:wght@400;500&display=swap" rel="stylesheet">
@@ -87,7 +87,7 @@ body {
 /* ---------- Welcome ---------- */
 .welcome {
   background: linear-gradient(180deg, #FAF6F0 0%, #EFE5D6 100%);
-  padding: 80px 32px 48px;
+  padding: 56px 32px 36px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -105,13 +105,24 @@ body {
   margin-top: 4px;
   letter-spacing: 0.08em;
 }
-.welcome-hero {
-  margin-top: 64px;
+.welcome-copy {
+  margin-top: 16px;
+}
+.welcome-eyebrow {
   font-family: 'Noto Serif JP', serif;
-  font-size: 26px;
-  line-height: 1.7;
+  font-size: 14px;
+  color: var(--text-soft);
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.welcome-hero {
+  margin-top: 0;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 30px;
+  line-height: 1.55;
   color: var(--text);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
+  font-weight: 500;
 }
 .welcome-hero em {
   font-style: normal;
@@ -120,15 +131,26 @@ body {
   padding-bottom: 2px;
 }
 .welcome-desc {
-  margin-top: 28px;
+  margin-top: 20px;
   color: var(--text-soft);
-  font-size: 14.5px;
-  line-height: 1.8;
+  font-size: 13.5px;
+  line-height: 1.9;
+}
+.welcome-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.welcome-cta-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
 }
 .welcome-visual {
-  margin: 48px auto 24px;
-  width: 140px;
-  height: 140px;
+  margin: 28px auto 16px;
+  width: 120px;
+  height: 120px;
   position: relative;
 }
 .welcome-blob {
@@ -5032,20 +5054,26 @@ function viewWelcome() {
     <div class="screen active welcome">
       <div>
         <div class="welcome-brand">Aside</div>
-        <div class="welcome-sub">認知行動療法アプリ</div>
+        <div class="welcome-sub">気持ちを整えるアプリ</div>
       </div>
       <div class="welcome-visual">
         <div class="welcome-blob"></div>
       </div>
-      <div>
-        <div class="welcome-hero">なんとなく、を<br>話せる、<em>AIの先輩</em>。</div>
+      <div class="welcome-copy">
+        <div class="welcome-eyebrow">なんとなくしんどい日に。</div>
+        <div class="welcome-hero">気持ちを、<br>少し整える。</div>
         <div class="welcome-desc">
-          正面でも、上からでもなく、横に寄り添う。<br>
-          書かなくていい。選ぶだけでも、話しかけるだけでもいい。
+          選ぶだけでも、<br>
+          少し話すだけでもいい。<br><br>
+          自分のペースで、<br>
+          気持ちを残していける場所。
         </div>
       </div>
       <div class="spacer"></div>
-      <button class="btn btn-primary" data-act="start">はじめる</button>
+      <div class="welcome-cta">
+        <button class="btn btn-primary" data-act="start">はじめる</button>
+        <div class="welcome-cta-note">書かなくても使えます</div>
+      </div>
     </div>
   `;
 }
