@@ -191,8 +191,10 @@ async function auditScreen(page, name, gotoFn) {
 const gotoGoal = async (page) => { await page.evaluate(() => { App.go('goal'); }); };
 const gotoTalk = async (page) => { await page.evaluate(() => { App.go('talk'); }); };
 const gotoCalendar = async (page) => { await page.evaluate(() => { App.go('calendar'); }); };
-const gotoHistoryChat = async (page) => { await page.evaluate(() => { historyFilter = 'chat'; App.go('history'); }); };
-const gotoHistoryReflect = async (page) => { await page.evaluate(() => { historyFilter = 'reflect'; App.go('history'); }); };
+const gotoHistoryChat = async (page) => { await page.evaluate(() => { historyTopTab='list'; historyFilter = 'chat'; App.go('history'); }); };
+const gotoHistoryReflect = async (page) => { await page.evaluate(() => { historyTopTab='list'; historyFilter = 'reflect'; App.go('history'); }); };
+const gotoHistoryWeek = async (page) => { await page.evaluate(() => { historyTopTab='week'; App.go('history'); }); };
+const gotoHistoryMonth = async (page) => { await page.evaluate(() => { historyTopTab='month'; App.go('history'); }); };
 const gotoChat = async (page) => { await page.evaluate(() => { state.currentSessionId = 's1'; chatState.session = state.sessions.find(s => s.id === 's1'); chatState.session.endedAt = null; const lastAi = [...chatState.session.messages].reverse().find(m => m.role === 'assistant'); chatState.currentChoices = lastAi?.choices || []; App.go('chat'); }); };
 const gotoHistoryDetailChat = async (page) => { await page.evaluate(() => { historyDetailId = 's1'; historyDetailKind = 'chat'; App.go('historyDetail'); }); };
 const gotoHistoryDetailReflect = async (page) => { await page.evaluate(() => { historyDetailId = 'r1'; historyDetailKind = 'reflect'; App.go('historyDetail'); }); };
@@ -247,7 +249,9 @@ async function main() {
     { name: '21_night_b_label', go: gotoNightBLabel },
     { name: '22_night_b_ack', go: gotoNightBAck },
     { name: '23_night_c_theme', go: gotoNightCTheme },
-    { name: '24_night_c_ack', go: gotoNightCAck }
+    { name: '24_night_c_ack', go: gotoNightCAck },
+    { name: '25_history_week', go: gotoHistoryWeek },
+    { name: '26_history_month', go: gotoHistoryMonth }
   ];
 
   const allResults = [];

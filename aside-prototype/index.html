@@ -3272,6 +3272,330 @@ body {
   margin-bottom: 4px;
 }
 
+/* ---------- きろく 3タブ ---------- */
+.history-top-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  background: var(--bg-soft);
+  padding: 4px;
+  border-radius: 999px;
+}
+.history-top-tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.history-top-tab.active {
+  background: var(--bg-card);
+  color: var(--accent-deep);
+  font-weight: 500;
+  box-shadow: var(--shadow-soft);
+}
+.history-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.history-chip {
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.history-chip.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-deep);
+  font-weight: 500;
+}
+
+/* ---------- レポート block ---------- */
+.report-header {
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.report-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.report-period {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+.report-empty {
+  text-align: center;
+  padding: 40px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-lg);
+}
+.report-empty-icon { font-size: 32px; margin-bottom: 12px; }
+.report-empty-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.report-block {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.report-block-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.report-block-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.8;
+}
+.report-mood-flow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.report-flow-item { text-align: center; min-width: 0; }
+.report-flow-emoji {
+  width: 100%;
+  max-width: 40px;
+  aspect-ratio: 1;
+  margin: 0 auto 4px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  background: var(--bg);
+}
+.report-flow-emoji.no-mood { color: var(--text-muted); }
+.report-flow-emoji.mood-1 { background: #D8D3CE; }
+.report-flow-emoji.mood-2 { background: #E8DCD2; }
+.report-flow-emoji.mood-3 { background: #EFDFC8; }
+.report-flow-emoji.mood-4 { background: #F2CCA2; }
+.report-flow-emoji.mood-5 { background: #EFB37A; }
+.report-flow-date {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+.report-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.report-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  padding: 12px 6px;
+  text-align: center;
+}
+.report-stat-n {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  color: var(--accent-deep);
+  line-height: 1;
+}
+.report-stat-l {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.report-topic-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.report-topic-chip {
+  display: inline-block;
+  padding: 5px 12px;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--accent-deep);
+}
+.report-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.9;
+}
+.report-narrative {
+  background: linear-gradient(135deg, var(--sage-soft, var(--accent-soft)), var(--bg-card));
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.report-narrative-label {
+  font-size: 11px;
+  color: var(--accent-deep);
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.report-narrative-line {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.9;
+  margin-bottom: 6px;
+}
+.report-narrative-line:last-child { margin-bottom: 0; }
+.report-self {
+  background: var(--bg-card);
+  border: 1px dashed var(--accent-soft);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.report-self-line {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.9;
+  margin-bottom: 6px;
+}
+.report-disclaimer {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  padding: 14px 16px;
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  margin-top: 16px;
+  text-align: center;
+}
+
+/* ---------- カレンダー 日別詳細 ---------- */
+.cal-activity {
+  font-size: 9px;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.day-detail-modal { max-width: 420px; }
+.day-detail-mood {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  margin-bottom: 16px;
+}
+.day-detail-mood-icon { font-size: 32px; line-height: 1; }
+.day-detail-mood-body { flex: 1; min-width: 0; }
+.day-detail-mood-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  color: var(--text);
+}
+.day-detail-comment {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-top: 4px;
+  line-height: 1.6;
+}
+.day-detail-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 14px;
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  margin-bottom: 12px;
+}
+.day-detail-section-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+.day-detail-activity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: transform .15s var(--ease);
+}
+.day-detail-activity:active { transform: scale(0.98); }
+.day-detail-activity-icon { font-size: 20px; flex-shrink: 0; }
+.day-detail-activity-body { flex: 1; min-width: 0; }
+.day-detail-activity-label {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+.day-detail-activity-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.day-detail-activity-arrow {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+/* ---------- 履歴詳細の相互導線 ---------- */
+.detail-cross-links {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--divider);
+}
+.detail-cross-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.detail-cross-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 8px;
+  transition: all .15s var(--ease);
+}
+.detail-cross-btn:active { transform: scale(0.98); background: var(--bg-soft); }
+
 /* ---------- 夜レスキュー専用 ---------- */
 .night-screen {
   background: linear-gradient(180deg, #F7EFE2 0%, #EDE3D2 100%);
@@ -7106,25 +7430,30 @@ function getBarTone(before, after) {
 }
 
 // ---------- History ----------
-let historyFilter = 'chat'; // 'chat' | 'reflect'
+let historyTopTab = 'list';    // 'list' | 'week' | 'month'
+let historyFilter = 'all';     // 'all' | 'chat' | 'reflect' | 'rescue'
+
+const RESCUE_LABEL = { fuzzy: 'なんとなくしんどい', spin: '頭がぐるぐるする', words: '気持ちをことばにしたい', night: '眠る前に整えたい' };
 
 function viewHistory() {
+  // 週次・月次タブはinsightsを埋め込む
+  if (historyTopTab === 'week' || historyTopTab === 'month') {
+    insightsRange = historyTopTab === 'month' ? 'month' : 'week';
+    return viewHistoryReport();
+  }
+
   const chatItems = state.sessions.map(s => ({ kind: 'chat', id: s.id, ts: s.startedAt, data: s })).sort((a, b) => b.ts - a.ts);
   const reflectItems = state.reflections.map(r => ({ kind: 'reflect', id: r.id, ts: r.startedAt, data: r })).sort((a, b) => b.ts - a.ts);
-  const items = historyFilter === 'chat' ? chatItems : reflectItems;
-  const emptyCta = historyFilter === 'chat'
-    ? {
-        emoji: '💬',
-        text: 'まだAsideとの会話記録はないよ。',
-        primary: { label: '1分で話してみる', act: 'start-chat' },
-        secondary: { label: '選ぶだけで始める', act: 'goto-talk' }
-      }
-    : {
-        emoji: '✨',
-        text: 'まだもやもや整理の記録はないよ。',
-        primary: { label: '最初のもやもや整理をやってみる', act: 'start-reflect' },
-        secondary: { label: 'はなす画面から始める', act: 'goto-talk' }
-      };
+  const rescueItems = (state.rescueHistory || []).map(r => ({ kind: 'rescue', id: r.id, ts: r.startedAt, data: r })).sort((a, b) => b.ts - a.ts);
+
+  let items;
+  if (historyFilter === 'all') {
+    items = [...chatItems, ...reflectItems, ...rescueItems].sort((a, b) => b.ts - a.ts);
+  } else if (historyFilter === 'chat') items = chatItems;
+  else if (historyFilter === 'reflect') items = reflectItems;
+  else items = rescueItems;
+
+  const totalCount = chatItems.length + reflectItems.length + rescueItems.length;
 
   return `
     <div class="screen active">
@@ -7132,57 +7461,122 @@ function viewHistory() {
         <div class="page-title">きろく</div>
       </div>
       <div class="history-topbar">
-        <div class="history-tabs">
-          <button class="history-tab ${historyFilter === 'chat' ? 'active' : ''}" data-act="history-tab-chat">AIと会話（${chatItems.length}）</button>
-          <button class="history-tab ${historyFilter === 'reflect' ? 'active' : ''}" data-act="history-tab-reflect">もやもや整理（${reflectItems.length}）</button>
-        </div>
-        <div class="card" style="margin-bottom: 16px;" data-act="goto-insights">
-          <div class="card-title">週次・月次レポート</div>
-          <div class="card-body">頑張れたことや良いポイントをまとめて、次の目標に活かそう。</div>
-          <div class="card-action">
-            <button class="btn btn-secondary" data-act="goto-insights">レポートを見る ›</button>
-          </div>
+        ${renderHistoryTopTabs()}
+        <div class="history-filter-chips">
+          <button class="history-chip ${historyFilter === 'all' ? 'active' : ''}" data-act="history-filter" data-filter="all">すべて（${totalCount}）</button>
+          <button class="history-chip ${historyFilter === 'chat' ? 'active' : ''}" data-act="history-filter" data-filter="chat">会話（${chatItems.length}）</button>
+          <button class="history-chip ${historyFilter === 'reflect' ? 'active' : ''}" data-act="history-filter" data-filter="reflect">整理（${reflectItems.length}）</button>
+          <button class="history-chip ${historyFilter === 'rescue' ? 'active' : ''}" data-act="history-filter" data-filter="rescue">レスキュー（${rescueItems.length}）</button>
         </div>
       </div>
       <div class="history-list">
-        ${items.length === 0 ? `
-          <div class="empty empty-action">
-            <div class="empty-emoji">${emptyCta.emoji}</div>
-            <div class="empty-text">${emptyCta.text}</div>
-            <div class="empty-actions">
-              <button class="btn btn-primary" data-act="${emptyCta.primary.act}">${escapeHtml(emptyCta.primary.label)}</button>
-              <button class="btn btn-ghost" data-act="${emptyCta.secondary.act}">${escapeHtml(emptyCta.secondary.label)}</button>
-            </div>
-          </div>
-        ` : items.map(item => {
-          if (item.kind === 'chat') {
-            const s = item.data;
-            const userMsgs = s.messages.filter(m => m.role === 'user');
-            return `
-              <div class="history-item" data-history="chat" data-hid="${s.id}">
-                <div class="history-date">${fmtDateLong(s.startedAt)} ・ はなす</div>
-                <div class="history-preview">${escapeHtml(previewSession(s))}</div>
-                <div class="history-meta">
-                  <span>${userMsgs.length} メッセージ</span>
-                  ${s.moodScore ? `<span>${MOODS.find(x => x.score === s.moodScore).emoji} ${MOODS.find(x => x.score === s.moodScore).label}</span>` : ''}
-                </div>
-              </div>
-            `;
-          } else {
-            const r = item.data;
-            const delta = r.emotionBefore.score - r.emotionAfter.score;
-            return `
-              <div class="history-item" data-history="reflect" data-hid="${r.id}">
-                <div class="history-date">${fmtDateLong(r.startedAt)} ・ ふりかえり</div>
-                <div class="history-preview">${escapeHtml(r.event.slice(0, 80))}</div>
-                <div class="history-meta">
-                  <span>${r.emotionBefore.emoji} ${r.emotionBefore.label}</span>
-                  <span>${r.emotionBefore.score} → ${r.emotionAfter.score}${delta > 0 ? `（-${delta}）` : delta < 0 ? `（+${Math.abs(delta)}）` : ''}</span>
-                </div>
-              </div>
-            `;
-          }
-        }).join('')}
+        ${items.length === 0 ? renderHistoryEmpty() : items.map(renderHistoryCard).join('')}
+      </div>
+      ${bottomNav('history')}
+    </div>
+  `;
+}
+
+function renderHistoryTopTabs() {
+  return `
+    <div class="history-top-tabs">
+      <button class="history-top-tab ${historyTopTab === 'list' ? 'active' : ''}" data-act="history-top-list">履歴</button>
+      <button class="history-top-tab ${historyTopTab === 'week' ? 'active' : ''}" data-act="history-top-week">週次</button>
+      <button class="history-top-tab ${historyTopTab === 'month' ? 'active' : ''}" data-act="history-top-month">月次</button>
+    </div>
+  `;
+}
+
+function renderHistoryEmpty() {
+  const map = {
+    all: { emoji: '🌱', text: 'まだ記録はないよ。<br>気持ちを残すと、ここでふりかえれるようになる。' },
+    chat: { emoji: '💬', text: 'まだAsideとの会話記録はないよ。' },
+    reflect: { emoji: '✨', text: 'まだもやもや整理の記録はないよ。' },
+    rescue: { emoji: '🌫', text: 'まだレスキューを使った記録はないよ。' }
+  };
+  const m = map[historyFilter] || map.all;
+  return `
+    <div class="empty empty-action">
+      <div class="empty-emoji">${m.emoji}</div>
+      <div class="empty-text">${m.text}</div>
+      <div class="empty-actions">
+        <button class="btn btn-primary" data-act="start-chat">はなす</button>
+        <button class="btn btn-secondary" data-act="start-reflect">もやもや整理をする</button>
+        <button class="btn btn-ghost" data-act="goto-rescue">レスキューを使う</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderHistoryCard(item) {
+  if (item.kind === 'chat') {
+    const s = item.data;
+    const userMsgs = s.messages.filter(m => m.role === 'user');
+    const pid = s.personaId || state.selectedPersonaId;
+    const persona = PERSONAS.find(p => p.id === pid) || PERSONAS[0];
+    const displayName = (state.personaNames && state.personaNames[persona.id]) || persona.name;
+    const firstUserMsg = userMsgs[0] ? userMsgs[0].content : (s.topicStart || '会話を始めた');
+    return `
+      <div class="history-item" data-history="chat" data-hid="${s.id}">
+        <div class="history-date">${fmtDateLong(s.startedAt)} ・ ${escapeHtml(displayName)}と話した</div>
+        <div class="history-preview">${escapeHtml(firstUserMsg.slice(0, 60))}</div>
+        <div class="history-meta">
+          <span>${userMsgs.length} メッセージ</span>
+          ${s.moodScore ? `<span>${MOODS.find(x => x.score === s.moodScore).emoji} ${MOODS.find(x => x.score === s.moodScore).label}</span>` : ''}
+          ${s.topicStart ? `<span>🎯 ${escapeHtml(s.topicStart)}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }
+  if (item.kind === 'reflect') {
+    const r = item.data;
+    const delta = r.emotionBefore.score - r.emotionAfter.score;
+    return `
+      <div class="history-item" data-history="reflect" data-hid="${r.id}">
+        <div class="history-date">${fmtDateLong(r.startedAt)} ・ もやもや整理</div>
+        <div class="history-preview">${escapeHtml((r.event || '').slice(0, 80))}</div>
+        <div class="history-meta">
+          <span>${r.emotionBefore.emoji} ${r.emotionBefore.label}</span>
+          <span>${r.emotionBefore.score} → ${r.emotionAfter.score}${delta > 0 ? `（-${delta}）` : delta < 0 ? `（+${Math.abs(delta)}）` : ''}</span>
+        </div>
+      </div>
+    `;
+  }
+  if (item.kind === 'rescue') {
+    const r = item.data;
+    const title = RESCUE_LABEL[r.flowId] || r.flowId;
+    let detailLine = r.exitChoice || '';
+    if (r.flowId === 'night' && r.detail) {
+      if (r.branch === 'A') detailLine = '10秒呼吸した';
+      else if (r.branch === 'B') detailLine = `「${r.detail.bLabel || 'ひとこと'}」を置いた`;
+      else if (r.branch === 'C') detailLine = `明日にまわす（${r.detail.cTheme || ''}）`;
+    }
+    return `
+      <div class="history-item" data-history="rescue" data-hid="${r.id}">
+        <div class="history-date">${fmtDateLong(r.startedAt)} ・ レスキュー</div>
+        <div class="history-preview">🌫 ${escapeHtml(title)}</div>
+        <div class="history-meta">
+          <span>${escapeHtml(detailLine)}</span>
+        </div>
+      </div>
+    `;
+  }
+  return '';
+}
+
+function viewHistoryReport() {
+  const days = historyTopTab === 'month' ? 30 : 7;
+  const ins = computeInsights(days);
+  return `
+    <div class="screen active">
+      <div class="page-header">
+        <div class="page-title">きろく</div>
+      </div>
+      <div class="history-topbar">
+        ${renderHistoryTopTabs()}
+      </div>
+      <div class="home-content">
+        ${renderReportBlocks(historyTopTab, ins, days)}
       </div>
       ${bottomNav('history')}
     </div>
@@ -7198,17 +7592,34 @@ function viewHistoryDetail() {
   }
   const s = state.sessions.find(x => x.id === historyDetailId);
   if (!s) { App.go('history'); return ''; }
+
+  // その日の他記録を探す
+  const sd = new Date(s.startedAt);
+  const sdKey = `${sd.getFullYear()}-${String(sd.getMonth()+1).padStart(2,'0')}-${String(sd.getDate()).padStart(2,'0')}`;
+  const sameDayReflects = (state.reflections || []).filter(r => {
+    const rd = new Date(r.startedAt);
+    return `${rd.getFullYear()}-${String(rd.getMonth()+1).padStart(2,'0')}-${String(rd.getDate()).padStart(2,'0')}` === sdKey;
+  });
+  const dayMood = state.moods.find(m => m.date === sdKey);
+
   return `
     <div class="screen active">
       <div class="chat-header">
         <button class="chat-back" data-act="back-history">${icon('arrow-left')}</button>
         <div class="chat-title">
           <div class="chat-name">${fmtDateLong(s.startedAt)}</div>
-          <div class="chat-status">${s.messages.length}メッセージ</div>
+          <div class="chat-status">${s.messages.length}メッセージ${dayMood ? ` ・ ${MOODS.find(x => x.score === dayMood.score).emoji}${MOODS.find(x => x.score === dayMood.score).label}` : ''}</div>
         </div>
       </div>
       <div class="chat-messages" style="padding-bottom: 40px;">
         ${s.messages.map(renderMsg).join('')}
+        <div class="detail-cross-links">
+          <div class="detail-cross-label">この日の他の記録</div>
+          <button class="detail-cross-btn" data-act="detail-goto-calendar" data-date="${sdKey}">📅 この日のカレンダーを見る</button>
+          ${sameDayReflects.map(r => `
+            <button class="detail-cross-btn" data-act="cal-day-reflect" data-rid="${r.id}">✨ この日のもやもや整理を見る</button>
+          `).join('')}
+        </div>
       </div>
     </div>
   `;
@@ -7954,7 +8365,7 @@ function startBreathAnimation() {
 function saveNightRescueHistory() {
   if (!state.nightRescueHistory) state.nightRescueHistory = [];
   if (!nightState) return;
-  state.nightRescueHistory.push({
+  const record = {
     startedAt: nightState.startedAt,
     endedAt: Date.now(),
     stateChoice: nightState.stateChoice,
@@ -7965,6 +8376,19 @@ function saveNightRescueHistory() {
     cHandoff: nightState.cHandoff,
     cMemo: nightState.cMemo,
     done: nightState.done
+  };
+  state.nightRescueHistory.push(record);
+  // 統合レスキュー履歴にも記録
+  if (!state.rescueHistory) state.rescueHistory = [];
+  state.rescueHistory.push({
+    id: uid(),
+    flowId: 'night',
+    startedAt: nightState.startedAt,
+    endedAt: Date.now(),
+    branch: nightState.branch,
+    detail: record,
+    exitChoice: `branch-${nightState.branch}`,
+    linkedDate: todayKey()
   });
   // レスキュー全般と同じく直近使用としても記録
   state.lastRescueExit = { flowId: 'night', ts: Date.now(), exitChoice: nightState.branch ? `branch-${nightState.branch}` : 'exit' };
@@ -8000,10 +8424,29 @@ function viewCalendar() {
     const isPast = dateKey < todayStr;
     const clickable = isToday;
     const moodClass = mood ? `mood-${mood.score}` : '';
+    // 実施機能アイコン（セッション/整理/レスキュー/ひとこと）を最大2個極小で表示
+    const daySessions = (state.sessions || []).filter(s => {
+      const sd = new Date(s.startedAt);
+      const sdKey = `${sd.getFullYear()}-${String(sd.getMonth()+1).padStart(2,'0')}-${String(sd.getDate()).padStart(2,'0')}`;
+      return sdKey === dateKey;
+    });
+    const dayReflects = (state.reflections || []).filter(r => {
+      const rd = new Date(r.startedAt);
+      const rdKey = `${rd.getFullYear()}-${String(rd.getMonth()+1).padStart(2,'0')}-${String(rd.getDate()).padStart(2,'0')}`;
+      return rdKey === dateKey;
+    });
+    const dayRescues = (state.rescueHistory || []).filter(r => r.linkedDate === dateKey);
+    const hasActivity = daySessions.length || dayReflects.length || dayRescues.length;
+    const activityIcons = [];
+    if (daySessions.length) activityIcons.push('💬');
+    if (dayReflects.length) activityIcons.push('✨');
+    if (dayRescues.length) activityIcons.push('🌙');
+    const clickableAct = (mood || hasActivity || isToday);
     cells.push(`
-      <div class="cal-cell ${mood ? 'has-mood' : ''} ${moodClass} ${isToday ? 'today' : ''} ${clickable ? 'clickable' : ''}" ${clickable ? `data-act="goto-mood"` : ''} title="${mood ? MOODS.find(x => x.score === mood.score).label : ''}">
+      <div class="cal-cell ${mood ? 'has-mood' : ''} ${moodClass} ${isToday ? 'today' : ''} ${clickableAct ? 'clickable' : ''}" ${clickableAct ? `data-act="cal-day-open" data-date="${dateKey}"` : ''} title="${mood ? MOODS.find(x => x.score === mood.score).label : ''}">
         <div class="cal-day">${d}</div>
         <div class="cal-mood">${mood ? MOODS.find(x => x.score === mood.score).emoji : ''}</div>
+        ${activityIcons.length > 0 ? `<div class="cal-activity">${activityIcons.slice(0,2).join('')}</div>` : ''}
       </div>
     `);
   }
@@ -8102,7 +8545,262 @@ function shiftCalendarMonth(delta) {
   render();
 }
 
-// ---------- Insights (週次・月次レポート) ----------
+function openDayDetailModal(dateKey) {
+  const mood = state.moods.find(m => m.date === dateKey);
+  const daySessions = (state.sessions || []).filter(s => {
+    const sd = new Date(s.startedAt);
+    const sdKey = `${sd.getFullYear()}-${String(sd.getMonth()+1).padStart(2,'0')}-${String(sd.getDate()).padStart(2,'0')}`;
+    return sdKey === dateKey;
+  });
+  const dayReflects = (state.reflections || []).filter(r => {
+    const rd = new Date(r.startedAt);
+    const rdKey = `${rd.getFullYear()}-${String(rd.getMonth()+1).padStart(2,'0')}-${String(rd.getDate()).padStart(2,'0')}`;
+    return rdKey === dateKey;
+  });
+  const dayRescues = (state.rescueHistory || []).filter(r => r.linkedDate === dateKey);
+  const isToday = dateKey === todayKey();
+  const dt = new Date(dateKey + 'T00:00:00');
+  const dateLabel = `${dt.getMonth() + 1}月${dt.getDate()}日 (${['日','月','火','水','木','金','土'][dt.getDay()]})`;
+
+  const moodBlock = mood
+    ? `
+      <div class="day-detail-mood">
+        <div class="day-detail-mood-icon">${MOODS.find(x => x.score === mood.score).emoji}</div>
+        <div class="day-detail-mood-body">
+          <div class="day-detail-mood-label">${MOODS.find(x => x.score === mood.score).label}</div>
+          ${mood.comment ? `<div class="day-detail-comment">「${escapeHtml(mood.comment)}」</div>` : ''}
+        </div>
+      </div>
+    `
+    : `<div class="day-detail-empty">気分は記録されていません${isToday ? '（今日はまだ）' : ''}</div>`;
+
+  const activities = [];
+  daySessions.forEach(s => {
+    const persona = PERSONAS.find(p => p.id === s.personaId) || PERSONAS[0];
+    const firstMsg = (s.messages || []).find(m => m.role === 'user');
+    activities.push({
+      kind: 'chat',
+      icon: '💬',
+      label: `${(state.personaNames && state.personaNames[persona.id]) || persona.name}と話した`,
+      sub: firstMsg ? firstMsg.content.slice(0, 40) : (s.topicStart || ''),
+      sid: s.id
+    });
+  });
+  dayReflects.forEach(r => {
+    activities.push({
+      kind: 'reflect',
+      icon: '✨',
+      label: 'もやもや整理',
+      sub: (r.event || '').slice(0, 40),
+      rid: r.id
+    });
+  });
+  dayRescues.forEach(r => {
+    activities.push({
+      kind: 'rescue',
+      icon: '🌙',
+      label: RESCUE_LABEL[r.flowId] || 'レスキュー',
+      sub: r.exitChoice || ''
+    });
+  });
+
+  const activitiesHtml = activities.length === 0
+    ? `<div class="day-detail-empty">この日は会話・整理・レスキューの記録はありません</div>`
+    : activities.map(a => {
+        const dataAct = a.kind === 'chat' ? `data-act="cal-day-chat" data-sid="${a.sid}"`
+          : a.kind === 'reflect' ? `data-act="cal-day-reflect" data-rid="${a.rid}"`
+          : `data-act="cal-day-rescue"`;
+        return `
+          <div class="day-detail-activity" ${dataAct}>
+            <span class="day-detail-activity-icon">${a.icon}</span>
+            <div class="day-detail-activity-body">
+              <div class="day-detail-activity-label">${escapeHtml(a.label)}</div>
+              ${a.sub ? `<div class="day-detail-activity-sub">${escapeHtml(a.sub)}</div>` : ''}
+            </div>
+            <div class="day-detail-activity-arrow">›</div>
+          </div>
+        `;
+      }).join('');
+
+  openModal(`
+    <div class="modal day-detail-modal">
+      <div class="modal-title">${dateLabel} の記録</div>
+      <div class="modal-body">
+        ${moodBlock}
+        <div class="day-detail-section-title">この日の活動</div>
+        ${activitiesHtml}
+      </div>
+      <div class="modal-actions">
+        ${isToday && !mood ? `<button class="btn btn-primary" data-act="cal-day-mood" data-date="${dateKey}">今日のきもちを記録する</button>` : ''}
+        ${isToday && mood ? `<button class="btn btn-secondary" data-act="cal-day-mood" data-date="${dateKey}">気分を修正する</button>` : ''}
+        <button class="btn btn-ghost" onclick="closeModal()">閉じる</button>
+      </div>
+    </div>
+  `);
+}
+
+// ---------- レポート Block 構成（仕様 WEEK-01 / MONTH-01） ----------
+function renderReportBlocks(kind, ins, days) {
+  const periodLabel = kind === 'month' ? '今月' : '今週';
+  const spanLabel = kind === 'month' ? '1ヶ月' : '1週間';
+
+  // Block B: 気分の流れ（直近N日）
+  const flowDates = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const dt = new Date();
+    dt.setDate(dt.getDate() - i);
+    flowDates.push(dt.toISOString().slice(0, 10));
+  }
+  const flowMoods = flowDates.map(dk => state.moods.find(m => m.date === dk));
+
+  // Block D: 今週多かった気分
+  const moodCounts = [0, 0, 0, 0, 0, 0];
+  flowMoods.forEach(m => { if (m) moodCounts[m.score]++; });
+  let dominantMoodText = '';
+  if (ins.checkinDays > 0) {
+    const maxScore = moodCounts.indexOf(Math.max(...moodCounts.slice(1)));
+    const label = MOODS.find(x => x.score === maxScore)?.label || '';
+    const lowDays = moodCounts[1] + moodCounts[2];
+    dominantMoodText = `${periodLabel}は「${label}」が多めでした。` + (lowDays >= 2 ? `\n疲れた日が${lowDays}日ありました。` : '');
+  }
+
+  // Block E: よく出てきたテーマ（topicStart集計）
+  const topics = {};
+  const cutoffTs = Date.now() - days * 86400000;
+  (state.sessions || []).filter(s => s.startedAt >= cutoffTs && s.topicStart).forEach(s => {
+    topics[s.topicStart] = (topics[s.topicStart] || 0) + 1;
+  });
+  // もやもや整理のテーマも拾う（あれば）
+  const topicList = Object.entries(topics).sort((a, b) => b[1] - a[1]).slice(0, 3).map(t => t[0]);
+
+  // Block F: 今週使ったサポート
+  const supportLines = [];
+  if (ins.sessionCount > 0) supportLines.push(`AI会話を${ins.sessionCount}回`);
+  if (ins.reflectionCount > 0) supportLines.push(`もやもや整理を${ins.reflectionCount}回`);
+  const rescueInPeriod = (state.rescueHistory || []).filter(r => r.startedAt >= cutoffTs);
+  if (rescueInPeriod.length > 0) {
+    const night = rescueInPeriod.filter(r => r.flowId === 'night').length;
+    if (night > 0) supportLines.push(`夜のレスキューを${night}回`);
+    const other = rescueInPeriod.length - night;
+    if (other > 0) supportLines.push(`その他のレスキューを${other}回`);
+  }
+
+  // Block G: AIのやさしい振り返り文
+  const narrative = [];
+  if (ins.checkinDays >= Math.ceil(days * 0.5)) {
+    narrative.push(`${periodLabel}は記録できた日が多かったようです。`);
+  } else if (ins.checkinDays >= 2) {
+    narrative.push(`${periodLabel}は少しずつでも記録できた日がありそうです。`);
+  }
+  if (ins.longestStreak >= 3) {
+    narrative.push(`最大${ins.longestStreak}日連続で記録できた時期もありました。`);
+  }
+  if (ins.reflectionImprovements > 0) {
+    narrative.push(`整理したあとに気分が軽くなった日もありそうです。`);
+  }
+  if (rescueInPeriod.some(r => r.flowId === 'night')) {
+    narrative.push(`夜に短いサポートを使う日が続いた時期もありました。`);
+  }
+  if (narrative.length === 0) {
+    narrative.push(`${periodLabel}は記録が少なめでした。少しずつで大丈夫です。`);
+  }
+
+  // Block（月次限定）: 今月の自分への一言
+  const monthSelfMsg = kind === 'month' ? [
+    '今月もここに戻ってきた日がありました。',
+    '言葉にしづらい日も、少しずつ残せていたようです。',
+    '完璧じゃなくても、続いてきたことがあります。'
+  ] : null;
+
+  return `
+    <div class="report-header">
+      <div class="report-title">${periodLabel}のふりかえり</div>
+      <div class="report-period">${reportPeriodLabel(days)}</div>
+    </div>
+
+    ${ins.checkinDays === 0 && ins.sessionCount === 0 && ins.reflectionCount === 0 ? `
+      <div class="report-empty">
+        <div class="report-empty-icon">🌱</div>
+        <div class="report-empty-text">${periodLabel}はまだ記録がないみたい。<br>小さく始めてみよう。</div>
+        <div class="empty-actions" style="margin-top:20px;">
+          <button class="btn btn-primary" data-act="goto-mood">きもちチェック</button>
+          <button class="btn btn-ghost" data-act="start-chat">Asideと話す</button>
+        </div>
+      </div>
+    ` : `
+      <div class="report-block">
+        <div class="report-block-label">${periodLabel}の気分の流れ</div>
+        <div class="report-mood-flow">
+          ${flowMoods.map((m, i) => `
+            <div class="report-flow-item">
+              <div class="report-flow-emoji ${m ? `mood-${m.score}` : 'no-mood'}">${m ? MOODS.find(x => x.score === m.score).emoji : '·'}</div>
+              ${kind === 'week' ? `<div class="report-flow-date">${flowDates[i].slice(5).replace('-', '/')}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="report-stats">
+        <div class="report-stat"><div class="report-stat-n">${ins.checkinDays}</div><div class="report-stat-l">記録日</div></div>
+        <div class="report-stat"><div class="report-stat-n">${ins.sessionCount}</div><div class="report-stat-l">会話</div></div>
+        <div class="report-stat"><div class="report-stat-n">${ins.reflectionCount}</div><div class="report-stat-l">整理</div></div>
+        <div class="report-stat"><div class="report-stat-n">${rescueInPeriod.length}</div><div class="report-stat-l">レスキュー</div></div>
+      </div>
+
+      ${dominantMoodText ? `
+        <div class="report-block">
+          <div class="report-block-label">${periodLabel}多かった気分</div>
+          <div class="report-block-text">${escapeHtml(dominantMoodText).replace(/\n/g, '<br>')}</div>
+        </div>
+      ` : ''}
+
+      ${topicList.length > 0 ? `
+        <div class="report-block">
+          <div class="report-block-label">${periodLabel}よく出てきたテーマ</div>
+          <div class="report-topic-chips">
+            ${topicList.map(t => `<span class="report-topic-chip">${escapeHtml(t)}</span>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      ${supportLines.length > 0 ? `
+        <div class="report-block">
+          <div class="report-block-label">${periodLabel}使ったサポート</div>
+          <ul class="report-list">
+            ${supportLines.map(l => `<li>${escapeHtml(l)}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      <div class="report-narrative">
+        <div class="report-narrative-label">やさしいふりかえり</div>
+        ${narrative.map(n => `<div class="report-narrative-line">${escapeHtml(n)}</div>`).join('')}
+      </div>
+
+      ${monthSelfMsg ? `
+        <div class="report-self">
+          <div class="report-block-label">今月の自分への一言</div>
+          ${monthSelfMsg.map(s => `<div class="report-self-line">${escapeHtml(s)}</div>`).join('')}
+        </div>
+      ` : ''}
+    `}
+
+    <div class="report-disclaimer">
+      これは記録をもとにしたふりかえりで、診断ではありません。<br>
+      近くないと感じたら、そのまま気にしなくて大丈夫です。
+    </div>
+  `;
+}
+
+function reportPeriodLabel(days) {
+  const now = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - (days - 1));
+  const fmt = (d) => `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+  return `${fmt(start)} 〜 ${fmt(now)}`;
+}
+
+// ---------- Insights (旧: 週次・月次レポート) ----------
 let insightsRange = 'week'; // 'week' | 'month'
 
 function computeInsights(days) {
@@ -8743,7 +9441,7 @@ function handleAction(act, el, e) {
         break;
       }
       if (!RESCUE_FLOWS[id]) { toast('このメニューは近日公開だよ'); return; }
-      rescueState = { flowId: id, stepIdx: 0, picks: [] };
+      rescueState = { flowId: id, stepIdx: 0, picks: [], startedAt: Date.now() };
       App.go('rescueFlow');
       break;
     }
@@ -8909,6 +9607,17 @@ function handleAction(act, el, e) {
         ts: Date.now(),
         exitChoice: choice
       };
+      // 統合レスキュー履歴に記録
+      if (!state.rescueHistory) state.rescueHistory = [];
+      state.rescueHistory.push({
+        id: uid(),
+        flowId: rescueState.flowId,
+        startedAt: rescueState.startedAt || Date.now(),
+        endedAt: Date.now(),
+        picks: [...(rescueState.picks || [])],
+        exitChoice: choice,
+        linkedDate: todayKey()
+      });
       saveState();
       if (choice === 'もう少し話す' || choice === '一言だけ話す' || choice === 'このまま話す') {
         chatState.session = null;
@@ -8960,9 +9669,62 @@ function handleAction(act, el, e) {
     case 'goto-history': App.go('history'); break;
     case 'history-tab-chat': historyFilter = 'chat'; render(); break;
     case 'history-tab-reflect': historyFilter = 'reflect'; render(); break;
+    case 'history-filter': historyFilter = el.dataset.filter; render(); break;
+    case 'history-top-list': historyTopTab = 'list'; render(); break;
+    case 'history-top-week': historyTopTab = 'week'; render(); break;
+    case 'history-top-month': historyTopTab = 'month'; render(); break;
     case 'goto-calendar': App.go('calendar'); break;
     case 'cal-prev': shiftCalendarMonth(-1); break;
     case 'cal-next': shiftCalendarMonth(1); break;
+    case 'cal-day-open': {
+      const dateKey = el.dataset.date;
+      openDayDetailModal(dateKey);
+      break;
+    }
+    case 'cal-day-mood': {
+      const dateKey = el.dataset.date;
+      closeModal();
+      if (dateKey === todayKey()) {
+        const existing = state.moods.find(m => m.date === dateKey);
+        moodDraft = existing ? { score: existing.score, comment: existing.comment || '' } : { score: null, comment: '' };
+        App.go('mood');
+      }
+      break;
+    }
+    case 'cal-day-chat': {
+      const sid = el.dataset.sid;
+      closeModal();
+      historyDetailId = sid;
+      historyDetailKind = 'chat';
+      App.go('historyDetail');
+      break;
+    }
+    case 'cal-day-reflect': {
+      const rid = el.dataset.rid;
+      closeModal();
+      historyDetailId = rid;
+      historyDetailKind = 'reflect';
+      App.go('historyDetail');
+      break;
+    }
+    case 'cal-day-rescue': {
+      closeModal();
+      historyTopTab = 'list';
+      historyFilter = 'rescue';
+      App.go('history');
+      break;
+    }
+    case 'detail-goto-calendar': {
+      const dateKey = el.dataset.date;
+      if (dateKey) {
+        calendarMonth = dateKey.slice(0, 7);
+        App.go('calendar');
+        setTimeout(() => openDayDetailModal(dateKey), 300);
+      } else {
+        App.go('calendar');
+      }
+      break;
+    }
     case 'goto-insights': App.go('insights'); break;
     case 'insights-week': insightsRange = 'week'; render(); break;
     case 'insights-month': insightsRange = 'month'; render(); break;
