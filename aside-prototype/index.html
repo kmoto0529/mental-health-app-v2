@@ -3107,6 +3107,203 @@ body {
   opacity: 0.6;
 }
 
+/* ---------- 今週の小さなテーマ ---------- */
+.week-theme-card {
+  background: linear-gradient(135deg, #F4E8D3, var(--bg-card));
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 10px rgba(139, 127, 112, 0.06);
+}
+.week-theme-card-empty {
+  cursor: pointer;
+  display: block;
+  padding: 16px 44px 18px 20px;
+  position: relative;
+}
+.week-theme-card-empty:active { transform: scale(0.98); }
+.week-theme-label {
+  font-size: 10px;
+  color: var(--accent-deep);
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.week-theme-empty-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.week-theme-empty-sub {
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.week-theme-arrow {
+  font-size: 22px;
+  color: var(--accent-deep);
+  opacity: 0.6;
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.week-theme-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.week-theme-change {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text-soft);
+  cursor: pointer;
+  padding: 4px 8px;
+  letter-spacing: 0.05em;
+}
+.week-theme-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 17px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.week-theme-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.week-theme-progress {
+  font-size: 11px;
+  color: var(--accent-deep);
+  background: rgba(255,255,255,0.6);
+  padding: 6px 12px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.week-theme-actions {
+  display: flex;
+  gap: 8px;
+}
+.week-theme-actions .btn { flex: 1; }
+
+/* ---------- テーマ選択モーダル ---------- */
+.theme-modal { max-width: 420px; }
+.theme-reason {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.8;
+  white-space: pre-line;
+  margin-bottom: 14px;
+}
+.theme-section-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+.theme-rec-card {
+  background: linear-gradient(135deg, var(--accent-soft), var(--bg-card));
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: transform .15s var(--ease);
+}
+.theme-rec-card:active { transform: scale(0.98); }
+.theme-rec-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.theme-rec-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+.theme-rec-cta {
+  font-size: 12px;
+  color: var(--accent-deep);
+  font-weight: 500;
+}
+.theme-alt-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: transform .15s var(--ease);
+}
+.theme-alt-card:active { transform: scale(0.98); background: var(--bg-soft); }
+.theme-alt-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.theme-alt-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.theme-current-card {
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+}
+.theme-current-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 6px;
+}
+.theme-current-progress {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ---------- レポート末尾のテーマ提案 ---------- */
+.report-theme {
+  background: linear-gradient(135deg, var(--accent-soft), var(--bg-card));
+  border: 1px solid var(--accent);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.report-theme-narrative {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.8;
+  margin: 10px 0 14px;
+  white-space: pre-line;
+}
+.report-theme-suggest-card {
+  background: rgba(255,255,255,0.6);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.report-theme-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.report-theme-actions .btn { width: 100%; }
+
 .home-subcta-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -5204,6 +5401,8 @@ function viewGoal() {
     dailyPetLogin();
     logEngagement();
   }
+  // 週が変わっていればテーマをリセット
+  ensureCurrentWeekTheme();
 
   // 今日の行動達成状況
   const moodDone = !!todayMood;
@@ -5305,6 +5504,8 @@ function viewGoal() {
             <div class="today-main-arrow">›</div>
           </div>
         `}
+
+        ${renderWeekThemeCard()}
 
         ${subCtas.length > 0 ? `
           <div class="home-subcta-row">
@@ -8013,6 +8214,319 @@ function viewRescueFlow() {
   `;
 }
 
+// ========== 今週の小さなテーマ ビュー ==========
+
+function renderWeekThemeCard() {
+  ensureCurrentWeekTheme();
+  const theme = state.weekTheme;
+  if (!theme || !theme.key) {
+    // 未設定：テーマを決める誘導
+    return `
+      <div class="week-theme-card week-theme-card-empty" data-act="week-theme-open">
+        <div class="week-theme-label">今週の小さなテーマ</div>
+        <div class="week-theme-empty-title">今週のテーマを決める</div>
+        <div class="week-theme-empty-sub">1週間、小さく意識してみよう</div>
+        <div class="week-theme-arrow">›</div>
+      </div>
+    `;
+  }
+  const themeDef = THEME_CATALOG.find(t => t.key === theme.key);
+  const count = computeThemeProgress(theme);
+  const target = themeDef && themeDef.target ? themeDef.target : null;
+  let progressText;
+  if (count === 0) progressText = '今週のテーマにしたよ';
+  else if (count === 1) progressText = '今週ここまで: 1回';
+  else progressText = `今週ここまで: ${count}回`;
+  return `
+    <div class="week-theme-card">
+      <div class="week-theme-top">
+        <div class="week-theme-label">今週の小さなテーマ</div>
+        <button class="week-theme-change" data-act="week-theme-change-open">変える</button>
+      </div>
+      <div class="week-theme-title">${escapeHtml(theme.title)}</div>
+      <div class="week-theme-desc">${escapeHtml(theme.description)}</div>
+      <div class="week-theme-progress">${escapeHtml(progressText)}</div>
+      <div class="week-theme-actions">
+        <button class="btn btn-primary" data-act="week-theme-cta" data-cta="${themeDef ? themeDef.ctaAct : 'goto-mood'}">やってみる</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderWeekThemeProgressMessage(count) {
+  if (count === 0) return 'まだ今週が始まったばかり。\nできそうな時に、少しだけで大丈夫。';
+  if (count === 1) return '一回できたね。\nそれだけでも、ちゃんと前に進んでる。';
+  return '少しずつ、このテーマに触れられているね。\n自分のペースで続けてみよう。';
+}
+
+function openThemeSelectionModal() {
+  const s = suggestThemes();
+  const recommend = s.recommend;
+  const alts = s.alts;
+  const reason = s.reason;
+  openModal(`
+    <div class="modal theme-modal">
+      <div class="modal-title">今週のテーマを選ぼう</div>
+      <div class="modal-body">
+        <div class="theme-reason">${escapeHtml(reason)}\n今週はこんなテーマはどう？</div>
+
+        <div class="theme-section-label">おすすめ</div>
+        <div class="theme-rec-card" data-act="week-theme-accept" data-key="${recommend.key}">
+          <div class="theme-rec-title">${escapeHtml(recommend.title)}</div>
+          <div class="theme-rec-desc">${escapeHtml(recommend.description)}</div>
+          <div class="theme-rec-cta">このテーマでやってみる ›</div>
+        </div>
+
+        ${alts.length > 0 ? `
+          <div class="theme-section-label" style="margin-top:16px;">他の候補</div>
+          ${alts.map(a => `
+            <div class="theme-alt-card" data-act="week-theme-accept" data-key="${a.key}">
+              <div class="theme-alt-title">${escapeHtml(a.title)}</div>
+              <div class="theme-alt-desc">${escapeHtml(a.description)}</div>
+            </div>
+          `).join('')}
+        ` : ''}
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" data-act="week-theme-skip">今週は決めない</button>
+      </div>
+    </div>
+  `);
+}
+
+function openThemeChangeModal() {
+  const s = suggestThemes();
+  const recommend = s.recommend;
+  const alts = s.alts;
+  const count = state.weekTheme ? computeThemeProgress(state.weekTheme) : 0;
+  openModal(`
+    <div class="modal theme-modal">
+      <div class="modal-title">今のテーマを見直す</div>
+      <div class="modal-body">
+        ${state.weekTheme ? `
+          <div class="theme-current-card">
+            <div class="theme-section-label">今のテーマ</div>
+            <div class="theme-current-title">${escapeHtml(state.weekTheme.title)}</div>
+            <div class="theme-current-progress">今週ここまで: ${count}回</div>
+          </div>
+        ` : ''}
+        <div class="theme-reason" style="margin-top:16px;">テーマ変更は失敗ではなく、見直しだよ。</div>
+
+        <div class="theme-section-label" style="margin-top:16px;">おすすめ</div>
+        <div class="theme-rec-card" data-act="week-theme-accept" data-key="${recommend.key}">
+          <div class="theme-rec-title">${escapeHtml(recommend.title)}</div>
+          <div class="theme-rec-desc">${escapeHtml(recommend.description)}</div>
+          <div class="theme-rec-cta">このテーマに変える ›</div>
+        </div>
+
+        ${alts.length > 0 ? `
+          <div class="theme-section-label" style="margin-top:16px;">他の候補</div>
+          ${alts.map(a => `
+            <div class="theme-alt-card" data-act="week-theme-accept" data-key="${a.key}">
+              <div class="theme-alt-title">${escapeHtml(a.title)}</div>
+              <div class="theme-alt-desc">${escapeHtml(a.description)}</div>
+            </div>
+          `).join('')}
+        ` : ''}
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">キャンセル</button>
+      </div>
+    </div>
+  `);
+}
+
+function acceptTheme(themeKey) {
+  const def = THEME_CATALOG.find(t => t.key === themeKey);
+  if (!def) return;
+  const week = getWeekRange();
+  const isChange = state.weekTheme && state.weekTheme.key && state.weekTheme.key !== themeKey;
+  state.weekTheme = {
+    weekStartDate: week.start,
+    weekEndDate: week.end,
+    category: def.category,
+    key: def.key,
+    title: def.title,
+    description: def.description,
+    status: isChange ? 'changed' : 'accepted',
+    acceptedAt: state.weekTheme && state.weekTheme.key === themeKey ? state.weekTheme.acceptedAt : Date.now(),
+    changedAt: isChange ? Date.now() : null
+  };
+  saveState();
+  closeModal();
+  toast(isChange ? 'テーマを見直したよ' : 'テーマを決めたよ');
+  render();
+}
+
+// ---------- 今週の小さなテーマ ----------
+
+// テーマカタログ：category = A(記録) / B(会話) / C(整理) / D(レスキュー)
+// actionType: 進捗カウントに使うイベント種別
+// ctaAct: タップ時に発火する action name（動線）
+const THEME_CATALOG = [
+  // Category A: 気持ちを残す
+  { key: 'mood_one_word', category: 'A', title: '気持ちを一言だけ残す', description: 'しんどい日も、ひとことだけで大丈夫。', actionType: 'mood_checkin', ctaAct: 'goto-mood' },
+  { key: 'mood_night', category: 'A', title: '夜に一回、気分を選ぶ', description: '夜はとくに、選ぶだけで十分。', actionType: 'mood_checkin', ctaAct: 'goto-mood' },
+  { key: 'mood_twice', category: 'A', title: '今週は2回だけ、気持ちを残してみる', description: '毎日じゃなくていい。少しずつで大丈夫。', actionType: 'mood_checkin', ctaAct: 'goto-mood', target: 2 },
+  // Category B: 会話に触れる
+  { key: 'talk_one_line', category: 'B', title: '一言だけ話してみる', description: 'うまく話せなくても、短く始めれば十分。', actionType: 'ai_talk', ctaAct: 'start-chat' },
+  { key: 'talk_choose', category: 'B', title: '今週は一回、選んで話すから始める', description: 'テーマを選ぶだけで、話し出しやすくなる。', actionType: 'ai_talk', ctaAct: 'goto-talk' },
+  { key: 'talk_fuzzy_day', category: 'B', title: 'なんとなくの日に、少しだけ話してみる', description: '理由が言えなくても、話していい。', actionType: 'ai_talk', ctaAct: 'start-chat' },
+  // Category C: 整理してみる
+  { key: 'thought_once', category: 'C', title: 'もやもやを一回だけ整理する', description: '頭の中を少し外に出すと楽になる。', actionType: 'thought_record', ctaAct: 'start-reflect' },
+  { key: 'thought_when_spin', category: 'C', title: '頭がぐるぐるする時に、整理を選ぶ', description: '考えを止めるより、ひとつにしぼる方が楽なこともある。', actionType: 'thought_record', ctaAct: 'goto-rescue-fuzzy' },
+  { key: 'thought_event_feeling', category: 'C', title: '今週は一度、出来事→気持ちまで書いてみる', description: '最後までじゃなくて途中で止めても大丈夫。', actionType: 'thought_record', ctaAct: 'start-reflect' },
+  // Category D: レスキュー利用
+  { key: 'rescue_use', category: 'D', title: 'しんどい時に「今すぐ少し楽になる」を開く', description: '開くだけでも十分。使うかは後で決めていい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' },
+  { key: 'night_reset', category: 'D', title: '寝る前に、一言だけ置いて寝る', description: '考えすぎる夜に、少しだけ外に出してみよう。', actionType: 'rescue_night', ctaAct: 'goto-rescue-night' },
+  { key: 'rescue_30sec', category: 'D', title: 'しんどい時に、30秒だけ整える', description: '長くやらなくていい。まずは少しだけでいい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' }
+];
+
+// 今週の範囲（月曜始まり）
+function getWeekRange() {
+  const today = new Date();
+  const day = today.getDay(); // 0=Sun, 1=Mon...
+  const diffToMon = (day + 6) % 7; // Mon=0, Sun=6
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - diffToMon);
+  monday.setHours(0, 0, 0, 0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return { start: fmt(monday), end: fmt(sunday), startTs: monday.getTime(), endTs: sunday.getTime() };
+}
+
+// 直近7〜14日の利用傾向を解析してルールベースでテーマを提案
+function suggestThemes() {
+  const now = Date.now();
+  const d14 = now - 14 * 86400000;
+  const d7 = now - 7 * 86400000;
+
+  const recentMoods = (state.moods || []).filter(m => m.checkedAt >= d14);
+  const recentSessions = (state.sessions || []).filter(s => s.startedAt >= d14);
+  const recentReflects = (state.reflections || []).filter(r => r.startedAt >= d14);
+  const recentRescues = (state.rescueHistory || []).filter(r => r.startedAt >= d14);
+
+  const moodCount14 = recentMoods.length;
+  const chatCount14 = recentSessions.length;
+  const reflectCount14 = recentReflects.length;
+  const rescueCount14 = recentRescues.length;
+  const nightRescueCount = recentRescues.filter(r => r.flowId === 'night').length;
+
+  const lowMood7 = (state.moods || []).filter(m => m.checkedAt >= d7 && m.score <= 2).length;
+  const heavyStressWeek = lowMood7 >= 3;
+
+  // 夜時間の記録傾向
+  const nightMoods = recentMoods.filter(m => {
+    const h = new Date(m.checkedAt).getHours();
+    return h >= 21 || h < 5;
+  }).length;
+  const dayMoods = recentMoods.length - nightMoods;
+
+  let recommendKey;
+  let reason;
+
+  // ルール5（最優先）: しんどさが強い週は軽量テーマ
+  if (heavyStressWeek) {
+    recommendKey = 'mood_one_word';
+    reason = '最近、少しつらい日が続いているみたい。';
+  }
+  // ルール1: 利用が全体に少ない
+  else if (moodCount14 < 2 && chatCount14 === 0 && reflectCount14 === 0) {
+    recommendKey = 'mood_one_word';
+    reason = 'まだ始まったばかり。まずは小さく。';
+  }
+  // ルール2: 夜利用が多い
+  else if (nightRescueCount >= 2 || (nightMoods >= 3 && nightMoods > dayMoods)) {
+    recommendKey = 'night_reset';
+    reason = '夜に使う日が多いみたい。';
+  }
+  // ルール3: 気持ち記録はあるが会話が少ない
+  else if (moodCount14 >= 3 && chatCount14 <= 1) {
+    recommendKey = 'talk_one_line';
+    reason = '最近は気持ちの記録が続いている。次は話すほうも。';
+  }
+  // ルール4: 会話は多いが整理が少ない
+  else if (chatCount14 >= 3 && reflectCount14 === 0) {
+    recommendKey = 'thought_once';
+    reason = '話す機会は続いている。整理してみるのもよさそう。';
+  }
+  // デフォルト: バランス継続
+  else if (reflectCount14 >= 1 && rescueCount14 === 0) {
+    recommendKey = 'rescue_use';
+    reason = 'しんどい時の手札を増やしておこう。';
+  }
+  else {
+    recommendKey = 'mood_one_word';
+    reason = '今週も、自分のペースで。';
+  }
+
+  const recommend = THEME_CATALOG.find(t => t.key === recommendKey);
+
+  // 候補2つ（カテゴリが被らないように）
+  const alts = [];
+  const catsUsed = new Set([recommend.category]);
+  // 異なるカテゴリから1つずつ、4カテゴリから順に選ぶ
+  ['A', 'B', 'C', 'D'].forEach(cat => {
+    if (alts.length >= 2) return;
+    if (catsUsed.has(cat)) return;
+    const candidate = THEME_CATALOG.find(t => t.category === cat && t.key !== recommendKey);
+    if (candidate) {
+      alts.push(candidate);
+      catsUsed.add(cat);
+    }
+  });
+
+  return { recommend, alts, reason };
+}
+
+// 今週のテーマに対する進捗カウント
+function computeThemeProgress(theme) {
+  if (!theme) return 0;
+  const week = state.weekTheme && state.weekTheme.weekStartDate
+    ? { start: state.weekTheme.weekStartDate, end: state.weekTheme.weekEndDate }
+    : getWeekRange();
+  const startTs = new Date(week.start + 'T00:00:00').getTime();
+  const endTs = new Date(week.end + 'T23:59:59').getTime();
+
+  const matches = (at) => {
+    switch (at) {
+      case 'mood_checkin':
+        return (state.moods || []).filter(m => {
+          const ts = m.checkedAt || new Date(m.date).getTime();
+          return ts >= startTs && ts <= endTs;
+        }).length;
+      case 'ai_talk':
+        return (state.sessions || []).filter(s => s.startedAt >= startTs && s.startedAt <= endTs).length;
+      case 'thought_record':
+        return (state.reflections || []).filter(r => (r.completedAt || r.startedAt) >= startTs && (r.completedAt || r.startedAt) <= endTs).length;
+      case 'rescue_use':
+        return (state.rescueHistory || []).filter(r => r.startedAt >= startTs && r.startedAt <= endTs).length;
+      case 'rescue_night':
+        return (state.rescueHistory || []).filter(r => r.flowId === 'night' && r.startedAt >= startTs && r.startedAt <= endTs).length;
+      default: return 0;
+    }
+  };
+
+  const themeDef = THEME_CATALOG.find(t => t.key === theme.key);
+  if (!themeDef) return 0;
+  return matches(themeDef.actionType);
+}
+
+// 新しい週に入ったら weekTheme をリセット（過去テーマは履歴に残す）
+function ensureCurrentWeekTheme() {
+  const week = getWeekRange();
+  if (state.weekTheme && state.weekTheme.weekStartDate === week.start) return;
+  // 旧テーマを履歴へ
+  if (state.weekTheme && state.weekTheme.key) {
+    if (!state.weekThemeHistory) state.weekThemeHistory = [];
+    state.weekThemeHistory.push({ ...state.weekTheme, archivedAt: Date.now() });
+  }
+  state.weekTheme = null;
+  saveState();
+}
+
 // ---------- 眠る前に整えたい（夜レスキュー フル実装） ----------
 let nightState = null;
 
@@ -8811,11 +9325,50 @@ function renderReportBlocks(kind, ins, days) {
           ${monthSelfMsg.map(s => `<div class="report-self-line">${escapeHtml(s)}</div>`).join('')}
         </div>
       ` : ''}
+
+      ${kind === 'week' ? renderReportThemeSuggestion() : ''}
     `}
 
     <div class="report-disclaimer">
       これは記録をもとにしたふりかえりで、診断ではありません。<br>
       近くないと感じたら、そのまま気にしなくて大丈夫です。
+    </div>
+  `;
+}
+
+// 週次レポート末尾: テーマ提案
+function renderReportThemeSuggestion() {
+  ensureCurrentWeekTheme();
+  // 既に今週テーマがある（accepted/changed）なら、テーマを再確認するだけ
+  if (state.weekTheme && state.weekTheme.key && state.weekTheme.status !== 'skipped') {
+    const theme = state.weekTheme;
+    const count = computeThemeProgress(theme);
+    const themeDef = THEME_CATALOG.find(t => t.key === theme.key);
+    return `
+      <div class="report-theme">
+        <div class="report-block-label">この1週間を次に活かす</div>
+        <div class="report-theme-narrative">今週のテーマは「${escapeHtml(theme.title)}」。${count > 0 ? `ここまで${count}回ふれられてるね。` : 'できる時だけでOK。'}</div>
+        <div class="report-theme-actions">
+          <button class="btn btn-secondary" data-act="week-theme-cta" data-cta="${themeDef ? themeDef.ctaAct : 'goto-mood'}">テーマの行動をする</button>
+          <button class="btn btn-ghost" data-act="week-theme-change-open">テーマを見直す</button>
+        </div>
+      </div>
+    `;
+  }
+  // 未設定 or スキップ状態 → 提案を表示
+  const s = suggestThemes();
+  return `
+    <div class="report-theme">
+      <div class="report-block-label">この1週間を次に活かす</div>
+      <div class="report-theme-narrative">${escapeHtml(s.reason)}\n今週はこんなテーマはどう？</div>
+      <div class="report-theme-suggest-card">
+        <div class="theme-rec-title">${escapeHtml(s.recommend.title)}</div>
+        <div class="theme-rec-desc">${escapeHtml(s.recommend.description)}</div>
+      </div>
+      <div class="report-theme-actions">
+        <button class="btn btn-primary" data-act="week-theme-accept" data-key="${s.recommend.key}">このテーマでやってみる</button>
+        <button class="btn btn-ghost" data-act="week-theme-open">別の候補を見る</button>
+      </div>
     </div>
   `;
 }
@@ -9497,6 +10050,36 @@ function handleAction(act, el, e) {
     case 'goto-rescue-night': {
       nightState = newNightState();
       App.go('nightRescue');
+      break;
+    }
+    // ===== 今週のテーマ =====
+    case 'week-theme-open':
+      openThemeSelectionModal();
+      break;
+    case 'week-theme-change-open':
+      openThemeChangeModal();
+      break;
+    case 'week-theme-accept':
+      acceptTheme(el.dataset.key);
+      break;
+    case 'week-theme-skip': {
+      const week = getWeekRange();
+      state.weekTheme = {
+        weekStartDate: week.start,
+        weekEndDate: week.end,
+        status: 'skipped',
+        skippedAt: Date.now()
+      };
+      saveState();
+      closeModal();
+      render();
+      break;
+    }
+    case 'week-theme-cta': {
+      const cta = el.dataset.cta;
+      // 対応機能へ直接飛ばす
+      const syntheticEl = { dataset: {} };
+      handleAction(cta, syntheticEl, e);
       break;
     }
     // ===== 夜レスキュー =====
