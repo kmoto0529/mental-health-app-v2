@@ -1598,7 +1598,10 @@ body {
 .reflect-score-legend span:last-child { padding-right: 2px; }
 
 .reflect-widget-area {
-  padding: 4px 16px 8px 54px;
+  /* チャット内インライン化：AI吹き出しの下に続けて表示、
+     chat-messages と一緒にスクロールする */
+  padding: 4px 0 12px 42px;
+  margin-top: -4px;
   animation: slideUp .45s var(--ease);
   display: flex;
   flex-direction: column;
@@ -7399,7 +7402,15 @@ function viewReflect() {
         </div>
       ` : ''}
       <div class="chat-messages" id="reflectMessages">
-        ${reflectState.messages.map(renderReflectMsg).join('')}
+        ${reflectState.messages.map((m, idx) => {
+          const isLast = idx === reflectState.messages.length - 1;
+          const base = renderReflectMsg(m);
+          // 最後のAIメッセージに widget があればインラインで展開（チャット上に流し、全体でスクロール可能に）
+          if (isLast && m.role === 'ai' && m.widget && !reflectState.aiLoading) {
+            return base + renderReflectWidget(m.widget);
+          }
+          return base;
+        }).join('')}
         ${reflectState.aiLoading ? `
           <div class="msg-group">
             <div class="msg-avatar"></div>
@@ -7407,7 +7418,6 @@ function viewReflect() {
           </div>
         ` : ''}
       </div>
-      ${widget && !reflectState.aiLoading ? renderReflectWidget(widget) : ''}
       ${showInput ? `
         <div class="chat-input-area">
           <div class="chat-input-hint">${freeTextHint(widget)}</div>
