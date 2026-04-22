@@ -3572,6 +3572,302 @@ body {
 }
 .theme-radio-cta:active { transform: scale(0.97); }
 
+/* ---------- 状態把握ミニ設問 ---------- */
+.survey-screen {
+  padding: 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.survey-step {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+.survey-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.survey-sub {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+.survey-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.survey-option {
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.survey-option:active { transform: scale(0.98); }
+.survey-option.selected {
+  background: linear-gradient(135deg, var(--accent-soft), var(--bg-card));
+  border-color: var(--accent);
+}
+.survey-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.survey-actions .btn { width: 100%; }
+
+/* ---------- 行動提案 ---------- */
+.suggest-screen {
+  padding: 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.suggest-step {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+.suggest-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.suggest-goal-pill {
+  display: inline-block;
+  padding: 5px 12px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  border-radius: 999px;
+  font-size: 11px;
+  max-width: fit-content;
+}
+.suggest-sub {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+.suggest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.suggest-card {
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--divider);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.suggest-card:active { transform: scale(0.98); }
+.suggest-card.selected {
+  background: linear-gradient(135deg, var(--accent-soft), var(--bg-card));
+  border-color: var(--accent);
+  box-shadow: 0 2px 10px rgba(198,139,94,0.12);
+}
+.suggest-card-head {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.suggest-label {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+.suggest-label-type { background: var(--accent-soft); color: var(--accent-deep); }
+.suggest-label-diff { background: var(--bg-soft); color: var(--text-soft); }
+.suggest-label-time { background: var(--bg-soft); color: var(--text-soft); }
+.suggest-card-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.suggest-card-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.suggest-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.suggest-actions .btn { width: 100%; }
+
+/* ---------- テーマ確定 ---------- */
+.confirm-screen {
+  padding: 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.confirm-step {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+.confirm-label {
+  font-size: 11px;
+  color: var(--accent-deep);
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  text-align: center;
+}
+.confirm-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1.7;
+  text-align: center;
+  padding: 0 8px;
+}
+.confirm-meaning {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.9;
+  text-align: center;
+  padding: 0 16px;
+}
+.confirm-actions-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-top: 12px;
+  padding-left: 4px;
+}
+.confirm-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.confirm-action {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.confirm-action-icon {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 16px;
+}
+.confirm-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.confirm-footer .btn { width: 100%; }
+
+/* ---------- 今日のおすすめ行動（ホーム） ---------- */
+.today-actions-section-v4 {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+}
+.today-actions-label-v4 {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+}
+.today-action-v4 {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.today-action-v4:last-child { border-bottom: none; }
+.today-action-v4.done { opacity: 0.6; }
+.today-action-head {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.today-action-type {
+  font-size: 10px;
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  border-radius: 999px;
+}
+.today-action-duration {
+  font-size: 10px;
+  padding: 2px 8px;
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  border-radius: 999px;
+}
+.today-action-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.today-action-v4.done .today-action-title { text-decoration: line-through; }
+.today-action-btns {
+  display: flex;
+  gap: 8px;
+}
+.today-action-btns .btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.today-action-done {
+  font-size: 12px;
+  color: var(--accent-deep);
+  background: var(--sage-soft, var(--accent-soft));
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* ---------- 行動ログモーダル ---------- */
+.action-log-modal .modal-body { padding-bottom: 6px; }
+.action-log-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.action-log-help {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.action-log-or {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin: 10px 0 4px;
+}
+.action-log-skip {
+  font-size: 12px !important;
+  padding: 10px 14px !important;
+}
+
 /* ---------- 方向性ゴール（今の方向） ---------- */
 .direction-goal-screen {
   padding: 24px 8px;
@@ -5710,6 +6006,9 @@ function render() {
     App.currentScreen === 'miniExperience' ? viewMiniExperience() :
     App.currentScreen === 'directionGoalSetup' ? viewDirectionGoalSetup() :
     App.currentScreen === 'directionGoalConfirm' ? viewDirectionGoalConfirm() :
+    App.currentScreen === 'stateSurvey' ? viewStateSurvey() :
+    App.currentScreen === 'actionSuggest' ? viewActionSuggest() :
+    App.currentScreen === 'themeConfirm' ? viewThemeConfirm() :
     App.currentScreen === 'rescue' ? viewRescue() :
     App.currentScreen === 'rescueFlow' ? viewRescueFlow() :
     App.currentScreen === 'nightRescue' ? viewNightRescue() :
@@ -5889,10 +6188,47 @@ function viewGoal() {
 
         ${renderTodayMoodSection(todayMood)}
         ${renderWeekThemeCard()}
+        ${renderTodayActions()}
         ${renderForestHero()}
 
       </div>
       ${bottomNav('goal')}
+    </div>
+  `;
+}
+
+// セクション：今日のおすすめ行動（テーマに紐づく行動 最大3件）
+function renderTodayActions() {
+  const theme = state.weekTheme;
+  if (!theme || !theme.actions || theme.actions.length === 0) return '';
+  const actions = theme.actions.slice(0, 3);
+  const today = todayKey();
+  const typeLabel = { app: 'アプリ', daily: '日常', social: '人に' };
+  return `
+    <div class="today-actions-section-v4">
+      <div class="today-actions-label-v4">今日のおすすめ行動</div>
+      ${actions.map(a => {
+        const doneToday = (state.actionLogs || []).some(log =>
+          log.actionId === a.id && log.executedAt && new Date(log.executedAt).toISOString().slice(0,10) === today && log.status === 'done'
+        );
+        return `
+          <div class="today-action-v4 ${doneToday ? 'done' : ''}">
+            <div class="today-action-head">
+              <span class="today-action-type">${typeLabel[a.type] || a.type}</span>
+              <span class="today-action-duration">${a.duration}分</span>
+            </div>
+            <div class="today-action-title">${escapeHtml(a.title)}</div>
+            <div class="today-action-btns">
+              ${doneToday ? `
+                <span class="today-action-done">やった ✓</span>
+              ` : `
+                ${a.ctaAct ? `<button class="btn btn-secondary today-action-open" data-act="${a.ctaAct}" data-action-id="${a.id}">開く</button>` : ''}
+                <button class="btn btn-primary today-action-log" data-act="action-log-open" data-action-id="${a.id}">やった</button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
 }
@@ -8904,6 +9240,184 @@ function acceptTheme(themeKey) {
   render();
 }
 
+// ---------- 状態把握ミニ設問（Screen 5-2） ----------
+let stateSurveyStep = 0;
+let stateSurveyDraft = { lifeStatus: null, actionType: null, duration: null };
+
+const SURVEY_QUESTIONS = [
+  {
+    key: 'lifeStatus',
+    title: '最近の毎日はどんな感じ？',
+    options: [
+      { id: 'calm',  label: 'わりと落ち着いている' },
+      { id: 'mixed', label: '少ししんどい日がある' },
+      { id: 'heavy', label: 'しんどい日が多い' }
+    ]
+  },
+  {
+    key: 'actionType',
+    title: 'どんな行動ならやりやすそう？',
+    options: [
+      { id: 'app_only', label: 'アプリの中でできること' },
+      { id: 'daily',    label: '日常でできる小さなこと' },
+      { id: 'social',   label: '誰かに頼る準備もしたい' }
+    ]
+  },
+  {
+    key: 'duration',
+    title: '続けやすい長さは？',
+    options: [
+      { id: 'one',   label: '1分くらい' },
+      { id: 'three', label: '3分くらい' },
+      { id: 'five',  label: '5分以上でもよい' }
+    ]
+  }
+];
+
+function viewStateSurvey() {
+  const q = SURVEY_QUESTIONS[stateSurveyStep] || SURVEY_QUESTIONS[0];
+  return `
+    <div class="screen active onb">
+      <div class="survey-screen">
+        <div class="survey-step">STEP ${stateSurveyStep + 1} / ${SURVEY_QUESTIONS.length}</div>
+        <div class="survey-title">${escapeHtml(q.title)}</div>
+        <div class="survey-sub">近いものを選んでみてね。</div>
+        <div class="survey-options">
+          ${q.options.map(o => `
+            <button class="survey-option ${stateSurveyDraft[q.key] === o.id ? 'selected' : ''}" data-act="survey-pick" data-key="${q.key}" data-id="${o.id}">
+              ${escapeHtml(o.label)}
+            </button>
+          `).join('')}
+        </div>
+        <div class="survey-actions">
+          <button class="btn btn-primary" data-act="survey-next" ${stateSurveyDraft[q.key] ? '' : 'disabled'}>${stateSurveyStep === SURVEY_QUESTIONS.length - 1 ? '行動を見る' : 'つぎへ'}</button>
+          <button class="btn btn-ghost" data-act="survey-skip">スキップ</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- AI行動提案（Screen 5-3） ----------
+let actionSuggestState = { proposals: [], selected: [], round: 0 };
+
+function prepareActionSuggestions() {
+  const goalKey = (state.directionGoal && state.directionGoal.key) || 'not_sure_yet';
+  const userState = state.userStateSurvey || null;
+  const pool = getActionsForGoal(goalKey, userState);
+  // ラウンド毎に異なるシャッフルで4件選ぶ
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  actionSuggestState.proposals = shuffled.slice(0, 4);
+  actionSuggestState.selected = [];
+}
+
+function viewActionSuggest() {
+  if (actionSuggestState.proposals.length === 0) prepareActionSuggestions();
+  const goal = getCurrentDirectionGoal();
+  const typeLabel = { app: 'アプリ内', daily: '日常', social: '人に頼る' };
+  const diffLabel = { easy: 'やさしめ', normal: 'ふつう', bold: '少し勇気がいる' };
+  return `
+    <div class="screen active onb">
+      <div class="suggest-screen">
+        <div class="suggest-step">STEP 2 / 3</div>
+        <div class="suggest-title">今のあなたに合いそうな<br>今週の行動候補</div>
+        ${goal ? `<div class="suggest-goal-pill">${escapeHtml(goal.title)}</div>` : ''}
+        <div class="suggest-sub">1つ、または2つまで選んでみて。</div>
+        <div class="suggest-list">
+          ${actionSuggestState.proposals.map(a => {
+            const isSel = actionSuggestState.selected.includes(a.id);
+            return `
+              <div class="suggest-card ${isSel ? 'selected' : ''}" data-act="suggest-toggle" data-id="${a.id}">
+                <div class="suggest-card-head">
+                  <span class="suggest-label suggest-label-type">${typeLabel[a.type] || a.type}</span>
+                  <span class="suggest-label suggest-label-diff">${diffLabel[a.difficulty] || a.difficulty}</span>
+                  <span class="suggest-label suggest-label-time">約${a.duration}分</span>
+                </div>
+                <div class="suggest-card-title">${escapeHtml(a.title)}</div>
+                <div class="suggest-card-desc">${escapeHtml(a.desc)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="suggest-actions">
+          <button class="btn btn-primary" data-act="suggest-next" ${actionSuggestState.selected.length > 0 ? '' : 'disabled'}>この行動で今週のテーマにする</button>
+          <button class="btn btn-ghost" data-act="suggest-regen">別の候補を見る</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- テーマ確定（Screen 5-4） ----------
+let themeConfirmState = { title: null, meaning: null, actions: [] };
+
+// 選ばれた行動から、やさしい意味づけのテーマ文を生成
+function generateThemeFromActions(actions) {
+  // ルールベース：actionType とキーワードで意味づけを組み立てる
+  const types = new Set(actions.map(a => a.type));
+  const hasAppOneLine = actions.some(a => a.id === 'act_ai_one_line' || a.id === 'act_mood_one' || a.id === 'act_one_event');
+  const hasNight = actions.some(a => a.id === 'act_night_reset' || a.id === 'act_mood_night');
+  const hasRescue = actions.some(a => a.id === 'act_rescue_once' || a.id === 'act_breath_10s');
+  const hasSocial = types.has('social');
+  const hasOrganize = actions.some(a => a.id === 'act_reflect_once');
+  const hasMoodRecord = actions.some(a => a.id === 'act_mood_select' || a.id === 'act_mood_normal');
+
+  const variants = [];
+  if (hasAppOneLine || hasOrganize) {
+    variants.push({ title: '頭の中にためすぎず、少しずつ外に出してみる', meaning: '考えを全部整理しきらなくても大丈夫。今週は、抱え込みすぎない練習をしてみよう。' });
+  }
+  if (hasNight) {
+    variants.push({ title: '夜に自分を放置しない', meaning: '一日の終わりに、ほんの少しだけ自分の方を向く時間をつくってみよう。' });
+  }
+  if (hasRescue) {
+    variants.push({ title: 'しんどい時の手札を1つ持っておく', meaning: '逃げ道があると知っているだけで、ちょっと楽になる。' });
+  }
+  if (hasSocial) {
+    variants.push({ title: '「ひとりで抱えない」の最初の一歩を置く', meaning: 'いきなり頼らなくていい。頼れる場所を心に置くだけで十分。' });
+  }
+  if (hasMoodRecord) {
+    variants.push({ title: '今日の自分を、少しだけ見つける', meaning: 'なんとなくの気分にも、ちゃんと自分の大事な情報がある。' });
+  }
+  if (variants.length === 0) {
+    variants.push({ title: '自分のペースを見つけていく', meaning: '続けやすい形を、今週少しだけ試してみよう。' });
+  }
+  return variants[themeConfirmState.regenCount % variants.length];
+}
+
+function viewThemeConfirm() {
+  if (!themeConfirmState.title) {
+    const selActions = actionSuggestState.proposals.filter(a => actionSuggestState.selected.includes(a.id));
+    themeConfirmState.actions = selActions;
+    themeConfirmState.regenCount = themeConfirmState.regenCount || 0;
+    const v = generateThemeFromActions(selActions);
+    themeConfirmState.title = v.title;
+    themeConfirmState.meaning = v.meaning;
+  }
+  return `
+    <div class="screen active onb">
+      <div class="confirm-screen">
+        <div class="confirm-step">STEP 3 / 3</div>
+        <div class="confirm-label">今週の小さなテーマ</div>
+        <div class="confirm-title">${escapeHtml(themeConfirmState.title)}</div>
+        <div class="confirm-meaning">${escapeHtml(themeConfirmState.meaning)}</div>
+        <div class="confirm-actions-label">今週試す行動</div>
+        <div class="confirm-actions-list">
+          ${themeConfirmState.actions.map(a => `
+            <div class="confirm-action">
+              <div class="confirm-action-icon">•</div>
+              <div>${escapeHtml(a.title)}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="confirm-footer">
+          <button class="btn btn-primary" data-act="confirm-theme">このテーマで進む</button>
+          <button class="btn btn-ghost" data-act="confirm-regen">別の表現にする</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // ---------- 方向性ゴール（今の方向）のビュー関数 ----------
 
 let directionGoalSelection = null; // 画面内で選択中のキー
@@ -8980,6 +9494,86 @@ function renderDirectionGoalCard() {
       <div class="direction-goal-card-sub">少しずつ、この方向で使っていこう。</div>
     </div>
   `;
+}
+
+// ---------- 行動ログモーダル ----------
+function openActionLogModal(actionId) {
+  const theme = state.weekTheme;
+  const action = theme && theme.actions && theme.actions.find(a => a.id === actionId);
+  if (!action) return;
+  openModal(`
+    <div class="modal action-log-modal">
+      <div class="modal-title">この行動、やったね</div>
+      <div class="modal-body">
+        <div class="action-log-title">${escapeHtml(action.title)}</div>
+        <div class="action-log-help">少しでも、自分のほうを向けた。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-act="action-log-done" data-action-id="${actionId}">やった</button>
+        <div class="action-log-or">できなかった？</div>
+        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="forgot">忘れていた</button>
+        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="not_mood">今は気分が合わなかった</button>
+        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="heavy">少し重たかった</button>
+        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="no_time">時間がなかった</button>
+        <button class="btn btn-ghost" onclick="closeModal()">閉じる</button>
+      </div>
+    </div>
+  `);
+}
+
+// ---------- 行動カタログ（目標別・状態対応・Phase 1 MVP） ----------
+// 各行動は goalKeys（対応する方向性ゴール）、type（app/daily/social）、
+// difficulty（easy/normal/bold）、duration（min）、ctaAct（実行導線）を持つ
+const ACTION_CATALOG = [
+  // 気持ちを整理できるようになりたい
+  { id: 'act_mood_one',  goalKeys:['organize_feelings','understand_my_feelings','not_sure_yet'], type:'app',    difficulty:'easy',   duration:1, title:'気持ちを一言だけ残す',          desc:'しんどい日も、ひとことだけで大丈夫。', ctaAct:'goto-mood' },
+  { id: 'act_reflect_once', goalKeys:['organize_feelings','reduce_overthinking'], type:'app',    difficulty:'normal', duration:3, title:'もやもやを1回だけ整理する',   desc:'頭の中を少し外に出すと楽になる。', ctaAct:'start-reflect' },
+  { id: 'act_one_event', goalKeys:['organize_feelings','reduce_overthinking'], type:'daily',  difficulty:'easy',   duration:1, title:'今日いちばん気になったことを1つ残す', desc:'全部じゃなくて、1つだけでいい。', ctaAct:'goto-mood' },
+  // 考えすぎる時間を少し減らしたい
+  { id: 'act_ai_one_line', goalKeys:['reduce_overthinking','have_place_to_rely','not_sure_yet'], type:'app', difficulty:'easy', duration:1, title:'もやもやしたらAIに一言だけ話す', desc:'うまく話せなくても、短く始めれば十分。', ctaAct:'start-chat' },
+  { id: 'act_phone_down', goalKeys:['reduce_overthinking'], type:'daily', difficulty:'easy', duration:5, title:'今日は5分だけスマホを置いて休む', desc:'止めようとしなくていい。置くだけでいい。', ctaAct:null },
+  { id: 'act_night_reset', goalKeys:['reduce_overthinking','understand_my_feelings'], type:'app', difficulty:'easy', duration:2, title:'寝る前に一言だけ置いて寝る', desc:'考えすぎる夜に、少しだけ外に出してみよう。', ctaAct:'goto-rescue-night' },
+  { id: 'act_breath_10s', goalKeys:['reduce_overthinking','organize_feelings'], type:'daily', difficulty:'easy', duration:1, title:'10秒だけ呼吸する', desc:'長くやらなくていい。少しだけでいい。', ctaAct:'goto-rescue' },
+  // 自分の気持ちをわかるようになりたい
+  { id: 'act_mood_select', goalKeys:['understand_my_feelings','not_sure_yet'], type:'app', difficulty:'easy', duration:1, title:'選ぶだけでも気持ちを残す', desc:'言葉にならなくても、選ぶだけでOK。', ctaAct:'goto-mood' },
+  { id: 'act_mood_normal', goalKeys:['understand_my_feelings'], type:'app', difficulty:'easy', duration:1, title:'「ふつう」の日も記録する', desc:'特別じゃない日を積み重ねるのが本当の軸になる。', ctaAct:'goto-mood' },
+  { id: 'act_mood_night', goalKeys:['understand_my_feelings','reduce_overthinking'], type:'app', difficulty:'easy', duration:1, title:'夜に一回、気分を選ぶ', desc:'夜はとくに、選ぶだけで十分。', ctaAct:'goto-mood' },
+  { id: 'act_body_check', goalKeys:['understand_my_feelings'], type:'daily', difficulty:'easy', duration:1, title:'体の調子を一度だけ確認する', desc:'肩・お腹・顔、どれか1つだけ意識してみる。', ctaAct:null },
+  // しんどい時に頼れる場所を持ちたい
+  { id: 'act_rescue_once', goalKeys:['have_place_to_rely','reduce_overthinking'], type:'app', difficulty:'easy', duration:1, title:'しんどい時に「少しひと息」を開く', desc:'開くだけでも十分。使うかは後で決めていい。', ctaAct:'goto-rescue' },
+  { id: 'act_talk_fuzzy', goalKeys:['have_place_to_rely'], type:'app', difficulty:'normal', duration:2, title:'なんとなくの日に少しだけ話す', desc:'理由が言えなくても、話していい。', ctaAct:'start-chat' },
+  { id: 'act_choose_relied', goalKeys:['have_place_to_rely'], type:'social', difficulty:'bold', duration:3, title:'頼れる相手候補を1人だけ思い浮かべる', desc:'連絡しなくていい。候補があるだけで、少し安心できる。', ctaAct:null },
+  { id: 'act_safe_action', goalKeys:['have_place_to_rely','not_sure_yet'], type:'daily', difficulty:'easy', duration:2, title:'しんどい時に落ち着く行動を1つ決めておく', desc:'お茶・散歩・音楽など、自分の「いつもの」を決めておく。', ctaAct:null },
+  // まだよくわからない / 汎用
+  { id: 'act_open_anytime', goalKeys:['not_sure_yet'], type:'app', difficulty:'easy', duration:1, title:'1日1回、このアプリを開く', desc:'何もしなくていい。開くだけで大丈夫。', ctaAct:null },
+  { id: 'act_try_anything', goalKeys:['not_sure_yet'], type:'app', difficulty:'easy', duration:1, title:'気分チェックか一言会話、どちらか1つ', desc:'合う方が、合っていきやすい。', ctaAct:'goto-mood' }
+];
+
+function getActionsForGoal(goalKey, userState) {
+  // goalKey に合う候補を抽出
+  let pool = ACTION_CATALOG.filter(a => a.goalKeys.includes(goalKey));
+
+  // 状態把握設問で絞り込み
+  if (userState) {
+    // 続けやすい長さ
+    if (userState.duration === 'one') pool = pool.filter(a => a.duration <= 1.5);
+    else if (userState.duration === 'three') pool = pool.filter(a => a.duration <= 3);
+    // duration === 'five' は制約なし
+
+    // やりやすい行動タイプ
+    if (userState.actionType === 'app_only') pool = pool.filter(a => a.type === 'app');
+    else if (userState.actionType === 'daily') pool = pool.filter(a => a.type === 'app' || a.type === 'daily');
+    // social の場合は全て含む
+
+    // しんどい日が多い → bold は避ける
+    if (userState.lifeStatus === 'heavy') pool = pool.filter(a => a.difficulty !== 'bold');
+  }
+
+  if (pool.length === 0) {
+    // フォールバック：easy な action 3件
+    pool = ACTION_CATALOG.filter(a => a.difficulty === 'easy').slice(0, 4);
+  }
+  return pool;
 }
 
 // ---------- 方向性ゴール（今の方向） ----------
@@ -10858,8 +11452,134 @@ function handleAction(act, el, e) {
       break;
     }
     case 'direction-goal-done':
+      // 初回は状態把握設問→行動提案→テーマ確定の流れに入る
+      if (!state.userStateSurvey) {
+        stateSurveyStep = 0;
+        stateSurveyDraft = { lifeStatus: null, actionType: null, duration: null };
+        App.go('stateSurvey');
+      } else {
+        App.go('goal');
+      }
+      break;
+    // ===== 状態把握設問 =====
+    case 'survey-pick':
+      stateSurveyDraft[el.dataset.key] = el.dataset.id;
+      render();
+      break;
+    case 'survey-next': {
+      if (stateSurveyStep < SURVEY_QUESTIONS.length - 1) {
+        stateSurveyStep++;
+        render();
+      } else {
+        // 設問完了 → 行動提案へ
+        state.userStateSurvey = { ...stateSurveyDraft };
+        saveState();
+        actionSuggestState = { proposals: [], selected: [], round: 0 };
+        prepareActionSuggestions();
+        App.go('actionSuggest');
+      }
+      break;
+    }
+    case 'survey-skip': {
+      state.userStateSurvey = { lifeStatus: null, actionType: null, duration: null };
+      saveState();
+      actionSuggestState = { proposals: [], selected: [], round: 0 };
+      prepareActionSuggestions();
+      App.go('actionSuggest');
+      break;
+    }
+    // ===== 行動提案 =====
+    case 'suggest-toggle': {
+      const id = el.dataset.id;
+      const idx = actionSuggestState.selected.indexOf(id);
+      if (idx >= 0) actionSuggestState.selected.splice(idx, 1);
+      else {
+        if (actionSuggestState.selected.length >= 2) {
+          toast('最大2つまで選べるよ');
+          return;
+        }
+        actionSuggestState.selected.push(id);
+      }
+      render();
+      break;
+    }
+    case 'suggest-regen':
+      actionSuggestState.round++;
+      prepareActionSuggestions();
+      render();
+      break;
+    case 'suggest-next': {
+      if (actionSuggestState.selected.length === 0) return;
+      themeConfirmState = { title: null, meaning: null, actions: [], regenCount: 0 };
+      App.go('themeConfirm');
+      break;
+    }
+    // ===== テーマ確定 =====
+    case 'confirm-regen':
+      themeConfirmState.regenCount = (themeConfirmState.regenCount || 0) + 1;
+      themeConfirmState.title = null;
+      themeConfirmState.meaning = null;
+      render();
+      break;
+    // ===== 行動ログ =====
+    case 'action-log-open':
+      openActionLogModal(el.dataset.actionId);
+      break;
+    case 'action-log-done': {
+      const id = el.dataset.actionId;
+      if (!state.actionLogs) state.actionLogs = [];
+      state.actionLogs.push({
+        actionId: id,
+        executedAt: Date.now(),
+        status: 'done',
+        skipReason: null,
+        comment: ''
+      });
+      saveState();
+      closeModal();
+      toast('行動を記録したよ');
+      render();
+      break;
+    }
+    case 'action-log-skip': {
+      const id = el.dataset.actionId;
+      const reason = el.dataset.reason || 'other';
+      if (!state.actionLogs) state.actionLogs = [];
+      state.actionLogs.push({
+        actionId: id,
+        executedAt: Date.now(),
+        status: 'skipped',
+        skipReason: reason,
+        comment: ''
+      });
+      saveState();
+      closeModal();
+      toast('今はそういう日もあるよ');
+      render();
+      break;
+    }
+    case 'confirm-theme': {
+      // state.weekTheme を新形式で保存（title, meaning, actionIds）
+      const week = getWeekRange();
+      const selActions = themeConfirmState.actions;
+      state.weekTheme = {
+        weekStartDate: week.start,
+        weekEndDate: week.end,
+        key: selActions[0] ? selActions[0].id : null,  // 互換性用
+        category: 'AI',
+        title: themeConfirmState.title,
+        description: themeConfirmState.meaning,
+        actions: selActions.map(a => ({ id: a.id, title: a.title, desc: a.desc, duration: a.duration, type: a.type, difficulty: a.difficulty, ctaAct: a.ctaAct })),
+        status: 'accepted',
+        acceptedAt: Date.now(),
+        changedAt: null
+      };
+      saveState();
+      themeConfirmState = { title: null, meaning: null, actions: [] };
+      toast('今週のテーマを決めたよ');
       App.go('goal');
       break;
+    }
     case 'direction-goal-open':
       directionGoalSelection = state.directionGoal && state.directionGoal.key ? state.directionGoal.key : null;
       App.go('directionGoalSetup');
