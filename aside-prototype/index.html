@@ -5611,8 +5611,17 @@ function toast(msg) {
 }
 
 function openModal(html) {
-  $('#modalContent').innerHTML = html;
+  const mc = $('#modalContent');
+  mc.innerHTML = html;
   $('#modalBackdrop').classList.add('open');
+  // モーダル内の data-act 要素にクリックハンドラを付与
+  // （attachHandlers はメインrender時にしか呼ばれないため、モーダルは手動attach）
+  mc.querySelectorAll('[data-act]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const act = el.dataset.act;
+      handleAction(act, el, e);
+    });
+  });
 }
 function closeModal() {
   $('#modalBackdrop').classList.remove('open');
