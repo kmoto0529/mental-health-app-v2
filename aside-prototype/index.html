@@ -5644,10 +5644,31 @@ const MOODS = [
 // ============================================================
 // Router
 // ============================================================
+// リロード時に復元してよい画面の白リスト
+// 理由: chat/reflect/rescue/onboarding/mini-exp/goal-setup 等は進行中の ephemeral state に依存
+// するため、セッション変数を持たないメインナビ画面のみを復元対象にする
+const RESTORABLE_SCREENS = ['goal', 'home', 'talk', 'calendar', 'history', 'settings', 'insights'];
+
+function persistUiState() {
+  state.ui = {
+    lastScreen: App.currentScreen,
+    historyTopTab: typeof historyTopTab !== 'undefined' ? historyTopTab : 'list',
+    historyFilter: typeof historyFilter !== 'undefined' ? historyFilter : 'all',
+    calendarMonth: typeof calendarMonth !== 'undefined' ? calendarMonth : null,
+    insightsRange: typeof insightsRange !== 'undefined' ? insightsRange : 'week'
+  };
+  // 直接 localStorage に書き（saveState() は state 全体を書くが ui だけで十分なので節約）
+  try { saveState(); } catch (e) {}
+}
+
 const App = {
   currentScreen: 'welcome',
   go(screen, opts = {}) {
     this.currentScreen = screen;
+    // 復元対象の画面だけ永続化（ephemeralな画面は保存しない）
+    if (RESTORABLE_SCREENS.includes(screen)) {
+      persistUiState();
+    }
     render();
     if (opts.scroll !== false) window.scrollTo(0, 0);
   },
@@ -11150,13 +11171,13 @@ function handleAction(act, el, e) {
     case 'goto-history': App.go('history'); break;
     case 'history-tab-chat': historyFilter = 'chat'; render(); break;
     case 'history-tab-reflect': historyFilter = 'reflect'; render(); break;
-    case 'history-filter': historyFilter = el.dataset.filter; render(); break;
-    case 'history-top-list': historyTopTab = 'list'; render(); break;
-    case 'history-top-week': historyTopTab = 'week'; render(); break;
-    case 'history-top-month': historyTopTab = 'month'; render(); break;
+    case 'history-filter': historyFilter = el.dataset.filter; persistUiState(); render(); break;
+    case 'history-top-list': historyTopTab = 'list'; persistUiState(); render(); break;
+    case 'history-top-week': historyTopTab = 'week'; persistUiState(); render(); break;
+    case 'history-top-month': historyTopTab = 'month'; persistUiState(); render(); break;
     case 'goto-calendar': App.go('calendar'); break;
-    case 'cal-prev': shiftCalendarMonth(-1); break;
-    case 'cal-next': shiftCalendarMonth(1); break;
+    case 'cal-prev': shiftCalendarMonth(-1); persistUiState(); break;
+    case 'cal-next': shiftCalendarMonth(1); persistUiState(); break;
     case 'cal-day-open': {
       const dateKey = el.dataset.date;
       openDayDetailModal(dateKey);
@@ -11207,8 +11228,8 @@ function handleAction(act, el, e) {
       break;
     }
     case 'goto-insights': App.go('insights'); break;
-    case 'insights-week': insightsRange = 'week'; render(); break;
-    case 'insights-month': insightsRange = 'month'; render(); break;
+    case 'insights-week': insightsRange = 'week'; persistUiState(); render(); break;
+    case 'insights-month': insightsRange = 'month'; persistUiState(); render(); break;
     case 'insights-to-goal': App.go('goalSetup'); break;
     case 'back-home': App.go('goal'); break;
     case 'back-history': App.go('history'); break;
@@ -12096,7 +12117,20 @@ if (window.visualViewport) {
 
 loadState();
 if (state.onboarded) {
-  App.currentScreen = 'home';
+  // UI state 復元：タブ切替・カレンダー月などを保存値から戻す
+  const ui = state.ui || {};
+  if (ui.historyTopTab && ['list', 'week', 'month'].includes(ui.historyTopTab)) historyTopTab = ui.historyTopTab;
+  if (ui.historyFilter && ['all', 'chat', 'reflect', 'rescue'].includes(ui.historyFilter)) historyFilter = ui.historyFilter;
+  if (ui.calendarMonth && /^\d{4}-\d{2}$/.test(ui.calendarMonth)) calendarMonth = ui.calendarMonth;
+  if (ui.insightsRange && ['week', 'month'].includes(ui.insightsRange)) insightsRange = ui.insightsRange;
+
+  // 前回画面の復元：ephemeralな画面は安全にhomeへフォールバック
+  const last = ui.lastScreen;
+  if (last && RESTORABLE_SCREENS.includes(last)) {
+    App.currentScreen = last;
+  } else {
+    App.currentScreen = 'home';
+  }
 } else {
   App.currentScreen = 'welcome';
 }
