@@ -3107,6 +3107,110 @@ body {
   opacity: 0.6;
 }
 
+/* ---------- ホーム v4（3要素のみ） ---------- */
+.home-content-v4 {
+  padding: 20px 20px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.home-content-v4 .forest-hero {
+  margin-top: 8px;
+}
+
+/* セクション1：きょうのきもち */
+.mood-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-lg);
+  padding: 22px 24px;
+  cursor: pointer;
+  transition: transform .15s var(--ease), box-shadow .15s var(--ease);
+  position: relative;
+  box-shadow: 0 2px 12px rgba(139, 127, 112, 0.06);
+}
+.mood-section-card:active { transform: scale(0.99); }
+.mood-section-card:hover { box-shadow: 0 4px 16px rgba(139, 127, 112, 0.08); }
+
+.mood-section-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.14em;
+  margin-bottom: 8px;
+}
+
+/* 未入力：emojis を並べて軽い誘導 */
+.mood-section-unfilled {
+  text-align: center;
+  padding: 28px 20px 24px;
+}
+.mood-section-emojis {
+  font-size: 26px;
+  letter-spacing: 6px;
+  margin: 6px 0 14px;
+  opacity: 0.88;
+}
+.mood-section-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.mood-section-sub {
+  font-size: 12px;
+  color: var(--text-soft);
+  letter-spacing: 0.04em;
+}
+.mood-section-arrow {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* 記録済み */
+.mood-section-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.mood-section-edit {
+  font-size: 11px;
+  color: var(--text-soft);
+  letter-spacing: 0.05em;
+}
+.mood-section-filled-body {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.mood-section-emoji-big {
+  font-size: 48px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.mood-section-filled-text {
+  flex: 1;
+  min-width: 0;
+}
+.mood-section-filled-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.mood-section-filled-comment {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
 /* ---------- 今週の小さなテーマ ---------- */
 .week-theme-card {
   background: linear-gradient(135deg, #F4E8D3, var(--bg-card));
@@ -3395,6 +3499,13 @@ body {
   color: var(--text-soft);
   letter-spacing: 0.02em;
 }
+.week-theme-kind-msg-row {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+.week-theme-action-btn { width: 100%; }
 
 /* ---------- テーマ選択モーダル（ラジオ型） ---------- */
 .theme-radio-list {
@@ -5731,70 +5842,7 @@ function viewGoal() {
     dailyPetLogin();
     logEngagement();
   }
-  // 週が変わっていればテーマをリセット
   ensureCurrentWeekTheme();
-
-  // 今日の行動達成状況
-  const moodDone = !!todayMood;
-  const didTodayByTs = didToday('startedAt');
-  const chatDone = didTodayByTs(state.sessions || []);
-  const reflectDone = didTodayByTs(state.reflections || []);
-  const allDone = moodDone && chatDone && reflectDone;
-
-  // 時間帯 / 直近状態の分析
-  const hour = new Date().getHours();
-  const isLateNight = hour >= 22 || hour < 5;
-  const isMorning = hour >= 5 && hour < 11;
-  const isEvening = hour >= 18 && hour < 22;
-
-  // 直近3日の気分平均（低気分ストリーク検出）
-  const recentMoods = (state.moods || [])
-    .filter(m => {
-      const diffDays = (new Date(today).getTime() - new Date(m.date).getTime()) / 86400000;
-      return diffDays >= 0 && diffDays < 3;
-    });
-  const lowMoodStreak = recentMoods.length >= 2 && recentMoods.every(m => m.score <= 2);
-
-  // 直近のレスキュー使用（2時間以内）
-  const recentRescue = state.lastRescueExit && (Date.now() - state.lastRescueExit.ts < 2 * 60 * 60 * 1000);
-
-  // 今日のひとこと・おすすめアクション（時間帯・状態を考慮）
-  let todayHint, mainAction;
-
-  if (recentRescue) {
-    // 直前にレスキュー完了 → 休むことを推奨
-    todayHint = 'さっきの「一歩」で十分。無理しないでいいよ。';
-    mainAction = null;
-  } else if (isLateNight && !moodDone) {
-    // 深夜 + 気分未チェック → 眠る前レスキューを主役に
-    todayHint = '夜は考えが大きくなりやすい時間。静かに整えよう。';
-    mainAction = { label: '眠る前に整えたい', sub: '30秒〜2分で夜の緊張をほどく', act: 'goto-rescue-night', icon: '🌙' };
-  } else if (lowMoodStreak && !moodDone) {
-    // 低気分が続いている → 気持ちをことばにレスキューを推奨
-    todayHint = 'つらい日が続いてるね。無理に明るくしなくていいよ。';
-    mainAction = { label: '気持ちをことばにしたい', sub: '言葉にならない気持ちを整える', act: 'goto-rescue-words', icon: '💭' };
-  } else if (isMorning && !moodDone) {
-    todayHint = 'おはよう。今日はまず、30秒できもちチェック。';
-    mainAction = { label: '30秒できもちをチェック', sub: '選ぶだけでも大丈夫', act: 'goto-mood', icon: '💭' };
-  } else if (!moodDone) {
-    todayHint = '今日はまず、30秒できもちチェック。';
-    mainAction = { label: '30秒できもちをチェック', sub: '選ぶだけでも大丈夫', act: 'goto-mood', icon: '💭' };
-  } else if (!chatDone) {
-    todayHint = isEvening ? '1日の終わり、ひとことだけ話してみる？' : '話してみたい気分なら、ひとことから。';
-    mainAction = { label: 'Asideと話す', sub: 'ひとことでもOK、何でも', act: 'goto-talk', icon: '💬' };
-  } else if (!reflectDone) {
-    todayHint = '頭がもやもやしているなら、整理もできるよ。';
-    mainAction = { label: 'もやもやを整理する', sub: '出来事→考え→気持ち→別の見方', act: 'start-reflect', icon: '✨' };
-  } else {
-    todayHint = '今日はもう十分。自分をほめていい日。';
-    mainAction = null;
-  }
-
-  const subCtas = [];
-  if (!moodDone && mainAction && mainAction.act !== 'goto-talk') subCtas.push({ label: 'Asideと話す', act: 'goto-talk', icon: '💬' });
-  if (!moodDone && mainAction && mainAction.act !== 'start-reflect') subCtas.push({ label: 'もやもや整理', act: 'start-reflect', icon: '✨' });
-  if (moodDone && !chatDone) subCtas.push({ label: 'もやもや整理', act: 'start-reflect', icon: '✨' });
-  if (moodDone && chatDone && !reflectDone) {}
 
   return `
     <div class="screen active">
@@ -5804,72 +5852,45 @@ function viewGoal() {
           <div class="home-greet-sub">${fmtDateLong(Date.now())}</div>
         </div>
       </div>
-      <div class="home-content">
+      <div class="home-content home-content-v4">
 
-        <div class="today-hint">${escapeHtml(todayHint)}</div>
-
-        ${mainAction ? `
-          <div class="today-main-cta" data-act="${mainAction.act}">
-            <div class="today-main-icon">${mainAction.icon}</div>
-            <div class="today-main-body">
-              <div class="today-main-label">${escapeHtml(mainAction.label)}</div>
-              <div class="today-main-sub">${escapeHtml(mainAction.sub)}</div>
-            </div>
-            <div class="today-main-arrow">›</div>
-          </div>
-        ` : `
-          <div class="today-all-done">
-            <div class="today-all-done-icon">✨</div>
-            <div class="today-all-done-text">今日はこれだけで大丈夫。<br>明日もまた、無理なく。</div>
-          </div>
-        `}
-
-        ${recentRescue ? '' : `
-          <div class="home-rescue-card" data-act="goto-rescue">
-            <div class="home-rescue-emoji">🌫</div>
-            <div class="home-rescue-body">
-              <div class="home-rescue-title">今すぐ少し楽になる</div>
-              <div class="home-rescue-sub">なんとなくしんどい時に、30秒〜3分</div>
-            </div>
-            <div class="today-main-arrow">›</div>
-          </div>
-        `}
-
-        ${renderDirectionGoalCard()}
+        ${renderTodayMoodSection(todayMood)}
         ${renderWeekThemeCard()}
-
-        ${subCtas.length > 0 ? `
-          <div class="home-subcta-row">
-            ${subCtas.map(s => `
-              <button class="home-subcta-btn" data-act="${s.act}">
-                <span class="home-subcta-icon">${s.icon}</span>
-                <span>${escapeHtml(s.label)}</span>
-              </button>
-            `).join('')}
-          </div>
-        ` : ''}
-
-        ${todayMood ? `
-          <div class="today-mood-card" style="margin-top: 20px;">
-            <div class="today-mood-icon">${MOODS.find(x => x.score === todayMood.score).emoji}</div>
-            <div class="today-mood-text">
-              <div class="today-mood-label">きょうのきもち</div>
-              <div class="today-mood-value">${MOODS.find(x => x.score === todayMood.score).label}${todayMood.comment ? `<span class="today-mood-comment">・${escapeHtml(todayMood.comment)}</span>` : ''}</div>
-            </div>
-            <button class="btn btn-ghost today-mood-edit" data-act="goto-mood">修正</button>
-          </div>
-        ` : ''}
-
-        ${state.goal ? `
-          <div class="home-goal-compact" data-act="goto-goal-detail">
-            <div class="home-goal-label">ありたい姿</div>
-            <div class="home-goal-text">${escapeHtml(state.goal.aspiration || '')}</div>
-          </div>
-        ` : ''}
-
         ${renderForestHero()}
+
       </div>
       ${bottomNav('goal')}
+    </div>
+  `;
+}
+
+// セクション1：きょうのきもち（主役カード）
+function renderTodayMoodSection(todayMood) {
+  if (!todayMood) {
+    return `
+      <div class="mood-section-card mood-section-unfilled" data-act="goto-mood">
+        <div class="mood-section-label">きょうのきもち</div>
+        <div class="mood-section-emojis">😔 😕 😐 🙂 😊</div>
+        <div class="mood-section-title">今の気分をのこす</div>
+        <div class="mood-section-sub">ひとことでもOK</div>
+        <div class="mood-section-arrow">›</div>
+      </div>
+    `;
+  }
+  const moodMeta = MOODS.find(x => x.score === todayMood.score);
+  return `
+    <div class="mood-section-card mood-section-filled" data-act="goto-mood">
+      <div class="mood-section-top">
+        <div class="mood-section-label">きょうのきもち</div>
+        <div class="mood-section-edit">修正</div>
+      </div>
+      <div class="mood-section-filled-body">
+        <div class="mood-section-emoji-big">${moodMeta.emoji}</div>
+        <div class="mood-section-filled-text">
+          <div class="mood-section-filled-label">${escapeHtml(moodMeta.label)}</div>
+          ${todayMood.comment ? `<div class="mood-section-filled-comment">${escapeHtml(todayMood.comment)}</div>` : ''}
+        </div>
+      </div>
     </div>
   `;
 }
@@ -5945,7 +5966,7 @@ function viewTalk() {
         <div class="talk-rescue-card" data-act="goto-rescue">
           <div class="talk-rescue-emoji">🌫</div>
           <div class="talk-rescue-body">
-            <div class="talk-rescue-title">今すぐ少し楽になる</div>
+            <div class="talk-rescue-title">少しひと息</div>
             <div class="talk-rescue-sub">状態に合わせて30秒〜3分の入口を選べる</div>
           </div>
           <div class="today-main-arrow">›</div>
@@ -8518,7 +8539,7 @@ function viewRescue() {
     <div class="screen active">
       <div class="page-header insights-header">
         <button class="chat-back" data-act="back-home">${icon('arrow-left')}</button>
-        <div class="page-title">今すぐ少し楽になる</div>
+        <div class="page-title">少しひと息</div>
       </div>
       <div class="home-content">
         <div class="rescue-intro">いまの状態に近いものを選んでね。30秒〜3分で終わるよ。</div>
@@ -8596,10 +8617,19 @@ function viewRescueFlow() {
 
 // ========== 今週の小さなテーマ ビュー ==========
 
+// ボタン文言：ctaAct別にアクション名を短く
+function ctaButtonLabel(ctaAct) {
+  if (!ctaAct) return 'やってみる';
+  if (ctaAct === 'goto-mood') return 'きもちチェック';
+  if (ctaAct === 'goto-rescue' || ctaAct === 'goto-rescue-night' || ctaAct === 'goto-rescue-words' || ctaAct === 'goto-rescue-fuzzy') return '少しひと息';
+  if (ctaAct === 'start-chat' || ctaAct === 'goto-talk') return '話してみる';
+  if (ctaAct === 'start-reflect') return 'もやもや整理';
+  return 'やってみる';
+}
+
 function renderWeekThemeCard() {
   ensureCurrentWeekTheme();
   const theme = state.weekTheme;
-  // 既にスキップされている週は empty と同じ扱い（再選択可能）
   if (!theme || !theme.key || theme.status === 'skipped') {
     return `
       <div class="week-theme-card week-theme-card-empty" data-act="week-theme-open">
@@ -8613,27 +8643,15 @@ function renderWeekThemeCard() {
   const themeDef = THEME_CATALOG.find(t => t.key === theme.key);
   const count = computeThemeProgress(theme);
   const target = themeDef && themeDef.target ? themeDef.target : null;
+  const ctaAct = themeDef ? themeDef.ctaAct : 'goto-mood';
+  const btnLabel = ctaButtonLabel(ctaAct);
 
-  // 進捗表示：targetがあれば達成率ではなく「N / X回」表示、なければ温度感メッセージ
-  let progressText, progressClass = '';
-  if (target) {
-    progressText = `今週 ${count} / ${target}回`;
-    if (count >= target) progressClass = 'week-theme-progress-done';
-  } else {
-    if (count === 0) progressText = '今週のテーマにしたよ';
-    else if (count === 1) progressText = '今週ここまで: 1回';
-    else progressText = `今週ここまで: ${count}回`;
-    if (count >= 3) progressClass = 'week-theme-progress-done';
-  }
-
-  // 温度感メッセージ（やさしい）
   let kindMsg = '';
   if (count === 0) kindMsg = 'できそうな時に、少しだけで大丈夫。';
   else if (count === 1) kindMsg = '一回できたね。';
   else if (count >= 3) kindMsg = '自分のペースで続けられてる。';
   else kindMsg = '少しずつ触れられているね。';
 
-  // 目標に近いドットインジケータ（targetがある場合のみ）
   let dots = '';
   if (target) {
     dots = '<div class="week-theme-dots">';
@@ -8650,14 +8668,10 @@ function renderWeekThemeCard() {
         <button class="week-theme-change" data-act="week-theme-change-open">変える</button>
       </div>
       <div class="week-theme-title">${escapeHtml(theme.title)}</div>
-      <div class="week-theme-desc">${escapeHtml(theme.description)}</div>
       ${dots}
-      <div class="week-theme-progress-row">
-        <span class="week-theme-progress ${progressClass}">${escapeHtml(progressText)}</span>
-        <span class="week-theme-kind-msg">${escapeHtml(kindMsg)}</span>
-      </div>
+      <div class="week-theme-kind-msg-row">${escapeHtml(kindMsg)}${count > 0 ? `　・　今週${count}回` : ''}</div>
       <div class="week-theme-actions">
-        <button class="btn btn-primary" data-act="week-theme-cta" data-cta="${themeDef ? themeDef.ctaAct : 'goto-mood'}">やってみる</button>
+        <button class="btn btn-primary week-theme-action-btn" data-act="week-theme-cta" data-cta="${ctaAct}">${escapeHtml(btnLabel)}</button>
       </div>
     </div>
   `;
@@ -9023,7 +9037,7 @@ const THEME_CATALOG = [
   { key: 'thought_when_spin', category: 'C', title: '頭がぐるぐるする時に、整理を選ぶ', description: '考えを止めるより、ひとつにしぼる方が楽なこともある。', actionType: 'thought_record', ctaAct: 'goto-rescue-fuzzy' },
   { key: 'thought_event_feeling', category: 'C', title: '今週は一度、出来事→気持ちまで書いてみる', description: '最後までじゃなくて途中で止めても大丈夫。', actionType: 'thought_record', ctaAct: 'start-reflect' },
   // Category D: レスキュー利用
-  { key: 'rescue_use', category: 'D', title: 'しんどい時に「今すぐ少し楽になる」を開く', description: '開くだけでも十分。使うかは後で決めていい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' },
+  { key: 'rescue_use', category: 'D', title: 'しんどい時に「少しひと息」を開く', description: '開くだけでも十分。使うかは後で決めていい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' },
   { key: 'night_reset', category: 'D', title: '寝る前に、一言だけ置いて寝る', description: '考えすぎる夜に、少しだけ外に出してみよう。', actionType: 'rescue_night', ctaAct: 'goto-rescue-night' },
   { key: 'rescue_30sec', category: 'D', title: 'しんどい時に、30秒だけ整える', description: '長くやらなくていい。まずは少しだけでいい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' }
 ];
