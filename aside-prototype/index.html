@@ -4566,8 +4566,8 @@ body {
 }
 .talk-mode-badge {
   position: absolute;
-  top: -6px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   background: var(--primary);
   color: white;
   font-size: 10px;
@@ -4575,6 +4575,7 @@ body {
   border-radius: 999px;
   letter-spacing: 0.05em;
   font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 .talk-mode-panel {
   margin: 0 12px 10px;
@@ -6773,10 +6774,8 @@ function renderTodayActions() {
   const actions = rankActionsForContext(theme.actions.slice()).slice(0, 3);
   const today = todayKey();
   const typeLabel = { app: 'アプリ', daily: '日常', social: '人に' };
-  // 上位テーマの短い表現（「〜」の練習です用）
-  const themeShort = theme.title
-    ? theme.title.replace(/[、。]/g, '').slice(0, 18) + (theme.title.length > 18 ? '…' : '')
-    : null;
+  // 上位テーマ（長くても折り返しで全文表示）
+  const themeShort = theme.title || null;
   return `
     <div class="today-actions-section-v4">
       <div class="today-actions-label-v4">今日のおすすめ行動</div>
@@ -6857,7 +6856,7 @@ const TALK_MODES = [
   { id: 'feel',     emoji: '🫧', label: '気持ちを話したい', desc: 'とにかく聞いてほしい',     shortLabel: '気持ちを話す' },
   { id: 'organize', emoji: '🧠', label: '整理したい',       desc: '考えや気持ちを整える',     shortLabel: '整理する' },
   { id: 'forward',  emoji: '🚶', label: '前に進みたい',     desc: 'どうするか決めたい',       shortLabel: '前に進む' },
-  { id: 'breath',   emoji: '🌿', label: '少し楽になりたい', desc: '今すぐ軽くなる（ひといき）', shortLabel: 'ひといき' }
+  { id: 'breath',   emoji: '🌿', label: '少し楽になりたい', desc: '今すぐ楽になる', shortLabel: 'ひといき' }
 ];
 function getTalkMode(id) { return TALK_MODES.find(m => m.id === id) || null; }
 
@@ -9738,17 +9737,17 @@ function renderWeekThemeCard() {
   ensureCurrentWeekTheme();
   const theme = state.weekTheme;
   const goalSet = !!getCurrentDirectionGoal();
+  // 目標未設定時は、テーマがあっても補助モードで表示（仕様§7-1）
+  if (!goalSet) {
+    return `
+      <div class="week-theme-card week-theme-card-secondary">
+        <div class="week-theme-label">今週の小さなテーマ</div>
+        <div class="week-theme-empty-title week-theme-secondary-title">まずは今の方向を決めよう</div>
+        <div class="week-theme-empty-sub">方向が決まると、今週のテーマを一緒に考えられます。</div>
+      </div>
+    `;
+  }
   if (!theme || !theme.key || theme.status === 'skipped') {
-    if (!goalSet) {
-      // 目標未設定時：補助説明モード（テーマ単独では決めさせない）
-      return `
-        <div class="week-theme-card week-theme-card-secondary">
-          <div class="week-theme-label">今週の小さなテーマ</div>
-          <div class="week-theme-empty-title week-theme-secondary-title">まずは今の方向を決めよう</div>
-          <div class="week-theme-empty-sub">方向が決まると、今週のテーマを一緒に考えられます。</div>
-        </div>
-      `;
-    }
     return `
       <div class="week-theme-card week-theme-card-empty" data-act="week-theme-open">
         <div class="week-theme-label">今週の小さなテーマ</div>
@@ -12226,6 +12225,13 @@ function renderReportSummaryV3(kind) {
   const daysRule = kind === 'month' ? 'days_month' : 'days';
   const chatRule = kind === 'month' ? 'chat_month' : 'chat';
 
+  // 差分がフラット(→)のときは差分hintは省略（混乱回避）
+  const chatArrow = weekCompareArrow(cur.chatCount, prev.chatCount, chatRule);
+  const chatDiff = (prev.chatCount !== null && prev.chatCount !== undefined) ? (cur.chatCount - prev.chatCount) : null;
+  const chatHint = (chatArrow.cls === 'flat' || chatDiff === null)
+    ? ''
+    : (chatDiff >= 0 ? `+${chatDiff}` : `${chatDiff}`);
+
   const rows = [
     {
       icon: '🙂',
@@ -12245,8 +12251,8 @@ function renderReportSummaryV3(kind) {
       icon: '💬',
       label: '会話',
       value: `${cur.chatCount}回`,
-      arrow: weekCompareArrow(cur.chatCount, prev.chatCount, chatRule),
-      hint: (prev.chatCount !== null && prev.chatCount !== undefined) ? (cur.chatCount - prev.chatCount >= 0 ? `+${cur.chatCount - prev.chatCount}` : `${cur.chatCount - prev.chatCount}`) : ''
+      arrow: chatArrow,
+      hint: chatHint
     },
     {
       icon: '🌙',
