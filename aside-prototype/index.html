@@ -3861,6 +3861,19 @@ body {
   color: var(--text);
   line-height: 1.6;
 }
+.confirm-action-reason {
+  font-size: 11px;
+  color: var(--text-soft);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.confirm-action-evidence {
+  font-size: 11px;
+  color: var(--primary);
+  margin-top: 4px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
 .confirm-action-icon {
   color: var(--accent);
   font-weight: 700;
@@ -8879,6 +8892,17 @@ function viewSettings() {
             <div class="setting-label">リマインド時刻</div>
             <div class="setting-value">${state.notificationTime}</div>
           </div>
+          ${(function(){
+            const p = state.personalizationProfile;
+            if (!p || !p.preferredTimeSlot) return '';
+            const nh = parseInt((state.notificationTime || '08:00').split(':')[0], 10);
+            let nSlot = 'morning';
+            if (nh >= 11 && nh < 16) nSlot = 'noon';
+            else if (nh >= 16 && nh < 21) nSlot = 'evening';
+            else if (nh >= 21 || nh < 5) nSlot = 'night';
+            if (p.preferredTimeSlot === nSlot) return '';
+            return `<div class="setting-hint-line">${escapeHtml(SLOT_LABELS[p.preferredTimeSlot])}の時間帯の方が、記録が続いている傾向があります。</div>`;
+          })()}
         </div>
         ${renderSettingsProfileSection()}
         <div class="setting-group">
@@ -9621,12 +9645,20 @@ function viewThemeConfirm() {
         <div class="confirm-meaning">${escapeHtml(themeConfirmState.meaning)}</div>
         <div class="confirm-actions-label">今週試す行動</div>
         <div class="confirm-actions-list">
-          ${themeConfirmState.actions.map(a => `
-            <div class="confirm-action">
-              <div class="confirm-action-icon">•</div>
-              <div>${escapeHtml(a.title)}</div>
-            </div>
-          `).join('')}
+          ${themeConfirmState.actions.map(a => {
+            const eff = (state.personalizationProfile && state.personalizationProfile.effectByAction && state.personalizationProfile.effectByAction[a.id]) || null;
+            const isEffective = eff && eff.sampleDays >= 2 && eff.delta > 0.3;
+            return `
+              <div class="confirm-action">
+                <div class="confirm-action-icon">•</div>
+                <div>
+                  <div>${escapeHtml(a.title)}</div>
+                  ${a.aiReason ? `<div class="confirm-action-reason">💭 ${escapeHtml(a.aiReason)}</div>` : ''}
+                  ${isEffective ? `<div class="confirm-action-evidence">◎ 過去、気分が少し上向きやすい傾向がありました</div>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
         <div class="confirm-footer">
           <button class="btn btn-primary" data-act="confirm-theme">このテーマで進む</button>
