@@ -4430,6 +4430,60 @@ body {
   margin: 20px 4px 8px;
   letter-spacing: 0.06em;
 }
+.talk-mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.talk-mode-card {
+  padding: 16px 14px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-md);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform .12s var(--ease), box-shadow .12s var(--ease);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.talk-mode-card:active { transform: scale(0.98); }
+.talk-mode-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.talk-mode-emoji { font-size: 24px; line-height: 1; }
+.talk-mode-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 4px;
+}
+.talk-mode-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.chat-mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(212, 165, 116, 0.08);
+  border-bottom: 1px solid var(--divider);
+  font-size: 12px;
+  color: var(--text-soft);
+  letter-spacing: 0.02em;
+}
+.chat-mode-emoji { font-size: 14px; }
+.chat-mode-text { font-weight: 500; color: var(--text); }
+.chat-mode-sep { color: var(--text-muted); }
+.chat-mode-partner { color: var(--primary); font-weight: 500; }
+.chat-mode-hint {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
 .talk-entry-card {
   display: flex;
   align-items: center;
@@ -6052,7 +6106,11 @@ function buildSystemPrompt(base) {
   }
   const profileContext = (typeof buildProfileContext === 'function') ? buildProfileContext() : '';
   const profileTail = profileContext ? '\n\n' + profileContext : '';
-  return nameHeader + '\n' + base + '\n\n' + addition + profileTail;
+  // チャットのはなすモード（feel/organize/forward/breath）が選ばれていれば追加
+  const modeId = (typeof chatState !== 'undefined' && chatState && chatState.mode) ? chatState.mode : null;
+  const modePrompt = (modeId && typeof buildTalkModePrompt === 'function') ? buildTalkModePrompt(modeId) : '';
+  const modeTail = modePrompt ? '\n\n' + modePrompt : '';
+  return nameHeader + '\n' + base + '\n\n' + addition + profileTail + modeTail;
 }
 
 const EMOTION_OPTIONS = [
@@ -6620,6 +6678,49 @@ const TOPIC_OPTIONS = [
   { id: 'tired', label: 'つかれた', emoji: '😮‍💨' }
 ];
 
+// はなすタブの4モード（目的）— スペック §3
+const TALK_MODES = [
+  { id: 'feel',     emoji: '🫧', label: '気持ちを話したい', desc: 'とにかく聞いてほしい',     shortLabel: '気持ちを話す' },
+  { id: 'organize', emoji: '🧠', label: '整理したい',       desc: '考えや気持ちを整える',     shortLabel: '整理する' },
+  { id: 'forward',  emoji: '🚶', label: '前に進みたい',     desc: 'どうするか決めたい',       shortLabel: '前に進む' },
+  { id: 'breath',   emoji: '🌿', label: '少し楽になりたい', desc: '今すぐ軽くなる（ひといき）', shortLabel: 'ひといき' }
+];
+function getTalkMode(id) { return TALK_MODES.find(m => m.id === id) || null; }
+
+// モード別のシステムプロンプト追記（SYSTEM_PROMPT の末尾に合成）
+const TALK_MODE_PROMPTS = {
+  feel: `
+【今回のモード：気持ちを話したい】
+- ユーザーは「とにかく聞いてほしい」目的で来ています
+- 共感を最優先。アドバイスや整理提案は今は控える
+- 短く自然な受けとめを中心に。1回の返答は2文以内が望ましい
+- 「それはしんどかったね」「少し疲れがたまってる感じするね」のような素直な受けとめが合う
+- 質問は30%程度まで。深掘りしすぎない
+- 3〜5ターン続いたら「少し楽になった？」のような柔らかい着地を検討してもよい（ただし強制しない）`,
+  organize: `
+【今回のモード：整理したい】
+- ユーザーは「考えや気持ちを整える」目的で来ています
+- 構造化を手伝う。「出来事 → 感情 → 別の見方」の順にゆっくり辿る
+- 受けとめてから、1つだけ中立的な問いを添える
+- 勝手にまとめ切らず、ユーザーの言葉で整うのを待つ`,
+  forward: `
+【今回のモード：前に進みたい】
+- ユーザーは「どうするか決めたい」目的で来ています
+- まず状況を確認し、何に迷っているかを一緒に絞る
+- 選択肢は最大3つまで、できれば [すぐできる / 少し頑張る / しっかり向き合う] のような粒度差で提示
+- 押しつけず「どれが今の自分に近そう？」のような柔らかい問いで選ばせる
+- 決まったら「これやってみる？」と小さく確認する`,
+  breath: `
+【今回のモード：ひといき】
+- ユーザーは「今すぐ軽くなりたい」目的で来ています
+- 深呼吸や短い問いを中心に、言葉数を最小に
+- 論理整理や行動提案は今はしない
+- 1〜2ターンで区切ってよい`
+};
+function buildTalkModePrompt(modeId) {
+  return TALK_MODE_PROMPTS[modeId] || '';
+}
+
 function viewTalk() {
   const persona = getCurrentPersona();
   // P2-1: 直近3件のトピック（重複排除）を quick-start として再提示
@@ -6675,13 +6776,15 @@ function viewTalk() {
           </div>
         </div>
 
-        <div class="talk-rescue-card" data-act="goto-rescue">
-          <div class="talk-rescue-emoji">🌫</div>
-          <div class="talk-rescue-body">
-            <div class="talk-rescue-title">少しひと息</div>
-            <div class="talk-rescue-sub">状態に合わせて30秒〜3分の入口を選べる</div>
-          </div>
-          <div class="today-main-arrow">›</div>
+        <div class="talk-section-title">今日はどうしたい？</div>
+        <div class="talk-mode-grid">
+          ${TALK_MODES.map(m => `
+            <button class="talk-mode-card" data-act="start-chat-mode" data-mode="${m.id}">
+              <div class="talk-mode-emoji">${m.emoji}</div>
+              <div class="talk-mode-label">${escapeHtml(m.label)}</div>
+              <div class="talk-mode-desc">${escapeHtml(m.desc)}</div>
+            </button>
+          `).join('')}
         </div>
 
         ${recentTopics.length > 0 ? `
@@ -6697,46 +6800,6 @@ function viewTalk() {
             </div>
           </div>
         ` : ''}
-
-        <div class="talk-section-title">話す</div>
-
-        <div class="talk-entry-card" data-act="start-chat">
-          <div class="talk-entry-icon">💬</div>
-          <div class="talk-entry-body">
-            <div class="talk-entry-title">ひとこと話す</div>
-            <div class="talk-entry-sub">短文でもOK。なんでもいいよ。</div>
-          </div>
-          <div class="today-main-arrow">›</div>
-        </div>
-
-        <div class="talk-entry-card" data-act="toggle-topic-picker" id="topicPickerToggle">
-          <div class="talk-entry-icon">🎯</div>
-          <div class="talk-entry-body">
-            <div class="talk-entry-title">選んで話す</div>
-            <div class="talk-entry-sub">テーマを選ぶと、${escapeHtml(persona.name)}が先に一言かけてくれる。</div>
-          </div>
-          <div class="today-main-arrow">›</div>
-        </div>
-
-        ${talkTopicPickerOpen ? `
-          <div class="topic-picker">
-            ${TOPIC_OPTIONS.map(t => `
-              <button class="topic-chip" data-act="start-chat-topic" data-topic="${t.id}">
-                <span>${t.emoji}</span>
-                <span>${escapeHtml(t.label)}</span>
-              </button>
-            `).join('')}
-          </div>
-        ` : ''}
-
-        <div class="talk-entry-card" data-act="start-reflect">
-          <div class="talk-entry-icon">✨</div>
-          <div class="talk-entry-body">
-            <div class="talk-entry-title">もやもやを整理する</div>
-            <div class="talk-entry-sub">出来事→考え→気持ち→別の見方の流れで。</div>
-          </div>
-          <div class="today-main-arrow">›</div>
-        </div>
 
         ${state.reflections.length > 0 ? `
           <div class="card" style="margin-top:16px;">
@@ -7916,7 +7979,7 @@ function viewMoodCheck() {
 }
 
 // ---------- Chat ----------
-let chatState = { session: null, isTyping: false, currentChoices: [] };
+let chatState = { session: null, isTyping: false, currentChoices: [], mode: null, modeStartedAt: null };
 
 function startNewChatSession() {
   const today = todayKey();
@@ -7964,6 +8027,9 @@ function viewChat() {
   }
   const s = chatState.session;
   const pC = getCurrentPersona();
+  const activeMode = chatState.mode ? getTalkMode(chatState.mode) : null;
+  const userMsgs = s.messages.filter(m => m.role === 'user').length;
+  const softEndHint = chatState.mode && userMsgs >= 5; // 5ターン以降、そろそろまとめようか
   return `
     <div class="screen active chat-screen" style="--p-accent: ${pC.avatarAccent}; --p-color: ${pC.avatarColor};">
       <div class="chat-header">
@@ -7974,8 +8040,17 @@ function viewChat() {
           <div class="chat-status">きいてるよ</div>
         </div>
         ${s.messages.filter(m => m.role === 'user').length >= 2 ? `<button class="chat-to-reflect" data-act="chat-to-reflect" aria-label="この話を整理する">✨ 整理</button>` : ''}
-        <button class="chat-end" data-act="chat-end">おわる</button>
+        <button class="chat-end" data-act="chat-end">${chatState.mode ? '今日はここまで' : 'おわる'}</button>
       </div>
+      ${activeMode ? `
+        <div class="chat-mode-bar">
+          <span class="chat-mode-emoji">${activeMode.emoji}</span>
+          <span class="chat-mode-text">${escapeHtml(activeMode.shortLabel)}</span>
+          <span class="chat-mode-sep">×</span>
+          <span class="chat-mode-partner">${escapeHtml(pC.name)}</span>
+          ${softEndHint ? '<span class="chat-mode-hint">そろそろ、まとめてみる？</span>' : ''}
+        </div>
+      ` : ''}
       <div class="chat-messages" id="chatMessages">
         ${s.messages.map(renderMsg).join('')}
         ${chatState.isTyping ? `
@@ -13402,9 +13477,26 @@ function handleAction(act, el, e) {
     case 'back-history': App.go('history'); break;
     case 'start-chat':
       chatState.session = null;
+      chatState.mode = null;
       App.go('chat');
       setTimeout(() => sendInitialAi(), 300);
       break;
+    case 'start-chat-mode': {
+      const modeId = el.dataset.mode;
+      if (modeId === 'breath') {
+        // ひといきは rescue 画面に流す
+        chatState.mode = null;
+        rescueState = { flowId: null, stepIdx: 0, picks: [] };
+        App.go('rescue');
+        break;
+      }
+      chatState.session = null;
+      chatState.mode = modeId;
+      chatState.modeStartedAt = Date.now();
+      App.go('chat');
+      setTimeout(() => sendInitialAi({ mode: modeId }), 300);
+      break;
+    }
     case 'toggle-topic-picker':
       talkTopicPickerOpen = !talkTopicPickerOpen;
       render();
