@@ -4129,6 +4129,48 @@ body {
   color: var(--accent);
   opacity: 0.7;
 }
+.direction-goal-card-welcome {
+  background: linear-gradient(180deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.03));
+  border: 1px solid rgba(212, 165, 116, 0.25);
+  border-left: 3px solid var(--accent);
+  padding: 18px 20px 20px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+.direction-goal-card-welcome:active { transform: scale(0.99); }
+.direction-goal-card-welcome-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  color: var(--text);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.direction-goal-card-welcome-body {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-top: 4px;
+  line-height: 1.7;
+}
+.direction-goal-card-welcome-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.direction-goal-card-welcome-cta {
+  margin-top: 14px;
+  width: 100%;
+}
+.week-theme-card-secondary {
+  background: rgba(0,0,0,0.02);
+  border: 1px dashed var(--divider);
+  opacity: 0.85;
+  cursor: default;
+}
+.week-theme-card-secondary:active { transform: none; }
+.week-theme-secondary-title {
+  color: var(--text-soft);
+}
 
 /* ---------- 変更理由選択 ---------- */
 .theme-change-reasons {
@@ -6301,9 +6343,10 @@ function viewGoal() {
       </div>
       <div class="home-content home-content-v4">
 
-        ${renderTodayMoodSection(todayMood)}
+        ${renderDirectionGoalCard()}
         ${renderWeekThemeCard()}
-        ${renderTodayActions()}
+        ${renderTodayMoodSection(todayMood)}
+        ${getCurrentDirectionGoal() ? renderTodayActions() : ''}
         ${renderForestHero()}
 
       </div>
@@ -8844,10 +8887,6 @@ function viewSettings() {
             <div class="setting-label">呼び名</div>
             <div class="setting-value">${escapeHtml(state.nickname)}</div>
           </div>
-          <div class="setting-row" data-act="direction-goal-open">
-            <div class="setting-label">今の方向</div>
-            <div class="setting-value">${(() => { const g = getCurrentDirectionGoal(); return g ? escapeHtml(g.title.slice(0, 14) + (g.title.length > 14 ? '…' : '')) : (state.directionGoal && state.directionGoal.status === 'skipped' ? '未設定' : '決める'); })()}</div>
-          </div>
         </div>
         <div class="setting-group">
           <div class="setting-group-title">話し相手</div>
@@ -9220,7 +9259,18 @@ function ctaButtonLabel(ctaAct) {
 function renderWeekThemeCard() {
   ensureCurrentWeekTheme();
   const theme = state.weekTheme;
+  const goalSet = !!getCurrentDirectionGoal();
   if (!theme || !theme.key || theme.status === 'skipped') {
+    if (!goalSet) {
+      // 目標未設定時：補助説明モード（テーマ単独では決めさせない）
+      return `
+        <div class="week-theme-card week-theme-card-secondary">
+          <div class="week-theme-label">今週の小さなテーマ</div>
+          <div class="week-theme-empty-title week-theme-secondary-title">まずは今の方向を決めよう</div>
+          <div class="week-theme-empty-sub">方向が決まると、今週のテーマを一緒に考えられます。</div>
+        </div>
+      `;
+    }
     return `
       <div class="week-theme-card week-theme-card-empty" data-act="week-theme-open">
         <div class="week-theme-label">今週の小さなテーマ</div>
@@ -9725,26 +9775,25 @@ function viewDirectionGoalConfirm() {
 function renderDirectionGoalCard() {
   const g = getCurrentDirectionGoal();
   if (!g) {
-    if (state.directionGoal && state.directionGoal.status === 'skipped') {
-      return `
-        <div class="direction-goal-card direction-goal-card-empty" data-act="direction-goal-open">
-          <div class="direction-goal-card-label">今の方向</div>
-          <div class="direction-goal-card-empty-title">方向を決める</div>
-          <div class="direction-goal-card-empty-sub">使いながら、ゆっくり見つけていい</div>
-          <div class="week-theme-arrow">›</div>
-        </div>
-      `;
-    }
-    return '';
+    // 未設定（初回 or スキップ）— どちらも「はじめの一歩」カードで歓迎導線を出す
+    return `
+      <div class="direction-goal-card direction-goal-card-welcome" data-act="direction-goal-open">
+        <div class="direction-goal-card-label">このアプリで目指したいこと</div>
+        <div class="direction-goal-card-welcome-title">まだ決まっていなくても大丈夫。</div>
+        <div class="direction-goal-card-welcome-body">今のあなたに近い方向を、一緒に見つけてみよう。</div>
+        <div class="direction-goal-card-welcome-sub">決めると、今週のテーマやおすすめの行動が出しやすくなります。</div>
+        <button class="btn btn-primary direction-goal-card-welcome-cta" data-act="direction-goal-open">一緒に決める</button>
+      </div>
+    `;
   }
   return `
     <div class="direction-goal-card">
       <div class="direction-goal-card-top">
-        <div class="direction-goal-card-label">今の方向</div>
+        <div class="direction-goal-card-label">このアプリで目指していること</div>
         <button class="direction-goal-card-edit" data-act="direction-goal-open">見直す</button>
       </div>
       <div class="direction-goal-card-title">${escapeHtml(g.title)}</div>
-      <div class="direction-goal-card-sub">少しずつ、この方向で使っていこう。</div>
+      <div class="direction-goal-card-sub">今週の小さなテーマは、この方向に近づくための一歩です。</div>
     </div>
   `;
 }
