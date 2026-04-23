@@ -3737,6 +3737,40 @@ body {
   color: var(--text-soft);
   line-height: 1.7;
 }
+.suggest-card-reason {
+  margin-top: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-main);
+  background: rgba(212, 165, 116, 0.08);
+  border-left: 2px solid var(--primary);
+  border-radius: 6px;
+  line-height: 1.6;
+}
+.suggest-ai-loading {
+  margin: 8px 4px 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-soft);
+  text-align: center;
+  background: rgba(0,0,0,0.025);
+  border-radius: 8px;
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+.suggest-ai-badge {
+  margin: 4px 4px 10px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--primary);
+  text-align: center;
+  background: rgba(212, 165, 116, 0.1);
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1.0; }
+}
 .suggest-actions {
   display: flex;
   flex-direction: column;
@@ -5526,6 +5560,7 @@ function pickTemplateGreeting(messageType, ctx) {
 
 async function generateLlmGreeting(messageType, ctx) {
   if (!state.apiKey) return null;
+  const profileCtx = buildProfileContext();
   const systemPrompt = `あなたはメンタルヘルスアプリのやさしい語り手。ユーザーにそっと一言かける。
 
 【制約】
@@ -5544,7 +5579,7 @@ async function generateLlmGreeting(messageType, ctx) {
 - 時間帯: ${ctx.timeBand}
 - 森のステージ: ${ctx.forestStage}
 - 話し相手ペルソナ: ${getCurrentPersona().name}
-
+${profileCtx ? '\n' + profileCtx + '\n' : ''}
 上記を踏まえ、静かでやわらかい一言を返してください。
 
 【出力JSON】
@@ -5785,7 +5820,9 @@ function buildSystemPrompt(base) {
   if (p.originalName && p.name !== p.originalName) {
     addition += `\n\n【補足】ユーザーはあなたの名前を「${p.name}」に上書きしています。このカスタム名を優先してください（元の名前「${p.originalName}」は使わない）。`;
   }
-  return nameHeader + '\n' + base + '\n\n' + addition;
+  const profileContext = (typeof buildProfileContext === 'function') ? buildProfileContext() : '';
+  const profileTail = profileContext ? '\n\n' + profileContext : '';
+  return nameHeader + '\n' + base + '\n\n' + addition + profileTail;
 }
 
 const EMOTION_OPTIONS = [
@@ -9337,7 +9374,7 @@ function viewStateSurvey() {
 // ---------- AI行動提案（Screen 5-3） ----------
 let actionSuggestState = { proposals: [], selected: [], round: 0 };
 
-function prepareActionSuggestions() {
+function prepareActionSuggestions(opts = {}) {
   const goalKey = (state.directionGoal && state.directionGoal.key) || 'not_sure_yet';
   const userState = state.userStateSurvey || null;
   let pool = getActionsForGoal(goalKey, userState);
@@ -9365,6 +9402,14 @@ function prepareActionSuggestions() {
 
   actionSuggestState.proposals = pool.slice(0, 4);
   actionSuggestState.selected = [];
+  actionSuggestState.isAiLoading = false;
+  actionSuggestState.aiSuccess = false;
+  actionSuggestState.mode = opts.mode || actionSuggestState.mode || 'initial';
+
+  // API keyがあれば裏でAIに問い合わせて差し替え
+  if (state.apiKey && !opts.skipAi) {
+    triggerAiActionUpgrade(actionSuggestState.mode);
+  }
 }
 
 function viewActionSuggest() {
@@ -9379,6 +9424,8 @@ function viewActionSuggest() {
         <div class="suggest-title">今のあなたに合いそうな<br>今週の行動候補</div>
         ${goal ? `<div class="suggest-goal-pill">${escapeHtml(goal.title)}</div>` : ''}
         <div class="suggest-sub">1つ、または2つまで選んでみて。</div>
+        ${actionSuggestState.isAiLoading ? '<div class="suggest-ai-loading">あなたに合いそうな候補を考えています…</div>' : ''}
+        ${actionSuggestState.aiSuccess ? '<div class="suggest-ai-badge">AIが今のあなたに合いそうな候補を選びました</div>' : ''}
         <div class="suggest-list">
           ${actionSuggestState.proposals.map(a => {
             const isSel = actionSuggestState.selected.includes(a.id);
@@ -9391,6 +9438,7 @@ function viewActionSuggest() {
                 </div>
                 <div class="suggest-card-title">${escapeHtml(a.title)}</div>
                 <div class="suggest-card-desc">${escapeHtml(a.desc)}</div>
+                ${a.aiReason ? `<div class="suggest-card-reason">💭 ${escapeHtml(a.aiReason)}</div>` : ''}
               </div>
             `;
           }).join('')}
@@ -9692,6 +9740,184 @@ function getTimeSlotMessage(slot) {
   if (!slot) return null;
   const m = { morning: '朝', noon: '昼', evening: '夕方', night: '夜' };
   return `${m[slot]}の方が、行動しやすいようです`;
+}
+
+// Profile を伴走AIへのシステム文脈として整形（全AIプロンプト共通で末尾に差し込む）
+function buildProfileContext() {
+  const p = state.personalizationProfile;
+  if (!p || !p.sampleSize) return '';
+  const totalSamples = (p.sampleSize.logs || 0) + (p.sampleSize.moods || 0)
+                     + (p.sampleSize.sessions || 0) + (p.sampleSize.reflects || 0)
+                     + (p.sampleSize.rescues || 0);
+  if (totalSamples < 3) return ''; // 記録が少なすぎる段階では profile を使わない
+
+  const styleGuide = {
+    recorder:    '静かに記録を積み重ねる傾向。言葉を多く求めず、短く受け止める口調で。',
+    talker:      '対話で整えていく傾向。ラリーを止めず、受けてから1つだけ問い返す口調で。',
+    organizer:   '構造的に整理する傾向。要点を拾い返してあげると安心しやすい。ただし勝手にまとめて閉じない。',
+    rescue_user: 'しんどい時に短いサポートを使える。助けを求めたことを責めず、そっと肯定する口調で。'
+  };
+  const slotLabel = { morning: '朝', noon: '日中', evening: '夕方', night: '夜' };
+  const typeLabel = { app: 'アプリ内で完結する行動', daily: '日常に溶け込む行動', social: '人と関わる行動' };
+
+  const lines = ['【このユーザーの傾向（直近30日の記録から・参考情報）】'];
+  if (p.supportStyle && styleGuide[p.supportStyle]) {
+    lines.push(`- 伴走スタイル: ${styleGuide[p.supportStyle]}`);
+  }
+  if (p.preferredTimeSlot) {
+    lines.push(`- よく記録をつける時間帯: ${slotLabel[p.preferredTimeSlot]}`);
+  }
+  if (p.preferredActionType && typeLabel[p.preferredActionType]) {
+    lines.push(`- 選ばれやすい行動タイプ: ${typeLabel[p.preferredActionType]}`);
+  }
+  if (p.completionRate !== null) {
+    if (p.completionRate < 30) {
+      lines.push(`- 最近の実施率は低め(${p.completionRate}%)。小さく始められる声かけを優先し、実施していないことを責めない。`);
+    } else if (p.completionRate >= 70) {
+      lines.push(`- 最近の実施率は高め(${p.completionRate}%)。積み重ねを小さく肯定する声かけを。`);
+    } else {
+      lines.push(`- 最近の実施率は中程度(${p.completionRate}%)。無理のないペースを尊重する声かけを。`);
+    }
+  }
+  if (p.freeTextTendency === 'low') {
+    lines.push(`- コメントは少なめ。言葉を求めず、選択肢で進められる話し方を。`);
+  } else if (p.freeTextTendency === 'high') {
+    lines.push(`- コメントが多め。言葉で整理するのが合うタイプ。`);
+  }
+  lines.push('');
+  lines.push('※ これは口調の柔らかさを選ぶ参考情報です。診断的に使わず、「あなたは◯◯なタイプですね」のように言語化しないこと。');
+  return lines.join('\n');
+}
+
+// 今週の行動候補をAIに選ばせる（rule-baseの候補プールから3つ選定＋reasonを添える）
+async function generateAiActionSuggestions(mode) {
+  if (!state.apiKey) return null;
+  const goal = (typeof getCurrentDirectionGoal === 'function') ? getCurrentDirectionGoal() : null;
+  const userState = state.userStateSurvey || null;
+  const goalKey = (state.directionGoal && state.directionGoal.key) || 'not_sure_yet';
+
+  // カタログをAIに渡す（固定IDからのみ選ばせる）
+  const candidates = getActionsForGoal(goalKey, userState);
+  if (!candidates || candidates.length === 0) return null;
+
+  const systemPrompt = `あなたは、ユーザーの「ありたい方向性」と「直近の傾向」から、今週の小さな行動を3つ選ぶ伴走者です。
+あなたは医療・心理の専門家ではありません。診断・治療・専門的助言は一切しません。
+
+【あなたの役割】
+- 下記の【行動候補】から、このユーザーに合いそうな3つを選ぶ
+- 各選択に、「なぜこの人に合いそうか」を1文（30〜70文字）で添える
+- reason は診断・分類・心理用語を使わず、「〜かもしれません」「〜に向いていそうです」「〜が今は合いそうです」など柔らかい可能性表現を使う
+- reason に「あなたは◯◯なタイプですね」のような決めつけは書かない
+- reason は行動を促す命令調（〜しましょう／〜すべき）にしない
+- 行動は新しく作らず、必ず【行動候補】にある id を使う
+
+【禁止】
+- 診断・治療・医学用語
+- 「〜すべき」「〜しなさい」の口調
+- 自分（AI）の経験や一般論を持ち出すこと
+- ネガティブ方向への誘導
+
+【モード】「${mode}」
+- initial: 新規に今週のテーマを決める（方向性を素直に反映）
+- continue: 前週と同じ方向性で続ける（同じ/近い行動を再提案）
+- ease: 前週が重かった → よりやさしい行動（difficulty:easy寄り、duration短め）を3つ
+- step_up: 前週が軽かった → 少しだけ背伸びした行動（normal以上を含める）を3つ
+- change: 前週と違う角度（type を前週と変える、新しい切り口）を3つ
+
+【返答形式（必ずJSON）】
+{
+  "picks": [
+    { "id": "act_xxx", "reason": "..." },
+    { "id": "act_yyy", "reason": "..." },
+    { "id": "act_zzz", "reason": "..." }
+  ]
+}`;
+
+  const goalLine = goal
+    ? `【このユーザーの今の方向性】\n${goal.title}${goal.description ? '（' + goal.description + '）' : ''}`
+    : '';
+  const surveyBlock = userState
+    ? `【最近の状態（オンボーディング設問の回答）】\n- 日々の感覚: ${userState.lifeStatus}\n- 続けやすさ: ${userState.duration}\n- 得意な行動タイプ: ${userState.actionType}`
+    : '';
+  const prevTheme = state.weekTheme;
+  const prevBlock = (prevTheme && prevTheme.status === 'accepted')
+    ? `【前週のテーマ】${prevTheme.title}\n【前週選んだ行動】${(prevTheme.actions || []).map(a => a.title).join(' / ')}`
+    : '';
+  const candidatesBlock = `【行動候補（この中からidを3つ選ぶ）】\n${candidates.map(a => `- ${a.id} [${a.type}/${a.difficulty}/${a.duration}分] ${a.title}（${a.desc}）`).join('\n')}`;
+  const userMsg = [goalLine, surveyBlock, prevBlock, candidatesBlock, '', `モード「${mode}」を踏まえて3つ選んでください。`].filter(x => x).join('\n\n');
+
+  const model = state.apiModel || 'gemini-2.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+  const body = {
+    systemInstruction: { parts: [{ text: buildSystemPrompt(systemPrompt) }] },
+    contents: [{ role: 'user', parts: [{ text: userMsg }] }],
+    generationConfig: {
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'object',
+        properties: {
+          picks: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: { id: { type: 'string' }, reason: { type: 'string' } },
+              required: ['id', 'reason']
+            }
+          }
+        },
+        required: ['picks']
+      },
+      temperature: 0.8,
+      maxOutputTokens: 1400,
+      thinkingConfig: { thinkingBudget: 0 }
+    },
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+    ]
+  };
+  try {
+    const res = await fetchGeminiWithRetry(url, body);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) return null;
+    const parsed = JSON.parse(text);
+    if (!parsed || !Array.isArray(parsed.picks)) return null;
+    const picks = parsed.picks.map(p => {
+      const a = ACTION_CATALOG.find(x => x.id === p.id);
+      if (!a) return null;
+      return { ...a, aiReason: String(p.reason || '').trim().slice(0, 120) };
+    }).filter(x => x);
+    if (picks.length === 0) return null;
+    return picks;
+  } catch (e) {
+    console.warn('[Aside] AI action suggest failed:', e);
+    return null;
+  }
+}
+
+// rule-baseで即時表示 → 裏でAIを呼んで差し替え
+async function triggerAiActionUpgrade(mode) {
+  if (!state.apiKey) return;
+  actionSuggestState.isAiLoading = true;
+  actionSuggestState.aiAttempted = true;
+  if (App.currentScreen === 'actionSuggest') render();
+  try {
+    const picks = await generateAiActionSuggestions(mode || 'initial');
+    if (picks && picks.length >= 2) {
+      actionSuggestState.proposals = picks.slice(0, 3);
+      actionSuggestState.selected = [];
+      actionSuggestState.aiSuccess = true;
+    }
+  } catch (e) {
+    console.warn('[Aside] triggerAiActionUpgrade:', e);
+  } finally {
+    actionSuggestState.isAiLoading = false;
+    if (App.currentScreen === 'actionSuggest') render();
+  }
 }
 
 // ---------- 行動カタログ（目標別・状態対応・Phase 1 MVP） ----------
@@ -10950,9 +11176,14 @@ function handleNextWeekPick(mode) {
   if (pool.length === 0) pool = ACTION_CATALOG.filter(a => a.difficulty === 'easy').slice(0, 4);
 
   // 提案を actionSuggest 経由で表示（ユーザーに選ばせる）
-  actionSuggestState = { proposals: pool.slice(0, 4), selected: [], round: 0, mode };
+  actionSuggestState = { proposals: pool.slice(0, 4), selected: [], round: 0, mode, isAiLoading: false, aiSuccess: false };
   App.go('actionSuggest');
   toast(mode === 'ease' ? '少しやさしめの候補を出すね' : mode === 'step_up' ? '少しだけ背伸び気味の候補だよ' : '違うテーマを探してみよう');
+
+  // API keyがあれば裏でAIに差し替えをリクエスト
+  if (state.apiKey) {
+    triggerAiActionUpgrade(mode);
+  }
 }
 
 // 週次レポート用：Block C/D/E = 気分傾向・AI伴走解釈・合う傾向
