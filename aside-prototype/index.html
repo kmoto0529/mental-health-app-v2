@@ -4176,6 +4176,26 @@ body {
   color: var(--text-soft);
   line-height: 1.6;
 }
+.exec-done-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 4px;
+  animation: fadeIn .5s var(--ease);
+}
+.exec-done-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(90deg, rgba(212, 165, 116, 0.12), rgba(212, 165, 116, 0.04));
+  border-left: 2px solid var(--primary);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.exec-done-badge .exec-badge-icon { font-size: 16px; }
 .exec-done-reaction {
   margin-top: 14px;
   font-size: 11px;
@@ -10403,6 +10423,23 @@ function openChoiceActionModal(action) {
   `);
 }
 
+// 行動完了時のマイルストーンを判定（初回/N日連続/累計節目）
+function getActionMilestone() {
+  const profile = (typeof computeProfile === 'function') ? computeProfile() : (state.personalizationProfile || {});
+  const streak = profile.streak || 0;
+  const total = profile.totalDone || 0;
+  const badges = [];
+  if (total === 1) badges.push({ icon: '🌱', text: '最初の一歩、踏み出したね' });
+  else if (streak >= 7) badges.push({ icon: '🔥', text: `${streak}日連続で行動できてる！` });
+  else if (streak >= 3) badges.push({ icon: '✨', text: `${streak}日連続で続いてるね` });
+  else if (streak === 2) badges.push({ icon: '🌿', text: '2日連続、いい流れだよ' });
+  // 累計節目
+  if ([5, 10, 20, 30, 50, 100].includes(total)) {
+    badges.push({ icon: '🏵', text: `これで累計${total}回。積み重なってきた` });
+  }
+  return badges;
+}
+
 // 行動完了の共通画面（仕様§7）
 function openActionDoneCelebration(action, detail) {
   // 保存: actionLogs に done を記録
@@ -10419,12 +10456,18 @@ function openActionDoneCelebration(action, detail) {
   saveState();
 
   const themeLink = (state.weekTheme && state.weekTheme.title) ? `今週のテーマ「${state.weekTheme.title}」に近づいているよ。` : '';
+  const milestones = getActionMilestone();
   openModal(`
     <div class="modal exec-modal">
       <div class="modal-title">今日の一歩ができたね</div>
       <div class="modal-body">
         <div class="exec-done-main">少しだけでも十分だよ。</div>
         ${themeLink ? `<div class="exec-done-theme">${escapeHtml(themeLink)}</div>` : ''}
+        ${milestones.length > 0 ? `
+          <div class="exec-done-badges">
+            ${milestones.map(b => `<div class="exec-done-badge"><span class="exec-badge-icon">${b.icon}</span><span>${escapeHtml(b.text)}</span></div>`).join('')}
+          </div>
+        ` : ''}
         ${detail && detail.memoText ? `<div class="exec-done-memo">記録：${escapeHtml(detail.memoText)}</div>` : ''}
         ${detail && detail.selectedValue ? `<div class="exec-done-choice">えらんだ：${escapeHtml(detail.selectedValue)}</div>` : ''}
         <div class="exec-done-reaction">この一歩、どうだった？（任意）</div>
@@ -10543,6 +10586,45 @@ function computeProfile() {
     : 0;
   const freeTextTendency = avgMoodCommentLen >= 20 ? 'high' : avgMoodCommentLen >= 8 ? 'mid' : 'low';
 
+  // === execType 別の完了率（§8 実行形式ごとのパーソナライズ） ===
+  const execTypeAttempt = { instant_done: 0, memo_done: 0, ai_assist: 0, choice_done: 0 };
+  const execTypeDone    = { instant_done: 0, memo_done: 0, ai_assist: 0, choice_done: 0 };
+  logs.forEach(l => {
+    let et = l.execType;
+    if (!et) {
+      // 旧ログ（execType なし）は ACTION_CATALOG から推定
+      const a = ACTION_CATALOG.find(x => x.id === l.actionId);
+      if (a && typeof getActionExecutionType === 'function') et = getActionExecutionType(a);
+    }
+    if (!et || !(et in execTypeAttempt)) return;
+    execTypeAttempt[et]++;
+    if (l.status === 'done') execTypeDone[et]++;
+  });
+  // 最も成功している execType（試行2件以上 かつ 完了率50%以上 を優先）
+  let preferredExecType = null;
+  let bestScore = -1;
+  Object.keys(execTypeAttempt).forEach(k => {
+    const att = execTypeAttempt[k];
+    if (att < 2) return;
+    const rate = execTypeDone[k] / att;
+    if (rate >= 0.5 && execTypeDone[k] > bestScore) {
+      bestScore = execTypeDone[k];
+      preferredExecType = k;
+    }
+  });
+
+  // 連続実行日数（今日/昨日/おととい... と遡って done が存在した日数）
+  const doneDates = new Set(
+    logs.filter(l => l.status === 'done').map(l => new Date(l.executedAt).toISOString().slice(0, 10))
+  );
+  let streak = 0;
+  const cur = new Date();
+  while (true) {
+    const dk = cur.toISOString().slice(0, 10);
+    if (doneDates.has(dk)) { streak++; cur.setDate(cur.getDate() - 1); } else break;
+  }
+  const totalDone = logs.filter(l => l.status === 'done').length;
+
   const profile = {
     completionRate,
     preferredTimeSlot,
@@ -10555,6 +10637,11 @@ function computeProfile() {
     nonActionDayMoodAvg,
     effectByAction,
     freeTextTendency,
+    execTypeAttempt,
+    execTypeDone,
+    preferredExecType,
+    streak,
+    totalDone,
     sampleSize: { logs: total, moods: moods.length, sessions: sessions.length, reflects: reflects.length, rescues: rescues.length },
     updatedAt: Date.now()
   };
@@ -11034,19 +11121,31 @@ function getActionsForGoal(goalKey, userState) {
 }
 
 // 仕様§6-3: 初回表示は やさしめ2-3/ふつう2-3/少し前進1-2 を混ぜる
+// 仕様§8: preferredExecType があれば、そのタイプを各難易度で優先
 function balancedActionMix(pool, targetSize) {
   targetSize = targetSize || 6;
-  const easy = pool.filter(a => a.difficulty === 'easy');
-  const normal = pool.filter(a => a.difficulty === 'normal');
-  const bold = pool.filter(a => a.difficulty === 'bold');
-  const shuf = (arr) => arr.sort(() => Math.random() - 0.5);
-  const pickedEasy = shuf(easy.slice()).slice(0, 3);
-  const pickedNormal = shuf(normal.slice()).slice(0, 2);
-  const pickedBold = shuf(bold.slice()).slice(0, 1);
+  const profile = state.personalizationProfile || {};
+  const preferredType = profile.preferredExecType || null;
+  const execTypeOf = (a) => (typeof getActionExecutionType === 'function') ? getActionExecutionType(a) : null;
+
+  // 各難易度内で preferredExecType を先頭に寄せる
+  const prioritize = (arr) => {
+    if (!preferredType) return arr.sort(() => Math.random() - 0.5);
+    const pref = arr.filter(a => execTypeOf(a) === preferredType).sort(() => Math.random() - 0.5);
+    const rest = arr.filter(a => execTypeOf(a) !== preferredType).sort(() => Math.random() - 0.5);
+    return pref.concat(rest);
+  };
+
+  const easy = prioritize(pool.filter(a => a.difficulty === 'easy'));
+  const normal = prioritize(pool.filter(a => a.difficulty === 'normal'));
+  const bold = prioritize(pool.filter(a => a.difficulty === 'bold'));
+  const pickedEasy = easy.slice(0, 3);
+  const pickedNormal = normal.slice(0, 2);
+  const pickedBold = bold.slice(0, 1);
   let mix = [...pickedEasy, ...pickedNormal, ...pickedBold];
   // 不足分をプールから補完
-  const remaining = pool.filter(a => !mix.find(m => m.id === a.id));
-  mix = mix.concat(shuf(remaining)).slice(0, targetSize);
+  const remaining = prioritize(pool.filter(a => !mix.find(m => m.id === a.id)));
+  mix = mix.concat(remaining).slice(0, targetSize);
   return mix;
 }
 
