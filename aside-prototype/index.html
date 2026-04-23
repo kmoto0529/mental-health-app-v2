@@ -4109,6 +4109,95 @@ body {
   margin-bottom: 6px;
   line-height: 1.5;
 }
+/* ---------- 行動実行モーダル v2 ---------- */
+.exec-modal .exec-help {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.exec-memo-input {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  background: var(--bg-soft);
+}
+.exec-countdown {
+  text-align: center;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 48px;
+  color: var(--primary);
+  padding: 20px 0;
+  font-weight: 300;
+}
+.exec-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+.exec-choice-btn {
+  padding: 12px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  transition: all .1s var(--ease);
+}
+.exec-choice-btn:active { transform: scale(0.97); background: rgba(212, 165, 116, 0.1); }
+.exec-done-main {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 4px;
+}
+.exec-done-theme {
+  font-size: 12px;
+  color: var(--primary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.exec-done-memo,
+.exec-done-choice {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: rgba(0,0,0,0.03);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.exec-done-reaction {
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.exec-done-reaction-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+.exec-done-reaction-row .exec-reaction-btn {
+  flex: 1;
+  font-size: 11px;
+  padding: 8px 6px;
+}
+.exec-done-reaction-row .exec-reaction-btn.selected {
+  background: rgba(212, 165, 116, 0.15);
+  color: var(--primary);
+  border-color: var(--primary);
+}
 .action-log-help {
   font-size: 12px;
   color: var(--text-soft);
@@ -6675,6 +6764,8 @@ function renderTodayActions() {
         const doneToday = (state.actionLogs || []).some(log =>
           log.actionId === a.id && log.executedAt && new Date(log.executedAt).toISOString().slice(0,10) === today && log.status === 'done'
         );
+        const execType = getActionExecutionType(a);
+        const ctaLabel = EXEC_CTA_LABEL[execType] || 'やってみる';
         return `
           <div class="today-action-v4 ${doneToday ? 'done' : ''}">
             <div class="today-action-head">
@@ -6687,8 +6778,7 @@ function renderTodayActions() {
               ${doneToday ? `
                 <span class="today-action-done">やった ✓</span>
               ` : `
-                ${a.ctaAct ? `<button class="btn btn-secondary today-action-open" data-act="${a.ctaAct}" data-action-id="${a.id}">開く</button>` : ''}
-                <button class="btn btn-primary today-action-log" data-act="action-log-open" data-action-id="${a.id}">やった</button>
+                <button class="btn btn-primary today-action-log" data-act="action-log-open" data-action-id="${a.id}">${escapeHtml(ctaLabel)}</button>
               `}
             </div>
           </div>
@@ -10190,24 +10280,163 @@ function openGoalChangeRealignModal() {
   `);
 }
 
+// 行動の実行形式を推定（execType 明示があれば優先）
+function getActionExecutionType(a) {
+  if (!a) return 'instant_done';
+  if (a.execType) return a.execType;
+  const t = (a.title || '') + ' ' + (a.desc || '');
+  // 1. タイトルが強い memo 指標を持つ → memo_done（ctaActより優先）
+  if (/残す|メモ|書く|1文|一文|保存|整理する|振り返る|並べる|まとめる|タイトルをつける|向き合う|具体的に決める|整理した内容|3つまで|2つを比べて/.test(t)) return 'memo_done';
+  // 2. タイトルが選択系なら choice_done
+  if (/近い言葉を1つ|近い色|近い一文|表情を選ぶ|スタンプ|思い浮かべる|1人だけ|度合いを選ぶ|近いものを1つ|条件を考える/.test(t)) return 'choice_done';
+  // 3. タイトルが身体系なら instant_done
+  if (/呼吸|水を|肩の力|目を閉じ|背伸び|立って|数える|温める|さする|外の空気|伸びる|姿勢|10秒|1分だけ歩く|静かな時間/.test(t)) return 'instant_done';
+  // 4. ctaAct ベースのフォールバック
+  if (a.ctaAct === 'start-chat') return 'ai_assist';
+  if (a.ctaAct === 'start-reflect') return 'ai_assist';
+  if (a.ctaAct === 'goto-mood') return 'choice_done';
+  if (a.ctaAct === 'goto-rescue' || a.ctaAct === 'goto-rescue-night') return 'instant_done';
+  return 'instant_done';
+}
+
+// CTA ラベル（仕様§10）
+const EXEC_CTA_LABEL = {
+  instant_done: 'やってみる',
+  memo_done:    'やって記録する',
+  ai_assist:    'AIと一緒にやる',
+  choice_done:  '選んで進める'
+};
+
+// 既存 action-log-open をこのディスパッチャへ
 function openActionLogModal(actionId) {
   const theme = state.weekTheme;
   const action = theme && theme.actions && theme.actions.find(a => a.id === actionId);
   if (!action) return;
+  const type = getActionExecutionType(action);
+  if (type === 'instant_done') return openInstantActionModal(action);
+  if (type === 'memo_done')    return openMemoActionModal(action);
+  if (type === 'ai_assist')    return openAiAssistActionModal(action);
+  if (type === 'choice_done')  return openChoiceActionModal(action);
+  return openInstantActionModal(action);
+}
+
+// instant_done 型: その場でできる行動（呼吸・水・伸びる 等）
+function openInstantActionModal(action) {
   openModal(`
-    <div class="modal action-log-modal">
-      <div class="modal-title">この行動、やったね</div>
+    <div class="modal exec-modal">
+      <div class="modal-title">${escapeHtml(action.title)}</div>
       <div class="modal-body">
-        <div class="action-log-title">${escapeHtml(action.title)}</div>
-        <div class="action-log-help">少しでも、自分のほうを向けた。</div>
+        <div class="exec-help">${escapeHtml(action.desc || '長くやらなくて大丈夫。少しだけで十分。')}</div>
+        <div id="execCountdown" class="exec-countdown" style="display:none;"></div>
+      </div>
+      <div class="modal-actions" id="execActions">
+        <button class="btn btn-primary" data-act="exec-instant-start" data-action-id="${action.id}">はじめる</button>
+        <button class="btn btn-ghost" onclick="closeModal()">あとで</button>
+      </div>
+    </div>
+  `);
+}
+
+// memo_done 型: 一言を残す
+function openMemoActionModal(action) {
+  openModal(`
+    <div class="modal exec-modal">
+      <div class="modal-title">${escapeHtml(action.title)}</div>
+      <div class="modal-body">
+        <div class="exec-help">${escapeHtml(action.desc || '大きなことでなくて大丈夫。ひとことで十分。')}</div>
+        <textarea id="execMemoInput" class="exec-memo-input" rows="3" placeholder="ひとことでOK"></textarea>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-primary" data-act="action-log-done" data-action-id="${actionId}">やった</button>
-        <div class="action-log-or">できなかった？</div>
-        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="forgot">忘れていた</button>
-        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="not_mood">今は気分が合わなかった</button>
-        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="heavy">少し重たかった</button>
-        <button class="btn btn-ghost action-log-skip" data-act="action-log-skip" data-action-id="${actionId}" data-reason="no_time">時間がなかった</button>
+        <button class="btn btn-primary" data-act="exec-memo-save" data-action-id="${action.id}">保存する</button>
+        <button class="btn btn-secondary" data-act="exec-memo-to-ai" data-action-id="${action.id}">AIと一緒に考える</button>
+        <button class="btn btn-ghost" onclick="closeModal()">あとで</button>
+      </div>
+    </div>
+  `);
+}
+
+// ai_assist 型: AIへ直接繋げる
+function openAiAssistActionModal(action) {
+  openModal(`
+    <div class="modal exec-modal">
+      <div class="modal-title">${escapeHtml(action.title)}</div>
+      <div class="modal-body">
+        <div class="exec-help">一緒にやってみよう。全部決めなくて大丈夫、少しずつでいい。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-act="exec-ai-start" data-action-id="${action.id}">AIと一緒にやる</button>
+        <button class="btn btn-ghost" onclick="closeModal()">あとで</button>
+      </div>
+    </div>
+  `);
+}
+
+// choice_done 型: 選択肢から1つ
+const ACTION_CHOICE_OPTIONS = {
+  // 気分系
+  'act_mood_one':    ['うれしい','ふつう','もやもや','つかれた','不安','さみしい','よくわからない'],
+  'act_mood_select': ['うれしい','ふつう','もやもや','つかれた','不安','さみしい','よくわからない'],
+  'act_mood_night':  ['ほっとしてる','ふつう','もやもや','つかれた','不安','さみしい'],
+  'act_mood_normal': ['うれしい','ふつう','もやもや','つかれた','不安','さみしい','よくわからない'],
+  'act_c02':         ['うれしい','ふつう','もやもや','つかれた','不安','さみしい','よくわからない'],
+  'act_c08':         ['😊','🙂','😐','😟','😢','😔','😡'],
+  'act_d01':         ['家族','友だち','学校の先生','部活の仲間','職場の人','先輩','オンラインの誰か','いない'],
+  'act_a10':         ['青','白','グレー','黄色','オレンジ','ピンク','赤','黒'],
+  'act_d12':         ['聞いてほしい','一緒に考えてほしい','そばにいてほしい','アドバイスがほしい'],
+  'act_c13':         ['ない','少しある','あるくらい','かなりある']
+};
+function openChoiceActionModal(action) {
+  const opts = ACTION_CHOICE_OPTIONS[action.id] || ['とてもよい','ふつう','もやもや','不安','つかれた','よくわからない'];
+  openModal(`
+    <div class="modal exec-modal">
+      <div class="modal-title">${escapeHtml(action.title)}</div>
+      <div class="modal-body">
+        <div class="exec-help">${escapeHtml(action.desc || '近いものを1つ選ぶだけでOK。')}</div>
+        <div class="exec-choices">
+          ${opts.map(o => `<button class="exec-choice-btn" data-act="exec-choice-pick" data-action-id="${action.id}" data-value="${escapeAttr(o)}">${escapeHtml(o)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">あとで</button>
+      </div>
+    </div>
+  `);
+}
+
+// 行動完了の共通画面（仕様§7）
+function openActionDoneCelebration(action, detail) {
+  // 保存: actionLogs に done を記録
+  if (!state.actionLogs) state.actionLogs = [];
+  state.actionLogs.push({
+    actionId: action.id,
+    executedAt: Date.now(),
+    status: 'done',
+    execType: detail && detail.execType,
+    memoText: detail && detail.memoText,
+    selectedValue: detail && detail.selectedValue,
+    reaction: null
+  });
+  saveState();
+
+  const themeLink = (state.weekTheme && state.weekTheme.title) ? `今週のテーマ「${state.weekTheme.title}」に近づいているよ。` : '';
+  openModal(`
+    <div class="modal exec-modal">
+      <div class="modal-title">今日の一歩ができたね</div>
+      <div class="modal-body">
+        <div class="exec-done-main">少しだけでも十分だよ。</div>
+        ${themeLink ? `<div class="exec-done-theme">${escapeHtml(themeLink)}</div>` : ''}
+        ${detail && detail.memoText ? `<div class="exec-done-memo">記録：${escapeHtml(detail.memoText)}</div>` : ''}
+        ${detail && detail.selectedValue ? `<div class="exec-done-choice">えらんだ：${escapeHtml(detail.selectedValue)}</div>` : ''}
+        <div class="exec-done-reaction">この一歩、どうだった？（任意）</div>
+        <div class="exec-done-reaction-row">
+          <button class="btn btn-ghost exec-reaction-btn" data-act="exec-reaction" data-value="easy">少し楽だった</button>
+          <button class="btn btn-ghost exec-reaction-btn" data-act="exec-reaction" data-value="flat">ふつう</button>
+          <button class="btn btn-ghost exec-reaction-btn" data-act="exec-reaction" data-value="hard">むずかしかった</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-act="exec-done-to-mood">きょうのきもちも残す</button>
+        <button class="btn btn-secondary" data-act="exec-done-to-chat">AIと少し話す</button>
         <button class="btn btn-ghost" onclick="closeModal()">閉じる</button>
       </div>
     </div>
@@ -13304,6 +13533,127 @@ function handleAction(act, el, e) {
       closeModal();
       toast('行動を記録したよ');
       render();
+      break;
+    }
+    // ===== 新：実行タイプ別のアクション =====
+    case 'exec-instant-start': {
+      // 10秒カウントダウン → 完了/スキップ選択
+      const id = el.dataset.actionId;
+      const theme = state.weekTheme;
+      const action = theme && theme.actions && theme.actions.find(a => a.id === id);
+      if (!action) { closeModal(); break; }
+      const countEl = document.getElementById('execCountdown');
+      const actionsEl = document.getElementById('execActions');
+      if (!countEl || !actionsEl) break;
+      countEl.style.display = 'block';
+      actionsEl.innerHTML = '';
+      let remaining = 10;
+      countEl.textContent = `${remaining}`;
+      const tid = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(tid);
+          countEl.textContent = '終わり';
+          actionsEl.innerHTML = `
+            <button class="btn btn-primary" data-act="exec-instant-done" data-action-id="${id}">できた</button>
+            <button class="btn btn-ghost" data-act="exec-instant-skip" data-action-id="${id}">今はやめておく</button>
+          `;
+          actionsEl.querySelectorAll('[data-act]').forEach(el2 => {
+            el2.addEventListener('click', (e2) => handleAction(el2.dataset.act, el2, e2));
+          });
+        } else {
+          countEl.textContent = `${remaining}`;
+        }
+      }, 1000);
+      break;
+    }
+    case 'exec-instant-done': {
+      const id = el.dataset.actionId;
+      const theme = state.weekTheme;
+      const action = theme && theme.actions && theme.actions.find(a => a.id === id);
+      if (action) openActionDoneCelebration(action, { execType: 'instant_done' });
+      break;
+    }
+    case 'exec-instant-skip': {
+      const id = el.dataset.actionId;
+      if (!state.actionLogs) state.actionLogs = [];
+      state.actionLogs.push({ actionId: id, executedAt: Date.now(), status: 'skipped', skipReason: 'not_ready', execType: 'instant_done' });
+      saveState();
+      closeModal();
+      toast('今はそういう日もあるよ');
+      render();
+      break;
+    }
+    case 'exec-memo-save': {
+      const id = el.dataset.actionId;
+      const theme = state.weekTheme;
+      const action = theme && theme.actions && theme.actions.find(a => a.id === id);
+      const input = document.getElementById('execMemoInput');
+      const memo = input ? input.value.trim() : '';
+      if (!memo) { toast('ひとこと書いてみて'); return; }
+      if (action) openActionDoneCelebration(action, { execType: 'memo_done', memoText: memo });
+      break;
+    }
+    case 'exec-memo-to-ai': {
+      const id = el.dataset.actionId;
+      const theme = state.weekTheme;
+      const action = theme && theme.actions && theme.actions.find(a => a.id === id);
+      const input = document.getElementById('execMemoInput');
+      const memo = input ? input.value.trim() : '';
+      // まずログを memo_done として保存してから chat 遷移
+      if (action) {
+        if (!state.actionLogs) state.actionLogs = [];
+        state.actionLogs.push({ actionId: id, executedAt: Date.now(), status: 'done', execType: 'memo_done', memoText: memo });
+        saveState();
+      }
+      closeModal();
+      chatState.session = null;
+      chatState.mode = 'organize';
+      App.go('chat');
+      setTimeout(() => sendInitialAi({ mode: 'organize', seedMemo: memo }), 300);
+      break;
+    }
+    case 'exec-ai-start': {
+      const id = el.dataset.actionId;
+      closeModal();
+      chatState.session = null;
+      chatState.mode = 'forward';
+      App.go('chat');
+      setTimeout(() => sendInitialAi({ mode: 'forward', actionId: id }), 300);
+      break;
+    }
+    case 'exec-choice-pick': {
+      const id = el.dataset.actionId;
+      const val = el.dataset.value;
+      const theme = state.weekTheme;
+      const action = theme && theme.actions && theme.actions.find(a => a.id === id);
+      if (action) openActionDoneCelebration(action, { execType: 'choice_done', selectedValue: val });
+      break;
+    }
+    case 'exec-reaction': {
+      const v = el.dataset.value;
+      // 最新のactionLogに reaction を付ける
+      if (Array.isArray(state.actionLogs) && state.actionLogs.length > 0) {
+        state.actionLogs[state.actionLogs.length - 1].reaction = v;
+        saveState();
+      }
+      // バッジ風に選択状態を反映
+      document.querySelectorAll('.exec-reaction-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      toast('ありがとう、覚えておくね');
+      break;
+    }
+    case 'exec-done-to-mood': {
+      closeModal();
+      App.go('mood');
+      break;
+    }
+    case 'exec-done-to-chat': {
+      closeModal();
+      chatState.session = null;
+      chatState.mode = 'feel';
+      App.go('chat');
+      setTimeout(() => sendInitialAi({ mode: 'feel' }), 300);
       break;
     }
     case 'action-log-skip': {
