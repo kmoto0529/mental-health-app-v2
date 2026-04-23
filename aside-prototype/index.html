@@ -3411,6 +3411,42 @@ body {
 }
 .report-theme-actions .btn { width: 100%; }
 
+/* ---------- Phase 2: 週次レポート 追加ブロック ---------- */
+.report-insight-line {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.9;
+  margin-bottom: 6px;
+}
+.report-insight-line:last-child { margin-bottom: 0; }
+
+.report-next-week {
+  background: linear-gradient(135deg, #F4E8D3, var(--bg-card));
+  border: 1px solid var(--accent);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+}
+.report-next-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.report-next-btn {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.report-next-btn:active { transform: scale(0.98); background: var(--accent-soft); }
+
 /* ---------- 先週テーマ振り返り / テーマ履歴 ---------- */
 .report-last-theme {
   background: var(--bg-soft);
@@ -9304,10 +9340,30 @@ let actionSuggestState = { proposals: [], selected: [], round: 0 };
 function prepareActionSuggestions() {
   const goalKey = (state.directionGoal && state.directionGoal.key) || 'not_sure_yet';
   const userState = state.userStateSurvey || null;
-  const pool = getActionsForGoal(goalKey, userState);
-  // ラウンド毎に異なるシャッフルで4件選ぶ
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  actionSuggestState.proposals = shuffled.slice(0, 4);
+  let pool = getActionsForGoal(goalKey, userState);
+
+  // プロフィール（Phase 3）反映：過去の実績で並び替え
+  const profile = computeProfile();
+  if (profile.preferredActionType) {
+    pool.sort((a, b) => (a.type === profile.preferredActionType ? -1 : b.type === profile.preferredActionType ? 1 : 0));
+  }
+  // 実施率が低い → やさしめを優先
+  if (profile.completionRate !== null && profile.completionRate < 30) {
+    pool.sort((a, b) => {
+      const order = { easy: 0, normal: 1, bold: 2 };
+      return order[a.difficulty] - order[b.difficulty];
+    });
+  }
+  // 直近で bold が続いていなければシャッフル要素を少し入れる
+  if (pool.length > 4) {
+    const preferred = pool.slice(0, 3);
+    const rest = pool.slice(3).sort(() => Math.random() - 0.5);
+    pool = preferred.concat(rest);
+  } else {
+    pool = pool.sort(() => Math.random() - 0.5);
+  }
+
+  actionSuggestState.proposals = pool.slice(0, 4);
   actionSuggestState.selected = [];
 }
 
@@ -9519,6 +9575,123 @@ function openActionLogModal(actionId) {
       </div>
     </div>
   `);
+}
+
+// ---------- パーソナライズProfile（Phase 3） ----------
+// state.personalizationProfile に蓄積する集約分析
+// 各所で computeProfile() を呼んで最新化して使う
+
+function computeProfile() {
+  const now = Date.now();
+  const D30 = now - 30 * 86400000;
+  const logs = (state.actionLogs || []).filter(l => l.executedAt >= D30);
+  const moods = (state.moods || []).filter(m => (m.checkedAt || new Date(m.date).getTime()) >= D30);
+  const sessions = (state.sessions || []).filter(s => s.startedAt >= D30);
+  const reflects = (state.reflections || []).filter(r => r.startedAt >= D30);
+  const rescues = (state.rescueHistory || []).filter(r => r.startedAt >= D30);
+
+  // === 完了率 ===
+  const done = logs.filter(l => l.status === 'done').length;
+  const total = logs.length;
+  const completionRate = total === 0 ? null : Math.round((done / total) * 100);
+
+  // === 時間帯分布（朝/昼/夕/夜） ===
+  const slotBins = { morning: 0, noon: 0, evening: 0, night: 0 };
+  const all = [
+    ...logs.filter(l => l.status === 'done').map(x => x.executedAt),
+    ...sessions.map(x => x.startedAt),
+    ...reflects.map(x => x.startedAt),
+    ...rescues.map(x => x.startedAt),
+    ...moods.map(x => x.checkedAt || new Date(x.date).getTime())
+  ];
+  all.forEach(ts => {
+    const h = new Date(ts).getHours();
+    if (h >= 5 && h < 11) slotBins.morning++;
+    else if (h >= 11 && h < 16) slotBins.noon++;
+    else if (h >= 16 && h < 21) slotBins.evening++;
+    else slotBins.night++;
+  });
+  let preferredTimeSlot = null;
+  let maxSlot = 0;
+  Object.entries(slotBins).forEach(([k, v]) => { if (v > maxSlot) { maxSlot = v; preferredTimeSlot = k; } });
+  if (maxSlot < 3) preferredTimeSlot = null; // サンプル少ない時は無指定
+
+  // === アクションカテゴリ傾向（app/daily/social） ===
+  const typeBins = { app: 0, daily: 0, social: 0 };
+  logs.filter(l => l.status === 'done').forEach(l => {
+    const a = ACTION_CATALOG.find(x => x.id === l.actionId);
+    if (a) typeBins[a.type] = (typeBins[a.type] || 0) + 1;
+  });
+  const preferredActionType = Object.entries(typeBins).sort((a, b) => b[1] - a[1])[0];
+  const avoidedActionType = Object.entries(typeBins).sort((a, b) => a[1] - b[1])[0];
+
+  // === 伴走スタイル（recorder / talker / organizer / rescue_user） ===
+  const styleScores = {
+    recorder: moods.length * 1.0,
+    talker: sessions.length * 2.0,
+    organizer: reflects.length * 3.0,
+    rescue_user: rescues.length * 2.5
+  };
+  const supportStyle = Object.entries(styleScores).sort((a, b) => b[1] - a[1])[0];
+  const supportStyleKey = supportStyle && supportStyle[1] > 0 ? supportStyle[0] : null;
+
+  // === 気分×行動の相関（行動実施日 vs 非実施日の気分平均） ===
+  const actionDaysSet = new Set(
+    logs.filter(l => l.status === 'done').map(l => new Date(l.executedAt).toISOString().slice(0, 10))
+  );
+  const actionDayMoods = [];
+  const nonActionDayMoods = [];
+  moods.forEach(m => {
+    const dk = m.date;
+    if (actionDaysSet.has(dk)) actionDayMoods.push(m.score);
+    else nonActionDayMoods.push(m.score);
+  });
+  const actionDayMoodAvg = actionDayMoods.length ? actionDayMoods.reduce((s, x) => s + x, 0) / actionDayMoods.length : null;
+  const nonActionDayMoodAvg = nonActionDayMoods.length ? nonActionDayMoods.reduce((s, x) => s + x, 0) / nonActionDayMoods.length : null;
+
+  // === 自由入力量 ===
+  const avgMoodCommentLen = moods.length
+    ? moods.reduce((s, m) => s + (m.comment ? m.comment.length : 0), 0) / moods.length
+    : 0;
+  const freeTextTendency = avgMoodCommentLen >= 20 ? 'high' : avgMoodCommentLen >= 8 ? 'mid' : 'low';
+
+  const profile = {
+    completionRate,
+    preferredTimeSlot,
+    preferredActionType: preferredActionType && preferredActionType[1] > 0 ? preferredActionType[0] : null,
+    avoidedActionType: avoidedActionType && avoidedActionType[1] === 0 ? avoidedActionType[0] : null,
+    supportStyle: supportStyleKey,
+    actionDayMoodAvg,
+    nonActionDayMoodAvg,
+    freeTextTendency,
+    sampleSize: { logs: total, moods: moods.length, sessions: sessions.length, reflects: reflects.length, rescues: rescues.length },
+    updatedAt: Date.now()
+  };
+
+  state.personalizationProfile = profile;
+  return profile;
+}
+
+// 伴走スタイルの表示ラベル
+const STYLE_LABELS = {
+  recorder: '気持ちを記録する',
+  talker: '話して整える',
+  organizer: '構造的に整理する',
+  rescue_user: '短いサポートを使う'
+};
+const STYLE_MESSAGES = {
+  recorder: '長く整理するより、一言だけ残す方が続けやすそうです',
+  talker: '話して外に出すスタイルが合っていそうです',
+  organizer: 'ゆっくり考えを整理するのが、今のあなたに合っていそうです',
+  rescue_user: '短いサポートを上手く使えているようです'
+};
+const SLOT_LABELS = { morning: '朝', noon: '昼', evening: '夕方', night: '夜' };
+
+// 時間帯別のおすすめメッセージ
+function getTimeSlotMessage(slot) {
+  if (!slot) return null;
+  const m = { morning: '朝', noon: '昼', evening: '夕方', night: '夜' };
+  return `${m[slot]}の方が、行動しやすいようです`;
 }
 
 // ---------- 行動カタログ（目標別・状態対応・Phase 1 MVP） ----------
@@ -10693,12 +10866,196 @@ function renderReportBlocks(kind, ins, days) {
         </div>
       ` : ''}
 
+      ${kind === 'week' ? renderReportInsightsV2() : ''}
+      ${kind === 'week' ? renderReportNextWeekPicker() : ''}
       ${kind === 'week' ? renderReportThemeSuggestion() : ''}
     `}
 
     <div class="report-disclaimer">
       これは記録をもとにしたふりかえりで、診断ではありません。<br>
       近くないと感じたら、そのまま気にしなくて大丈夫です。
+    </div>
+  `;
+}
+
+// 来週どうする？ モード別に次週テーマを自動生成
+function handleNextWeekPick(mode) {
+  const profile = computeProfile();
+  const currentTheme = state.weekTheme;
+
+  // 現テーマを履歴にアーカイブ
+  if (currentTheme && currentTheme.key) {
+    if (!state.weekThemeHistory) state.weekThemeHistory = [];
+    state.weekThemeHistory.push({ ...currentTheme, archivedAt: Date.now() });
+  }
+
+  if (mode === 'continue' && currentTheme) {
+    // 同じテーマで次週に進める
+    const week = getWeekRange();
+    const nextMonday = new Date(week.start + 'T00:00:00');
+    nextMonday.setDate(nextMonday.getDate() + 7);
+    const nextSunday = new Date(nextMonday);
+    nextSunday.setDate(nextMonday.getDate() + 6);
+    const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    state.weekTheme = {
+      ...currentTheme,
+      weekStartDate: fmt(nextMonday),
+      weekEndDate: fmt(nextSunday),
+      acceptedAt: Date.now(),
+      changedAt: null
+    };
+    saveState();
+    toast('来週も同じテーマで進むね');
+    App.go('goal');
+    return;
+  }
+
+  // ease/step_up/change: 新しい行動セットを抽出して themeConfirm へ
+  const goalKey = (state.directionGoal && state.directionGoal.key) || 'not_sure_yet';
+  const userState = state.userStateSurvey || {};
+  let pool = getActionsForGoal(goalKey, userState);
+
+  if (mode === 'ease') {
+    // easy・duration短めを最優先
+    pool = pool.filter(a => a.difficulty === 'easy').sort((a, b) => a.duration - b.duration);
+  } else if (mode === 'step_up') {
+    // completion rateが高ければ bold も混ぜる
+    const completed = profile.completionRate !== null && profile.completionRate >= 50;
+    pool = pool.filter(a => completed ? true : a.difficulty !== 'bold')
+               .sort((a, b) => {
+                 const order = { easy: 0, normal: 1, bold: 2 };
+                 return order[a.difficulty] - order[b.difficulty];
+               });
+    pool.reverse(); // 難しめから
+  } else if (mode === 'change') {
+    // 前回と違うテーマキーから抽出
+    const prevKeys = new Set(((currentTheme && currentTheme.actions) || []).map(a => a.id));
+    pool = pool.filter(a => !prevKeys.has(a.id));
+  }
+
+  // プロフィール反映：時間帯・action typeで好みを優先
+  if (profile.preferredActionType) {
+    pool.sort((a, b) => {
+      const af = a.type === profile.preferredActionType ? 0 : 1;
+      const bf = b.type === profile.preferredActionType ? 0 : 1;
+      return af - bf;
+    });
+  }
+  if (profile.avoidedActionType) {
+    pool = pool.filter(a => a.type !== profile.avoidedActionType).concat(
+      pool.filter(a => a.type === profile.avoidedActionType)
+    );
+  }
+
+  if (pool.length === 0) pool = ACTION_CATALOG.filter(a => a.difficulty === 'easy').slice(0, 4);
+
+  // 提案を actionSuggest 経由で表示（ユーザーに選ばせる）
+  actionSuggestState = { proposals: pool.slice(0, 4), selected: [], round: 0, mode };
+  App.go('actionSuggest');
+  toast(mode === 'ease' ? '少しやさしめの候補を出すね' : mode === 'step_up' ? '少しだけ背伸び気味の候補だよ' : '違うテーマを探してみよう');
+}
+
+// 週次レポート用：Block C/D/E = 気分傾向・AI伴走解釈・合う傾向
+function renderReportInsightsV2() {
+  const profile = computeProfile();
+  const weekStartTs = Date.now() - 7 * 86400000;
+
+  // Block C: 気分の傾向（前半/後半＋行動日/非行動日）
+  const weekMoods = (state.moods || [])
+    .filter(m => (m.checkedAt || new Date(m.date).getTime()) >= weekStartTs)
+    .sort((a, b) => (a.checkedAt || 0) - (b.checkedAt || 0));
+
+  let moodTrendLine = '';
+  if (weekMoods.length >= 4) {
+    const mid = Math.floor(weekMoods.length / 2);
+    const firstAvg = weekMoods.slice(0, mid).reduce((s, m) => s + m.score, 0) / mid;
+    const lastAvg = weekMoods.slice(mid).reduce((s, m) => s + m.score, 0) / (weekMoods.length - mid);
+    const delta = lastAvg - firstAvg;
+    if (delta >= 0.6) moodTrendLine = '週の前半より後半の方が、少し楽になった傾向があります。';
+    else if (delta <= -0.6) moodTrendLine = '週の前半より後半の方が、少し重めだったようです。';
+    else moodTrendLine = '週を通して、気分は大きく動かなかったみたいです。';
+  }
+
+  let actionDayCorr = '';
+  if (profile.actionDayMoodAvg !== null && profile.nonActionDayMoodAvg !== null) {
+    const diff = profile.actionDayMoodAvg - profile.nonActionDayMoodAvg;
+    if (diff >= 0.4) actionDayCorr = '行動を実施した日の方が、少し気分が良い傾向が見えています。';
+    else if (diff <= -0.4) actionDayCorr = '行動した日ほど気分が良かったわけではなさそう。無理していたかも。';
+  }
+
+  let slotLine = '';
+  if (profile.preferredTimeSlot) {
+    const slotLabel = SLOT_LABELS[profile.preferredTimeSlot];
+    slotLine = `${slotLabel}の方が、行動しやすいようです。`;
+  }
+
+  const cBlock = [moodTrendLine, actionDayCorr, slotLine].filter(Boolean);
+
+  // Block D: AI解釈文（伴走スタイル＋実施状況）
+  const interpretations = [];
+  const weekLogs = (state.actionLogs || []).filter(l => l.executedAt >= weekStartTs);
+  const weekDone = weekLogs.filter(l => l.status === 'done').length;
+  const weekSkip = weekLogs.filter(l => l.status === 'skipped').length;
+
+  if (weekDone >= 3) {
+    interpretations.push('今週は、気持ちをすっきりさせるというより、抱え込みすぎないための動きが少しできていました。');
+  } else if (weekDone >= 1) {
+    interpretations.push(`今週は ${weekDone} 回、行動に触れられた日がありました。一回でもやれたことは、ちゃんと進んでいる証拠です。`);
+  } else if (weekSkip > 0) {
+    interpretations.push('今週は動けない日が多かったかもしれません。それも、今の自分を守るための一つの選択です。');
+  } else {
+    interpretations.push('今週は、まだ始まったばかり。続けやすい形を、ゆっくり探していきましょう。');
+  }
+
+  if (profile.supportStyle && profile.sampleSize.logs + profile.sampleSize.moods + profile.sampleSize.sessions >= 5) {
+    interpretations.push(STYLE_MESSAGES[profile.supportStyle] + '。');
+  }
+
+  // Block E: あなたに合いそうな傾向
+  const tendencies = [];
+  if (profile.supportStyle) tendencies.push(STYLE_MESSAGES[profile.supportStyle]);
+  if (profile.preferredTimeSlot) tendencies.push(getTimeSlotMessage(profile.preferredTimeSlot));
+  if (profile.preferredActionType) {
+    const tLabel = { app: 'アプリ内', daily: '日常での小さな行動', social: '人につながる行動' };
+    tendencies.push(`${tLabel[profile.preferredActionType]}が、今のあなたに合っていそうです`);
+  }
+  if (profile.freeTextTendency === 'low') tendencies.push('選ぶだけでも十分に、自分のほうを向けています');
+
+  return `
+    ${cBlock.length > 0 ? `
+      <div class="report-block">
+        <div class="report-block-label">気分と行動の傾向</div>
+        ${cBlock.map(x => `<div class="report-insight-line">${escapeHtml(x)}</div>`).join('')}
+      </div>
+    ` : ''}
+
+    <div class="report-narrative">
+      <div class="report-narrative-label">${escapeHtml(getCurrentPersona().name)}のふりかえり</div>
+      ${interpretations.map(x => `<div class="report-narrative-line">${escapeHtml(x)}</div>`).join('')}
+    </div>
+
+    ${tendencies.length > 0 ? `
+      <div class="report-block">
+        <div class="report-block-label">あなたに合いそうな傾向</div>
+        <ul class="report-list">
+          ${tendencies.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+  `;
+}
+
+// Block F: 来週どうする？（4択）
+function renderReportNextWeekPicker() {
+  return `
+    <div class="report-next-week">
+      <div class="report-block-label">来週どうする？</div>
+      <div class="report-next-options">
+        <button class="report-next-btn" data-act="next-week-pick" data-mode="continue">同じテーマで続ける</button>
+        <button class="report-next-btn" data-act="next-week-pick" data-mode="ease">少しやさしくする</button>
+        <button class="report-next-btn" data-act="next-week-pick" data-mode="step_up">少しだけステップアップ</button>
+        <button class="report-next-btn" data-act="next-week-pick" data-mode="change">別のテーマにする</button>
+      </div>
     </div>
   `;
 }
@@ -11556,6 +11913,12 @@ function handleAction(act, el, e) {
       closeModal();
       toast('今はそういう日もあるよ');
       render();
+      break;
+    }
+    // ===== 来週どうする？（Phase 2） =====
+    case 'next-week-pick': {
+      const mode = el.dataset.mode;
+      handleNextWeekPick(mode);
       break;
     }
     case 'confirm-theme': {
