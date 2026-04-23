@@ -9645,7 +9645,7 @@ function viewRescue() {
     <div class="screen active">
       <div class="page-header insights-header">
         <button class="chat-back" data-act="back-home">${icon('arrow-left')}</button>
-        <div class="page-title">少しひと息</div>
+        <div class="page-title">ひといき</div>
       </div>
       <div class="home-content">
         <div class="rescue-intro">いまの状態に近いものを選んでね。30秒〜3分で終わるよ。</div>
@@ -9727,7 +9727,7 @@ function viewRescueFlow() {
 function ctaButtonLabel(ctaAct) {
   if (!ctaAct) return 'やってみる';
   if (ctaAct === 'goto-mood') return 'きもちチェック';
-  if (ctaAct === 'goto-rescue' || ctaAct === 'goto-rescue-night' || ctaAct === 'goto-rescue-words' || ctaAct === 'goto-rescue-fuzzy') return '少しひと息';
+  if (ctaAct === 'goto-rescue' || ctaAct === 'goto-rescue-night' || ctaAct === 'goto-rescue-words' || ctaAct === 'goto-rescue-fuzzy') return 'ひといき';
   if (ctaAct === 'start-chat' || ctaAct === 'goto-talk') return '話してみる';
   if (ctaAct === 'start-reflect') return 'もやもや整理';
   return 'やってみる';
@@ -10698,7 +10698,7 @@ function homeStyleHint() {
   } else if (s === 'organizer') {
     return 'もやもやがあれば、1回だけ整理してみる？';
   } else if (s === 'rescue_user') {
-    return 'しんどい時は「少しひと息」を開くだけで十分。';
+    return 'しんどい時は「ひといき」を開くだけで十分。';
   }
   return '';
 }
@@ -10958,7 +10958,7 @@ const ACTION_CATALOG = [
   { id: 'act_mood_normal',   goalKeys:['understand_my_feelings'], type:'app', difficulty:'easy', duration:1, title:'「ふつう」の日も記録する', desc:'特別じゃない日を積み重ねるのが本当の軸になる。', ctaAct:'goto-mood', states:ALL_STATES, category:'H' },
   { id: 'act_mood_night',    goalKeys:['understand_my_feelings','reduce_overthinking'], type:'app', difficulty:'easy', duration:1, title:'夜に一回、気分を選ぶ', desc:'夜はとくに、選ぶだけで十分。', ctaAct:'goto-mood', states:ALL_STATES, category:'H' },
   { id: 'act_body_check',    goalKeys:['understand_my_feelings'], type:'daily', difficulty:'easy', duration:1, title:'体の調子を一度だけ確認する', desc:'肩・お腹・顔、どれか1つだけ意識してみる。', ctaAct:null, states:ALL_STATES, category:'D' },
-  { id: 'act_rescue_once',   goalKeys:['have_place_to_rely','reduce_overthinking'], type:'app', difficulty:'easy', duration:1, title:'しんどい時に「少しひと息」を開く', desc:'開くだけでも十分。使うかは後で決めていい。', ctaAct:'goto-rescue', states:['mixed','heavy'], category:'A' },
+  { id: 'act_rescue_once',   goalKeys:['have_place_to_rely','reduce_overthinking'], type:'app', difficulty:'easy', duration:1, title:'しんどい時に「ひといき」を開く', desc:'開くだけでも十分。使うかは後で決めていい。', ctaAct:'goto-rescue', states:['mixed','heavy'], category:'A' },
   { id: 'act_talk_fuzzy',    goalKeys:['have_place_to_rely'], type:'app', difficulty:'normal', duration:2, title:'なんとなくの日に少しだけ話す', desc:'理由が言えなくても、話していい。', ctaAct:'start-chat', states:['calm','mixed'], category:'A' },
   { id: 'act_choose_relied', goalKeys:['have_place_to_rely'], type:'social', difficulty:'bold', duration:3, title:'頼れる相手候補を1人だけ思い浮かべる', desc:'連絡しなくていい。候補があるだけで、少し安心できる。', ctaAct:null, states:['calm'], category:'F' },
   { id: 'act_safe_action',   goalKeys:['have_place_to_rely','not_sure_yet'], type:'daily', difficulty:'easy', duration:2, title:'しんどい時に落ち着く行動を1つ決めておく', desc:'お茶・散歩・音楽など、自分の「いつもの」を決めておく。', ctaAct:null, states:ALL_STATES, category:'G' },
@@ -11246,7 +11246,7 @@ const THEME_CATALOG = [
   { key: 'thought_when_spin', category: 'C', title: '頭がぐるぐるする時に、整理を選ぶ', description: '考えを止めるより、ひとつにしぼる方が楽なこともある。', actionType: 'thought_record', ctaAct: 'goto-rescue-fuzzy' },
   { key: 'thought_event_feeling', category: 'C', title: '今週は一度、出来事→気持ちまで書いてみる', description: '最後までじゃなくて途中で止めても大丈夫。', actionType: 'thought_record', ctaAct: 'start-reflect' },
   // Category D: レスキュー利用
-  { key: 'rescue_use', category: 'D', title: 'しんどい時に「少しひと息」を開く', description: '開くだけでも十分。使うかは後で決めていい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' },
+  { key: 'rescue_use', category: 'D', title: 'しんどい時に「ひといき」を開く', description: '開くだけでも十分。使うかは後で決めていい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' },
   { key: 'night_reset', category: 'D', title: '寝る前に、一言だけ置いて寝る', description: '考えすぎる夜に、少しだけ外に出してみよう。', actionType: 'rescue_night', ctaAct: 'goto-rescue-night' },
   { key: 'rescue_30sec', category: 'D', title: 'しんどい時に、30秒だけ整える', description: '長くやらなくていい。まずは少しだけでいい。', actionType: 'rescue_use', ctaAct: 'goto-rescue' }
 ];
