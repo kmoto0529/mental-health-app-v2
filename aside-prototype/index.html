@@ -11439,14 +11439,15 @@ function openDayDetailModal(dateKey) {
   `);
 }
 
-// ---------- 週次レポートV3: 前週比較+3ブロック構成 ----------
-// 集計：今週と前週の 気分平均 / 記録日数 / 会話数 / 夜利用割合
-function computeWeekCompareStats(weekOffset) {
-  // weekOffset: 0 = 今週, 1 = 前週
+// ---------- レポートV3: 前期間比較+3ブロック構成 ----------
+// 集計：指定期間の 気分平均 / 記録日数 / 会話数 / 夜利用割合
+// days: 期間の日数 (7=週, 30=月)
+// offset: 0=現在, 1=前期間
+function computeRangeCompareStats(days, offset) {
   const now = Date.now();
   const DAY = 86400000;
-  const startTs = now - (weekOffset + 1) * 7 * DAY;
-  const endTs = now - weekOffset * 7 * DAY;
+  const startTs = now - (offset + 1) * days * DAY;
+  const endTs = now - offset * days * DAY;
 
   const moods = (state.moods || []).filter(m => {
     const ts = m.checkedAt || new Date(m.date).getTime();
@@ -11487,9 +11488,15 @@ function weekCompareArrow(current, previous, rule) {
   } else if (rule === 'days') {
     if (diff > 0) dir = 'up';
     else if (diff < 0) dir = 'down';
+  } else if (rule === 'days_month') {
+    if (diff >= 3) dir = 'up';
+    else if (diff <= -3) dir = 'down';
   } else if (rule === 'chat') {
     if (diff >= 2) dir = 'up';
     else if (diff <= -2) dir = 'down';
+  } else if (rule === 'chat_month') {
+    if (diff >= 5) dir = 'up';
+    else if (diff <= -5) dir = 'down';
   } else if (rule === 'ratio') {
     if (diff >= 0.1) dir = 'up';
     else if (diff <= -0.1) dir = 'down';
@@ -11513,11 +11520,28 @@ function weeklyNightWord(ratio) {
   return '少なめ';
 }
 
-function renderReportWeeklySummaryV3() {
-  const cur = computeWeekCompareStats(0);
-  const prev = computeWeekCompareStats(1);
-  const rng = getWeekRange();
-  const periodText = `${rng.start.slice(5).replace('-', '/')} - ${rng.end.slice(5).replace('-', '/')}`;
+// kind: 'week' or 'month'
+function renderReportSummaryV3(kind) {
+  const days = kind === 'month' ? 30 : 7;
+  const cur = computeRangeCompareStats(days, 0);
+  const prev = computeRangeCompareStats(days, 1);
+
+  // 期間表示
+  let periodText;
+  if (kind === 'month') {
+    const now = new Date();
+    const start = new Date(now); start.setDate(now.getDate() - 29);
+    const fmt = (d) => `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+    periodText = `${fmt(start)} - ${fmt(now)}`;
+  } else {
+    const rng = getWeekRange();
+    periodText = `${rng.start.slice(5).replace('-', '/')} - ${rng.end.slice(5).replace('-', '/')}`;
+  }
+  const title = kind === 'month' ? '今月のまとめ' : '今週のまとめ';
+  const prevLabel = kind === 'month' ? '先月' : '先週';
+  // 月次は記録/会話の比較閾値を大きくする
+  const daysRule = kind === 'month' ? 'days_month' : 'days';
+  const chatRule = kind === 'month' ? 'chat_month' : 'chat';
 
   const rows = [
     {
@@ -11531,14 +11555,14 @@ function renderReportWeeklySummaryV3() {
       icon: '📅',
       label: '記録',
       value: `${cur.recordDays}日`,
-      arrow: weekCompareArrow(cur.recordDays, prev.recordDays, 'days'),
-      hint: prev.recordDays !== null ? `先週 ${prev.recordDays}日` : ''
+      arrow: weekCompareArrow(cur.recordDays, prev.recordDays, daysRule),
+      hint: prev.recordDays !== null ? `${prevLabel} ${prev.recordDays}日` : ''
     },
     {
       icon: '💬',
       label: '会話',
       value: `${cur.chatCount}回`,
-      arrow: weekCompareArrow(cur.chatCount, prev.chatCount, 'chat'),
+      arrow: weekCompareArrow(cur.chatCount, prev.chatCount, chatRule),
       hint: (prev.chatCount !== null && prev.chatCount !== undefined) ? (cur.chatCount - prev.chatCount >= 0 ? `+${cur.chatCount - prev.chatCount}` : `${cur.chatCount - prev.chatCount}`) : ''
     },
     {
@@ -11552,7 +11576,7 @@ function renderReportWeeklySummaryV3() {
 
   return `
     <div class="report-summary-v3">
-      <div class="report-summary-title">今週のまとめ</div>
+      <div class="report-summary-title">${title}</div>
       <div class="report-summary-period">${escapeHtml(periodText)}</div>
       <div class="report-summary-rows">
         ${rows.map(r => `
@@ -11569,25 +11593,37 @@ function renderReportWeeklySummaryV3() {
   `;
 }
 
+// 後方互換用（既存呼び出し）
+function renderReportWeeklySummaryV3() { return renderReportSummaryV3('week'); }
+
 // ② 気づき（ルールベースAI要約、最大3、比較矢印つき）
-function renderReportInsightsV3() {
-  const cur = computeWeekCompareStats(0);
-  const prev = computeWeekCompareStats(1);
+function renderReportInsightsV3(kind) {
+  kind = kind || 'week';
+  const days = kind === 'month' ? 30 : 7;
+  const cur = computeRangeCompareStats(days, 0);
+  const prev = computeRangeCompareStats(days, 1);
+  const prevLabel = kind === 'month' ? '先月' : '先週';
+  const curLabel = kind === 'month' ? '今月' : '今週';
   const profile = (state.personalizationProfile || (typeof computeProfile === 'function' ? computeProfile() : null)) || {};
   const items = [];
 
+  // 閾値を期間で調整
+  const chatDiffThreshold = kind === 'month' ? 5 : 2;
+  const recordHigh = kind === 'month' ? 20 : 5;
+  const recordLow = kind === 'month' ? 8 : 2;
+
   // 1. 会話増減
-  if (cur.chatCount >= 3 && (cur.chatCount - (prev.chatCount || 0)) >= 2) {
+  if (cur.chatCount >= (kind === 'month' ? 10 : 3) && (cur.chatCount - (prev.chatCount || 0)) >= chatDiffThreshold) {
     items.push({ text: '話すことで少し楽になる時間が増えていそう', dir: 'up' });
-  } else if ((prev.chatCount || 0) - cur.chatCount >= 2) {
-    items.push({ text: '今週は話す時間が少し減ったようです', dir: 'down' });
+  } else if ((prev.chatCount || 0) - cur.chatCount >= chatDiffThreshold) {
+    items.push({ text: `${curLabel}は話す時間が少し減ったようです`, dir: 'down' });
   }
 
   // 2. 記録継続
-  if (cur.recordDays >= 5) {
+  if (cur.recordDays >= recordHigh) {
     items.push({ text: '気持ちを記録する習慣が続いています', dir: cur.recordDays > (prev.recordDays || 0) ? 'up' : 'flat' });
-  } else if (cur.recordDays <= 2 && (prev.recordDays || 0) > cur.recordDays) {
-    items.push({ text: '今週は記録が少なめ。無理しない週だったかも', dir: 'down' });
+  } else if (cur.recordDays <= recordLow && (prev.recordDays || 0) > cur.recordDays) {
+    items.push({ text: `${curLabel}は記録が少なめ。無理しない${kind === 'month' ? '月' : '週'}だったかも`, dir: 'down' });
   }
 
   // 3. 夜利用
@@ -11598,8 +11634,8 @@ function renderReportInsightsV3() {
   // 4. 気分の動き
   if (cur.moodAvg !== null && prev.moodAvg !== null) {
     const diff = cur.moodAvg - prev.moodAvg;
-    if (diff >= 0.3) items.push({ text: '先週より気分が少し上向きになっています', dir: 'up' });
-    else if (diff <= -0.3) items.push({ text: '先週より少し疲れが溜まりやすい週だったかも', dir: 'down' });
+    if (diff >= 0.3) items.push({ text: `${prevLabel}より気分が少し上向きになっています`, dir: 'up' });
+    else if (diff <= -0.3) items.push({ text: `${prevLabel}より少し疲れが溜まりやすい${kind === 'month' ? '月' : '週'}だったかも`, dir: 'down' });
   }
 
   // 5. styleヒント（補填）
@@ -11610,10 +11646,11 @@ function renderReportInsightsV3() {
   const finalItems = items.slice(0, 3);
   if (finalItems.length === 0) return '';
 
+  const titleText = kind === 'month' ? '💡 今月の気づき' : '💡 今週の気づき';
   const arrow = (d) => d === 'up' ? '↑' : d === 'down' ? '↓' : '→';
   return `
     <div class="report-insight-v3">
-      <div class="report-insight-v3-title">💡 今週の気づき</div>
+      <div class="report-insight-v3-title">${titleText}</div>
       <ul class="report-insight-v3-list">
         ${finalItems.map(x => `
           <li>
@@ -11626,8 +11663,27 @@ function renderReportInsightsV3() {
   `;
 }
 
-// ③ 次どうする？（Block F picker + 今週の一言CTA強化）
-function renderReportNextActionV3() {
+// ③ 次どうする？（week: 4ボタン / month: 目標見直しベース）
+function renderReportNextActionV3(kind) {
+  kind = kind || 'week';
+  if (kind === 'month') {
+    const hasGoal = !!getCurrentDirectionGoal();
+    return `
+      <div class="report-next-action-v3">
+        <div class="report-next-action-v3-title">👉 来月どうする？</div>
+        <div class="report-next-options">
+          <button class="report-next-btn" data-act="month-next-pick" data-mode="continue">今の方向で続ける</button>
+          <button class="report-next-btn" data-act="month-next-pick" data-mode="deepen">この方向を深める</button>
+          <button class="report-next-btn" data-act="month-next-pick" data-mode="revise">${hasGoal ? '目標を見直す' : '目標を決める'}</button>
+        </div>
+        <div class="report-week-quote">
+          <div class="rwq-label">今月の一言</div>
+          <div class="rwq-text">「積み重ねてきた日々が、今の自分をつくっている」</div>
+          <button class="btn btn-primary rwq-cta" data-act="direction-goal-open">方向を見直す</button>
+        </div>
+      </div>
+    `;
+  }
   return `
     <div class="report-next-action-v3">
       <div class="report-next-action-v3-title">👉 来週どうする？</div>
@@ -11749,9 +11805,9 @@ function renderReportBlocks(kind, ins, days) {
       </div>
       ${renderReportLastWeekRecap()}
       ${renderReportGoalThemeNarrative()}
-      ${renderReportWeeklySummaryV3()}
-      ${renderReportInsightsV3()}
-      ${renderReportNextActionV3()}
+      ${renderReportSummaryV3('week')}
+      ${renderReportInsightsV3('week')}
+      ${renderReportNextActionV3('week')}
       <div class="report-disclaimer">
         これは記録をもとにしたふりかえりで、診断ではありません。<br>
         近くないと感じたら、そのまま気にしなくて大丈夫です。
@@ -11759,85 +11815,35 @@ function renderReportBlocks(kind, ins, days) {
     `;
   }
 
-  // === 月次ビュー（従来のまま） ===
-  return `
-    <div class="report-header">
-      <div class="report-title">${periodLabel}のふりかえり</div>
-      <div class="report-period">${reportPeriodLabel(days)}</div>
-    </div>
-
-    ${ins.checkinDays === 0 && ins.sessionCount === 0 && ins.reflectionCount === 0 ? `
+  // === 月次ビュー（V3 簡略構造） ===
+  const hasAnyDataMonth = ins.checkinDays > 0 || ins.sessionCount > 0 || ins.reflectionCount > 0;
+  if (!hasAnyDataMonth) {
+    return `
+      <div class="report-header">
+        <div class="report-title">今月のふりかえり</div>
+        <div class="report-period">${reportPeriodLabel(days)}</div>
+      </div>
       <div class="report-empty">
         <div class="report-empty-icon">🌱</div>
-        <div class="report-empty-text">${periodLabel}はまだ記録がないみたい。<br>小さく始めてみよう。</div>
+        <div class="report-empty-text">今月はまだ記録がないみたい。<br>小さく始めてみよう。</div>
         <div class="empty-actions" style="margin-top:20px;">
           <button class="btn btn-primary" data-act="goto-mood">きもちチェック</button>
           <button class="btn btn-ghost" data-act="start-chat">Asideと話す</button>
         </div>
       </div>
-    ` : `
-      <div class="report-block">
-        <div class="report-block-label">${periodLabel}の気分の流れ</div>
-        <div class="report-mood-flow">
-          ${flowMoods.map((m, i) => `
-            <div class="report-flow-item">
-              <div class="report-flow-emoji ${m ? `mood-${m.score}` : 'no-mood'}">${m ? MOODS.find(x => x.score === m.score).emoji : '·'}</div>
-              ${kind === 'week' ? `<div class="report-flow-date">${flowDates[i].slice(5).replace('-', '/')}</div>` : ''}
-            </div>
-          `).join('')}
-        </div>
+      <div class="report-disclaimer">
+        これは記録をもとにしたふりかえりで、診断ではありません。
       </div>
-
-      <div class="report-stats">
-        <div class="report-stat"><div class="report-stat-n">${ins.checkinDays}</div><div class="report-stat-l">記録日</div></div>
-        <div class="report-stat"><div class="report-stat-n">${ins.sessionCount}</div><div class="report-stat-l">会話</div></div>
-        <div class="report-stat"><div class="report-stat-n">${ins.reflectionCount}</div><div class="report-stat-l">整理</div></div>
-        <div class="report-stat"><div class="report-stat-n">${rescueInPeriod.length}</div><div class="report-stat-l">ひといき</div></div>
-      </div>
-
-      ${dominantMoodText ? `
-        <div class="report-block">
-          <div class="report-block-label">${periodLabel}多かった気分</div>
-          <div class="report-block-text">${escapeHtml(dominantMoodText).replace(/\n/g, '<br>')}</div>
-        </div>
-      ` : ''}
-
-      ${topicList.length > 0 ? `
-        <div class="report-block">
-          <div class="report-block-label">${periodLabel}よく出てきたテーマ</div>
-          <div class="report-topic-chips">
-            ${topicList.map(t => `<span class="report-topic-chip">${escapeHtml(t)}</span>`).join('')}
-          </div>
-        </div>
-      ` : ''}
-
-      ${supportLines.length > 0 ? `
-        <div class="report-block">
-          <div class="report-block-label">${periodLabel}使ったサポート</div>
-          <ul class="report-list">
-            ${supportLines.map(l => `<li>${escapeHtml(l)}</li>`).join('')}
-          </ul>
-        </div>
-      ` : ''}
-
-      <div class="report-narrative">
-        <div class="report-narrative-label">やさしいふりかえり</div>
-        ${narrative.map(n => `<div class="report-narrative-line">${escapeHtml(n)}</div>`).join('')}
-      </div>
-
-      ${monthSelfMsg ? `
-        <div class="report-self">
-          <div class="report-block-label">今月の自分への一言</div>
-          ${monthSelfMsg.map(s => `<div class="report-self-line">${escapeHtml(s)}</div>`).join('')}
-        </div>
-      ` : ''}
-
-      ${kind === 'week' ? renderReportGoalThemeNarrative() : ''}
-      ${kind === 'week' ? renderReportInsightsV2() : ''}
-      ${kind === 'week' ? renderReportNextWeekPicker() : ''}
-      ${kind === 'week' ? renderReportThemeSuggestion() : ''}
-    `}
-
+    `;
+  }
+  return `
+    <div class="report-header">
+      <div class="report-title">今月のふりかえり</div>
+      <div class="report-period">${reportPeriodLabel(days)}</div>
+    </div>
+    ${renderReportSummaryV3('month')}
+    ${renderReportInsightsV3('month')}
+    ${renderReportNextActionV3('month')}
     <div class="report-disclaimer">
       これは記録をもとにしたふりかえりで、診断ではありません。<br>
       近くないと感じたら、そのまま気にしなくて大丈夫です。
@@ -12966,6 +12972,25 @@ function handleAction(act, el, e) {
     case 'next-week-pick': {
       const mode = el.dataset.mode;
       handleNextWeekPick(mode);
+      break;
+    }
+    case 'month-next-pick': {
+      const mode = el.dataset.mode;
+      if (mode === 'continue') {
+        toast('今の方向で進んでいこう');
+        App.go('goal');
+      } else if (mode === 'deepen') {
+        // 同じ目標で新テーマ候補を深める
+        actionSuggestState = { proposals: [], selected: [], round: 0, mode: 'step_up', isAiLoading: false, aiSuccess: false };
+        themeConfirmState = { title: null, meaning: null, actions: [] };
+        prepareActionSuggestions({ mode: 'step_up' });
+        App.go('actionSuggest');
+        toast('今の方向で少し深めてみよう');
+      } else if (mode === 'revise') {
+        // 目標見直し
+        directionGoalSelection = state.directionGoal && state.directionGoal.key ? state.directionGoal.key : null;
+        App.go('directionGoalSetup');
+      }
       break;
     }
     case 'confirm-theme': {
