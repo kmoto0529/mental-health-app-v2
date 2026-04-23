@@ -6287,6 +6287,8 @@ function viewGoal() {
     logEngagement();
   }
   ensureCurrentWeekTheme();
+  // プロフィールを先に計算（homeStyleHint・rankActionsForContextが参照するため）
+  try { computeProfile(); } catch (e) { /* ignore */ }
 
   return `
     <div class="screen active">
