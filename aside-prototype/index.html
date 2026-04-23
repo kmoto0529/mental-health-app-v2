@@ -285,6 +285,13 @@ body {
   color: var(--text-muted);
   margin-top: 4px;
 }
+.home-greet-hint {
+  font-size: 12px;
+  color: var(--primary);
+  margin-top: 6px;
+  opacity: 0.85;
+  letter-spacing: 0.01em;
+}
 .home-settings-btn {
   width: 40px; height: 40px;
   border-radius: 50%;
@@ -926,6 +933,25 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.setting-row-readonly {
+  pointer-events: none;
+}
+.setting-hint-line {
+  padding: 10px 20px 0;
+  font-size: 12px;
+  color: var(--primary);
+  letter-spacing: 0.01em;
+}
+.setting-sub-note {
+  padding: 8px 20px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.report-narrative-evidence {
+  color: var(--primary);
+  opacity: 0.92;
 }
 
 /* ---------- Modal ---------- */
@@ -6255,6 +6281,7 @@ function viewGoal() {
         <div>
           <div class="home-greet">おかえり、${escapeHtml(state.nickname)}。</div>
           <div class="home-greet-sub">${fmtDateLong(Date.now())}</div>
+          ${(function(){ const h = homeStyleHint(); return h ? `<div class="home-greet-hint">${escapeHtml(h)}</div>` : ''; })()}
         </div>
       </div>
       <div class="home-content home-content-v4">
@@ -6270,11 +6297,40 @@ function viewGoal() {
   `;
 }
 
+// 今日の行動を「現在の時間帯」「気分効果」で並び替え
+function rankActionsForContext(rawActions) {
+  if (!Array.isArray(rawActions) || rawActions.length <= 1) return rawActions || [];
+  const profile = state.personalizationProfile || {};
+  const effectMap = profile.effectByAction || {};
+  const slot = currentTimeSlot();
+  // 夜向き/朝向きアクションの簡易ヒント
+  const SLOT_PREFER = {
+    morning: ['act_mood_one', 'act_mood_normal', 'act_mood_select', 'act_one_event', 'act_breath_10s'],
+    noon:    ['act_phone_down', 'act_breath_10s', 'act_ai_one_line'],
+    evening: ['act_ai_one_line', 'act_mood_night', 'act_reflect_once'],
+    night:   ['act_mood_night', 'act_night_reset', 'act_reflect_once', 'act_safe_action']
+  };
+  const slotList = SLOT_PREFER[slot] || [];
+  const scored = rawActions.map(a => {
+    let score = 0;
+    // 時間帯合致 → +3
+    if (slotList.indexOf(a.id) >= 0) score += 3;
+    // 気分効果がプラスなら +（delta*2、最大+2）
+    const eff = effectMap[a.id];
+    if (eff && eff.sampleDays >= 2 && eff.delta > 0) score += Math.min(2, eff.delta * 2);
+    // 気分効果マイナスは -0.5
+    if (eff && eff.sampleDays >= 2 && eff.delta < 0) score -= 0.5;
+    return { a, score };
+  });
+  scored.sort((x, y) => y.score - x.score);
+  return scored.map(x => x.a);
+}
+
 // セクション：今日のおすすめ行動（テーマに紐づく行動 最大3件）
 function renderTodayActions() {
   const theme = state.weekTheme;
   if (!theme || !theme.actions || theme.actions.length === 0) return '';
-  const actions = theme.actions.slice(0, 3);
+  const actions = rankActionsForContext(theme.actions.slice()).slice(0, 3);
   const today = todayKey();
   const typeLabel = { app: 'アプリ', daily: '日常', social: '人に' };
   return `
@@ -8701,6 +8757,64 @@ function viewHistoryDetail() {
 }
 
 // ---------- Settings ----------
+// 設定画面：「あなたの傾向」セクション（Profile蓄積の可視化）
+function renderSettingsProfileSection() {
+  // profile がまだ計算されていない / サンプル少ない時は控えめに省略
+  const profile = (function(){
+    try { return computeProfile(); } catch(e) { return state.personalizationProfile || null; }
+  })();
+  if (!profile || !profile.sampleSize) return '';
+  const totalSamples = (profile.sampleSize.logs || 0) + (profile.sampleSize.moods || 0)
+                     + (profile.sampleSize.sessions || 0) + (profile.sampleSize.reflects || 0)
+                     + (profile.sampleSize.rescues || 0);
+  if (totalSamples < 3) return '';
+
+  const lines = [];
+  if (profile.supportStyle && STYLE_LABELS[profile.supportStyle]) {
+    lines.push({ label: '伴走スタイル', value: STYLE_LABELS[profile.supportStyle] });
+  }
+  if (profile.preferredTimeSlot) {
+    lines.push({ label: '行動しやすい時間', value: SLOT_LABELS[profile.preferredTimeSlot] });
+  }
+  if (profile.preferredActionType) {
+    const typeLabel = { app: 'アプリ内', daily: '日常', social: '人と関わる' };
+    lines.push({ label: '選ばれやすい行動', value: typeLabel[profile.preferredActionType] || profile.preferredActionType });
+  }
+  if (profile.completionRate !== null) {
+    lines.push({ label: '直近の実施率', value: `${profile.completionRate}%` });
+  }
+
+  // 変化の兆し（profileHistory から直近 vs 前回）
+  let changeHint = '';
+  const hist = state.profileHistory || [];
+  if (hist.length >= 2) {
+    const latest = hist[hist.length - 1];
+    const prev = hist[hist.length - 2];
+    if (latest && prev) {
+      const dcr = (latest.completionRate || 0) - (prev.completionRate || 0);
+      if (dcr >= 10) changeHint = '実施率が少し上がってきています。';
+      else if (dcr <= -10) changeHint = '最近は少し無理しない期間のようです。';
+      else if (latest.supportStyle && prev.supportStyle && latest.supportStyle !== prev.supportStyle) changeHint = '関わり方が少しずつ変わってきています。';
+    }
+  }
+
+  if (lines.length === 0) return '';
+
+  return `
+    <div class="setting-group">
+      <div class="setting-group-title">あなたの傾向（直近30日から）</div>
+      ${lines.map(l => `
+        <div class="setting-row setting-row-readonly">
+          <div class="setting-label">${escapeHtml(l.label)}</div>
+          <div class="setting-value">${escapeHtml(l.value)}</div>
+        </div>
+      `).join('')}
+      ${changeHint ? `<div class="setting-hint-line">${escapeHtml(changeHint)}</div>` : ''}
+      <div class="setting-sub-note">※ これは口調や提案のヒントに使われます。診断ではありません。</div>
+    </div>
+  `;
+}
+
 function viewSettings() {
   const p = getCurrentPersona();
   return `
@@ -8766,6 +8880,7 @@ function viewSettings() {
             <div class="setting-value">${state.notificationTime}</div>
           </div>
         </div>
+        ${renderSettingsProfileSection()}
         <div class="setting-group">
           <div class="setting-group-title">データ</div>
           <div class="setting-row" data-act="delete-all">
@@ -9697,6 +9812,28 @@ function computeProfile() {
   const actionDayMoodAvg = actionDayMoods.length ? actionDayMoods.reduce((s, x) => s + x, 0) / actionDayMoods.length : null;
   const nonActionDayMoodAvg = nonActionDayMoods.length ? nonActionDayMoods.reduce((s, x) => s + x, 0) / nonActionDayMoods.length : null;
 
+  // === アクション別の気分効果（実施した日の気分平均 vs 全体平均） ===
+  const moodByDate = {};
+  moods.forEach(m => { moodByDate[m.date] = m.score; });
+  const overallMoodAvg = moods.length ? moods.reduce((s, m) => s + m.score, 0) / moods.length : null;
+  const effectByAction = {};
+  if (overallMoodAvg !== null) {
+    const actionDatesByAction = {};
+    logs.filter(l => l.status === 'done').forEach(l => {
+      const dk = new Date(l.executedAt).toISOString().slice(0, 10);
+      if (!actionDatesByAction[l.actionId]) actionDatesByAction[l.actionId] = new Set();
+      actionDatesByAction[l.actionId].add(dk);
+    });
+    Object.entries(actionDatesByAction).forEach(([actionId, dates]) => {
+      const scores = [];
+      dates.forEach(dk => { if (moodByDate[dk] !== undefined) scores.push(moodByDate[dk]); });
+      if (scores.length >= 2) {
+        const avg = scores.reduce((s, x) => s + x, 0) / scores.length;
+        effectByAction[actionId] = { delta: +(avg - overallMoodAvg).toFixed(2), sampleDays: scores.length };
+      }
+    });
+  }
+
   // === 自由入力量 ===
   const avgMoodCommentLen = moods.length
     ? moods.reduce((s, m) => s + (m.comment ? m.comment.length : 0), 0) / moods.length
@@ -9706,19 +9843,93 @@ function computeProfile() {
   const profile = {
     completionRate,
     preferredTimeSlot,
+    slotBins,
     preferredActionType: preferredActionType && preferredActionType[1] > 0 ? preferredActionType[0] : null,
     avoidedActionType: avoidedActionType && avoidedActionType[1] === 0 ? avoidedActionType[0] : null,
     supportStyle: supportStyleKey,
+    styleScores,
     actionDayMoodAvg,
     nonActionDayMoodAvg,
+    effectByAction,
     freeTextTendency,
     sampleSize: { logs: total, moods: moods.length, sessions: sessions.length, reflects: reflects.length, rescues: rescues.length },
     updatedAt: Date.now()
   };
 
   state.personalizationProfile = profile;
+
+  // 週次スナップショット：過去の profile を蓄積
+  maybeArchiveProfileSnapshot(profile);
+
   return profile;
 }
+
+// 週次プロファイル履歴の蓄積（月曜午前 or 前回が7日以上前なら1件追加）
+function maybeArchiveProfileSnapshot(profile) {
+  if (!profile || !profile.sampleSize) return;
+  const totalSamples = (profile.sampleSize.logs || 0) + (profile.sampleSize.moods || 0)
+                     + (profile.sampleSize.sessions || 0) + (profile.sampleSize.reflects || 0)
+                     + (profile.sampleSize.rescues || 0);
+  if (totalSamples < 3) return; // サンプル少な過ぎる時は蓄積しない
+
+  if (!Array.isArray(state.profileHistory)) state.profileHistory = [];
+  const last = state.profileHistory[state.profileHistory.length - 1];
+  const DAY = 86400000;
+  if (last && (Date.now() - last.capturedAt) < 7 * DAY) return; // 直近1週間以内は上書きしない
+
+  state.profileHistory.push({
+    capturedAt: Date.now(),
+    weekKey: (function(){ const d = new Date(); const wkStart = new Date(d); wkStart.setDate(d.getDate() - d.getDay() + 1); return wkStart.toISOString().slice(0,10); })(),
+    completionRate: profile.completionRate,
+    preferredTimeSlot: profile.preferredTimeSlot,
+    preferredActionType: profile.preferredActionType,
+    supportStyle: profile.supportStyle,
+    actionDayMoodAvg: profile.actionDayMoodAvg,
+    nonActionDayMoodAvg: profile.nonActionDayMoodAvg,
+    sampleLogs: profile.sampleSize.logs
+  });
+  // 最大12週分（3ヶ月）保持
+  if (state.profileHistory.length > 12) state.profileHistory = state.profileHistory.slice(-12);
+  try { saveState(); } catch(e) { /* ignore */ }
+}
+
+// ホーム挨拶のサブライン（スタイル×時間帯で最適化）
+function homeStyleHint() {
+  const p = state.personalizationProfile;
+  if (!p || !p.supportStyle) return '';
+  const slot = currentTimeSlot();
+  const s = p.supportStyle;
+  if (s === 'recorder') {
+    if (slot === 'morning') return '朝のきもち、ひとこと残してみる？';
+    if (slot === 'night')   return '今日のきもちを、ひとこと置いて終わろう。';
+    return '今日も、気分メモをひとつだけでも大丈夫。';
+  } else if (s === 'talker') {
+    if (slot === 'night')   return '寝る前に話したいこと、AIに少しだけ置いてもいい。';
+    return '話したいこと、少しだけ外に出してもいいですよ。';
+  } else if (s === 'organizer') {
+    return 'もやもやがあれば、1回だけ整理してみる？';
+  } else if (s === 'rescue_user') {
+    return 'しんどい時は「少しひと息」を開くだけで十分。';
+  }
+  return '';
+}
+
+// 現在時刻の time slot を返す
+function currentTimeSlot() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 11) return 'morning';
+  if (h >= 11 && h < 16) return 'noon';
+  if (h >= 16 && h < 21) return 'evening';
+  return 'night';
+}
+
+// スタイル優先の行動 id（Home CTA を並び替えるヒント）
+const STYLE_PREFERRED_ACTION = {
+  recorder:    ['act_mood_one', 'act_mood_select', 'act_mood_normal', 'act_mood_night', 'act_one_event'],
+  talker:      ['act_ai_one_line', 'act_talk_fuzzy'],
+  organizer:   ['act_reflect_once'],
+  rescue_user: ['act_rescue_once', 'act_night_reset', 'act_breath_10s', 'act_safe_action']
+};
 
 // 伴走スタイルの表示ラベル
 const STYLE_LABELS = {
@@ -9843,8 +10054,21 @@ async function generateAiActionSuggestions(mode) {
   const prevBlock = (prevTheme && prevTheme.status === 'accepted')
     ? `【前週のテーマ】${prevTheme.title}\n【前週選んだ行動】${(prevTheme.actions || []).map(a => a.title).join(' / ')}`
     : '';
+  // 効果の大きい行動（過去に気分が少し上向いた日と相関）と現在の時間帯を示す
+  const profile = state.personalizationProfile || {};
+  const effectPairs = profile.effectByAction
+    ? Object.entries(profile.effectByAction).filter(([_, v]) => v.sampleDays >= 2 && v.delta > 0.3).sort((a,b)=>b[1].delta-a[1].delta).slice(0,3)
+    : [];
+  const effectBlock = effectPairs.length > 0
+    ? `【このユーザーの過去データで気分が少し上がりやすかった行動】\n${effectPairs.map(([id, v]) => {
+        const a = ACTION_CATALOG.find(x => x.id === id);
+        return a ? `- ${a.id}（${a.title}）＋${v.delta.toFixed(1)}ポイント（${v.sampleDays}日分）` : '';
+      }).filter(Boolean).join('\n')}\n※ この行動を優先候補にしてよいですが、飽きないよう他カテゴリも混ぜてください。`
+    : '';
+  const slotNow = currentTimeSlot();
+  const slotHint = `【現在の時間帯】${ ({morning:'朝', noon:'日中', evening:'夕方', night:'夜'}[slotNow]) } — この人が今から無理なく取り組みやすい行動を優先。`;
   const candidatesBlock = `【行動候補（この中からidを3つ選ぶ）】\n${candidates.map(a => `- ${a.id} [${a.type}/${a.difficulty}/${a.duration}分] ${a.title}（${a.desc}）`).join('\n')}`;
-  const userMsg = [goalLine, surveyBlock, prevBlock, candidatesBlock, '', `モード「${mode}」を踏まえて3つ選んでください。`].filter(x => x).join('\n\n');
+  const userMsg = [goalLine, surveyBlock, prevBlock, effectBlock, slotHint, candidatesBlock, '', `モード「${mode}」を踏まえて3つ選んでください。`].filter(x => x).join('\n\n');
 
   const model = state.apiModel || 'gemini-2.5-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
@@ -11242,6 +11466,19 @@ function renderReportInsightsV2() {
     interpretations.push(STYLE_MESSAGES[profile.supportStyle] + '。');
   }
 
+  // 気分×行動の個別相関（効果がある行動をやさしく言語化）
+  const effectLines = [];
+  if (profile.effectByAction) {
+    const top = Object.entries(profile.effectByAction)
+      .filter(([_, v]) => v.sampleDays >= 2 && v.delta > 0.3)
+      .sort((a, b) => b[1].delta - a[1].delta)
+      .slice(0, 2);
+    top.forEach(([actionId, v]) => {
+      const a = ACTION_CATALOG.find(x => x.id === actionId);
+      if (a) effectLines.push(`「${a.title}」を実施した日は、気分が少し上向きやすい傾向があります。`);
+    });
+  }
+
   // Block E: あなたに合いそうな傾向
   const tendencies = [];
   if (profile.supportStyle) tendencies.push(STYLE_MESSAGES[profile.supportStyle]);
@@ -11263,6 +11500,7 @@ function renderReportInsightsV2() {
     <div class="report-narrative">
       <div class="report-narrative-label">${escapeHtml(getCurrentPersona().name)}のふりかえり</div>
       ${interpretations.map(x => `<div class="report-narrative-line">${escapeHtml(x)}</div>`).join('')}
+      ${effectLines.map(x => `<div class="report-narrative-line report-narrative-evidence">${escapeHtml(x)}</div>`).join('')}
     </div>
 
     ${tendencies.length > 0 ? `
