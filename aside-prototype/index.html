@@ -3306,6 +3306,26 @@ body {
   line-height: 1.5;
   margin-bottom: 6px;
 }
+.week-theme-goal-link {
+  font-size: 11px;
+  color: var(--primary);
+  opacity: 0.9;
+  line-height: 1.6;
+  margin: -2px 0 8px;
+}
+.week-theme-stale-hint {
+  font-size: 12px;
+  color: var(--danger);
+  background: rgba(200, 120, 80, 0.08);
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin: 2px 0 10px;
+  line-height: 1.6;
+}
+.week-theme-card-stale {
+  opacity: 0.92;
+  border-left-color: var(--danger);
+}
 .week-theme-desc {
   font-size: 12px;
   color: var(--text-soft);
@@ -3929,8 +3949,20 @@ body {
   font-family: 'Noto Serif JP', serif;
   font-size: 14px;
   color: var(--text);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   line-height: 1.5;
+}
+.today-action-theme-link {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+.report-goal-theme-narrative {
+  border-left: 2px solid var(--primary);
+  padding-left: 12px;
+  background: rgba(212, 165, 116, 0.05);
 }
 .today-action-v4.done .today-action-title { text-decoration: line-through; }
 .today-action-btns {
@@ -6388,9 +6420,15 @@ function rankActionsForContext(rawActions) {
 function renderTodayActions() {
   const theme = state.weekTheme;
   if (!theme || !theme.actions || theme.actions.length === 0) return '';
+  // テーマが再生成待ちのときは今日の行動は出さない
+  if (theme.status === 'needs_refresh') return '';
   const actions = rankActionsForContext(theme.actions.slice()).slice(0, 3);
   const today = todayKey();
   const typeLabel = { app: 'アプリ', daily: '日常', social: '人に' };
+  // 上位テーマの短い表現（「〜」の練習です用）
+  const themeShort = theme.title
+    ? theme.title.replace(/[、。]/g, '').slice(0, 18) + (theme.title.length > 18 ? '…' : '')
+    : null;
   return `
     <div class="today-actions-section-v4">
       <div class="today-actions-label-v4">今日のおすすめ行動</div>
@@ -6405,6 +6443,7 @@ function renderTodayActions() {
               <span class="today-action-duration">${a.duration}分</span>
             </div>
             <div class="today-action-title">${escapeHtml(a.title)}</div>
+            ${themeShort ? `<div class="today-action-theme-link">今週のテーマ「${escapeHtml(themeShort)}」の練習です</div>` : ''}
             <div class="today-action-btns">
               ${doneToday ? `
                 <span class="today-action-done">やった ✓</span>
@@ -9301,13 +9340,22 @@ function renderWeekThemeCard() {
     dots += '</div>';
   }
 
+  // 上位目標との接続文（3層構造の「つながり」）
+  const goalCtx = getCurrentDirectionGoal();
+  const goalLine = goalCtx
+    ? `「${goalCtx.title}」に近づくための今週の一歩です。`
+    : null;
+  const needsRefresh = theme.status === 'needs_refresh';
+
   return `
-    <div class="week-theme-card">
+    <div class="week-theme-card ${needsRefresh ? 'week-theme-card-stale' : ''}">
       <div class="week-theme-top">
         <div class="week-theme-label">今週の小さなテーマ</div>
         <button class="week-theme-change" data-act="week-theme-change-open">変える</button>
       </div>
       <div class="week-theme-title">${escapeHtml(theme.title)}</div>
+      ${goalLine ? `<div class="week-theme-goal-link">${escapeHtml(goalLine)}</div>` : ''}
+      ${needsRefresh ? `<div class="week-theme-stale-hint">目指したい方向が変わったので、今週のテーマを整え直しましょう。</div>` : ''}
       ${dots}
       <div class="week-theme-kind-msg-row">${escapeHtml(kindMsg)}${count > 0 ? `　・　今週${count}回` : ''}</div>
       <div class="week-theme-actions">
@@ -9487,6 +9535,7 @@ function acceptTheme(themeKey) {
   if (!def) return;
   const week = getWeekRange();
   const isChange = state.weekTheme && state.weekTheme.key && state.weekTheme.key !== themeKey;
+  const currentGoal = getCurrentDirectionGoal();
   state.weekTheme = {
     weekStartDate: week.start,
     weekEndDate: week.end,
@@ -9494,6 +9543,8 @@ function acceptTheme(themeKey) {
     key: def.key,
     title: def.title,
     description: def.description,
+    goalKey: currentGoal ? currentGoal.key : null,
+    goalTitle: currentGoal ? currentGoal.title : null,
     status: isChange ? 'changed' : 'accepted',
     acceptedAt: state.weekTheme && state.weekTheme.key === themeKey ? state.weekTheme.acceptedAt : Date.now(),
     changedAt: isChange ? Date.now() : null
@@ -9799,6 +9850,25 @@ function renderDirectionGoalCard() {
 }
 
 // ---------- 行動ログモーダル ----------
+// 目標変更時の「整え直し」確認モーダル
+function openGoalChangeRealignModal() {
+  openModal(`
+    <div class="modal">
+      <div class="modal-title">整え直しましょう</div>
+      <div class="modal-body" style="font-size: 13px; color: var(--text-soft); line-height: 1.8;">
+        目指したい方向が変わったので、<br>
+        今週のテーマと今日の行動も、<br>
+        今のあなたに合う形に整え直します。<br><br>
+        このまま進めますか？
+      </div>
+      <div class="modal-actions" style="display:flex; flex-direction:column; gap:8px; margin-top: 16px;">
+        <button class="btn btn-primary" data-act="goal-realign-proceed">はい、整え直す</button>
+        <button class="btn btn-ghost" data-act="goal-realign-later">まだ変えない</button>
+      </div>
+    </div>
+  `);
+}
+
 function openActionLogModal(actionId) {
   const theme = state.weekTheme;
   const action = theme && theme.actions && theme.actions.find(a => a.id === actionId);
@@ -11399,6 +11469,7 @@ function renderReportBlocks(kind, ins, days) {
         </div>
       ` : ''}
 
+      ${kind === 'week' ? renderReportGoalThemeNarrative() : ''}
       ${kind === 'week' ? renderReportInsightsV2() : ''}
       ${kind === 'week' ? renderReportNextWeekPicker() : ''}
       ${kind === 'week' ? renderReportThemeSuggestion() : ''}
@@ -11407,6 +11478,40 @@ function renderReportBlocks(kind, ins, days) {
     <div class="report-disclaimer">
       これは記録をもとにしたふりかえりで、診断ではありません。<br>
       近くないと感じたら、そのまま気にしなくて大丈夫です。
+    </div>
+  `;
+}
+
+// 週次レポート：Goal→Theme→Action のナラティブ（「今週は〜に向けて〜を試した」「2/3回取り組めました」）
+function renderReportGoalThemeNarrative() {
+  const theme = state.weekTheme;
+  const goal = getCurrentDirectionGoal();
+  if (!theme || !theme.key) return '';
+
+  const lines = [];
+  // 目標とのつながり
+  if (goal && theme.title) {
+    lines.push(`今週は「${goal.title}」に向けて、「${theme.title}」を試した1週間でした。`);
+  } else if (theme.title) {
+    lines.push(`今週は「${theme.title}」を意識した1週間でした。`);
+  }
+
+  // テーマとの一致度（行動実施率 / テーマの行動数）
+  if (Array.isArray(theme.actions) && theme.actions.length > 0) {
+    const weekStartTs = Date.now() - 7 * 86400000;
+    const themeActionIds = new Set(theme.actions.map(a => a.id));
+    const doneCount = (state.actionLogs || []).filter(l =>
+      l.status === 'done' && l.executedAt >= weekStartTs && themeActionIds.has(l.actionId)
+    ).length;
+    const target = theme.actions.length;
+    lines.push(`今週の行動は、テーマに対して ${doneCount}/${target} 回取り組めました。`);
+  }
+
+  if (lines.length === 0) return '';
+  return `
+    <div class="report-block report-goal-theme-narrative">
+      <div class="report-block-label">今週のつながり</div>
+      ${lines.map(x => `<div class="report-narrative-line">${escapeHtml(x)}</div>`).join('')}
     </div>
   `;
 }
@@ -12341,16 +12446,43 @@ function handleAction(act, el, e) {
       break;
     case 'direction-goal-confirm': {
       if (!directionGoalSelection) { toast('ひとつ選んでね'); return; }
-      const wasChange = !!getCurrentDirectionGoal();
+      const oldGoal = getCurrentDirectionGoal();
+      const wasChange = !!oldGoal && oldGoal.key !== directionGoalSelection;
+      const hasActiveTheme = state.weekTheme && state.weekTheme.key && state.weekTheme.status !== 'skipped';
       selectDirectionGoal(directionGoalSelection);
       directionGoalSelection = null;
-      if (wasChange) {
-        // 見直し経由：そのままホームへ（または設定画面に戻る）
+      if (wasChange && hasActiveTheme) {
+        // 方向が変わった＆テーマが既にある → 整え直しフロー
+        // 現テーマを needs_refresh に、actions を obsolete へ
+        if (state.weekTheme) {
+          state.weekTheme.status = 'needs_refresh';
+          if (Array.isArray(state.weekTheme.actions)) {
+            state.weekTheme.actions.forEach(a => { if (!a.status) a.status = 'obsolete'; });
+          }
+          saveState();
+        }
+        // 確認モーダルで伴走表現を出す
+        openGoalChangeRealignModal();
+      } else if (wasChange) {
         toast('今の方向を見直したよ');
         App.go('goal');
       } else {
         App.go('directionGoalConfirm');
       }
+      break;
+    }
+    case 'goal-realign-proceed': {
+      // 整え直しを進める → 状態把握設問 → 行動提案 → テーマ確定
+      closeModal();
+      stateSurveyStep = 0;
+      stateSurveyDraft = { lifeStatus: null, actionType: null, duration: null };
+      App.go('stateSurvey');
+      break;
+    }
+    case 'goal-realign-later': {
+      closeModal();
+      toast('あとで整え直せるよ');
+      App.go('goal');
       break;
     }
     case 'direction-goal-skip': {
@@ -12477,6 +12609,7 @@ function handleAction(act, el, e) {
       // state.weekTheme を新形式で保存（title, meaning, actionIds）
       const week = getWeekRange();
       const selActions = themeConfirmState.actions;
+      const currentGoal = getCurrentDirectionGoal();
       state.weekTheme = {
         weekStartDate: week.start,
         weekEndDate: week.end,
@@ -12484,7 +12617,9 @@ function handleAction(act, el, e) {
         category: 'AI',
         title: themeConfirmState.title,
         description: themeConfirmState.meaning,
-        actions: selActions.map(a => ({ id: a.id, title: a.title, desc: a.desc, duration: a.duration, type: a.type, difficulty: a.difficulty, ctaAct: a.ctaAct })),
+        goalKey: currentGoal ? currentGoal.key : null,
+        goalTitle: currentGoal ? currentGoal.title : null,
+        actions: selActions.map(a => ({ id: a.id, title: a.title, desc: a.desc, duration: a.duration, type: a.type, difficulty: a.difficulty, ctaAct: a.ctaAct, themeTitle: themeConfirmState.title })),
         status: 'accepted',
         acceptedAt: Date.now(),
         changedAt: null
@@ -12548,7 +12683,16 @@ function handleAction(act, el, e) {
     case 'week-theme-open':
       openThemeSelectionModal();
       break;
-    case 'week-theme-change-open':
+    case 'week-theme-change-open': {
+      // 仕様8-2: テーマだけ差し替えず、目標を踏まえて行動→テーマを再生成
+      actionSuggestState = { proposals: [], selected: [], round: 0, mode: 'change', isAiLoading: false, aiSuccess: false };
+      themeConfirmState = { title: null, meaning: null, actions: [] };
+      prepareActionSuggestions({ mode: 'change' });
+      App.go('actionSuggest');
+      toast('今の方向の中で、違うテーマを探してみよう');
+      break;
+    }
+    case 'week-theme-change-open-legacy':
       _lastSuggest = null; selectedWeeklyTheme = null;
       openThemeChangeModal();
       break;
