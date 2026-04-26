@@ -2,8 +2,21 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Aside — 気持ちを整えるアプリ</title>
+
+<!-- PWA / iOSホーム画面追加 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C68B5E">
+<meta name="description" content="日々の気持ちと小さな行動を、すこし立ち止まって整えるセルフケアアプリ">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Aside">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Serif+JP:wght@400;500&display=swap" rel="stylesheet">
@@ -3920,6 +3933,22 @@ body {
   border-radius: 8px;
   animation: pulse-soft 1.6s ease-in-out infinite;
 }
+/* 初期ロード中（候補が無い状態）のフルサイズ表示 */
+.suggest-ai-loading-block {
+  margin: 40px 4px 40px;
+  padding: 48px 20px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-soft);
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
 .suggest-ai-badge {
   margin: 4px 4px 10px;
   padding: 6px 10px;
@@ -5836,7 +5865,67 @@ body {
   cursor: pointer;
   font-family: inherit;
 }
+
+/* ============================================================
+   同意モーダル（β版・初回起動時）
+   ============================================================ */
+.consent-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(61, 52, 42, 0.75);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.consent-overlay.hidden { display: none; }
+.consent-card {
+  background: var(--bg-card);
+  border-radius: var(--r-md);
+  padding: 28px 24px 24px;
+  max-width: 420px; width: 100%;
+  box-shadow: var(--shadow-lift);
+  max-height: 90vh; overflow-y: auto;
+}
+.consent-title {
+  font-size: 18px; font-weight: 700; color: var(--text);
+  margin-bottom: 12px; text-align: center;
+}
+.consent-lead { font-size: 14px; color: var(--text-soft); line-height: 1.7; margin-bottom: 16px; }
+.consent-points {
+  background: var(--bg-soft); border-radius: var(--r-sm);
+  padding: 14px 16px; margin-bottom: 16px;
+  font-size: 13px; line-height: 1.7; color: var(--text);
+}
+.consent-points ul { padding-left: 18px; margin: 0; }
+.consent-points li { margin-bottom: 6px; }
+.consent-links { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; text-align: center; }
+.consent-links a { color: var(--accent-deep); text-decoration: underline; margin: 0 8px; }
+.consent-actions { display: flex; flex-direction: column; gap: 10px; }
+.consent-btn-primary {
+  background: var(--accent); color: white; border: none;
+  padding: 14px 20px; border-radius: var(--r-sm);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: inherit;
+}
+.consent-btn-primary:active { background: var(--accent-deep); }
+.consent-btn-decline {
+  background: transparent; color: var(--text-muted); border: none;
+  padding: 10px; font-size: 12px; cursor: pointer;
+  font-family: inherit; text-decoration: underline;
+}
 </style>
+<script>
+  // Aside β版 ログSDK 設定
+  window.ASIDE_CONFIG = {
+    supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
+    supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
+    appVersion:      '0.1.0-beta.1',
+    consentVersion:  'v0.1-beta',
+    // Google Sheets 公開CSV URL（行動カタログのリモート更新元）。空ならバンドル既定値を使う
+    // → Sheets ID 1PugqUR07WwTrz36Mbsperuj4_ifCIUqYENoxvnIZ8C8（Aside 行動カタログ）
+    actionCatalogUrl: 'https://docs.google.com/spreadsheets/d/1PugqUR07WwTrz36Mbsperuj4_ifCIUqYENoxvnIZ8C8/export?format=csv'
+  };
+</script>
+<script src="js/logger.js"></script>
+<script src="js/catalog-loader.js"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -5844,6 +5933,33 @@ body {
   <div id="modalContent"></div>
 </div>
 <div class="toast" id="toast"></div>
+
+<!-- β版 初回起動時 同意モーダル -->
+<div class="consent-overlay hidden" id="consentOverlay">
+  <div class="consent-card">
+    <div class="consent-title">Aside β版へようこそ</div>
+    <p class="consent-lead">
+      このアプリは、日々の気持ちと小さな行動を通じて、すこし立ち止まる時間をつくるためのセルフケアアプリです。<br>
+      現在はβ版（限定公開テスト）で、招待された方のみご利用いただけます。
+    </p>
+    <div class="consent-points">
+      利用にあたってのお願い
+      <ul>
+        <li>本アプリは<strong>医療行為・診断・治療を目的としたものではありません</strong>。つらい状態が続くときは医療機関や相談窓口へ。</li>
+        <li>匿名IDを発行し、気持ち・行動・画面操作のログをサービス改善のために収集します（氏名・メール等は取得しません）。</li>
+        <li>機能・仕様はβ期間中に変更・停止されることがあります。</li>
+      </ul>
+    </div>
+    <div class="consent-links">
+      <a href="docs/terms-of-service-beta.md" target="_blank">利用規約</a>
+      <a href="docs/privacy-policy-beta.md" target="_blank">プライバシーポリシー</a>
+    </div>
+    <div class="consent-actions">
+      <button class="consent-btn-primary" id="consentAgreeBtn">同意して始める</button>
+      <button class="consent-btn-decline" id="consentDeclineBtn">今回は利用しない</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ============================================================
@@ -6280,7 +6396,7 @@ function buildSystemPrompt(base) {
   }
   const profileContext = (typeof buildProfileContext === 'function') ? buildProfileContext() : '';
   const profileTail = profileContext ? '\n\n' + profileContext : '';
-  // チャットのはなすモード（feel/organize/forward/breath）が選ばれていれば追加
+  // チャットのはなすモード（feel/organize/breath）が選ばれていれば追加
   const modeId = (typeof chatState !== 'undefined' && chatState && chatState.mode) ? chatState.mode : null;
   const modePrompt = (modeId && typeof buildTalkModePrompt === 'function') ? buildTalkModePrompt(modeId) : '';
   const modeTail = modePrompt ? '\n\n' + modePrompt : '';
@@ -6500,6 +6616,8 @@ const App = {
     if (RESTORABLE_SCREENS.includes(screen)) {
       persistUiState();
     }
+    // Supabaseログ: 画面遷移
+    if (window.AsideLogger) AsideLogger.screenView(screen, opts);
     render();
     if (opts.scroll !== false) window.scrollTo(0, 0);
   },
@@ -6851,12 +6969,11 @@ const TOPIC_OPTIONS = [
   { id: 'tired', label: 'つかれた', emoji: '😮‍💨' }
 ];
 
-// はなすタブの4モード（目的）— スペック §3
+// はなすタブの3モード（目的）
 const TALK_MODES = [
   { id: 'feel',     emoji: '🫧', label: '気持ちを話したい', desc: 'とにかく聞いてほしい',     shortLabel: '気持ちを話す' },
-  { id: 'organize', emoji: '🧠', label: '整理したい',       desc: '考えや気持ちを整える',     shortLabel: '整理する' },
-  { id: 'forward',  emoji: '🚶', label: '前に進みたい',     desc: 'どうするか決めたい',       shortLabel: '前に進む' },
-  { id: 'breath',   emoji: '🌿', label: '少し楽になりたい', desc: '今すぐ楽になる', shortLabel: 'ひといき' }
+  { id: 'organize', emoji: '🧠', label: '整理したい',       desc: '別の見方で見てみる',       shortLabel: '整理する' },
+  { id: 'breath',   emoji: '🌿', label: '少し楽になりたい', desc: '今すぐ楽になる',           shortLabel: 'ひといき' }
 ];
 function getTalkMode(id) { return TALK_MODES.find(m => m.id === id) || null; }
 
@@ -6876,13 +6993,6 @@ const TALK_MODE_PROMPTS = {
 - 構造化を手伝う。「出来事 → 感情 → 別の見方」の順にゆっくり辿る
 - 受けとめてから、1つだけ中立的な問いを添える
 - 勝手にまとめ切らず、ユーザーの言葉で整うのを待つ`,
-  forward: `
-【今回のモード：前に進みたい】
-- ユーザーは「どうするか決めたい」目的で来ています
-- まず状況を確認し、何に迷っているかを一緒に絞る
-- 選択肢は最大3つまで、できれば [すぐできる / 少し頑張る / しっかり向き合う] のような粒度差で提示
-- 押しつけず「どれが今の自分に近そう？」のような柔らかい問いで選ばせる
-- 決まったら「これやってみる？」と小さく確認する`,
   breath: `
 【今回のモード：ひといき】
 - ユーザーは「今すぐ軽くなりたい」目的で来ています
@@ -6913,7 +7023,6 @@ function recommendTalkMode() {
   if (recentAvg !== null && recentAvg <= 2.5) return 'feel';        // 気分低 → まず共感
   if (recentRescue.length >= 2) return 'breath';                    // ひといきを繰り返している → breath
   if (profile.supportStyle === 'organizer') return 'organize';      // organizer → 整理
-  if (hasPendingAction && profile.completionRate !== null && profile.completionRate >= 40) return 'forward'; // 行動期 → 前進
   if (profile.supportStyle === 'talker') return 'feel';
   return null;
 }
@@ -8284,32 +8393,10 @@ function viewChat() {
   `;
 }
 
-// モード別のアクションパネル（forward: 選択肢 / feel: 終了チェックイン）
+// モード別のアクションパネル（feel: 終了チェックイン）
 function renderTalkModeActionPanel(userMsgs) {
   const mode = chatState.mode;
   if (!mode || chatState.isTyping) return '';
-  if (mode === 'forward' && userMsgs >= 2 && !chatState.forwardDecisionMade) {
-    // モード3: 選択肢3つ
-    return `
-      <div class="talk-mode-panel talk-mode-panel-forward">
-        <div class="talk-mode-panel-label">どんな向き合い方がしっくり来そう？</div>
-        <div class="talk-mode-panel-choices">
-          <button class="talk-mode-choice" data-act="talk-forward-choice" data-level="quick">
-            <div class="tmc-title">すぐできる</div>
-            <div class="tmc-desc">今日〜明日に1回試す小さな一歩</div>
-          </button>
-          <button class="talk-mode-choice" data-act="talk-forward-choice" data-level="try">
-            <div class="tmc-title">少し頑張る</div>
-            <div class="tmc-desc">1週間かけて少しずつ進める</div>
-          </button>
-          <button class="talk-mode-choice" data-act="talk-forward-choice" data-level="deep">
-            <div class="tmc-title">しっかり向き合う</div>
-            <div class="tmc-desc">じっくり考えてから決めてもいい</div>
-          </button>
-        </div>
-      </div>
-    `;
-  }
   if (mode === 'feel' && userMsgs >= 3 && !chatState.feelCheckDismissed) {
     // モード1: 終了チェックイン
     return `
@@ -9151,14 +9238,17 @@ function renderHistoryCard(item) {
   }
   if (item.kind === 'reflect') {
     const r = item.data;
-    const delta = r.emotionBefore.score - r.emotionAfter.score;
+    const eBefore = r.emotionBefore || {};
+    const eAfter  = r.emotionAfter  || {};
+    const hasDelta = typeof eBefore.score === 'number' && typeof eAfter.score === 'number';
+    const delta = hasDelta ? (eBefore.score - eAfter.score) : null;
     return `
       <div class="history-item" data-history="reflect" data-hid="${r.id}">
         <div class="history-date">${fmtDateLong(r.startedAt)} ・ もやもや整理</div>
         <div class="history-preview">${escapeHtml((r.event || '').slice(0, 80))}</div>
         <div class="history-meta">
-          <span>${r.emotionBefore.emoji} ${r.emotionBefore.label}</span>
-          <span>${r.emotionBefore.score} → ${r.emotionAfter.score}${delta > 0 ? `（-${delta}）` : delta < 0 ? `（+${Math.abs(delta)}）` : ''}</span>
+          ${eBefore.emoji ? `<span>${eBefore.emoji} ${escapeHtml(eBefore.label || '')}</span>` : ''}
+          ${hasDelta ? `<span>${eBefore.score} → ${eAfter.score}${delta > 0 ? `（-${delta}）` : delta < 0 ? `（+${Math.abs(delta)}）` : ''}</span>` : ''}
         </div>
       </div>
     `;
@@ -10071,54 +10161,72 @@ function prepareActionSuggestions(opts = {}) {
       return order[a.difficulty] - order[b.difficulty];
     });
   }
-  // 仕様§6-3: やさしめ/ふつう/少し前進 をバランスよく混ぜて6件表示
-  actionSuggestState.proposals = balancedActionMix(pool, 6);
+  // 仕様§6-3: やさしめ/ふつう/少し前進 をバランスよく混ぜて6件（フォールバック用）
+  const fallbackPicks = balancedActionMix(pool, 6);
+
   actionSuggestState.selected = [];
-  actionSuggestState.isAiLoading = false;
   actionSuggestState.aiSuccess = false;
   actionSuggestState.mode = opts.mode || actionSuggestState.mode || 'initial';
+  actionSuggestState.fallbackPool = fallbackPicks;
 
-  // API keyがあれば裏でAIに問い合わせて差し替え
-  if (state.apiKey && !opts.skipAi) {
+  const useAi = state.apiKey && !opts.skipAi;
+  if (useAi) {
+    // AIの結果が出るまで候補は見せない（ローディング表示のみ）
+    actionSuggestState.proposals = [];
+    actionSuggestState.isAiLoading = true;
     triggerAiActionUpgrade(actionSuggestState.mode);
+  } else {
+    // API keyなし：即ローカル候補を表示
+    actionSuggestState.proposals = fallbackPicks;
+    actionSuggestState.isAiLoading = false;
   }
 }
 
 function viewActionSuggest() {
-  if (actionSuggestState.proposals.length === 0) prepareActionSuggestions();
+  // 初回呼び出し時だけ候補を準備（AIロード中は再呼び出し禁止）
+  if (actionSuggestState.proposals.length === 0 && !actionSuggestState.isAiLoading) {
+    prepareActionSuggestions();
+  }
   const goal = getCurrentDirectionGoal();
   const typeLabel = { app: 'アプリ内', daily: '日常', social: '人に頼る' };
   const diffLabel = DIFFICULTY_LABELS;
+  const loading = actionSuggestState.isAiLoading && actionSuggestState.proposals.length === 0;
   return `
     <div class="screen active onb">
       <div class="suggest-screen">
         <div class="suggest-step">STEP 2 / 3</div>
         <div class="suggest-title">今のあなたに合いそうな<br>今週の行動候補</div>
         ${goal ? `<div class="suggest-goal-pill">${escapeHtml(goal.title)}</div>` : ''}
-        <div class="suggest-sub">1つ、または2つまで選んでみて。</div>
-        ${actionSuggestState.isAiLoading ? '<div class="suggest-ai-loading">あなたに合いそうな候補を考えています…</div>' : ''}
-        ${actionSuggestState.aiSuccess ? '<div class="suggest-ai-badge">AIが今のあなたに合いそうな候補を選びました</div>' : ''}
-        <div class="suggest-list">
-          ${actionSuggestState.proposals.map(a => {
-            const isSel = actionSuggestState.selected.includes(a.id);
-            return `
-              <div class="suggest-card ${isSel ? 'selected' : ''}" data-act="suggest-toggle" data-id="${a.id}">
-                <div class="suggest-card-head">
-                  <span class="suggest-label suggest-label-type">${typeLabel[a.type] || a.type}</span>
-                  <span class="suggest-label suggest-label-diff">${diffLabel[a.difficulty] || a.difficulty}</span>
-                  <span class="suggest-label suggest-label-time">約${a.duration}分</span>
+        ${loading ? `
+          <div class="suggest-ai-loading suggest-ai-loading-block">
+            Asideが、あなたに合いそうな候補を<br>考えています…
+            <div class="alt-loading-dots"><span></span><span></span><span></span></div>
+          </div>
+        ` : `
+          <div class="suggest-sub">1つ、または2つまで選んでみて。</div>
+          ${actionSuggestState.aiSuccess ? '<div class="suggest-ai-badge">Asideが今のあなたに合いそうな候補を選んだよ</div>' : ''}
+          <div class="suggest-list">
+            ${actionSuggestState.proposals.map(a => {
+              const isSel = actionSuggestState.selected.includes(a.id);
+              return `
+                <div class="suggest-card ${isSel ? 'selected' : ''}" data-act="suggest-toggle" data-id="${a.id}">
+                  <div class="suggest-card-head">
+                    <span class="suggest-label suggest-label-type">${typeLabel[a.type] || a.type}</span>
+                    <span class="suggest-label suggest-label-diff">${diffLabel[a.difficulty] || a.difficulty}</span>
+                    <span class="suggest-label suggest-label-time">約${a.duration}分</span>
+                  </div>
+                  <div class="suggest-card-title">${escapeHtml(a.title)}</div>
+                  <div class="suggest-card-desc">${escapeHtml(a.desc)}</div>
+                  ${a.aiReason ? `<div class="suggest-card-reason">💭 ${escapeHtml(a.aiReason)}</div>` : ''}
                 </div>
-                <div class="suggest-card-title">${escapeHtml(a.title)}</div>
-                <div class="suggest-card-desc">${escapeHtml(a.desc)}</div>
-                ${a.aiReason ? `<div class="suggest-card-reason">💭 ${escapeHtml(a.aiReason)}</div>` : ''}
-              </div>
-            `;
-          }).join('')}
-        </div>
-        <div class="suggest-actions">
-          <button class="btn btn-primary" data-act="suggest-next" ${actionSuggestState.selected.length > 0 ? '' : 'disabled'}>この行動で今週のテーマにする</button>
-          <button class="btn btn-ghost" data-act="suggest-regen">別の候補を見る</button>
-        </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="suggest-actions">
+            <button class="btn btn-primary" data-act="suggest-next" ${actionSuggestState.selected.length > 0 ? '' : 'disabled'}>この行動で今週のテーマにする</button>
+            <button class="btn btn-ghost" data-act="suggest-regen">別の候補を見る</button>
+          </div>
+        `}
       </div>
     </div>
   `;
@@ -10238,15 +10346,21 @@ function viewDirectionGoalSetup() {
 function viewDirectionGoalConfirm() {
   const g = getCurrentDirectionGoal();
   if (!g) { App.go('goal'); return ''; }
+  // 初回は状態把握設問→行動提案へ進む。設問済みならホームへ直行。
+  const needsSurvey = !state.userStateSurvey;
+  const btnLabel = needsSurvey ? 'つぎへ' : 'ホームへ';
+  const descText = needsSurvey
+    ? 'あなたに合う行動を提案するため、<br>簡単な質問に3つだけ答えてね。'
+    : '毎日じゃなくて大丈夫。<br>少しずつ、この方向で使っていこう。';
   return `
     <div class="screen active onb">
       <div class="direction-confirm">
         <div class="direction-confirm-icon">🧭</div>
         <div class="direction-confirm-lead">今の方向を決めたよ。</div>
         <div class="direction-confirm-title">${escapeHtml(g.title)}</div>
-        <div class="direction-confirm-desc">毎日じゃなくて大丈夫。<br>少しずつ、この方向で使っていこう。</div>
+        <div class="direction-confirm-desc">${descText}</div>
         <div class="direction-confirm-actions">
-          <button class="btn btn-primary" data-act="direction-goal-done">ホームへ</button>
+          <button class="btn btn-primary" data-act="direction-goal-done">${btnLabel}</button>
         </div>
       </div>
     </div>
@@ -10439,6 +10553,39 @@ function getActionMilestone() {
   return badges;
 }
 
+// Supabase: state.actionLogs の最新エントリをSupabaseに同期
+// 使い方: state.actionLogs.push(...) の直後に mirrorLatestActionLog() を呼ぶ
+function mirrorLatestActionLog() {
+  if (!window.AsideLogger || !AsideLogger.isInitialized()) return;
+  const logs = state.actionLogs;
+  if (!Array.isArray(logs) || logs.length === 0) return;
+  const entry = logs[logs.length - 1];
+  if (entry.supabaseLogId) return; // 既に送信済み
+  const action = (state.weekTheme && state.weekTheme.actions && state.weekTheme.actions.find(a => a.id === entry.actionId))
+              || (typeof ACTION_CATALOG !== 'undefined' ? ACTION_CATALOG.find(a => a.id === entry.actionId) : null);
+  const status = entry.status === 'skipped' ? 'abandoned' : (entry.status || 'done');
+  AsideLogger.startAction({
+    actionId:   entry.actionId,
+    themeId:    (state.weekTheme && state.weekTheme.id) || null,
+    type:       entry.execType || (action ? getExecutionType(action) : 'instant_done'),
+    difficulty: (action && action.difficulty) || null
+  }).then(logId => {
+    if (!logId) return;
+    entry.supabaseLogId = logId;
+    try { saveState(); } catch (e) {}
+    AsideLogger.completeAction(logId, {
+      status:        status,
+      memoText:      entry.memoText || entry.comment || null,
+      selectedValue: entry.selectedValue || null
+    });
+  });
+}
+
+// リアクション値マッピング（UI値 → DB値）
+function __asideMapReaction(v) {
+  return { easy: 'better', flat: 'same', hard: 'hard' }[v] || null;
+}
+
 // 行動完了の共通画面（仕様§7）
 function openActionDoneCelebration(action, detail) {
   // 保存: actionLogs に done を記録
@@ -10453,6 +10600,7 @@ function openActionDoneCelebration(action, detail) {
     reaction: null
   });
   saveState();
+  mirrorLatestActionLog();
 
   const themeLink = (state.weekTheme && state.weekTheme.title) ? `今週のテーマ「${state.weekTheme.title}」に近づいているよ。` : '';
   const milestones = getActionMilestone();
@@ -10917,7 +11065,7 @@ async function generateAiActionSuggestions(mode) {
   }
 }
 
-// rule-baseで即時表示 → 裏でAIを呼んで差し替え
+// AI応答が出るまで待ってから候補を表示（失敗時はローカルfallback）
 async function triggerAiActionUpgrade(mode) {
   if (!state.apiKey) return;
   actionSuggestState.isAiLoading = true;
@@ -10927,12 +11075,16 @@ async function triggerAiActionUpgrade(mode) {
     const picks = await generateAiActionSuggestions(mode || 'initial');
     if (picks && picks.length >= 2) {
       actionSuggestState.proposals = picks.slice(0, 3);
-      actionSuggestState.selected = [];
       actionSuggestState.aiSuccess = true;
+    } else {
+      // AI使えない時はローカルfallback
+      actionSuggestState.proposals = actionSuggestState.fallbackPool || [];
     }
   } catch (e) {
     console.warn('[Aside] triggerAiActionUpgrade:', e);
+    actionSuggestState.proposals = actionSuggestState.fallbackPool || [];
   } finally {
+    actionSuggestState.selected = [];
     actionSuggestState.isAiLoading = false;
     if (App.currentScreen === 'actionSuggest') render();
   }
@@ -11082,6 +11234,16 @@ const ACTION_CATALOG = [
   { id:'act_g06', goalKeys:ALL_GOALS, type:'app', difficulty:'bold', duration:3, title:'今の自分に合う「続け方ルール」を1つ作る', desc:'時間帯、回数、無理しない条件などを決める。', ctaAct:null, states:['calm','mixed'], category:'G' },
   { id:'act_g07', goalKeys:ALL_GOALS, type:'app', difficulty:'bold', duration:3, title:'うまくいかなかった時の次の一歩を先に決める', desc:'止まった時の再開を楽にする。', ctaAct:null, states:['calm'], category:'G' }
 ];
+
+// 行動カタログのリモート更新（Google Sheets由来のCSVを fetch して上書き）
+// URL未設定 or 取得失敗時は上記バンドル既定値のまま使う
+if (window.AsideCatalog) {
+  AsideCatalog.init({
+    target:   ACTION_CATALOG,
+    url:      (window.ASIDE_CONFIG && window.ASIDE_CONFIG.actionCatalogUrl) || '',
+    onUpdate: () => { try { if (typeof render === 'function') render(); } catch (e) {} }
+  });
+}
 
 function getActionsForGoal(goalKey, userState) {
   // goalKey に合う候補を抽出
@@ -12645,13 +12807,22 @@ function handleNextWeekPick(mode) {
 
   if (pool.length === 0) pool = ACTION_CATALOG.filter(a => a.difficulty === 'easy').slice(0, 4);
 
-  // 提案を actionSuggest 経由で表示（ユーザーに選ばせる）
-  actionSuggestState = { proposals: pool.slice(0, 4), selected: [], round: 0, mode, isAiLoading: false, aiSuccess: false };
+  // 提案を actionSuggest 経由で表示。API keyありならAIを待ってから表示。
+  const fallbackPicks = pool.slice(0, 4);
+  const useAi = !!state.apiKey;
+  actionSuggestState = {
+    proposals:    useAi ? [] : fallbackPicks,
+    selected:     [],
+    round:        0,
+    mode,
+    isAiLoading:  useAi,
+    aiSuccess:    false,
+    fallbackPool: fallbackPicks
+  };
   App.go('actionSuggest');
   toast(mode === 'ease' ? '少しやさしめの候補を出すね' : mode === 'step_up' ? '少しだけ背伸び気味の候補だよ' : '違うテーマを探してみよう');
 
-  // API keyがあれば裏でAIに差し替えをリクエスト
-  if (state.apiKey) {
+  if (useAi) {
     triggerAiActionUpgrade(mode);
   }
 }
@@ -13635,6 +13806,7 @@ function handleAction(act, el, e) {
         comment: ''
       });
       saveState();
+      mirrorLatestActionLog();
       closeModal();
       toast('行動を記録したよ');
       render();
@@ -13684,6 +13856,7 @@ function handleAction(act, el, e) {
       if (!state.actionLogs) state.actionLogs = [];
       state.actionLogs.push({ actionId: id, executedAt: Date.now(), status: 'skipped', skipReason: 'not_ready', execType: 'instant_done' });
       saveState();
+      mirrorLatestActionLog();
       closeModal();
       toast('今はそういう日もあるよ');
       render();
@@ -13710,6 +13883,7 @@ function handleAction(act, el, e) {
         if (!state.actionLogs) state.actionLogs = [];
         state.actionLogs.push({ actionId: id, executedAt: Date.now(), status: 'done', execType: 'memo_done', memoText: memo });
         saveState();
+        mirrorLatestActionLog();
       }
       closeModal();
       chatState.session = null;
@@ -13720,11 +13894,16 @@ function handleAction(act, el, e) {
     }
     case 'exec-ai-start': {
       const id = el.dataset.actionId;
+      // ai_assist 型の行動ログを記録
+      if (!state.actionLogs) state.actionLogs = [];
+      state.actionLogs.push({ actionId: id, executedAt: Date.now(), status: 'done', execType: 'ai_assist' });
+      saveState();
+      mirrorLatestActionLog();
       closeModal();
       chatState.session = null;
-      chatState.mode = 'forward';
+      chatState.mode = null;
       App.go('chat');
-      setTimeout(() => sendInitialAi({ mode: 'forward', actionId: id }), 300);
+      setTimeout(() => sendInitialAi({ actionId: id }), 300);
       break;
     }
     case 'exec-choice-pick': {
@@ -13739,8 +13918,13 @@ function handleAction(act, el, e) {
       const v = el.dataset.value;
       // 最新のactionLogに reaction を付ける
       if (Array.isArray(state.actionLogs) && state.actionLogs.length > 0) {
-        state.actionLogs[state.actionLogs.length - 1].reaction = v;
+        const last = state.actionLogs[state.actionLogs.length - 1];
+        last.reaction = v;
         saveState();
+        // Supabase: 該当ログに reaction を追記
+        if (window.AsideLogger && last.supabaseLogId) {
+          AsideLogger.setActionReaction(last.supabaseLogId, __asideMapReaction(v));
+        }
       }
       // バッジ風に選択状態を反映
       document.querySelectorAll('.exec-reaction-btn').forEach(b => b.classList.remove('selected'));
@@ -14216,16 +14400,6 @@ function handleAction(act, el, e) {
       App.go('chat');
       setTimeout(() => sendInitialAi(), 300);
       break;
-    case 'talk-forward-choice': {
-      const level = el.dataset.level; // quick / try / deep
-      const levelLabel = level === 'quick' ? 'すぐできる' : level === 'try' ? '少し頑張る' : 'しっかり向き合う';
-      chatState.forwardDecisionMade = true;
-      // ユーザー側の「選択」としてチャット送信
-      const input = document.getElementById('chatInput');
-      if (input) input.value = `${levelLabel}で進めたい`;
-      handleAction('send', { dataset: {} }, e);
-      break;
-    }
     case 'talk-feel-done': {
       // モード1: 少し楽になった → セッション終了
       chatState.feelCheckDismissed = true;
@@ -14244,6 +14418,13 @@ function handleAction(act, el, e) {
         chatState.mode = null;
         rescueState = { flowId: null, stepIdx: 0, picks: [] };
         App.go('rescue');
+        break;
+      }
+      if (modeId === 'organize') {
+        // 「整理したい」は元のもやもや整理機能へ
+        chatState.mode = null;
+        startNewReflection();
+        App.go('reflect');
         break;
       }
       chatState.session = null;
@@ -14424,6 +14605,11 @@ ${r.emotionBefore.score - r.emotionAfter.score >= 0 ? `${r.emotionBefore.score -
       logEngagement();
       const fr = addForestCheckin();
       saveState();
+      // Supabase: 気持ちチェック記録
+      if (window.AsideLogger) {
+        AsideLogger.logEmotion(moodDraft.score, moodDraft.comment || null);
+        AsideLogger.setSessionMoodAfter(moodDraft.score);
+      }
       moodDraft = { score: null, comment: '' };
       if (fr.stageChanged) {
         toast('森に、すこし変化があったみたい。');
@@ -14452,6 +14638,11 @@ ${r.emotionBefore.score - r.emotionAfter.score >= 0 ? `${r.emotionBefore.score -
       logEngagement();
       addForestCheckin();
       saveState();
+      // Supabase: 気持ちチェック記録
+      if (window.AsideLogger) {
+        AsideLogger.logEmotion(moodDraft.score, moodDraft.comment || null);
+        AsideLogger.setSessionMoodAfter(moodDraft.score);
+      }
       moodDraft = { score: null, comment: '' };
       chatState.session = null;
       App.go('chat');
@@ -15151,7 +15342,53 @@ if (state.onboarded) {
 } else {
   App.currentScreen = 'welcome';
 }
-render();
+
+// ============================================================
+// β版 同意モーダル制御 & AsideLogger 初期化
+// ============================================================
+(function setupAsideBeta() {
+  if (!window.AsideLogger) { render(); return; }
+  AsideLogger.init();
+
+  const overlay = document.getElementById('consentOverlay');
+  const agreeBtn = document.getElementById('consentAgreeBtn');
+  const declineBtn = document.getElementById('consentDeclineBtn');
+
+  if (AsideLogger.hasConsent()) {
+    // 同意済み: 通常起動
+    render();
+    AsideLogger.screenView(App.currentScreen, { initial: true });
+    return;
+  }
+
+  // 未同意: モーダル表示、アプリは白紙で待機
+  if (overlay) overlay.classList.remove('hidden');
+
+  if (agreeBtn) {
+    agreeBtn.addEventListener('click', () => {
+      if (overlay) overlay.classList.add('hidden');
+      AsideLogger.recordConsent();
+      render();
+      AsideLogger.screenView(App.currentScreen, { initial: true });
+    });
+  }
+  if (declineBtn) {
+    declineBtn.addEventListener('click', () => {
+      if (overlay) {
+        overlay.innerHTML = '<div class="consent-card"><div class="consent-title">またお待ちしています</div><p class="consent-lead">β版は同意いただいた上でのご利用をお願いしています。このタブを閉じてください。</p></div>';
+      }
+    });
+  }
+})();
+
+// Service Worker 登録（PWA対応）
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(err => {
+      console.warn('[Aside] SW registration failed:', err && err.message);
+    });
+  });
+}
 </script>
 </body>
 </html>
