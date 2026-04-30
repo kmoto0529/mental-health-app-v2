@@ -7,7 +7,7 @@
 
 <!-- PWA / iOSホーム画面追加 -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#C68B5E">
+<meta name="theme-color" content="#6B8F71">
 <meta name="description" content="相談したいけどハードルで相談できていない方が、毎日3-5分で気持ちと行動を整理するアプリ">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -19,30 +19,55 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
    Aside v2.1 — ナナメトーンデザインシステム
    ============================================================ */
 :root {
-  /* カラー */
-  --bg: #FAF6F0;
+  /* ============================================================
+     Aside Design Tokens v2 — デザイン部統合版 2026-04-30
+     - Primary: Sage Green (デザイン部 v1 準拠)
+     - Secondary/FAB: Warm Sand (ブリーフ「ブラウン系」準拠)
+     - Crisis: Sage (ブリーフ「赤NG・ブラウン or 緑」準拠)
+     ============================================================ */
+  /* 背景 — Warm Minimal */
+  --bg: #FAF7F2;          /* warm white */
   --bg-card: #FFFFFF;
-  --bg-soft: #F3EDE3;
-  --bg-warm: #EFE5D6;
-  --text: #3D342A;
-  --text-soft: #8B7F70;
-  --text-muted: #B3A896;
-  --accent: #C68B5E;
-  --accent-soft: #E8D5C0;
-  --accent-deep: #9E6B40;
-  --sage: #8FA68C;       /* クライシス寄り添い色 */
+  --bg-soft: #F0EDE6;     /* surface variant */
+  --bg-warm: #EAE0CB;     /* warm sand subtle */
+
+  /* テキスト */
+  --text: #2D2D2D;
+  --text-soft: #6B6B6B;
+  --text-muted: #9E9E9E;
+
+  /* Primary — Sage Green（ブランドメイン） */
+  --primary: #6B8F71;
+  --primary-light: #9BB89F;
+  --primary-dark: #4A6B4F;
+  --primary-soft: #E0EBE2;
+
+  /* Secondary — Warm Sand（FAB / 補色アクセント） */
+  --secondary: #D4A574;
+  --secondary-light: #E8C9A4;
+  --secondary-dark: #B8874E;
+  --secondary-soft: #F5E8D6;
+
+  /* Legacy 互換 — accent → primary 経由でほぼsage化 */
+  --accent: #6B8F71;          /* primary と同期 */
+  --accent-soft: #E0EBE2;
+  --accent-deep: #4A6B4F;
+
+  /* Crisis — Sage（赤NG。穏やかな緑で寄り添い） */
+  --sage: #8FA68C;
   --sage-soft: #D7E0D2;
-  --divider: rgba(61, 52, 42, 0.08);
-  --shadow-soft: 0 2px 12px rgba(61, 52, 42, 0.05);
-  --shadow-card: 0 4px 20px rgba(61, 52, 42, 0.08);
-  --shadow-lift: 0 8px 28px rgba(61, 52, 42, 0.12);
+
+  --divider: #E0DCD4;
+  --shadow-soft: 0 2px 12px rgba(45, 45, 45, 0.05);
+  --shadow-card: 0 4px 20px rgba(45, 45, 45, 0.08);
+  --shadow-lift: 0 8px 28px rgba(45, 45, 45, 0.12);
 
   /* 角丸 */
   --r-sm: 12px;
@@ -58,10 +83,11 @@
 html, body { height: 100%; }
 html { background: var(--bg); }
 body {
-  font-family: 'Zen Kaku Gothic New', -apple-system, sans-serif;
+  font-family: 'Noto Sans JP', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 1.7;
+  letter-spacing: 0.02em;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
@@ -74,10 +100,12 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; bord
 ul, ol { list-style: none; }
 a { color: var(--accent-deep); text-decoration: none; }
 
-h1, h2, h3 { font-family: 'Noto Serif JP', serif; font-weight: 500; line-height: 1.4; color: var(--text); }
-h1 { font-size: 22px; }
-h2 { font-size: 18px; }
-h3 { font-size: 16px; }
+/* 見出しは Noto Serif JP で「手紙・日記」のような温かさを演出
+   （ナナメの関係＝先生でも友達でもない、の視覚化） */
+h1, h2, h3 { font-family: 'Noto Serif JP', 'Noto Sans JP', serif; font-weight: 500; line-height: 1.4; color: var(--text); letter-spacing: 0.01em; }
+h1 { font-size: 24px; font-weight: 600; line-height: 1.3; }
+h2 { font-size: 18px; font-weight: 500; }
+h3 { font-size: 16px; font-weight: 500; }
 
 /* ============================================================
    レイアウト
@@ -111,21 +139,24 @@ h3 { font-size: 16px; }
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-height: 52px;
   padding: 14px 24px;
-  border-radius: var(--r-sm);
-  font-weight: 500;
+  border-radius: 16px;
+  font-family: inherit;
+  font-weight: 600;
   font-size: 15px;
-  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  letter-spacing: 0.03em;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background-color 0.15s var(--ease);
   width: 100%;
 }
 .btn:active { transform: scale(0.97); }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--primary);
   color: #fff;
   box-shadow: var(--shadow-soft);
 }
-.btn-primary:hover { background: var(--accent-deep); }
+.btn-primary:hover { background: var(--primary-dark); }
 
 .btn-secondary {
   background: var(--bg-card);
@@ -259,7 +290,7 @@ h3 { font-size: 16px; }
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--secondary);
   color: #fff;
   display: flex;
   align-items: center;
@@ -269,6 +300,7 @@ h3 { font-size: 16px; }
   z-index: 90;
   transition: transform 0.2s var(--ease);
 }
+.fab:hover { background: var(--secondary-dark); }
 .fab:active { transform: scale(0.92); }
 .fab.hidden { display: none; }
 
@@ -631,19 +663,21 @@ h3 { font-size: 16px; }
   padding: 40px 30px;
 }
 .welcome-logo {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 28px;
-  color: var(--accent-deep);
+  font-family: 'Inter', 'Noto Serif JP', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--primary-dark);
   margin-bottom: 30px;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.02em;
 }
 .welcome-message {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 22px;
+  font-family: 'Noto Serif JP', 'Noto Sans JP', serif;
+  font-size: 20px;
   color: var(--text);
   line-height: 1.7;
   margin-bottom: 50px;
   font-weight: 500;
+  letter-spacing: 0.02em;
 }
 .welcome-cta { width: 100%; max-width: 280px; }
 
