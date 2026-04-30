@@ -69,6 +69,56 @@
   --shadow-card: 0 4px 20px rgba(45, 45, 45, 0.08);
   --shadow-lift: 0 8px 28px rgba(45, 45, 45, 0.12);
 
+  /* 発光トークン（ダーク時のみ視認） */
+  --glow-primary: 0 0 16px rgba(167, 196, 160, 0.0);
+  --glow-strong:  0 0 24px rgba(167, 196, 160, 0.0);
+}
+
+/* ============================================================
+   Deep Forest（夜モード 18:00-5:00 自動切替）
+   ============================================================ */
+[data-theme="dark"] {
+  /* 背景 */
+  --bg: #1F2A2A;
+  --bg-card: #2F3E3E;
+  --bg-soft: #2A3838;
+  --bg-warm: #2A3A2A;
+
+  /* テキスト */
+  --text: #EAEAEA;
+  --text-soft: #B0B8B5;
+  --text-muted: #7A8580;
+
+  /* Primary — Deep Teal */
+  --primary: #4E7C7B;
+  --primary-light: #6B9494;
+  --primary-dark: #2F5E5D;
+  --primary-soft: #2F4040;
+
+  /* Secondary — Sage（光るアクセント） */
+  --secondary: #A7C4A0;
+  --secondary-light: #DCEBD8;
+  --secondary-dark: #87A582;
+  --secondary-soft: #2A3A2A;
+
+  /* Legacy alias — accent は sage に */
+  --accent: #A7C4A0;
+  --accent-soft: #2A3A2A;
+  --accent-deep: #DCEBD8;
+
+  /* Crisis — sage 強め */
+  --sage: #A7C4A0;
+  --sage-soft: #2A3A2A;
+
+  --divider: #3A4949;
+  --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 8px 28px rgba(0, 0, 0, 0.55);
+
+  /* 発光（夜のみ ON） */
+  --glow-primary: 0 0 16px rgba(167, 196, 160, 0.4), 0 0 32px rgba(167, 196, 160, 0.18);
+  --glow-strong:  0 0 24px rgba(167, 196, 160, 0.55), 0 0 48px rgba(167, 196, 160, 0.25);
+
   /* 角丸 */
   --r-sm: 12px;
   --r-md: 18px;
@@ -81,7 +131,10 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
-html { background: var(--bg); }
+html {
+  background: var(--bg);
+  transition: background-color 0.5s var(--ease);
+}
 body {
   font-family: 'Noto Sans JP', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 400;
@@ -90,6 +143,7 @@ body {
   letter-spacing: 0.02em;
   color: var(--text);
   background: var(--bg);
+  transition: background-color 0.5s var(--ease), color 0.5s var(--ease);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
@@ -140,13 +194,13 @@ h3 { font-size: 16px; font-weight: 500; }
   justify-content: center;
   gap: 8px;
   min-height: 52px;
-  padding: 14px 24px;
-  border-radius: 16px;
+  padding: 14px 28px;
+  border-radius: 999px;             /* ピル型 */
   font-family: inherit;
   font-weight: 600;
   font-size: 15px;
   letter-spacing: 0.03em;
-  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background-color 0.15s var(--ease);
+  transition: transform 0.15s var(--ease), box-shadow 0.3s var(--ease), background-color 0.3s var(--ease), color 0.3s var(--ease);
   width: 100%;
 }
 .btn:active { transform: scale(0.97); }
@@ -157,6 +211,15 @@ h3 { font-size: 16px; font-weight: 500; }
   box-shadow: var(--shadow-soft);
 }
 .btn-primary:hover { background: var(--primary-dark); }
+[data-theme="dark"] .btn-primary {
+  background: var(--secondary);
+  color: #1F2A2A;                   /* 濃い背景に黒文字で読みやすく */
+  box-shadow: var(--glow-primary);
+}
+[data-theme="dark"] .btn-primary:hover {
+  background: var(--secondary-light);
+  box-shadow: var(--glow-strong);
+}
 
 .btn-secondary {
   background: var(--bg-card);
@@ -164,6 +227,10 @@ h3 { font-size: 16px; font-weight: 500; }
   border: 1px solid var(--divider);
 }
 .btn-secondary:hover { background: var(--bg-soft); }
+[data-theme="dark"] .btn-secondary {
+  background: transparent;
+  border-color: var(--divider);
+}
 
 .btn-ghost {
   background: transparent;
@@ -187,6 +254,7 @@ h3 { font-size: 16px; font-weight: 500; }
   padding: 18px;
   box-shadow: var(--shadow-soft);
   margin-bottom: 14px;
+  transition: background 0.5s var(--ease), border-color 0.5s var(--ease);
 }
 .card-soft {
   background: var(--bg-soft);
@@ -199,6 +267,17 @@ h3 { font-size: 16px; font-weight: 500; }
   border-radius: var(--r-md);
   padding: 18px;
   margin-bottom: 14px;
+}
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-soft,
+[data-theme="dark"] .card-warm {
+  background: rgba(47, 62, 62, 0.55);
+  border: 1px solid var(--divider);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+[data-theme="dark"] .card-warm {
+  background: rgba(58, 73, 73, 0.6);
 }
 
 /* ============================================================
@@ -269,6 +348,12 @@ h3 { font-size: 16px; font-weight: 500; }
   grid-template-columns: repeat(3, 1fr);
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom);
+  transition: background 0.5s var(--ease), border-color 0.5s var(--ease);
+}
+[data-theme="dark"] .tabbar {
+  background: rgba(31, 42, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .tabbar-item {
   padding: 10px 0 12px;
@@ -277,6 +362,7 @@ h3 { font-size: 16px; font-weight: 500; }
   transition: color 0.2s var(--ease);
 }
 .tabbar-item.active { color: var(--accent-deep); }
+[data-theme="dark"] .tabbar-item.active { color: var(--secondary); }
 .tabbar-icon { font-size: 22px; line-height: 1; margin-bottom: 4px; }
 .tabbar-label { font-size: 11px; font-weight: 500; }
 
@@ -298,9 +384,25 @@ h3 { font-size: 16px; font-weight: 500; }
   font-size: 24px;
   box-shadow: var(--shadow-lift);
   z-index: 90;
-  transition: transform 0.2s var(--ease);
+  transition: transform 0.2s var(--ease), box-shadow 0.4s var(--ease), background 0.4s var(--ease);
 }
 .fab:hover { background: var(--secondary-dark); }
+[data-theme="dark"] .fab {
+  background: var(--bg-card);
+  color: var(--secondary);
+  border: 2px solid var(--secondary);
+  box-shadow: var(--glow-primary);
+  animation: fab-pulse 4s var(--ease) infinite;
+}
+[data-theme="dark"] .fab:hover {
+  background: var(--secondary);
+  color: var(--bg);
+  box-shadow: var(--glow-strong);
+}
+@keyframes fab-pulse {
+  0%, 100% { box-shadow: var(--glow-primary); }
+  50% { box-shadow: var(--glow-strong); }
+}
 .fab:active { transform: scale(0.92); }
 .fab.hidden { display: none; }
 
@@ -651,35 +753,88 @@ h3 { font-size: 16px; font-weight: 500; }
 }
 
 /* ============================================================
-   オンボーディング画面
+   オンボーディング画面（Welcome — ヒーロー画像対応）
    ============================================================ */
 .welcome-screen {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   min-height: 100vh;
   text-align: center;
-  padding: 40px 30px;
+  padding: 40px 28px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.welcome-hero {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55vh;
+  background-image: linear-gradient(180deg, rgba(31,42,42,0) 0%, rgba(31,42,42,0.5) 70%, var(--bg) 100%),
+                    url('./assets/welcome-hero.png');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+[data-theme="light"] .welcome-hero,
+:root:not([data-theme="dark"]) .welcome-hero {
+  /* ライトモード時は薄め＋暖色オーバーレイ */
+  background-image: linear-gradient(180deg, rgba(250,247,242,0.0) 0%, rgba(250,247,242,0.6) 70%, var(--bg) 100%),
+                    url('./assets/welcome-hero.png');
+}
+/* 画像が無い場合のフォールバック（CSSのみで森の夜を再現） */
+.welcome-hero-fallback {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55vh;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(167,196,160,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 35% 30%, rgba(220,235,216,0.4) 0%, transparent 4%),  /* 月 */
+    linear-gradient(180deg, #0F1A1A 0%, #1F2A2A 60%, var(--bg) 100%);
+  z-index: 0;
+}
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: auto;
 }
 .welcome-logo {
-  font-family: 'Inter', 'Noto Serif JP', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--primary-dark);
-  margin-bottom: 30px;
-  letter-spacing: -0.02em;
+  font-family: 'Noto Serif JP', 'Inter', serif;
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 24px;
+  letter-spacing: 0.02em;
+}
+[data-theme="dark"] .welcome-logo {
+  color: var(--secondary-light);
+  text-shadow: 0 0 20px rgba(167, 196, 160, 0.3);
 }
 .welcome-message {
   font-family: 'Noto Serif JP', 'Noto Sans JP', serif;
-  font-size: 20px;
-  color: var(--text);
-  line-height: 1.7;
-  margin-bottom: 50px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 17px;
+  color: var(--text-soft);
+  line-height: 1.9;
+  margin-bottom: 40px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  max-width: 320px;
 }
-.welcome-cta { width: 100%; max-width: 280px; }
+.welcome-cta { width: 100%; max-width: 280px; margin-bottom: 8px; }
+.welcome-skip {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  background: transparent;
+  padding: 12px;
+  width: 100%;
+  max-width: 280px;
+}
 
 /* ============================================================
    同意モーダル
@@ -850,14 +1005,38 @@ const DOMAINS = [
   { id: 'later',        emoji: '⏭', name: 'あとで' },
 ];
 
-// 気分 5段階
-const MOODS = [
+// 気分 5段階（朝Light = 太陽系 / 夜Dark = 月系。テーマで自動切替）
+const MOODS_DAY = [
   { id: 5, emoji: '☀️', label: 'とても良い' },
   { id: 4, emoji: '🌤', label: '良い' },
   { id: 3, emoji: '☁️', label: 'ふつう' },
   { id: 2, emoji: '🌧', label: 'しんどい' },
   { id: 1, emoji: '⛈', label: 'つらい' },
 ];
+const MOODS_NIGHT = [
+  { id: 5, emoji: '🌙', label: 'いい感じ' },
+  { id: 4, emoji: '✨', label: 'まあまあ' },
+  { id: 3, emoji: '☁️', label: 'ふつう' },
+  { id: 2, emoji: '🌧', label: 'しんどい' },
+  { id: 1, emoji: '⛈', label: 'つらい' },
+];
+function getMoods() {
+  return getVisualTheme() === 'dark' ? MOODS_NIGHT : MOODS_DAY;
+}
+// MOODS は内部参照用にプロキシ化（再代入を避けるため getter で取得）
+const MOODS = new Proxy([], {
+  get(_target, prop) {
+    const arr = getMoods();
+    if (prop === 'find') return arr.find.bind(arr);
+    if (prop === 'map') return arr.map.bind(arr);
+    if (prop === 'forEach') return arr.forEach.bind(arr);
+    if (prop === 'length') return arr.length;
+    if (prop === 'filter') return arr.filter.bind(arr);
+    if (prop === 'slice') return arr.slice.bind(arr);
+    if (typeof prop === 'string' && /^\d+$/.test(prop)) return arr[Number(prop)];
+    return arr[prop];
+  }
+});
 
 // 改善行動カタログ 50項目（ユーザー向け表現）
 const ACTIONS = [
@@ -1010,6 +1189,31 @@ function getMode() {
   return 'day';
 }
 
+// ============================================================
+// ビジュアルテーマ（Light Warm 5-18 / Deep Forest 18-5）
+// ============================================================
+function getVisualTheme() {
+  // 手動上書き対応
+  if (state.preferences && state.preferences.themeOverride) {
+    return state.preferences.themeOverride;   // 'light' | 'dark'
+  }
+  const h = new Date().getHours();
+  return (h >= 18 || h < 5) ? 'dark' : 'light';
+}
+function applyVisualTheme() {
+  const theme = getVisualTheme();
+  document.documentElement.setAttribute('data-theme', theme);
+  // theme-color メタタグも切替
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#1F2A2A' : '#6B8F71');
+}
+function probeHeroImage() {
+  const img = new Image();
+  img.onload = () => { window.ASIDE_HAS_HERO = true; if (currentScreen === 'welcome') render(); };
+  img.onerror = () => { window.ASIDE_HAS_HERO = false; if (currentScreen === 'welcome') render(); };
+  img.src = './assets/welcome-hero.png';
+}
+
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1103,14 +1307,21 @@ function render() {
 // 画面: Welcome
 // ============================================================
 function viewWelcome() {
+  // ヒーロー画像が無ければ CSS フォールバック森を表示
+  const heroEl = window.ASIDE_HAS_HERO === false
+    ? '<div class="welcome-hero-fallback"></div>'
+    : '<div class="welcome-hero" onerror="this.style.display=\'none\'"></div>';
   return `
     <div class="welcome-screen">
-      <div class="welcome-logo">Aside</div>
-      <div class="welcome-message">
-        ひとりで抱えてる、を、<br>ちょっとずつ整理する。
+      ${heroEl}
+      <div class="welcome-content">
+        <div class="welcome-logo">Aside</div>
+        <div class="welcome-message">
+          ここは、あなたの気持ちを<br>静かに受け止める場所です。
+        </div>
+        <button class="btn btn-primary welcome-cta" data-act="welcome-next">はじめる</button>
+        <button class="welcome-skip" data-act="welcome-next">スキップ</button>
       </div>
-      <button class="btn btn-primary welcome-cta" data-act="welcome-next">はじめる</button>
-      <p class="text-tiny text-muted mt-4" style="margin-top:30px;">あなたの感情と行動の伴走 AI</p>
     </div>
   `;
 }
@@ -2395,6 +2606,18 @@ function init() {
     state.user.daysUsed = Math.floor((Date.now() - state.user.createdAt) / 86400000) + 1;
     saveState();
   }
+
+  // ビジュアルテーマ初期適用 + 定期チェック
+  applyVisualTheme();
+  setInterval(() => {
+    const before = document.documentElement.getAttribute('data-theme');
+    applyVisualTheme();
+    const after = document.documentElement.getAttribute('data-theme');
+    if (before !== after) render();   // 切替時に再描画（mood絵文字差替）
+  }, 60_000);
+
+  // ヒーロー画像の存在を確認（無ければ CSS フォールバック）
+  probeHeroImage();
 
   // AsideLogger 初期化
   if (window.AsideLogger) {
