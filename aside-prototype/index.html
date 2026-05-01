@@ -376,7 +376,7 @@ h3 { font-size: 16px; font-weight: 500; }
   cursor: pointer;
   font: inherit;
 }
-.tabbar-item.active { color: var(--accent-deep); }
+.tabbar-item.active { color: var(--primary); }       /* ダークすぎ問題回避: brighter sage */
 [data-theme="dark"] .tabbar-item.active { color: var(--secondary); }
 .tabbar-icon {
   font-size: 22px;
@@ -386,17 +386,19 @@ h3 { font-size: 16px; font-weight: 500; }
   display: block;
 }
 .tabbar-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  font-family: 'Noto Sans JP', -apple-system, sans-serif;
+  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', system-ui, sans-serif;
   color: inherit;
   background: transparent;
   text-decoration: none;
   text-shadow: none;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   line-height: 1.3;
   display: block;
+  white-space: nowrap;
 }
+.tabbar-item.active .tabbar-label { font-weight: 600; }
 
 /* ============================================================
    フローティング 💬
