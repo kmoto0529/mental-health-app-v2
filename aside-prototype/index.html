@@ -359,12 +359,44 @@ h3 { font-size: 16px; font-weight: 500; }
   padding: 10px 0 12px;
   text-align: center;
   color: var(--text-muted);
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
   transition: color 0.2s var(--ease);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  font: inherit;
 }
 .tabbar-item.active { color: var(--accent-deep); }
 [data-theme="dark"] .tabbar-item.active { color: var(--secondary); }
-.tabbar-icon { font-size: 22px; line-height: 1; margin-bottom: 4px; }
-.tabbar-label { font-size: 11px; font-weight: 500; }
+.tabbar-icon {
+  font-size: 22px;
+  line-height: 1;
+  background: transparent;
+  color: inherit;
+  display: block;
+}
+.tabbar-label {
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Noto Sans JP', -apple-system, sans-serif;
+  color: inherit;
+  background: transparent;
+  text-decoration: none;
+  text-shadow: none;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  display: block;
+}
 
 /* ============================================================
    フローティング 💬
@@ -1505,10 +1537,6 @@ function viewHome() {
         ${state.moodLogs.slice().reverse().slice(0, 3).map(m => renderMoodLogCard(m, true)).join('')}
       ` : ''}
 
-      <div class="disclaimer mt-4">
-        <span>⚠️</span>
-        <div>Aside の AI による分析・提案は、医療行為や診断ではなく、AIが推定した参考情報です。深刻な悩みは専門の相談機関へ。</div>
-      </div>
     </div>
   `;
 }
@@ -1580,11 +1608,6 @@ function viewMoodFull() {
         <button class="btn btn-primary" data-act="mood-save-end" ${d.moodScore == null ? 'disabled' : ''}>保存して終わる</button>
         <button class="btn btn-secondary" data-act="mood-save-talk" ${d.moodScore == null ? 'disabled' : ''}>保存してAIと話す</button>
         <button class="btn-ghost" data-act="back-home">キャンセル</button>
-      </div>
-
-      <div class="disclaimer mt-4">
-        <span>⚠️</span>
-        <div>AI推定の参考情報です。深刻な悩みは専門機関へ。</div>
       </div>
     </div>
   `;
@@ -1912,11 +1935,6 @@ function viewAction() {
           <p class="text-small text-soft mb-4">今の悩みや変えたいことをAIと話しながら、あなたに合った目標を一緒に見つけます。</p>
           <button class="btn btn-primary" data-act="goal-chat-start">AIと目標を決める</button>
         </div>
-
-        <div class="disclaimer mt-4">
-          <span>⚠️</span>
-          <div>AI推定の参考情報です。深刻な悩みは専門機関へ。</div>
-        </div>
       </div>
     `;
   }
@@ -1983,11 +2001,6 @@ function viewAction() {
 
         <button class="btn-ghost mt-4" data-act="action-change" style="width:100%;">別のアクションに変える</button>
       `}
-
-      <div class="disclaimer mt-4">
-        <span>⚠️</span>
-        <div>AI推定の参考情報です。深刻な悩みは専門機関へ。</div>
-      </div>
     </div>
   `;
 }
@@ -2128,11 +2141,6 @@ function viewPolicySelect() {
           </button>
         `).join('')}
       </div>
-
-      <div class="disclaimer mt-4">
-        <span>⚠️</span>
-        <div>AI推定の参考情報です。</div>
-      </div>
     </div>
   `;
 }
@@ -2194,11 +2202,6 @@ function viewActionSelect() {
             </div>
           </button>
         `).join('')}
-      </div>
-
-      <div class="disclaimer mt-4">
-        <span>⚠️</span>
-        <div>AI推定の参考情報です。</div>
       </div>
     </div>
   `;
@@ -2396,11 +2399,6 @@ function viewRecord() {
       </div>
 
       ${sub === 'calendar' ? viewCalendarSection() : viewReportSection()}
-
-      <div class="disclaimer mt-4">
-        <span>⚠️</span>
-        <div>AI推定の参考情報です。深刻な悩みは専門機関へ。</div>
-      </div>
     </div>
   `;
 }
