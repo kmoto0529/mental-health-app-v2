@@ -381,16 +381,14 @@ h3 { font-size: 16px; font-weight: 500; }
   display: block;
 }
 .navtxt {
-  font-size: 13px;
+  font-size: 16px;        /* kanji潰れ完全回避のため大幅に拡大 */
   font-weight: 500;
   /* font-family は親 .navbtn の font:inherit 経由で body の 'Noto Sans JP' が来る */
   line-height: 1.4;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   display: block;
   white-space: nowrap;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* text-rendering と font-smoothing は小サイズkanjiの黒つぶれ原因のため除去 */
 }
 .navbtn.active .navtxt { font-weight: 600; }
 
