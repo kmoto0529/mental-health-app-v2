@@ -381,11 +381,11 @@ h3 { font-size: 16px; font-weight: 500; }
   display: block;
 }
 .navtxt {
-  font-size: 14px;                                                  /* 12 → 14 でkanjiの潰れ回避 */
+  font-size: 13px;
   font-weight: 500;
-  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic UI', Meiryo, system-ui, sans-serif;
+  /* font-family は親 .navbtn の font:inherit 経由で body の 'Noto Sans JP' が来る */
   line-height: 1.4;
-  letter-spacing: 0.08em;                                           /* kanjiに息継ぎ */
+  letter-spacing: 0.05em;
   display: block;
   white-space: nowrap;
   text-rendering: optimizeLegibility;
