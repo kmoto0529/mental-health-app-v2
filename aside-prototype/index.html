@@ -161,14 +161,16 @@
 }
 .home-mascot {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: #E5EFE0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 4px;
 }
+.home-mascot svg, .home-mascot img { width: 100%; height: 100%; object-fit: contain; }
 
 /* ===== 気持ち入力カード ===== */
 .home-mood-card {
@@ -407,6 +409,71 @@
 [data-theme="dark"] .recent-row-mood { color: #EAEAEA; }
 [data-theme="dark"] .recent-row-emoji { background: rgba(167,196,160,0.15); }
 [data-theme="dark"] .recent-row { border-bottom-color: rgba(255,255,255,0.06); }
+
+/* ============================================================
+   Welcome まめこ版
+   ============================================================ */
+.welcome-mameko {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 60px 32px;
+  background: linear-gradient(180deg, #FAF7F2 0%, #F1E8D5 100%);
+}
+.welcome-mameko .welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+}
+.welcome-mameko-art {
+  width: 160px;
+  height: 176px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.welcome-mameko-art svg, .welcome-mameko-art img { width: 100%; height: 100%; object-fit: contain; }
+.welcome-mameko .welcome-logo {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: #4A6B4F;
+  margin-bottom: 18px;
+  letter-spacing: 0.05em;
+}
+.welcome-mameko .welcome-message {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  line-height: 2;
+  color: #6B6B6B;
+  text-align: center;
+  margin-bottom: 38px;
+}
+.welcome-mameko .welcome-cta {
+  width: 100%;
+  background: #7BA876;
+  color: #FFF;
+  border: 0;
+  border-radius: 999px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.welcome-mameko .welcome-skip {
+  background: transparent;
+  border: 0;
+  color: #9E9E9E;
+  font-size: 13px;
+  padding: 12px;
+  cursor: pointer;
+}
 
 /* ============================================================
    ベース
@@ -1700,14 +1767,12 @@ function render() {
 // 画面: Welcome
 // ============================================================
 function viewWelcome() {
-  // ヒーロー画像が無ければ CSS フォールバック森を表示
-  const heroEl = window.ASIDE_HAS_HERO === false
-    ? '<div class="welcome-hero-fallback"></div>'
-    : '<div class="welcome-hero" onerror="this.style.display=\'none\'"></div>';
   return `
-    <div class="welcome-screen">
-      ${heroEl}
+    <div class="welcome-screen welcome-mameko">
       <div class="welcome-content">
+        <div class="welcome-mameko-art" aria-hidden="true">
+          ${mameko({ stage: 'tane', expression: 'calm', size: 160 })}
+        </div>
         <div class="welcome-logo">Aside</div>
         <div class="welcome-message">
           ここは、あなたの気持ちを<br>静かに受け止める場所です。
@@ -1817,45 +1882,14 @@ function viewHome() {
           <p class="home-subtitle">${getHomeSubtitle()}</p>
         </div>
         <div class="home-mascot" aria-hidden="true">
-          <svg viewBox="0 0 60 60" width="56" height="56">
-            <circle cx="30" cy="30" r="28" fill="#E5EFE0"/>
-            <ellipse cx="30" cy="38" rx="13" ry="14" fill="#FFF" stroke="#C8D5C0" stroke-width="1"/>
-            <circle cx="26" cy="36" r="1.5" fill="#3D342A"/>
-            <circle cx="34" cy="36" r="1.5" fill="#3D342A"/>
-            <path d="M27 41 Q30 43 33 41" stroke="#3D342A" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <ellipse cx="22" cy="40" rx="2" ry="1.5" fill="#FFD8B5" opacity="0.6"/>
-            <ellipse cx="38" cy="40" rx="2" ry="1.5" fill="#FFD8B5" opacity="0.6"/>
-            <path d="M30 24 Q26 18 23 16 Q26 19 28 23" fill="#7BA876"/>
-            <path d="M30 24 Q34 18 37 16 Q34 19 32 23" fill="#7BA876"/>
-            <ellipse cx="30" cy="22" rx="2" ry="3" fill="#9BB89F"/>
-          </svg>
+          ${mameko({ size: 56 })}
         </div>
       </header>
 
       <!-- 気持ち入力カード -->
       <div class="home-mood-card">
         <div class="home-mood-illust" aria-hidden="true">
-          <svg viewBox="0 0 120 140" width="96" height="112">
-            <circle cx="68" cy="22" r="8" fill="#F4C566"/>
-            <g stroke="#F4C566" stroke-width="1.5" stroke-linecap="round">
-              <line x1="68" y1="6" x2="68" y2="10"/>
-              <line x1="56" y1="22" x2="60" y2="22"/>
-              <line x1="76" y1="22" x2="80" y2="22"/>
-              <line x1="60" y1="14" x2="62" y2="16"/>
-              <line x1="76" y1="14" x2="74" y2="16"/>
-            </g>
-            <rect x="20" y="50" width="40" height="80" rx="4" fill="#A8C0A2" stroke="#7BA876" stroke-width="1.5"/>
-            <line x1="40" y1="50" x2="40" y2="130" stroke="#7BA876" stroke-width="1"/>
-            <circle cx="35" cy="92" r="1.5" fill="#5C7A5A"/>
-            <circle cx="45" cy="92" r="1.5" fill="#5C7A5A"/>
-            <ellipse cx="40" cy="118" rx="8" ry="9" fill="#FFF" stroke="#C8D5C0" stroke-width="1"/>
-            <circle cx="37" cy="117" r="1" fill="#3D342A"/>
-            <circle cx="43" cy="117" r="1" fill="#3D342A"/>
-            <path d="M40 113 Q38 110 36 109" stroke="#7BA876" stroke-width="1" fill="none"/>
-            <path d="M40 113 Q42 110 44 109" stroke="#7BA876" stroke-width="1" fill="none"/>
-            <path d="M10 130 Q15 122 20 125 Q18 132 12 132" fill="#9BB89F" opacity="0.6"/>
-            <path d="M70 130 Q65 124 60 126 Q63 132 70 132" fill="#9BB89F" opacity="0.5"/>
-          </svg>
+          ${mameko({ pose: 'watering', size: 96 })}
         </div>
         <div class="home-mood-body">
           <h2 class="home-mood-title">いまのきもちを教えてください</h2>
@@ -1878,12 +1912,7 @@ function viewHome() {
       <!-- もやもや整理カード -->
       <div class="home-moya-card">
         <div class="home-moya-illust" aria-hidden="true">
-          <svg viewBox="0 0 100 100" width="80" height="80">
-            <circle cx="50" cy="50" r="38" fill="#FFE4D6" opacity="0.7"/>
-            <path d="M30 38 C 40 30, 60 30, 70 40 C 75 48, 60 55, 50 50 C 38 45, 32 58, 45 62 C 60 65, 70 60, 65 70 C 60 78, 35 75, 30 65" stroke="#5C7A5A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M65 80 Q70 75 75 80" stroke="#7BA876" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <ellipse cx="78" cy="86" rx="3" ry="4" fill="#9BB89F"/>
-          </svg>
+          ${mameko({ pose: 'bulb', size: 80 })}
         </div>
         <div class="home-moya-body">
           <h2 class="home-moya-title">もやもやを整理する</h2>
@@ -2721,6 +2750,268 @@ function saveActionEval() {
 }
 
 // ============================================================
+// まめこキャラクター（成長段階+表情+ポーズ / PNGフォールバック付きSVG）
+// ============================================================
+const MAMEKO_PT = { mood: 1, moyamoya: 2, action: 3 };
+const MAMEKO_STAGES = ['tane', 'futaba', 'nae', 'hana', 'ookii'];
+const MAMEKO_STAGE_THRESHOLDS = [0, 3, 10, 25, 50];
+
+function mamekoTotalPoints() {
+  const m = (state.moodLogs || []).length * MAMEKO_PT.mood;
+  const my = (state.moyamoyaRecords || []).length * MAMEKO_PT.moyamoya;
+  const a = (state.actionLogs || []).filter(l => l.rating > 0).length * MAMEKO_PT.action;
+  return m + my + a;
+}
+function mamekoStage() {
+  const pt = mamekoTotalPoints();
+  for (let i = MAMEKO_STAGE_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (pt >= MAMEKO_STAGE_THRESHOLDS[i]) return MAMEKO_STAGES[i];
+  }
+  return 'tane';
+}
+function mamekoStageNumber() {
+  return MAMEKO_STAGES.indexOf(mamekoStage()) + 1;
+}
+function mamekoExpression() {
+  const last = state.moodLogs && state.moodLogs[state.moodLogs.length - 1];
+  if (!last) return 'calm';
+  if (last.moodScore <= 2) return 'sad';
+  if (last.moodScore >= 4) return 'happy';
+  return 'calm';
+}
+
+// PNG資産の存在確認（読み込めたものから順次差し替え）
+const _mamekoAssetCache = {};
+function mamekoProbeAsset(category, name) {
+  const key = `${category}/${name}`;
+  if (key in _mamekoAssetCache) return _mamekoAssetCache[key];
+  _mamekoAssetCache[key] = false;
+  const img = new Image();
+  img.onload = () => { _mamekoAssetCache[key] = true; if (typeof render === 'function' && currentScreen) render(); };
+  img.onerror = () => { _mamekoAssetCache[key] = false; };
+  img.src = `./assets/mameko/${key}.png`;
+  return false;
+}
+
+// メイン関数：HTMLを返す（PNG > SVG）
+function mameko(opts = {}) {
+  const stage = opts.stage || mamekoStage();
+  const expression = opts.expression || mamekoExpression();
+  const pose = opts.pose || null;
+  const seasonal = opts.seasonal || null;
+  const size = opts.size || 96;
+
+  // 優先順: pose > seasonal > expression > growth-stage
+  const tries = [];
+  if (pose) tries.push(['poses', pose]);
+  if (seasonal) tries.push(['seasonal', seasonal]);
+  if (expression !== 'calm') tries.push(['expressions', expression]);
+  const stageIdx = MAMEKO_STAGES.indexOf(stage) + 1;
+  tries.push(['growth', `stage${stageIdx}-${stage}`]);
+
+  for (const [cat, name] of tries) {
+    if (mamekoProbeAsset(cat, name)) {
+      return `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none;">`;
+    }
+  }
+  return mamekoSvg({ stage, expression, pose, size });
+}
+
+// SVGプレースホルダー生成器（合成）
+function mamekoSvg(opts = {}) {
+  const stage = opts.stage || 'futaba';
+  const expression = opts.expression || 'calm';
+  const pose = opts.pose || null;
+  const size = opts.size || 96;
+
+  // 配色
+  const C = {
+    body: '#FFFFFF',
+    bodyEdge: '#C8D5C0',
+    leafM: '#7BA876',
+    leafD: '#5C7A5A',
+    leafL: '#9BB89F',
+    eye: '#3D342A',
+    blush: '#FFD8B5',
+    flower: '#FFFFFF',
+    flowerCenter: '#F4C566',
+    pot: '#A07854',
+    potShade: '#7A5A3E',
+  };
+
+  // 頭の上（成長段階）
+  let head = '';
+  if (stage === 'tane') {
+    head = `<ellipse cx="50" cy="36" rx="2" ry="5" fill="${C.leafL}"/>`;
+  } else if (stage === 'futaba') {
+    head = `
+      <path d="M50 40 C 46 30, 38 26, 36 28 C 38 32, 44 36, 49 40 Z" fill="${C.leafM}"/>
+      <path d="M50 40 C 54 30, 62 26, 64 28 C 62 32, 56 36, 51 40 Z" fill="${C.leafM}"/>
+      <ellipse cx="50" cy="36" rx="2" ry="3" fill="${C.leafL}"/>
+    `;
+  } else if (stage === 'nae') {
+    head = `
+      <path d="M50 42 C 44 30, 34 24, 32 26 C 34 32, 42 38, 49 42 Z" fill="${C.leafM}"/>
+      <path d="M50 42 C 56 30, 66 24, 68 26 C 66 32, 58 38, 51 42 Z" fill="${C.leafM}"/>
+      <path d="M50 42 C 50 30, 48 22, 50 18 C 52 22, 50 30, 50 42 Z" fill="${C.leafL}"/>
+    `;
+  } else if (stage === 'hana') {
+    head = `
+      <path d="M50 42 C 44 32, 36 28, 34 30 C 36 34, 44 38, 49 42 Z" fill="${C.leafM}"/>
+      <path d="M50 42 C 56 32, 64 28, 66 30 C 64 34, 56 38, 51 42 Z" fill="${C.leafM}"/>
+      <g transform="translate(50,24)">
+        <circle cx="0" cy="-6" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
+        <circle cx="-5" cy="0" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
+        <circle cx="5" cy="0" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
+        <circle cx="-3" cy="-7" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
+        <circle cx="3" cy="-7" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
+        <circle cx="0" cy="-3" r="2.5" fill="${C.flowerCenter}"/>
+      </g>
+    `;
+  } else if (stage === 'ookii') {
+    head = `
+      <path d="M40 38 C 30 22, 20 18, 18 22 C 22 30, 32 36, 40 40 Z" fill="${C.leafM}"/>
+      <path d="M50 36 C 48 18, 50 12, 52 12 C 54 18, 52 30, 50 36 Z" fill="${C.leafL}"/>
+      <path d="M60 38 C 70 22, 80 18, 82 22 C 78 30, 68 36, 60 40 Z" fill="${C.leafM}"/>
+      <g transform="translate(36,16)">
+        <circle cx="0" cy="0" r="3" fill="${C.flower}"/>
+        <circle cx="-3" cy="2" r="3" fill="${C.flower}"/>
+        <circle cx="3" cy="2" r="3" fill="${C.flower}"/>
+        <circle cx="0" cy="0" r="1.5" fill="${C.flowerCenter}"/>
+      </g>
+      <g transform="translate(70,20)">
+        <circle cx="0" cy="0" r="2.5" fill="${C.flower}"/>
+        <circle cx="-2" cy="2" r="2.5" fill="${C.flower}"/>
+        <circle cx="2" cy="2" r="2.5" fill="${C.flower}"/>
+        <circle cx="0" cy="0" r="1" fill="${C.flowerCenter}"/>
+      </g>
+    `;
+  }
+
+  // ボディ（鉢があるかどうかは ookii のみ）
+  let body = '';
+  if (stage === 'ookii') {
+    body = `
+      <ellipse cx="50" cy="58" rx="20" ry="20" fill="${C.body}" stroke="${C.bodyEdge}" stroke-width="1.5"/>
+      <path d="M28 84 L 30 100 L 70 100 L 72 84 Z" fill="${C.pot}" stroke="${C.potShade}" stroke-width="1"/>
+      <ellipse cx="50" cy="84" rx="22" ry="3" fill="${C.potShade}"/>
+    `;
+  } else {
+    body = `<ellipse cx="50" cy="64" rx="22" ry="26" fill="${C.body}" stroke="${C.bodyEdge}" stroke-width="1.5"/>`;
+  }
+
+  // 目（表情）
+  let eyes = '';
+  if (expression === 'happy') {
+    eyes = `
+      <path d="M40 60 Q42 56 45 60" stroke="${C.eye}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M55 60 Q58 56 60 60" stroke="${C.eye}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    `;
+  } else if (expression === 'cheering') {
+    eyes = `
+      <circle cx="42" cy="60" r="1.6" fill="${C.eye}"/>
+      <circle cx="58" cy="60" r="1.6" fill="${C.eye}"/>
+      <text x="32" y="50" font-size="6" fill="${C.flowerCenter}">✨</text>
+      <text x="62" y="50" font-size="6" fill="${C.flowerCenter}">✨</text>
+    `;
+  } else if (expression === 'sad') {
+    eyes = `
+      <circle cx="42" cy="62" r="1.4" fill="${C.eye}"/>
+      <circle cx="58" cy="62" r="1.4" fill="${C.eye}"/>
+    `;
+  } else if (expression === 'thinking') {
+    eyes = `
+      <circle cx="44" cy="60" r="1.4" fill="${C.eye}"/>
+      <circle cx="60" cy="60" r="1.4" fill="${C.eye}"/>
+      <text x="68" y="48" font-size="8" fill="${C.leafM}" font-style="italic">?</text>
+    `;
+  } else { // calm
+    eyes = `
+      <circle cx="42" cy="60" r="1.5" fill="${C.eye}"/>
+      <circle cx="58" cy="60" r="1.5" fill="${C.eye}"/>
+    `;
+  }
+
+  // 口（表情）
+  let mouth = '';
+  if (expression === 'happy' || expression === 'cheering') {
+    mouth = `<path d="M46 66 Q50 70 54 66" stroke="${C.eye}" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+  } else if (expression === 'sad') {
+    mouth = `<path d="M46 70 Q50 67 54 70" stroke="${C.eye}" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+  } else {
+    mouth = `<path d="M47 66 Q50 68 53 66" stroke="${C.eye}" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+  }
+
+  // 頬紅（基本付与）
+  const cheeks = `
+    <ellipse cx="38" cy="65" rx="3" ry="2" fill="${C.blush}" opacity="0.7"/>
+    <ellipse cx="62" cy="65" rx="3" ry="2" fill="${C.blush}" opacity="0.7"/>
+  `;
+
+  // ポーズ装飾（最前面に重ねる）
+  let poseDecor = '';
+  if (pose === 'heart') {
+    poseDecor = `
+      <g transform="translate(50,72)">
+        <path d="M-6 -2 C -6 -7, -3 -8, 0 -5 C 3 -8, 6 -7, 6 -2 C 6 3, 0 8, 0 8 C 0 8, -6 3, -6 -2 Z" fill="#F4A6B2" stroke="#E58FA0" stroke-width="0.5"/>
+      </g>
+      <text x="22" y="44" font-size="8">♡</text>
+      <text x="72" y="48" font-size="6">♡</text>
+    `;
+  } else if (pose === 'blanket') {
+    poseDecor = `
+      <path d="M22 56 Q25 50 35 50 L 65 50 Q75 50 78 56 L 78 100 L 22 100 Z" fill="#B4BFA8" opacity="0.92" stroke="#8FA08A" stroke-width="1"/>
+    `;
+  } else if (pose === 'bulb') {
+    poseDecor = `
+      <g transform="translate(50,18)">
+        <circle cx="0" cy="0" r="6" fill="#FFE99A" stroke="#E5C66B" stroke-width="0.6"/>
+        <rect x="-2" y="5" width="4" height="3" fill="#9E9E9E" rx="0.5"/>
+        <line x1="-12" y1="0" x2="-8" y2="0" stroke="#F4C566" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="12" y1="0" x2="8" y2="0" stroke="#F4C566" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="-9" y1="-9" x2="-6" y2="-6" stroke="#F4C566" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="9" y1="-9" x2="6" y2="-6" stroke="#F4C566" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="0" y1="-12" x2="0" y2="-8" stroke="#F4C566" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+    `;
+  } else if (pose === 'cup') {
+    poseDecor = `
+      <g transform="translate(50,72)">
+        <rect x="-6" y="-3" width="12" height="9" rx="1.5" fill="#FFFFFF" stroke="#C8C0A8" stroke-width="0.8"/>
+        <path d="M6 -1 Q9 0 9 3 Q9 5 6 5" stroke="#C8C0A8" stroke-width="0.8" fill="none"/>
+        <path d="M-4 -8 Q-4 -10 -2 -10 Q-2 -8 0 -8" stroke="#B0B0B0" stroke-width="0.8" fill="none" opacity="0.6"/>
+        <path d="M2 -8 Q2 -10 4 -10 Q4 -8 6 -8" stroke="#B0B0B0" stroke-width="0.8" fill="none" opacity="0.6"/>
+      </g>
+    `;
+  } else if (pose === 'sleeping') {
+    poseDecor = `
+      <path d="M30 36 Q40 22 50 24 Q62 26 64 36 Z" fill="#9DB0C4"/>
+      <circle cx="62" cy="28" r="3" fill="#FFFFFF"/>
+      <text x="68" y="42" font-size="6" fill="#9DB0C4">Z</text>
+      <text x="74" y="32" font-size="4" fill="#9DB0C4">z</text>
+    `;
+  } else if (pose === 'watering') {
+    poseDecor = `
+      <g transform="translate(70,68)">
+        <ellipse cx="0" cy="0" rx="6" ry="5" fill="#A8C0A2" stroke="#7BA876" stroke-width="0.8"/>
+        <path d="M5 -2 L 10 -4 L 11 -3 L 8 0" fill="#A8C0A2" stroke="#7BA876" stroke-width="0.8"/>
+        <line x1="11" y1="-3" x2="14" y2="2" stroke="#A8C0A2" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <ellipse cx="86" cy="80" rx="3" ry="2" fill="#9BB89F" opacity="0.7"/>
+    `;
+  }
+
+  return `<svg viewBox="0 0 100 110" width="${size}" height="${size * 1.1}" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+    ${head}
+    ${body}
+    ${cheeks}
+    ${eyes}
+    ${mouth}
+    ${poseDecor}
+  </svg>`;
+}
+
+// ============================================================
 // Gemini API 呼び出し
 // ============================================================
 function getApiKey() {
@@ -3054,9 +3345,24 @@ function viewSettingsModal() {
   const action = activeAction();
   const apiKey = (state.preferences && state.preferences.geminiApiKey) || '';
   const masked = apiKey ? apiKey.slice(0, 6) + '••••••' + apiKey.slice(-4) : '';
+  const stage = mamekoStage();
+  const stageLabels = { tane: 'たねのまめこ', futaba: 'ふたばのまめこ', nae: 'なえのまめこ', hana: 'はなのまめこ', ookii: 'おおきなまめこ' };
+  const pt = mamekoTotalPoints();
+  const stageIdx = MAMEKO_STAGES.indexOf(stage);
+  const nextThreshold = MAMEKO_STAGE_THRESHOLDS[stageIdx + 1];
+  const progressTxt = nextThreshold ? `${pt} / ${nextThreshold} pt` : `${pt} pt（最大段階）`;
   return `
     <h2 class="modal-title">設定</h2>
     <div style="display:flex; flex-direction:column; gap:14px; max-height:70vh; overflow-y:auto;">
+      <div style="display:flex; align-items:center; gap:14px; padding:12px; background: var(--bg-soft); border-radius: 14px;">
+        <div style="width:64px; height:64px; flex-shrink:0;">${mameko({ size: 64 })}</div>
+        <div style="flex:1;">
+          <div class="text-tiny text-muted">いまのまめこ</div>
+          <div style="font-family:'Noto Serif JP', serif; font-weight:600; margin-top:2px;">${stageLabels[stage]}</div>
+          <div class="text-tiny" style="color: var(--primary); margin-top:4px;">${progressTxt}</div>
+        </div>
+      </div>
+
       <div>
         <div class="text-tiny text-muted">プロフィール</div>
         <div class="mt-1">${escapeHtml(getUserName())}（利用 ${state.user.daysUsed || 0} 日）</div>
