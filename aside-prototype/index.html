@@ -1659,9 +1659,9 @@ function go(screen, opts = {}) {
 }
 
 function render() {
-  // タブバー＆FAB の表示制御
+  // タブバー＆FAB の表示制御（v3.5 仕様: ホームには独自CTAがあるためFABは非表示）
   const showTabbar = ['home', 'action', 'record'].includes(currentScreen);
-  const showFab = ['home', 'action', 'record'].includes(currentScreen);
+  const showFab = false;        // FAB全廃（ホームのきもち/もやもやCTAで代替）
   document.getElementById('tabbar').style.display = showTabbar ? 'flex' : 'none';
   document.getElementById('fab').classList.toggle('hidden', !showFab);
 
@@ -1802,12 +1802,7 @@ function getGreeting() {
 }
 
 function getHomeSubtitle() {
-  if (state.moodLogs.length === 0) return '今日のきもちを残してみよう。';
-  const last = state.moodLogs[state.moodLogs.length - 1];
-  const hours = (Date.now() - new Date(last.createdAt).getTime()) / 3600000;
-  if (hours < 6) return 'さっき記録できたね。';
-  if (hours < 24) return '今日の状態をもう一度残してもいいね。';
-  return '久しぶりにきもちを残そうか。';
+  return '久しぶりに、きもちを残してみませんか？';
 }
 
 function viewHome() {
