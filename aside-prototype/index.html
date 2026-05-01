@@ -129,6 +129,285 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+/* ============================================================
+   ホーム画面 (v3.5 画像準拠)
+   ============================================================ */
+.home-screen {
+  padding: 24px 20px 100px;
+  background: var(--bg);
+}
+.home-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.home-greeting { flex: 1; min-width: 0; }
+.home-greet-h1 {
+  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #2D2D2D;
+  margin: 0 0 6px;
+  letter-spacing: 0.01em;
+}
+.home-subtitle {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.5;
+  margin: 0;
+}
+.home-mascot {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #E5EFE0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== 気持ち入力カード ===== */
+.home-mood-card {
+  background: #F1E8D5;
+  border-radius: 20px;
+  padding: 18px 18px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+.home-mood-illust {
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  width: 96px;
+  height: 112px;
+  pointer-events: none;
+}
+.home-mood-body {
+  margin-left: 100px;
+  min-height: 76px;
+}
+.home-mood-title {
+  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2D2D2D;
+  margin: 0 0 6px;
+  line-height: 1.45;
+}
+.home-mood-sub {
+  font-size: 12px;
+  color: #8B7F70;
+  margin: 0;
+  line-height: 1.5;
+}
+.home-mood-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 14px 0 16px;
+}
+.home-mood-pick {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.home-mood-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.home-mood-pick:hover .home-mood-circle,
+.home-mood-pick:active .home-mood-circle {
+  transform: scale(1.08);
+  background: rgba(255,255,255,0.85);
+}
+.home-mood-pick-label {
+  font-size: 10px;
+  color: #6B6B6B;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.home-mood-cta {
+  display: flex;
+  align-items: center;
+  background: #7BA876;
+  color: #FFF;
+  border-radius: 999px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.home-mood-cta:hover { background: #6B9466; }
+
+/* ===== もやもやカード ===== */
+.home-moya-card {
+  background: #FFF;
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.home-moya-illust {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+}
+.home-moya-body { flex: 1; min-width: 0; }
+.home-moya-title {
+  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2D2D2D;
+  margin: 0 0 6px;
+}
+.home-moya-sub {
+  font-size: 12px;
+  color: #8B7F70;
+  margin: 0 0 12px;
+  line-height: 1.55;
+}
+.home-moya-cta {
+  display: flex;
+  align-items: center;
+  background: #FFF;
+  color: #5C7A5A;
+  border: 1.5px solid #C2D5C5;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+}
+.home-moya-cta:hover { background: #F4F8F2; }
+
+/* ===== 最近のきもち ===== */
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 4px 12px;
+}
+.recent-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6B6B6B;
+}
+.recent-all {
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+  color: #7BA876;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.recent-list {
+  background: #FFF;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.recent-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 1.4fr 14px;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 14px 14px 12px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #F0EDE6;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.recent-row:last-child { border-bottom: 0; }
+.recent-row-emoji {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #F4F0E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.recent-row-main { min-width: 0; }
+.recent-row-mood {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2D2D2D;
+}
+.recent-row-date {
+  font-size: 11px;
+  color: #9E9E9E;
+  margin-top: 2px;
+}
+.recent-row-meta { min-width: 0; }
+.recent-row-cats {
+  font-size: 12px;
+  color: #6B6B6B;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recent-row-cmt {
+  font-size: 11px;
+  color: #9E9E9E;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recent-row-arrow {
+  color: #BBB;
+  font-size: 16px;
+}
+
+/* ダーク時の上書き */
+[data-theme="dark"] .home-mood-card { background: rgba(80, 70, 50, 0.4); }
+[data-theme="dark"] .home-moya-card { background: rgba(47, 62, 62, 0.55); }
+[data-theme="dark"] .recent-list { background: rgba(47, 62, 62, 0.55); }
+[data-theme="dark"] .home-greet-h1 { color: #EAEAEA; }
+[data-theme="dark"] .home-mood-title,
+[data-theme="dark"] .home-moya-title,
+[data-theme="dark"] .recent-row-mood { color: #EAEAEA; }
+[data-theme="dark"] .recent-row-emoji { background: rgba(167,196,160,0.15); }
+[data-theme="dark"] .recent-row { border-bottom-color: rgba(255,255,255,0.06); }
+
+/* ============================================================
+   ベース
+   ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 html {
@@ -366,20 +645,34 @@ h3 { font-size: 16px; font-weight: 500; }
   border: 0;
   outline: 0;
   font: inherit;
-  color: #9E9E9E;
+  color: #B0B0B0;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s ease;
 }
-.navbtn.active { color: #6B8F71; }
+.navbtn.active { color: #4A6B4F; }
 [data-theme="dark"] .navbtn { color: #7A8580; }
 [data-theme="dark"] .navbtn.active { color: #A7C4A0; }
+/* アイコンを丸角ボックスで囲む（active時は薄い緑背景） */
 .navico {
-  font-size: 22px;
-  line-height: 1;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 32px;
+  border-radius: 16px;
+  background: transparent;
+  transition: background 0.2s ease;
 }
+.navbtn.active .navico {
+  background: #DDE9DC;        /* 薄いセージ背景 */
+}
+[data-theme="dark"] .navbtn.active .navico {
+  background: rgba(167, 196, 160, 0.18);
+}
+.navico svg { display: block; }
 .navtxt {
   font-size: 12px;
   font-weight: 500;
@@ -979,18 +1272,24 @@ window.ASIDE_CONFIG = {
   <!-- フローティング💬 -->
   <button class="fab hidden" id="fab" data-act="open-dialog" aria-label="ちょっと聞いて">💬</button>
 
-  <!-- タブバー（v3: ホーム / 行動 / きろく） -->
+  <!-- タブバー（v3.5: ホーム / いっぽ / きろく ・ SVGアイコン） -->
   <nav class="navbar" id="tabbar" style="display:none">
     <button type="button" class="navbtn" data-tab="home">
-      <span class="navico" aria-hidden="true">🏠</span>
+      <span class="navico" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9.5"/></svg>
+      </span>
       <span class="navtxt">ホーム</span>
     </button>
     <button type="button" class="navbtn" data-tab="action">
-      <span class="navico" aria-hidden="true">🌱</span>
-      <span class="navtxt">行動</span>
+      <span class="navico" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V11"/><path d="M12 11c-4-1-5-4-5-7 3 0 5 1 5 5"/><path d="M12 11c4-1 5-3 5-6-3 0-5 1-5 4"/></svg>
+      </span>
+      <span class="navtxt">いっぽ</span>
     </button>
     <button type="button" class="navbtn" data-tab="record">
-      <span class="navico" aria-hidden="true">📅</span>
+      <span class="navico" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="6"/></svg>
+      </span>
       <span class="navtxt">きろく</span>
     </button>
   </nav>
@@ -1040,20 +1339,20 @@ const EMOTIONS = [
   '悲しい', '不安', '怒り', '焦り', '恥ずかしい', '孤独', '悔しい', '無力感', 'その他'
 ];
 
-// 気分 5段階（朝Light=太陽系 / 夜Dark=月系。仕様: 大雨/雨/くもり/晴れ/快晴）
+// 気分 5段階（順序: つらい→とてもよい / ラベルを画像準拠に変更）
 const MOODS_DAY = [
-  { id: 5, emoji: '☀️', label: '快晴' },
-  { id: 4, emoji: '🌤', label: '晴れ' },
-  { id: 3, emoji: '☁️', label: 'くもり' },
-  { id: 2, emoji: '🌧', label: '雨' },
-  { id: 1, emoji: '⛈', label: '大雨' },
+  { id: 1, emoji: '⛈', label: 'つらい' },
+  { id: 2, emoji: '🌧', label: '少しつらい' },
+  { id: 3, emoji: '☁️', label: 'ふつう' },
+  { id: 4, emoji: '🌤', label: '少しよい' },
+  { id: 5, emoji: '☀️', label: 'とてもよい' },
 ];
 const MOODS_NIGHT = [
-  { id: 5, emoji: '🌙', label: '快晴' },
-  { id: 4, emoji: '✨', label: '晴れ' },
-  { id: 3, emoji: '☁️', label: 'くもり' },
-  { id: 2, emoji: '🌧', label: '雨' },
-  { id: 1, emoji: '⛈', label: '大雨' },
+  { id: 1, emoji: '⛈', label: 'つらい' },
+  { id: 2, emoji: '🌧', label: '少しつらい' },
+  { id: 3, emoji: '☁️', label: 'ふつう' },
+  { id: 4, emoji: '✨', label: '少しよい' },
+  { id: 5, emoji: '🌙', label: 'とてもよい' },
 ];
 function getMoods() {
   return getVisualTheme() === 'dark' ? MOODS_NIGHT : MOODS_DAY;
@@ -1513,49 +1812,132 @@ function getHomeSubtitle() {
 
 function viewHome() {
   return `
-    <div class="screen active">
-      <h1 class="mb-1">${getGreeting()}、${getUserName()}</h1>
-      <p class="text-soft mb-3">${getHomeSubtitle()}</p>
+    <div class="screen active home-screen">
+      <header class="home-header">
+        <div class="home-greeting">
+          <h1 class="home-greet-h1">${getGreeting()}、${escapeHtml(getUserName())}さん</h1>
+          <p class="home-subtitle">${getHomeSubtitle()}</p>
+        </div>
+        <div class="home-mascot" aria-hidden="true">
+          <svg viewBox="0 0 60 60" width="56" height="56">
+            <circle cx="30" cy="30" r="28" fill="#E5EFE0"/>
+            <ellipse cx="30" cy="38" rx="13" ry="14" fill="#FFF" stroke="#C8D5C0" stroke-width="1"/>
+            <circle cx="26" cy="36" r="1.5" fill="#3D342A"/>
+            <circle cx="34" cy="36" r="1.5" fill="#3D342A"/>
+            <path d="M27 41 Q30 43 33 41" stroke="#3D342A" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="22" cy="40" rx="2" ry="1.5" fill="#FFD8B5" opacity="0.6"/>
+            <ellipse cx="38" cy="40" rx="2" ry="1.5" fill="#FFD8B5" opacity="0.6"/>
+            <path d="M30 24 Q26 18 23 16 Q26 19 28 23" fill="#7BA876"/>
+            <path d="M30 24 Q34 18 37 16 Q34 19 32 23" fill="#7BA876"/>
+            <ellipse cx="30" cy="22" rx="2" ry="3" fill="#9BB89F"/>
+          </svg>
+        </div>
+      </header>
 
-      <div class="card-warm" style="padding:18px;">
-        <h2 class="mb-2">いまの気持ちを教えてください</h2>
-        <p class="text-small text-soft mb-3">天気で5段階。書かなくてもOK。</p>
-        <button class="btn btn-primary" data-act="open-mood-full">きもちを記録する</button>
+      <!-- 気持ち入力カード -->
+      <div class="home-mood-card">
+        <div class="home-mood-illust" aria-hidden="true">
+          <svg viewBox="0 0 120 140" width="96" height="112">
+            <circle cx="68" cy="22" r="8" fill="#F4C566"/>
+            <g stroke="#F4C566" stroke-width="1.5" stroke-linecap="round">
+              <line x1="68" y1="6" x2="68" y2="10"/>
+              <line x1="56" y1="22" x2="60" y2="22"/>
+              <line x1="76" y1="22" x2="80" y2="22"/>
+              <line x1="60" y1="14" x2="62" y2="16"/>
+              <line x1="76" y1="14" x2="74" y2="16"/>
+            </g>
+            <rect x="20" y="50" width="40" height="80" rx="4" fill="#A8C0A2" stroke="#7BA876" stroke-width="1.5"/>
+            <line x1="40" y1="50" x2="40" y2="130" stroke="#7BA876" stroke-width="1"/>
+            <circle cx="35" cy="92" r="1.5" fill="#5C7A5A"/>
+            <circle cx="45" cy="92" r="1.5" fill="#5C7A5A"/>
+            <ellipse cx="40" cy="118" rx="8" ry="9" fill="#FFF" stroke="#C8D5C0" stroke-width="1"/>
+            <circle cx="37" cy="117" r="1" fill="#3D342A"/>
+            <circle cx="43" cy="117" r="1" fill="#3D342A"/>
+            <path d="M40 113 Q38 110 36 109" stroke="#7BA876" stroke-width="1" fill="none"/>
+            <path d="M40 113 Q42 110 44 109" stroke="#7BA876" stroke-width="1" fill="none"/>
+            <path d="M10 130 Q15 122 20 125 Q18 132 12 132" fill="#9BB89F" opacity="0.6"/>
+            <path d="M70 130 Q65 124 60 126 Q63 132 70 132" fill="#9BB89F" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="home-mood-body">
+          <h2 class="home-mood-title">いまのきもちを教えてください</h2>
+          <p class="home-mood-sub">天気で5段階。書かなくてもOK。</p>
+        </div>
+        <div class="home-mood-row">
+          ${MOODS.map(m => `
+            <button class="home-mood-pick" data-act="quick-mood" data-score="${m.id}" aria-label="${m.label}">
+              <span class="home-mood-circle">${m.emoji}</span>
+              <span class="home-mood-pick-label">${m.label}</span>
+            </button>
+          `).join('')}
+        </div>
+        <button class="btn btn-primary home-mood-cta" data-act="open-mood-full">
+          <span style="flex:1; text-align:center;">きもちを記録する</span>
+          <span style="opacity:0.85;">›</span>
+        </button>
       </div>
 
-      <div class="card mt-3" style="padding:18px;">
-        <h2 class="mb-2">もやもやを整理する</h2>
-        <p class="text-small text-soft mb-3">頭の中でぐるぐるしていることを、AIと一緒に少しずつ整理できます。</p>
-        <button class="btn btn-secondary" data-act="moyamoya-start">整理をはじめる</button>
+      <!-- もやもや整理カード -->
+      <div class="home-moya-card">
+        <div class="home-moya-illust" aria-hidden="true">
+          <svg viewBox="0 0 100 100" width="80" height="80">
+            <circle cx="50" cy="50" r="38" fill="#FFE4D6" opacity="0.7"/>
+            <path d="M30 38 C 40 30, 60 30, 70 40 C 75 48, 60 55, 50 50 C 38 45, 32 58, 45 62 C 60 65, 70 60, 65 70 C 60 78, 35 75, 30 65" stroke="#5C7A5A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M65 80 Q70 75 75 80" stroke="#7BA876" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="78" cy="86" rx="3" ry="4" fill="#9BB89F"/>
+          </svg>
+        </div>
+        <div class="home-moya-body">
+          <h2 class="home-moya-title">もやもやを整理する</h2>
+          <p class="home-moya-sub">頭の中でぐるぐるしていることを、AIと一緒に少しずつ整理できます。</p>
+          <button class="btn home-moya-cta" data-act="moyamoya-start">
+            <span style="flex:1; text-align:center;">整理をはじめる</span>
+            <span>›</span>
+          </button>
+        </div>
       </div>
 
       ${state.moodLogs.length > 0 ? `
-        <h3 class="section-title">最近のきもち</h3>
-        ${state.moodLogs.slice().reverse().slice(0, 3).map(m => renderMoodLogCard(m, true)).join('')}
+        <div class="recent-header">
+          <div class="recent-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7A8580" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span>最近のきもち</span>
+          </div>
+          <button class="recent-all" data-act="see-all-records">すべて見る ›</button>
+        </div>
+        <div class="recent-list">
+          ${state.moodLogs.slice().reverse().slice(0, 3).map(m => renderRecentRow(m)).join('')}
+        </div>
       ` : ''}
 
     </div>
   `;
 }
 
-function renderMoodLogCard(m, compact = false) {
-  const moodObj = MOODS.find(x => x.id === m.moodScore);
+function renderRecentRow(m) {
+  const moodObj = MOODS.find(x => x.id === m.moodScore) || { emoji: '📝', label: '' };
   const cats = (m.categories || []).map(id => CATEGORIES.find(c => c.id === id)?.name).filter(Boolean).join('・');
   const date = new Date(m.createdAt);
-  const dateStr = `${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+  const dow = ['日','月','火','水','木','金','土'][date.getDay()];
+  const dateStr = `${date.getMonth()+1}/${date.getDate()} (${dow}) ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
   return `
-    <div class="card" style="padding:14px;">
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
-        <span style="font-size:24px;">${moodObj ? moodObj.emoji : '📝'}</span>
-        <div style="flex:1;">
-          <div class="text-small" style="font-weight:500;">${moodObj ? moodObj.label : ''}</div>
-          <div class="text-tiny text-muted">${dateStr}${cats ? ' ・ ' + cats : ''}</div>
-        </div>
+    <button class="recent-row" data-act="open-record-detail" data-id="${m.id}">
+      <span class="recent-row-emoji">${moodObj.emoji}</span>
+      <div class="recent-row-main">
+        <div class="recent-row-mood">${moodObj.label}</div>
+        <div class="recent-row-date">${dateStr}</div>
       </div>
-      ${m.comment ? `<p class="text-small ${compact ? 'text-soft' : ''}" style="margin-top:4px; ${compact ? 'overflow:hidden; text-overflow:ellipsis; white-space:nowrap;' : ''}">${escapeHtml(m.comment)}</p>` : ''}
-    </div>
+      <div class="recent-row-meta">
+        ${cats ? `<div class="recent-row-cats">${escapeHtml(cats)}</div>` : ''}
+        ${m.comment ? `<div class="recent-row-cmt">${escapeHtml(m.comment)}</div>` : ''}
+      </div>
+      <span class="recent-row-arrow">›</span>
+    </button>
   `;
 }
+
+// 旧API互換
+function renderMoodLogCard(m) { return renderRecentRow(m); }
 
 // ============================================================
 // 画面: 気持ち入力フル（カテゴリ複数選択+コメント）
@@ -1681,7 +2063,7 @@ function generateMoodAIOpening(log) {
   return `${intro}\n\n${ask}`;
 }
 
-function moodChatSend() {
+async function moodChatSend() {
   if (!moodChatSession) return;
   const input = document.getElementById('moodChatInput');
   if (!input) return;
@@ -1694,8 +2076,26 @@ function moodChatSend() {
   if (crisis && crisis.sev >= 4) { showCrisisModal(crisis.sev); return; }
 
   moodChatSession.messages.push({ role: 'user', content: text, createdAt: new Date().toISOString() });
+  // タイピング表示
+  moodChatSession.messages.push({ role: 'assistant', content: '…', typing: true, createdAt: new Date().toISOString() });
+  document.getElementById('main').innerHTML = viewMoodChat();
+  setTimeout(scrollChatToBottom, 50);
+
   const log = state.moodLogs.find(l => l.id === moodChatSession.logId);
-  const aiText = generateMoodAIReply(log, text, moodChatSession.messages);
+  let aiText = null;
+  if (getApiKey()) {
+    // 実Gemini通信
+    const moodLabel = MOODS.find(m => m.id === log?.moodScore)?.label || '';
+    const cats = (log?.categories || []).map(id => CATEGORIES.find(c => c.id === id)?.name).filter(Boolean).join('・');
+    const ctx = `ユーザーが記録した気持ち: ${moodLabel}${cats ? '、テーマ: ' + cats : ''}${log?.comment ? '、ひとこと: ' + log.comment : ''}`;
+    const history = moodChatSession.messages.filter(m => !m.typing);
+    aiText = await callGemini(MOOD_AI_SYSTEM + '\n\n' + ctx, history);
+  }
+  if (!aiText) {
+    aiText = generateMoodAIReply(log, text, moodChatSession.messages.filter(m => !m.typing));
+  }
+  // タイピング消す
+  moodChatSession.messages = moodChatSession.messages.filter(m => !m.typing);
   moodChatSession.messages.push({ role: 'assistant', content: aiText, createdAt: new Date().toISOString() });
   persistAIChat({ sourceType: 'mood_log', sourceId: moodChatSession.logId, messages: moodChatSession.messages.slice() });
   document.getElementById('main').innerHTML = viewMoodChat();
@@ -2323,6 +2723,59 @@ function saveActionEval() {
 }
 
 // ============================================================
+// Gemini API 呼び出し
+// ============================================================
+function getApiKey() {
+  return (state.preferences && state.preferences.geminiApiKey) || null;
+}
+
+async function callGemini(systemPrompt, messages, options = {}) {
+  const key = getApiKey();
+  if (!key) return null;
+  const model = options.model || 'gemini-2.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+  const contents = messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+  const body = {
+    contents,
+    systemInstruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
+    generationConfig: {
+      temperature: options.temperature ?? 0.8,
+      maxOutputTokens: options.maxTokens ?? 512,
+      thinkingConfig: { thinkingBudget: 0 },
+    },
+  };
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      console.warn('[Gemini]', res.status, await res.text());
+      return null;
+    }
+    const data = await res.json();
+    const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    return txt || null;
+  } catch (e) {
+    console.warn('[Gemini] network', e);
+    return null;
+  }
+}
+
+const MOOD_AI_SYSTEM = `あなたは「ナナメの関係」のAI伴走者。22-28歳のメンタルヘルスサポートアプリ「Aside」。
+原則:
+- まず受け止める。決めつけない。診断しない。
+- 1ターンは2-3文・80字目安。
+- 「~してください」より「~してみてもいいかも」など柔らかく。
+- 必要なら別の見方を提示。最後は小さな行動につなげる。
+- 「死にたい」「消えたい」など重大ワードが出たら、専門窓口（よりそいホットライン 0120-279-338 / いのちの電話 0570-064-556）を紹介。
+- 医療行為や診断はしない。`;
+
+// ============================================================
 // チャット共通
 // ============================================================
 function renderChatBubble(m) {
@@ -2601,9 +3054,11 @@ function viewSettingsModal() {
   const goal = activeGoal();
   const policy = activePolicy();
   const action = activeAction();
+  const apiKey = (state.preferences && state.preferences.geminiApiKey) || '';
+  const masked = apiKey ? apiKey.slice(0, 6) + '••••••' + apiKey.slice(-4) : '';
   return `
     <h2 class="modal-title">設定</h2>
-    <div style="display:flex; flex-direction:column; gap:14px;">
+    <div style="display:flex; flex-direction:column; gap:14px; max-height:70vh; overflow-y:auto;">
       <div>
         <div class="text-tiny text-muted">プロフィール</div>
         <div class="mt-1">${escapeHtml(getUserName())}（利用 ${state.user.daysUsed || 0} 日）</div>
@@ -2620,11 +3075,34 @@ function viewSettingsModal() {
         <div class="text-tiny text-muted">選択中のアクション</div>
         <div class="mt-1 text-small">${action ? escapeHtml(action.actionText) : '未設定'}</div>
       </div>
+
       <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
+
+      <div>
+        <div class="text-tiny text-muted">AI接続（Gemini API キー）</div>
+        <p class="text-tiny text-muted" style="margin-top:4px; line-height:1.5;">
+          AIをパターン応答ではなく実際のGeminiに切り替えます。<br>
+          キーは <strong>このブラウザのlocalStorageにのみ</strong> 保存され、サーバーには送信されません。<br>
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color: var(--primary); font-size:11px;">→ Google AI Studioでキーを取得</a>
+        </p>
+        ${apiKey ? `
+          <div style="display:flex; align-items:center; gap:8px; margin-top:8px; padding:8px 12px; background: var(--bg-soft); border-radius:8px;">
+            <span style="flex:1; font-family: monospace; font-size:12px;">${escapeHtml(masked)}</span>
+            <button class="btn-ghost" data-act="api-key-clear" style="color:#C85450; font-size:12px; padding:4px 8px;">クリア</button>
+          </div>
+          <button class="btn btn-secondary" data-act="api-key-edit" style="margin-top:8px; font-size:13px; padding:8px 12px;">変更</button>
+        ` : `
+          <input type="password" id="apiKeyInput" placeholder="AIza..." style="width:100%; margin-top:8px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font-family: monospace; font-size:13px; background: var(--bg-card); color: var(--text);">
+          <button class="btn btn-primary" data-act="api-key-save" style="margin-top:8px; font-size:13px; padding:10px 12px;">保存</button>
+        `}
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
+
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">Aside v0.3.0-beta.1</p>
+      <p class="text-tiny text-muted text-center mt-2">Aside v0.5.0-beta.1</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -2693,8 +3171,27 @@ function handleAction(act, el, ev) {
     return;
   }
 
+  // ホーム上での即時気分選択 → mood-full に遷移して気分プリセット
+  if (act === 'quick-mood') {
+    const score = Number(el.dataset.score);
+    moodDraft = { moodScore: score, categories: [], comment: '' };
+    go('mood-full');
+    return;
+  }
   // 気持ち入力フル
   if (act === 'open-mood-full') { moodDraft = null; go('mood-full'); return; }
+  // すべての記録を見る
+  if (act === 'see-all-records') { go('record'); return; }
+  // 記録詳細
+  if (act === 'open-record-detail') {
+    const m = state.moodLogs.find(x => x.id === el.dataset.id);
+    if (m) {
+      const d = new Date(m.createdAt);
+      viewParams.dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      go('day-detail');
+    }
+    return;
+  }
   if (act === 'mood-score') { ensureMoodDraft().moodScore = Number(el.dataset.score); render(); return; }
   if (act === 'mood-cat') {
     const d = ensureMoodDraft();
@@ -2808,6 +3305,39 @@ function handleAction(act, el, ev) {
 
   // 設定
   if (act === 'open-settings') { modal(viewSettingsModal()); return; }
+  if (act === 'api-key-save') {
+    const v = (document.getElementById('apiKeyInput')||{}).value || '';
+    const trimmed = v.trim();
+    if (!trimmed) { toast('キーを入力してください'); return; }
+    if (!trimmed.startsWith('AIza')) {
+      if (!confirm('"AIza" で始まらないキーのようです。それでも保存しますか？')) return;
+    }
+    state.preferences = state.preferences || {};
+    state.preferences.geminiApiKey = trimmed;
+    saveState();
+    toast('APIキーを保存しました');
+    closeModal();
+    setTimeout(() => modal(viewSettingsModal()), 50);
+    return;
+  }
+  if (act === 'api-key-edit') {
+    state.preferences = state.preferences || {};
+    delete state.preferences.geminiApiKey;
+    saveState();
+    closeModal();
+    setTimeout(() => modal(viewSettingsModal()), 50);
+    return;
+  }
+  if (act === 'api-key-clear') {
+    if (!confirm('APIキーを削除しますか？AI応答はパターン応答に戻ります。')) return;
+    state.preferences = state.preferences || {};
+    delete state.preferences.geminiApiKey;
+    saveState();
+    toast('APIキーを削除しました');
+    closeModal();
+    setTimeout(() => modal(viewSettingsModal()), 50);
+    return;
+  }
   if (act === 'reset-data') {
     if (confirm('本当にすべてのデータを削除しますか？元に戻せません。')) {
       localStorage.removeItem(STORAGE_KEY);
