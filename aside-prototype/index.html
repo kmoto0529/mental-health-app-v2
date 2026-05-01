@@ -2794,27 +2794,36 @@ function mamekoProbeAsset(category, name) {
 }
 
 // メイン関数：HTMLを返す（PNG > SVG）
+// 優先順方針: 指定された意図（pose/seasonal/expression）はPNG無いならSVGで再現する。
+// growthPNGに勝手にフォールバックしないことでポーズ装飾の喪失を防ぐ。
 function mameko(opts = {}) {
   const stage = opts.stage || mamekoStage();
   const expression = opts.expression || mamekoExpression();
   const pose = opts.pose || null;
   const seasonal = opts.seasonal || null;
   const size = opts.size || 96;
-
-  // 優先順: pose > seasonal > expression > growth-stage
-  const tries = [];
-  if (pose) tries.push(['poses', pose]);
-  if (seasonal) tries.push(['seasonal', seasonal]);
-  if (expression !== 'calm') tries.push(['expressions', expression]);
   const stageIdx = MAMEKO_STAGES.indexOf(stage) + 1;
-  tries.push(['growth', `stage${stageIdx}-${stage}`]);
+  const imgTag = (cat, name) => `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none;">`;
 
-  for (const [cat, name] of tries) {
-    if (mamekoProbeAsset(cat, name)) {
-      return `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none;">`;
-    }
+  // poseが指定されている場合: poseのPNGを試し、無ければSVGで描く（growthPNGには戻さない）
+  if (pose) {
+    if (mamekoProbeAsset('poses', pose)) return imgTag('poses', pose);
+    return mamekoSvg({ stage, expression, pose, size });
   }
-  return mamekoSvg({ stage, expression, pose, size });
+  // seasonalが指定されている場合
+  if (seasonal) {
+    if (mamekoProbeAsset('seasonal', seasonal)) return imgTag('seasonal', seasonal);
+    return mamekoSvg({ stage, expression, seasonal, size });
+  }
+  // 表情がcalm以外でPNGがある場合
+  if (expression !== 'calm' && mamekoProbeAsset('expressions', expression)) {
+    return imgTag('expressions', expression);
+  }
+  // 通常の成長段階表示
+  if (mamekoProbeAsset('growth', `stage${stageIdx}-${stage}`)) {
+    return imgTag('growth', `stage${stageIdx}-${stage}`);
+  }
+  return mamekoSvg({ stage, expression, size });
 }
 
 // SVGプレースホルダー生成器（合成）
