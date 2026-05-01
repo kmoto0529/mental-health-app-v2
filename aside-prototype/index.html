@@ -2794,8 +2794,8 @@ function mamekoProbeAsset(category, name) {
 }
 
 // メイン関数：HTMLを返す（PNG > SVG）
-// 優先順方針: 指定された意図（pose/seasonal/expression）はPNG無いならSVGで再現する。
-// growthPNGに勝手にフォールバックしないことでポーズ装飾の喪失を防ぐ。
+// 優先順: 個別ファイル → growth-stage → 普遍フォールバック(tane) → SVG
+// 個別PNGを追加するだけで自動切替。配置されていない場所はtane PNGで埋める。
 function mameko(opts = {}) {
   const stage = opts.stage || mamekoStage();
   const expression = opts.expression || mamekoExpression();
@@ -2803,27 +2803,24 @@ function mameko(opts = {}) {
   const seasonal = opts.seasonal || null;
   const size = opts.size || 96;
   const stageIdx = MAMEKO_STAGES.indexOf(stage) + 1;
-  const imgTag = (cat, name) => `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none;">`;
+  const imgTag = (cat, name) => `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none; object-fit: contain;">`;
 
-  // poseが指定されている場合: poseのPNGを試し、無ければSVGで描く（growthPNGには戻さない）
-  if (pose) {
-    if (mamekoProbeAsset('poses', pose)) return imgTag('poses', pose);
-    return mamekoSvg({ stage, expression, pose, size });
+  // 候補PNGを優先順に並べる
+  const candidates = [];
+  if (pose) candidates.push(['poses', pose]);
+  if (seasonal) candidates.push(['seasonal', seasonal]);
+  if (expression !== 'calm') candidates.push(['expressions', expression]);
+  candidates.push(['growth', `stage${stageIdx}-${stage}`]);
+  // 普遍フォールバック: tane（最低1枚は配置されていることが多い）
+  if (stageIdx !== 1) candidates.push(['growth', 'stage1-tane']);
+
+  for (const [cat, name] of candidates) {
+    if (mamekoProbeAsset(cat, name)) {
+      return imgTag(cat, name);
+    }
   }
-  // seasonalが指定されている場合
-  if (seasonal) {
-    if (mamekoProbeAsset('seasonal', seasonal)) return imgTag('seasonal', seasonal);
-    return mamekoSvg({ stage, expression, seasonal, size });
-  }
-  // 表情がcalm以外でPNGがある場合
-  if (expression !== 'calm' && mamekoProbeAsset('expressions', expression)) {
-    return imgTag('expressions', expression);
-  }
-  // 通常の成長段階表示
-  if (mamekoProbeAsset('growth', `stage${stageIdx}-${stage}`)) {
-    return imgTag('growth', `stage${stageIdx}-${stage}`);
-  }
-  return mamekoSvg({ stage, expression, size });
+  // PNG が一切無い場合のみ SVG プレースホルダー
+  return mamekoSvg({ stage, expression, pose, size });
 }
 
 // SVGプレースホルダー生成器（合成）
