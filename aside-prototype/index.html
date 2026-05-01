@@ -490,6 +490,45 @@
 }
 [data-theme="dark"] .moya-scale-btn.selected { color: #A7C4A0; border-color: #A7C4A0; }
 
+/* step4: 別の見方カード（クリックで1つ選択） */
+.moya-altview-card {
+  width: 100%;
+  text-align: left;
+  background: var(--bg-card);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  padding: 14px 16px;
+  line-height: 1.85;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .moya-altview-card { background: rgba(47, 62, 62, 0.55); }
+.moya-altview-card:hover { border-color: rgba(123, 168, 118, 0.35); }
+.moya-altview-card.selected {
+  border-color: #7BA876;
+  background: rgba(123, 168, 118, 0.12);
+  box-shadow: 0 0 0 3px rgba(123, 168, 118, 0.15);
+}
+[data-theme="dark"] .moya-altview-card.selected {
+  background: rgba(167, 196, 160, 0.15);
+  border-color: #A7C4A0;
+  box-shadow: 0 0 0 3px rgba(167, 196, 160, 0.18);
+}
+.moya-altview-num {
+  color: #6B8F71;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 18px;
+}
+[data-theme="dark"] .moya-altview-num { color: #A7C4A0; }
+.moya-altview-card.selected .moya-altview-num { color: #5C7E60; }
+[data-theme="dark"] .moya-altview-card.selected .moya-altview-num { color: #C0D8B7; }
+
 /* ============================================================
    気持ち入力フル画面 (v3.6 画像準拠)
    ============================================================ */
@@ -2751,21 +2790,23 @@ function viewMoyamoya() {
     }
     const visible = s.alternativeViews.slice(0, s.alternativeViewsRevealed);
     const canMore = s.alternativeViewsRevealed < s.alternativeViews.length;
+    const selectedIdx = s.alternativeViewSelectedIndex;
+    const hasSelection = typeof selectedIdx === 'number' && selectedIdx >= 0 && selectedIdx < s.alternativeViewsRevealed;
     return moyamoyaScreen(stepLabel, '別の見方を考えてみました', `
-      <p class="text-tiny text-muted mb-3">⚠️ AIが推定した参考情報です。納得できないものはスルーで大丈夫。</p>
+      <p class="text-tiny text-muted mb-3">⚠️ AIが推定した参考情報です。納得できるものを1つ選んでください。</p>
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${visible.map((v, i) => `
-          <div class="card-warm" style="padding:14px 16px; line-height:1.85; display:flex; gap:10px; align-items:flex-start;">
-            <span style="color: var(--primary, #6B8F71); font-weight:700; flex-shrink:0; min-width:18px;">${i+1}</span>
+          <button class="moya-altview-card ${selectedIdx === i ? 'selected' : ''}" data-act="moya-step4-pick" data-index="${i}">
+            <span class="moya-altview-num">${i+1}</span>
             <p style="margin:0;">${escapeHtml(v).replace(/\n/g, '<br>')}</p>
-          </div>
+          </button>
         `).join('')}
       </div>
       ${canMore ? `
         <button class="btn btn-secondary" data-act="moya-step4-more" style="margin-top:14px; width:100%;">他の見方も見てみる</button>
       ` : ''}
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="moya-step4-next">この見方を踏まえて続ける</button>
+        <button class="btn btn-primary" data-act="moya-step4-next" ${!hasSelection ? 'disabled' : ''}>この見方を踏まえて続ける</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
       </div>
     `);
@@ -4136,12 +4177,19 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  if (act === 'moya-step4-pick') {
+    moyamoya.alternativeViewSelectedIndex = parseInt(el.dataset.index, 10);
+    render();
+    return;
+  }
   if (act === 'moya-step4-next') {
-    // 表示中の見方を保存用にまとめる
-    if (Array.isArray(moyamoya.alternativeViews)) {
-      const n = moyamoya.alternativeViewsRevealed || 3;
-      moyamoya.alternativeView = moyamoya.alternativeViews.slice(0, n).map((v, i) => `${i+1}. ${v}`).join('\n\n');
+    // 選択された1つの見方をレター用に保存
+    const idx = moyamoya.alternativeViewSelectedIndex;
+    if (!Array.isArray(moyamoya.alternativeViews) || typeof idx !== 'number' || idx < 0 || idx >= (moyamoya.alternativeViewsRevealed || 0)) {
+      toast('しっくりくる見方を1つ選んでね');
+      return;
     }
+    moyamoya.alternativeView = moyamoya.alternativeViews[idx];
     moyamoya.step = 5;
     render();
     return;
