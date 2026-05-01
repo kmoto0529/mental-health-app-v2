@@ -23,7 +23,7 @@ const server = http.createServer((req, res) => {
 });
 
 (async () => {
-  await new Promise(r => server.listen(7805, r));
+  await new Promise(r => server.listen(7810, r));
 
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ ...devices['iPhone 14 Pro'], locale: 'ja-JP' });
@@ -31,7 +31,7 @@ const server = http.createServer((req, res) => {
   await page.route('**/service-worker.js', r => r.fulfill({ status: 404, body: '' }));
 
   // === Welcome画面 ===
-  await page.goto('http://127.0.0.1:7805/', { waitUntil: 'load', timeout: 15000 });
+  await page.goto('http://127.0.0.1:7810/', { waitUntil: 'load', timeout: 15000 });
   await page.waitForTimeout(500);
   await page.screenshot({ path: path.join(OUT, '01_welcome.png') });
 
@@ -45,7 +45,7 @@ const server = http.createServer((req, res) => {
   ];
 
   for (const s of stages) {
-    await page.goto('http://127.0.0.1:7805/', { waitUntil: 'load' });
+    await page.goto('http://127.0.0.1:7810/', { waitUntil: 'load' });
     await page.evaluate((s) => {
       const now = Date.now();
       const moods = [];
@@ -68,6 +68,20 @@ const server = http.createServer((req, res) => {
     await page.waitForTimeout(400);
     await page.screenshot({ path: path.join(OUT, `02_home_stage_${s.name}.png`) });
   }
+
+  // === ダークモード ホーム ===
+  await page.evaluate(() => {
+    const seed = JSON.parse(localStorage.getItem('aside_v3_state'));
+    seed.preferences = seed.preferences || {};
+    seed.preferences.themeOverride = 'dark';
+    localStorage.setItem('aside_v3_state', JSON.stringify(seed));
+  });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(OUT, '04_home_dark.png') });
+
+  // ダークモードのホーム上部だけクロップ
+  await page.screenshot({ path: path.join(OUT, '04_home_dark_top.png'), clip: { x: 0, y: 0, width: 393, height: 200 } });
 
   // === 設定モーダル ===
   await page.click('.navbtn[data-tab="record"]');

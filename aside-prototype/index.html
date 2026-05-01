@@ -161,16 +161,23 @@
 }
 .home-mascot {
   flex-shrink: 0;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: #E5EFE0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  overflow: hidden;
+  position: relative;
+  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
-.home-mascot svg, .home-mascot img { width: 100%; height: 100%; object-fit: contain; }
+.home-mascot svg, .home-mascot img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+[data-theme="dark"] .home-mascot {
+  background: #243030;
+  box-shadow: 0 0 0 1.5px rgba(167, 196, 160, 0.45),
+              0 0 14px rgba(167, 196, 160, 0.18);
+}
 
 /* ===== 気持ち入力カード ===== */
 .home-mood-card {
