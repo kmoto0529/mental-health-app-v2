@@ -1285,12 +1285,14 @@ h3 { font-size: 16px; font-weight: 500; }
 .input-text {
   flex: 1;
   background: var(--bg-soft);
+  color: var(--text);
   border-radius: var(--r-md);
   padding: 12px 14px;
   font-size: 15px;
   resize: none;
   max-height: 120px;
 }
+.input-text::placeholder { color: var(--text-muted); }
 .input-send {
   background: var(--accent);
   color: #fff;
@@ -1308,6 +1310,7 @@ h3 { font-size: 16px; font-weight: 500; }
 .textarea-block {
   width: 100%;
   background: var(--bg-card);
+  color: var(--text);
   border-radius: var(--r-md);
   padding: 14px;
   font-size: 15px;
@@ -1316,9 +1319,14 @@ h3 { font-size: 16px; font-weight: 500; }
   min-height: 120px;
   border: 1px solid var(--divider);
 }
+.textarea-block::placeholder { color: var(--text-muted); }
 .textarea-block:focus {
   border-color: var(--accent);
-  background: #fff;
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(123, 168, 118, 0.15);
+}
+[data-theme="dark"] .textarea-block:focus {
+  box-shadow: 0 0 0 3px rgba(167, 196, 160, 0.18);
 }
 
 /* ============================================================
