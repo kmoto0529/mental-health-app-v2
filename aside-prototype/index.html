@@ -360,8 +360,8 @@ h3 { font-size: 16px; font-weight: 500; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 14px 0 14px;
+  gap: 4px;
+  padding: 10px 0 12px;
   background: transparent;
   border: 0;
   outline: 0;
@@ -371,40 +371,24 @@ h3 { font-size: 16px; font-weight: 500; }
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
-  position: relative;
 }
 .navbtn.active { color: #6B8F71; }
 [data-theme="dark"] .navbtn { color: #7A8580; }
 [data-theme="dark"] .navbtn.active { color: #A7C4A0; }
 .navico {
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1;
   display: block;
 }
-/* ラベルは visually-hidden にしてアクセシビリティ対応のみ残す（kanji描画問題を完全回避） */
 .navtxt {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  display: block;
   white-space: nowrap;
-  border: 0;
 }
-/* アクティブインジケーター: アイコン下に小さなドット */
-.navbtn.active::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-}
+.navbtn.active .navtxt { font-weight: 600; }
 
 /* ============================================================
    フローティング 💬
