@@ -418,6 +418,354 @@
 [data-theme="dark"] .recent-row { border-bottom-color: rgba(255,255,255,0.06); }
 
 /* ============================================================
+   気持ち入力フル画面 (v3.6 画像準拠)
+   ============================================================ */
+.moodfull {
+  padding: 16px 16px 32px;
+  background: var(--bg);
+  color: var(--text);
+}
+.moodfull * { color: inherit; }
+.moodfull-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 64px;
+  align-items: center;
+  margin-bottom: 22px;
+  position: relative;
+}
+.moodfull-back {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--text);
+  font-size: 26px;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 4px;
+  line-height: 1;
+}
+.moodfull-back:hover { background: var(--bg-soft); }
+.moodfull-titles {
+  text-align: center;
+}
+.moodfull-titles h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.moodfull-titles p {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin: 4px 0 0;
+}
+.moodfull-mascot {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(167, 196, 160, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+[data-theme="dark"] .moodfull-mascot {
+  background: rgba(167, 196, 160, 0.08);
+  box-shadow: 0 0 0 1px rgba(167, 196, 160, 0.25);
+}
+.moodfull-mascot svg, .moodfull-mascot img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.moodfull-section { margin-bottom: 22px; }
+.moodfull-h2 {
+  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+.moodfull-h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+/* ムード5択カード */
+.moodfull-mood-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.moodfull-mood-item {
+  background: var(--bg-card);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  padding: 10px 4px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font: inherit;
+  color: var(--text);
+}
+[data-theme="dark"] .moodfull-mood-item {
+  background: rgba(47, 62, 62, 0.55);
+}
+.moodfull-mood-item.selected {
+  border-color: #7BA876;
+  box-shadow: 0 0 0 1.5px rgba(123, 168, 118, 0.2), 0 0 12px rgba(155, 184, 159, 0.5);
+}
+.moodfull-mood-emoji {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.moodfull-mood-label {
+  font-size: 11px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.moodfull-mood-item.selected .moodfull-mood-label {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* カテゴリ セクション */
+.moodfull-cats-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+.moodfull-cats-head h2 { margin: 0; }
+.moodfull-cats-sub {
+  font-size: 11px;
+  color: var(--text-soft);
+  margin: 4px 0 0;
+}
+
+.moodfull-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.moodfull-cat-item {
+  background: var(--bg-card);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  padding: 12px 6px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font: inherit;
+  color: var(--text);
+}
+[data-theme="dark"] .moodfull-cat-item {
+  background: rgba(47, 62, 62, 0.55);
+}
+.moodfull-cat-item.selected {
+  border-color: #7BA876;
+  background: rgba(123, 168, 118, 0.15);
+  box-shadow: 0 0 0 1px rgba(123, 168, 118, 0.25);
+}
+.moodfull-cat-emoji {
+  font-size: 22px;
+  line-height: 1;
+  display: block;
+}
+.moodfull-cat-name {
+  font-size: 11px;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin-top: 6px;
+  letter-spacing: 0.01em;
+}
+.moodfull-cat-item.selected .moodfull-cat-name {
+  color: #7BA876;
+  font-weight: 600;
+}
+[data-theme="dark"] .moodfull-cat-item.selected .moodfull-cat-name {
+  color: #A7C4A0;
+}
+
+.moodfull-cats-toggle {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid rgba(123, 168, 118, 0.45);
+  border-radius: 999px;
+  color: #7BA876;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.15s ease;
+}
+[data-theme="dark"] .moodfull-cats-toggle { color: #A7C4A0; }
+.moodfull-cats-toggle:hover { background: rgba(123, 168, 118, 0.08); }
+.moodfull-cats-toggle.is-open {
+  width: auto;
+  padding: 6px 14px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* テキストエリア */
+.moodfull-textarea-wrap {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 14px 14px 28px;
+  position: relative;
+}
+[data-theme="dark"] .moodfull-textarea-wrap {
+  background: rgba(47, 62, 62, 0.55);
+}
+.moodfull-textarea-wrap textarea {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  resize: none;
+  min-height: 70px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.moodfull-textarea-wrap textarea::placeholder {
+  color: var(--text-muted);
+}
+.moodfull-counter {
+  position: absolute;
+  bottom: 8px;
+  right: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* 励ましカード */
+.moodfull-encourage {
+  background: rgba(167, 196, 160, 0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 16px;
+  border: 1px solid rgba(167, 196, 160, 0.18);
+}
+[data-theme="dark"] .moodfull-encourage {
+  background: rgba(167, 196, 160, 0.06);
+  border-color: rgba(167, 196, 160, 0.15);
+}
+.moodfull-encourage-mascot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .moodfull-encourage-mascot {
+  background: rgba(167, 196, 160, 0.12);
+}
+.moodfull-encourage-mascot svg, .moodfull-encourage-mascot img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+}
+.moodfull-encourage-text {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+
+/* 保存ボタン2つ */
+.moodfull-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.moodfull-cta-end, .moodfull-cta-talk {
+  background: var(--bg-card);
+  border: 1.5px solid;
+  border-radius: 14px;
+  padding: 14px 8px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .moodfull-cta-end,
+[data-theme="dark"] .moodfull-cta-talk {
+  background: rgba(47, 62, 62, 0.55);
+}
+.moodfull-cta-end {
+  border-color: #C9D685;
+  color: #8A9A4A;
+}
+.moodfull-cta-talk {
+  border-color: #B8A6E5;
+  color: #6B5DAB;
+}
+[data-theme="dark"] .moodfull-cta-end { color: #C9D685; }
+[data-theme="dark"] .moodfull-cta-talk { color: #B8A6E5; }
+.moodfull-cta-end:disabled, .moodfull-cta-talk:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.moodfull-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.moodfull-cta-icon { font-size: 16px; }
+.moodfull-cta-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+.moodfull-cta-sub {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.8;
+  letter-spacing: 0.02em;
+}
+
+.moodfull-cancel {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  padding: 14px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* ============================================================
    Welcome まめこ版
    ============================================================ */
 .welcome-mameko {
@@ -1397,18 +1745,38 @@ const DISTORTIONS = [
   { id: 'fortune_telling',  tier: 'expansion', name: '運命の先読み',     desc: '将来を悲観的に決めつける',             examples: ['将来真っ暗','もう手遅れ','絶対上手くいかない','未来ない'], counter: '未来は予想であって事実じゃないよね。今わかってる事実だけに目を向けてみない？' },
 ];
 
-// カテゴリ 10種（v3 仕様準拠・複数選択可）
+// カテゴリ 28種（コア8 + 拡張20。core:trueが初期表示）
 const CATEGORIES = [
-  { id: 'work',     emoji: '💼', name: '仕事' },
-  { id: 'family',   emoji: '👨‍👩‍👧', name: '家族' },
-  { id: 'love',     emoji: '💗', name: '恋愛' },
-  { id: 'friend',   emoji: '👥', name: '友人' },
-  { id: 'future',   emoji: '🌅', name: '将来' },
-  { id: 'money',    emoji: '💰', name: 'お金' },
-  { id: 'health',   emoji: '🌿', name: '健康' },
-  { id: 'self',     emoji: '🌱', name: '自分自身' },
-  { id: 'school',   emoji: '🎓', name: '学校' },
-  { id: 'other',    emoji: '✨', name: 'その他' },
+  // コア（よく選ぶもの・初期表示8つ）
+  { id: 'work',         emoji: '💼', name: '仕事',           core: true },
+  { id: 'family',       emoji: '👨‍👩‍👧', name: '家族',         core: true },
+  { id: 'love',         emoji: '💗', name: '恋愛',           core: true },
+  { id: 'friend',       emoji: '👥', name: '友人',           core: true },
+  { id: 'self',         emoji: '🌱', name: '自分自身',       core: true },
+  { id: 'health',       emoji: '🌿', name: '健康',           core: true },
+  { id: 'money',        emoji: '💰', name: 'お金',           core: true },
+  { id: 'future',       emoji: '🌅', name: '将来',           core: true },
+  // 拡張（もっと見るで表示）
+  { id: 'school',       emoji: '🎓', name: '学業・勉強' },
+  { id: 'relationship', emoji: '💬', name: '人間関係' },
+  { id: 'hobby',        emoji: '🎵', name: '趣味・楽しみ' },
+  { id: 'home',         emoji: '🏠', name: '住まい' },
+  { id: 'sleep',        emoji: '🌙', name: '睡眠' },
+  { id: 'food',         emoji: '🍴', name: '食事' },
+  { id: 'illness',      emoji: '💓', name: '体調・病気' },
+  { id: 'care',         emoji: '♿', name: '介護・看病' },
+  { id: 'lonely',       emoji: '👤', name: '孤独・さみしさ' },
+  { id: 'anxious',      emoji: '🌀', name: '不安' },
+  { id: 'irritated',    emoji: '⚡', name: 'イライラ' },
+  { id: 'sad',          emoji: '💧', name: '悲しみ' },
+  { id: 'angry',        emoji: '😠', name: '怒り' },
+  { id: 'tired',        emoji: '🪫', name: '疲れ' },
+  { id: 'energetic',    emoji: '☀️', name: 'やる気・元気' },
+  { id: 'calm',         emoji: '🍃', name: '安心・落ち着き' },
+  { id: 'grateful',     emoji: '💟', name: '感謝・幸せ' },
+  { id: 'empty',        emoji: '⛈️', name: '寂しさ・虚しさ' },
+  { id: 'unknown',      emoji: '❓', name: 'わからない' },
+  { id: 'other',        emoji: '⭐', name: 'その他' },
 ];
 
 // もやもや整理：感情選択肢
@@ -1983,50 +2351,105 @@ function ensureMoodDraft() {
   return moodDraft;
 }
 
+// もっと見るの開閉ステート（モジュールローカル）
+let moodCatsExpanded = false;
+
 function viewMoodFull() {
   const d = ensureMoodDraft();
+  const cats = moodCatsExpanded ? CATEGORIES : CATEGORIES.filter(c => c.core);
+  const subText = moodCatsExpanded ? 'いくつでも選べます' : 'よく選ぶもの';
+  const commentLen = (d.comment || '').length;
   return `
-    <div class="screen active">
-      <div class="page-header">
-        <button class="page-back" data-act="back-home">‹</button>
-        <span class="page-title">いまの気持ち</span>
-        <span style="width:36px;"></span>
-      </div>
+    <div class="screen active moodfull">
+      <header class="moodfull-header">
+        <button class="moodfull-back" data-act="back-home" aria-label="戻る">‹</button>
+        <div class="moodfull-titles">
+          <h1>いまの気持ち</h1>
+          <p>いまどんな感じ？</p>
+        </div>
+        <div class="moodfull-mascot">
+          ${mameko({ size: 56 })}
+        </div>
+      </header>
 
-      <h2 class="mb-2">いまどんな感じ？</h2>
-      <div class="mood-grid">
-        ${MOODS.map(m => `
-          <button class="mood-item ${d.moodScore === m.id ? 'selected' : ''}" data-act="mood-score" data-score="${m.id}">
-            <div class="mood-emoji">${m.emoji}</div>
-            <div class="mood-label">${m.label}</div>
+      <section class="moodfull-section">
+        <h2 class="moodfull-h2">いまどんな感じ？</h2>
+        <div class="moodfull-mood-grid">
+          ${MOODS.map(m => `
+            <button class="moodfull-mood-item ${d.moodScore === m.id ? 'selected' : ''}" data-act="mood-score" data-score="${m.id}">
+              <div class="moodfull-mood-emoji">${m.emoji}</div>
+              <div class="moodfull-mood-label">${m.label}</div>
+            </button>
+          `).join('')}
+        </div>
+      </section>
+
+      <section class="moodfull-section">
+        <div class="moodfull-cats-head">
+          <div>
+            <h2 class="moodfull-h2">何についての気持ち？</h2>
+            <p class="moodfull-cats-sub">${subText}</p>
+          </div>
+          ${moodCatsExpanded ? `
+            <button class="moodfull-cats-toggle is-open" data-act="cats-collapse">
+              閉じる <span style="font-size:11px;">⌃</span>
+            </button>
+          ` : ''}
+        </div>
+        <div class="moodfull-cat-grid">
+          ${cats.map(c => `
+            <button class="moodfull-cat-item ${d.categories.includes(c.id) ? 'selected' : ''}" data-act="mood-cat" data-cat="${c.id}">
+              <span class="moodfull-cat-emoji">${c.emoji}</span>
+              <div class="moodfull-cat-name">${c.name}</div>
+            </button>
+          `).join('')}
+        </div>
+        ${!moodCatsExpanded ? `
+          <button class="moodfull-cats-toggle" data-act="cats-expand">
+            もっと見る <span style="font-size:11px;">›</span>
           </button>
-        `).join('')}
+        ` : ''}
+      </section>
+
+      <section class="moodfull-section">
+        <h3 class="moodfull-h3">ひとこと（任意）</h3>
+        <div class="moodfull-textarea-wrap">
+          <textarea id="moodComment" maxlength="200" placeholder="今の気持ちをひとことで書いてみましょう" oninput="window.moodSetComment(this.value); window.moodUpdateCounter && window.moodUpdateCounter();">${escapeHtml(d.comment)}</textarea>
+          <div class="moodfull-counter"><span id="moodCounter">${commentLen}</span> / 200</div>
+        </div>
+      </section>
+
+      <div class="moodfull-encourage">
+        <div class="moodfull-encourage-mascot">
+          ${mameko({ size: 36 })}
+        </div>
+        <div class="moodfull-encourage-text">
+          気持ちを記録すると、<br>自分のこころの変化に気づきやすくなります
+        </div>
       </div>
 
-      <h2 class="section-title">何についての気持ち？</h2>
-      <p class="text-tiny text-muted mb-2">複数えらべます</p>
-      <div class="domain-grid">
-        ${CATEGORIES.map(c => `
-          <button class="domain-item ${d.categories.includes(c.id) ? 'selected' : ''}" data-act="mood-cat" data-cat="${c.id}">
-            <span class="domain-emoji">${c.emoji}</span>
-            <div class="domain-name">${c.name}</div>
-          </button>
-        `).join('')}
+      <div class="moodfull-buttons">
+        <button class="moodfull-cta-end" data-act="mood-save-end" ${d.moodScore == null ? 'disabled' : ''}>
+          <div class="moodfull-cta-row"><span class="moodfull-cta-icon">📝</span><span class="moodfull-cta-title">保存して終わる</span></div>
+          <span class="moodfull-cta-sub">あとで見返せます</span>
+        </button>
+        <button class="moodfull-cta-talk" data-act="mood-save-talk" ${d.moodScore == null ? 'disabled' : ''}>
+          <div class="moodfull-cta-row"><span class="moodfull-cta-icon">💬</span><span class="moodfull-cta-title">保存してAIと話す</span></div>
+          <span class="moodfull-cta-sub">気持ちを整理できます</span>
+        </button>
       </div>
 
-      <h2 class="section-title">ひとこと（任意）</h2>
-      <textarea class="textarea-block" id="moodComment" maxlength="500" placeholder="今の気持ちをひとことで書いてみましょう" oninput="window.moodSetComment(this.value)">${escapeHtml(d.comment)}</textarea>
-
-      <div style="margin-top:24px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="mood-save-end" ${d.moodScore == null ? 'disabled' : ''}>保存して終わる</button>
-        <button class="btn btn-secondary" data-act="mood-save-talk" ${d.moodScore == null ? 'disabled' : ''}>保存してAIと話す</button>
-        <button class="btn-ghost" data-act="back-home">キャンセル</button>
-      </div>
+      <button class="moodfull-cancel" data-act="back-home">キャンセル</button>
     </div>
   `;
 }
 
 window.moodSetComment = function(t) { ensureMoodDraft().comment = t; };
+window.moodUpdateCounter = function() {
+  const el = document.getElementById('moodCounter');
+  const ta = document.getElementById('moodComment');
+  if (el && ta) el.textContent = String((ta.value || '').length);
+};
 
 function saveMoodLog() {
   const d = ensureMoodDraft();
@@ -3432,7 +3855,7 @@ function viewSettingsModal() {
 // ============================================================
 function handleAction(act, el, ev) {
   // 共通: ナビ
-  if (act === 'back-home')   { moodDraft = null; go('home'); return; }
+  if (act === 'back-home')   { moodDraft = null; moodCatsExpanded = false; go('home'); return; }
   if (act === 'back-action') { go('action'); return; }
   if (act === 'back-record') { go('record'); return; }
   if (act === 'close-modal') { closeModal(); return; }
@@ -3518,6 +3941,8 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  if (act === 'cats-expand')  { moodCatsExpanded = true;  render(); return; }
+  if (act === 'cats-collapse'){ moodCatsExpanded = false; render(); return; }
   if (act === 'mood-save-end') {
     const log = saveMoodLog();
     moodDraft = null;
