@@ -418,6 +418,79 @@
 [data-theme="dark"] .recent-row { border-bottom-color: rgba(255,255,255,0.06); }
 
 /* ============================================================
+   もやもや整理 (v3.7)
+   ============================================================ */
+.moya-emo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.moya-emo-item {
+  background: var(--bg-card);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  padding: 12px 4px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font: inherit;
+  color: var(--text);
+}
+[data-theme="dark"] .moya-emo-item { background: rgba(47, 62, 62, 0.55); }
+.moya-emo-item.selected {
+  border-color: #7BA876;
+  background: rgba(123, 168, 118, 0.15);
+  box-shadow: 0 0 0 1px rgba(123, 168, 118, 0.25);
+}
+.moya-emo-emoji {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.moya-emo-name {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+.moya-emo-item.selected .moya-emo-name {
+  color: #7BA876;
+  font-weight: 600;
+}
+[data-theme="dark"] .moya-emo-item.selected .moya-emo-name { color: #A7C4A0; }
+
+/* 0-10 スケール ボタン行 */
+.moya-scale-row {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 4px;
+  margin: 0 auto;
+  max-width: 100%;
+}
+.moya-scale-btn {
+  background: var(--bg-card);
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  padding: 10px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .moya-scale-btn { background: rgba(47, 62, 62, 0.55); }
+.moya-scale-btn:hover { background: rgba(123, 168, 118, 0.08); }
+.moya-scale-btn.selected {
+  background: rgba(123, 168, 118, 0.2);
+  border-color: #7BA876;
+  color: #7BA876;
+  font-weight: 700;
+}
+[data-theme="dark"] .moya-scale-btn.selected { color: #A7C4A0; border-color: #A7C4A0; }
+
+/* ============================================================
    気持ち入力フル画面 (v3.6 画像準拠)
    ============================================================ */
 .moodfull {
@@ -1779,9 +1852,36 @@ const CATEGORIES = [
   { id: 'other',        emoji: '⭐', name: 'その他' },
 ];
 
-// もやもや整理：感情選択肢
+// もやもや整理：感情選択肢（v3.8 絵文字付き28種）
 const EMOTIONS = [
-  '悲しい', '不安', '怒り', '焦り', '恥ずかしい', '孤独', '悔しい', '無力感', 'その他'
+  { name: '悲しい',       emoji: '😢' },
+  { name: '不安',         emoji: '😟' },
+  { name: '怒り',         emoji: '😠' },
+  { name: '焦り',         emoji: '😣' },
+  { name: '恥ずかしい',   emoji: '😳' },
+  { name: '孤独',         emoji: '🥺' },
+  { name: '悔しい',       emoji: '😤' },
+  { name: '無力感',       emoji: '😩' },
+  { name: '罪悪感',       emoji: '😔' },
+  { name: '嫉妬',         emoji: '😒' },
+  { name: '疲れ',         emoji: '😫' },
+  { name: '混乱',         emoji: '😵' },
+  { name: '緊張',         emoji: '😬' },
+  { name: '恐れ',         emoji: '😨' },
+  { name: 'がっかり',     emoji: '😞' },
+  { name: 'ショック',     emoji: '😱' },
+  { name: '自己嫌悪',     emoji: '😖' },
+  { name: '後悔',         emoji: '😓' },
+  { name: '切ない',       emoji: '🥲' },
+  { name: 'うんざり',     emoji: '🙄' },
+  { name: 'ゆううつ',     emoji: '😶‍🌫️' },
+  { name: '動揺',         emoji: '😰' },
+  { name: '諦め',         emoji: '😑' },
+  { name: '違和感',       emoji: '🤔' },
+  { name: 'もやもや',     emoji: '🌫️' },
+  { name: 'むなしい',     emoji: '🫥' },
+  { name: '傷ついた',     emoji: '💔' },
+  { name: 'その他',       emoji: '💭' },
 ];
 
 // 気分 5段階（順序: つらい→とてもよい / ラベルを画像準拠に変更）
@@ -2589,10 +2689,11 @@ let moyamoya = null;
 function viewMoyamoya() {
   if (!moyamoya) moyamoya = { step: 1 };
   const s = moyamoya;
-  const stepLabel = `Step ${s.step} / 6`;
+  // step 6 はレターでステップ表示しない。1-5のみ "Step X / 5"
+  const stepLabel = `Step ${s.step} / 5`;
 
   if (s.step === 1) {
-    return moyamoyaScreen(stepLabel, '何があったのかを短く教えてください', `
+    return moyamoyaScreen(stepLabel, '何があったのかを教えてください', `
       <p class="text-soft mb-3">うまくまとまっていなくても大丈夫。</p>
       <textarea class="textarea-block" id="moyaInput" placeholder="例：上司に強く注意された" rows="4">${escapeHtml(s.eventText || '')}</textarea>
       <div style="margin-top:16px; display:grid; gap:10px;">
@@ -2603,10 +2704,11 @@ function viewMoyamoya() {
   }
   if (s.step === 2) {
     return moyamoyaScreen(stepLabel, 'どんな気持ちが一番近かった？', `
-      <div class="domain-grid" style="grid-template-columns: repeat(3, 1fr); gap:8px;">
+      <div class="moya-emo-grid">
         ${EMOTIONS.map(e => `
-          <button class="domain-item ${s.emotion === e ? 'selected' : ''}" data-act="moya-step2-pick" data-emotion="${e}" style="padding:10px; text-align:center;">
-            <div class="domain-name" style="font-size:13px;">${e}</div>
+          <button class="moya-emo-item ${s.emotion === e.name ? 'selected' : ''}" data-act="moya-step2-pick" data-emotion="${e.name}">
+            <span class="moya-emo-emoji">${e.emoji}</span>
+            <span class="moya-emo-name">${e.name}</span>
           </button>
         `).join('')}
       </div>
@@ -2617,15 +2719,16 @@ function viewMoyamoya() {
     `);
   }
   if (s.step === 3) {
-    const v = s.emotionScoreBefore == null ? 50 : s.emotionScoreBefore;
-    return moyamoyaScreen(stepLabel, 'その気持ちの強さは0〜100でいうとどのくらい？', `
-      <div style="text-align:center; margin: 32px 0;">
-        <div id="moyaScoreNum" style="font-size:48px; font-weight:600; font-family:'Noto Serif JP', serif;">${v}</div>
-        <div class="text-tiny text-muted">0=ほぼ感じない / 100=最大</div>
+    const v = s.emotionScoreBefore == null ? 5 : s.emotionScoreBefore;
+    return moyamoyaScreen(stepLabel, 'その気持ちの強さはどのくらい？', `
+      <div style="text-align:center; margin: 28px 0 18px;">
+        <div id="moyaScoreNum" style="font-size:64px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1;">${v}</div>
+        <div class="text-tiny text-muted" style="margin-top:6px;">0=ほぼ感じない / 10=最大</div>
       </div>
-      <input type="range" min="0" max="100" step="5" value="${v}" oninput="window.moyaSetScore(this.value)" style="width:100%;">
-      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:6px;">
-        <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+      <div class="moya-scale-row">
+        ${Array.from({length: 11}, (_, n) => `
+          <button class="moya-scale-btn ${v === n ? 'selected' : ''}" data-act="moya-set-score" data-score="${n}">${n}</button>
+        `).join('')}
       </div>
       <div style="margin-top:24px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="moya-step3-next">つづける</button>
@@ -2634,26 +2737,42 @@ function viewMoyamoya() {
     `);
   }
   if (s.step === 4) {
-    if (!s.alternativeView) s.alternativeView = generateAlternativeView(s.eventText, s.emotion);
+    if (!s.alternativeViews) {
+      s.alternativeViews = generateAlternativeViews(s.eventText, s.emotion);
+      s.alternativeViewsRevealed = 3;
+    }
+    const visible = s.alternativeViews.slice(0, s.alternativeViewsRevealed);
+    const canMore = s.alternativeViewsRevealed < s.alternativeViews.length;
     return moyamoyaScreen(stepLabel, '別の見方を考えてみました', `
-      <div class="card-warm" style="padding:18px; line-height:1.9;">${escapeHtml(s.alternativeView).replace(/\n/g, '<br>')}</div>
-      <p class="text-tiny text-muted mt-2">⚠️ AIが推定した参考情報です。納得できなくても問題ありません。</p>
-      <div style="margin-top:24px; display:grid; gap:10px;">
+      <p class="text-tiny text-muted mb-3">⚠️ AIが推定した参考情報です。納得できないものはスルーで大丈夫。</p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${visible.map((v, i) => `
+          <div class="card-warm" style="padding:14px 16px; line-height:1.85; display:flex; gap:10px; align-items:flex-start;">
+            <span style="color: var(--primary, #6B8F71); font-weight:700; flex-shrink:0; min-width:18px;">${i+1}</span>
+            <p style="margin:0;">${escapeHtml(v).replace(/\n/g, '<br>')}</p>
+          </div>
+        `).join('')}
+      </div>
+      ${canMore ? `
+        <button class="btn btn-secondary" data-act="moya-step4-more" style="margin-top:14px; width:100%;">他の見方も見てみる</button>
+      ` : ''}
+      <div style="margin-top:18px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="moya-step4-next">この見方を踏まえて続ける</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
       </div>
     `);
   }
   if (s.step === 5) {
-    const v = s.emotionScoreAfter == null ? Math.max(0, (s.emotionScoreBefore || 50) - 20) : s.emotionScoreAfter;
+    const v = s.emotionScoreAfter == null ? Math.max(0, (s.emotionScoreBefore || 5) - 2) : s.emotionScoreAfter;
     return moyamoyaScreen(stepLabel, 'いま、気持ちの強さはどのくらい？', `
       <p class="text-soft mb-2">さっきは <strong>${s.emotionScoreBefore}</strong> でした。</p>
-      <div style="text-align:center; margin: 32px 0;">
-        <div id="moyaScoreNum" style="font-size:48px; font-weight:600; font-family:'Noto Serif JP', serif;">${v}</div>
+      <div style="text-align:center; margin: 28px 0 18px;">
+        <div id="moyaScoreNum" style="font-size:64px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1;">${v}</div>
       </div>
-      <input type="range" min="0" max="100" step="5" value="${v}" oninput="window.moyaSetScoreAfter(this.value)" style="width:100%;">
-      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:6px;">
-        <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+      <div class="moya-scale-row">
+        ${Array.from({length: 11}, (_, n) => `
+          <button class="moya-scale-btn ${v === n ? 'selected' : ''}" data-act="moya-set-score-after" data-score="${n}">${n}</button>
+        `).join('')}
       </div>
       <div style="margin-top:24px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="moya-step5-next">レターを作る</button>
@@ -2713,9 +2832,22 @@ window.moyaSetScoreAfter = function(v) {
   if (el) el.textContent = v;
 };
 
+// v3.7: 6個の別の見方を返す。3個ずつ表示。
+function generateAlternativeViews(eventText, emotion) {
+  const short = (eventText || '').slice(0, 28) + ((eventText || '').length > 28 ? '…' : '');
+  const emo = emotion || 'つらさ';
+  return [
+    `「${short}」というできごと、${emo}を強く感じたんですね。感情はあなたを守るために働いているサイン。否定する必要はありません。`,
+    `「自分が全部悪い」と感じている部分があるかもしれません。でも別の見方をすると、「今回はうまくいかなかったけれど、あなたの全部が否定されたわけではない」とも考えられそうです。`,
+    `今回のできごとは、永遠に続くものではなく、一時的なもの。明日になれば、感じ方が少し変わっているかもしれません。`,
+    `「絶対こうあるべき」と自分にプレッシャーをかけている部分はありませんか？「できる範囲でいい」と自分に言ってあげるのも、ひとつの選択肢です。`,
+    `周りの人にも、よく似た経験は意外とよくあります。あなただけが特別に「ダメ」というわけではなく、誰もが感じる自然な感情です。`,
+    `「もし友達が同じ状況にいたら、何て言ってあげる？」その言葉を、今のあなた自身にも、優しくかけてみてもいいかもしれません。`,
+  ];
+}
+// 旧API互換
 function generateAlternativeView(eventText, emotion) {
-  const short = (eventText || '').slice(0, 30) + ((eventText || '').length > 30 ? '…' : '');
-  return `「${short}」というできごと、${emotion}を強く感じたんですね。\n\nもしかすると「自分は全部ダメだ」「全部自分のせいだ」と感じている部分があるかもしれません。\n\nでも別の見方をすると、\n「今回はうまくいかなかったけれど、あなたの全部が否定されたわけではない」\nとも考えられそうです。\n\n感情はあなたを守るために働いているサイン。それを否定する必要はありません。`;
+  return generateAlternativeViews(eventText, emotion).join('\n\n');
 }
 
 function generateLetter(s) {
@@ -2723,13 +2855,16 @@ function generateLetter(s) {
   const dateStr = `${date.getMonth()+1}月${date.getDate()}日`;
   const eventShort = (s.eventText || '').slice(0, 20);
   const title = `${eventShort || '今日'}の整理（${dateStr}）`;
+  // 10段階スケール: diff>=2 で「軽くなった」、>0 で「ほぐれていく」、それ以下は据え置き
   const diff = (s.emotionScoreBefore || 0) - (s.emotionScoreAfter || 0);
-  const closing = diff >= 10
+  const closing = diff >= 2
     ? '少しだけ心が軽くなったね。それで十分です。'
     : diff > 0
     ? '気持ちは少しずつほぐれていきます。今日は書けただけでも一歩。'
     : '今日はまだ重く感じるかもしれない。それでも書いてくれたこと、覚えておこう。';
-  const body = `今日起きたこと\n${s.eventText}\n\n感じていたこと\n${s.emotion}（強さ ${s.emotionScoreBefore}）\n\n別の見方\n${s.alternativeView}\n\n少し楽になるための一言\n${closing}`;
+  // alternativeView は step4 で alternativeViews から組み立てたものを使う（互換）
+  const altText = s.alternativeView || (Array.isArray(s.alternativeViews) ? s.alternativeViews.slice(0, s.alternativeViewsRevealed || 3).map((v, i) => `${i+1}. ${v}`).join('\n\n') : '');
+  const body = `今日起きたこと\n${s.eventText}\n\n感じていたこと\n${s.emotion}（強さ ${s.emotionScoreBefore} / 10）\n\n別の見方\n${altText}\n\n少し楽になるための一言\n${closing}`;
   return { title, body };
 }
 
@@ -3974,13 +4109,37 @@ function handleAction(act, el, ev) {
   }
   if (act === 'moya-step2-pick') { moyamoya.emotion = el.dataset.emotion; render(); return; }
   if (act === 'moya-step2-next') { if (moyamoya.emotion) { moyamoya.step = 3; render(); } return; }
+  if (act === 'moya-set-score') {
+    moyamoya.emotionScoreBefore = parseInt(el.dataset.score, 10);
+    render();
+    return;
+  }
+  if (act === 'moya-set-score-after') {
+    moyamoya.emotionScoreAfter = parseInt(el.dataset.score, 10);
+    render();
+    return;
+  }
   if (act === 'moya-step3-next') {
-    if (moyamoya.emotionScoreBefore == null) moyamoya.emotionScoreBefore = 50;
+    if (moyamoya.emotionScoreBefore == null) moyamoya.emotionScoreBefore = 5;
     moyamoya.step = 4; render(); return;
   }
-  if (act === 'moya-step4-next') { moyamoya.step = 5; render(); return; }
+  if (act === 'moya-step4-more') {
+    moyamoya.alternativeViewsRevealed = Math.min(6, (moyamoya.alternativeViewsRevealed || 3) + 3);
+    render();
+    return;
+  }
+  if (act === 'moya-step4-next') {
+    // 表示中の見方を保存用にまとめる
+    if (Array.isArray(moyamoya.alternativeViews)) {
+      const n = moyamoya.alternativeViewsRevealed || 3;
+      moyamoya.alternativeView = moyamoya.alternativeViews.slice(0, n).map((v, i) => `${i+1}. ${v}`).join('\n\n');
+    }
+    moyamoya.step = 5;
+    render();
+    return;
+  }
   if (act === 'moya-step5-next') {
-    if (moyamoya.emotionScoreAfter == null) moyamoya.emotionScoreAfter = 50;
+    if (moyamoya.emotionScoreAfter == null) moyamoya.emotionScoreAfter = 5;
     moyamoya.step = 6; render(); return;
   }
   if (act === 'moya-save') {
