@@ -335,7 +335,8 @@ h3 { font-size: 16px; font-weight: 500; }
 /* ============================================================
    タブバー（3タブ）
    ============================================================ */
-.tabbar {
+/* ---- ナビゲーションバー（v3.4: 完全リライト） ---- */
+.navbar {
   position: fixed;
   bottom: 0;
   left: 50%;
@@ -344,61 +345,49 @@ h3 { font-size: 16px; font-weight: 500; }
   max-width: 480px;
   background: var(--bg-card);
   border-top: 1px solid var(--divider);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom);
-  transition: background 0.5s var(--ease), border-color 0.5s var(--ease);
 }
-[data-theme="dark"] .tabbar {
+[data-theme="dark"] .navbar {
   background: rgba(31, 42, 42, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
-.tabbar-item {
-  padding: 10px 0 12px;
-  text-align: center;
-  color: var(--text-muted);
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border: none !important;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: color 0.2s var(--ease);
+.navbtn {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  cursor: pointer;
+  padding: 10px 0 12px;
+  background: transparent;
+  border: 0;
+  outline: 0;
   font: inherit;
+  color: #9E9E9E;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.tabbar-item.active { color: var(--primary); }       /* ダークすぎ問題回避: brighter sage */
-[data-theme="dark"] .tabbar-item.active { color: var(--secondary); }
-.tabbar-icon {
+.navbtn.active { color: #6B8F71; }
+[data-theme="dark"] .navbtn { color: #7A8580; }
+[data-theme="dark"] .navbtn.active { color: #A7C4A0; }
+.navico {
   font-size: 22px;
   line-height: 1;
-  background: transparent;
-  color: inherit;
   display: block;
 }
-.tabbar-label {
+.navtxt {
   font-size: 12px;
   font-weight: 500;
-  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', system-ui, sans-serif;
-  color: inherit;
-  background: transparent;
-  text-decoration: none;
-  text-shadow: none;
-  letter-spacing: 0.02em;
-  line-height: 1.3;
+  line-height: 1.2;
   display: block;
   white-space: nowrap;
 }
-.tabbar-item.active .tabbar-label { font-weight: 600; }
+.navbtn.active .navtxt { font-weight: 600; }
 
 /* ============================================================
    フローティング 💬
@@ -985,18 +974,18 @@ window.ASIDE_CONFIG = {
   <button class="fab hidden" id="fab" data-act="open-dialog" aria-label="ちょっと聞いて">💬</button>
 
   <!-- タブバー（v3: ホーム / 行動 / きろく） -->
-  <nav class="tabbar" id="tabbar" style="display:none">
-    <button class="tabbar-item" data-tab="home">
-      <div class="tabbar-icon">🏠</div>
-      <div class="tabbar-label">ホーム</div>
+  <nav class="navbar" id="tabbar" style="display:none">
+    <button type="button" class="navbtn" data-tab="home">
+      <span class="navico" aria-hidden="true">🏠</span>
+      <span class="navtxt">ホーム</span>
     </button>
-    <button class="tabbar-item" data-tab="action">
-      <div class="tabbar-icon">🌱</div>
-      <div class="tabbar-label">行動</div>
+    <button type="button" class="navbtn" data-tab="action">
+      <span class="navico" aria-hidden="true">🌱</span>
+      <span class="navtxt">行動</span>
     </button>
-    <button class="tabbar-item" data-tab="record">
-      <div class="tabbar-icon">📅</div>
-      <div class="tabbar-label">きろく</div>
+    <button type="button" class="navbtn" data-tab="record">
+      <span class="navico" aria-hidden="true">📅</span>
+      <span class="navtxt">きろく</span>
     </button>
   </nav>
 </div>
@@ -1368,11 +1357,11 @@ function render() {
   // タブバー＆FAB の表示制御
   const showTabbar = ['home', 'action', 'record'].includes(currentScreen);
   const showFab = ['home', 'action', 'record'].includes(currentScreen);
-  document.getElementById('tabbar').style.display = showTabbar ? 'grid' : 'none';
+  document.getElementById('tabbar').style.display = showTabbar ? 'flex' : 'none';
   document.getElementById('fab').classList.toggle('hidden', !showFab);
 
   // タブバー active 状態
-  document.querySelectorAll('.tabbar-item').forEach(el => {
+  document.querySelectorAll('.navbtn').forEach(el => {
     const tab = el.dataset.tab;
     el.classList.toggle('active', tab === currentScreen);
   });
