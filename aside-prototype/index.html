@@ -560,18 +560,23 @@ h3 { font-size: 16px; font-weight: 500; }
   position: fixed;
   bottom: 100px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
+  transform: translateX(-50%);
   background: var(--text);
   color: #fff;
   padding: 12px 20px;
   border-radius: var(--r-md);
   font-size: 14px;
   z-index: 200;
-  transition: transform 0.3s var(--ease);
+  transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease);
   pointer-events: none;
   white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;       /* show なしの状態では完全非表示 */
 }
-.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+}
 
 /* ============================================================
    モーダル
