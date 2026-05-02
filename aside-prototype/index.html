@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Aside — ひとりで抱えてる、を、ちょっとずつ整理する。</title>
 
 <!-- PWA / iOSホーム画面追加 -->
@@ -3703,6 +3703,68 @@ window.autoExpand = function(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(120, el.scrollHeight) + 'px';
 };
+
+// ============================================================
+// モバイルキーボード対応（AIと話す / 目標を決める チャット画面）
+//   - iOS Safari は position:fixed 要素がキーボードに隠れるので
+//     VisualViewport で検知して .input-row を持ち上げる
+//   - フォーカス時に最新メッセージを可視領域にスクロール
+// ============================================================
+(function setupChatKeyboard() {
+  const CHAT_INPUT_IDS = ['moodChatInput', 'goalChatInput'];
+  const CHAT_BOX_MAP = { moodChatInput: 'moodChatBox', goalChatInput: 'goalChatBox' };
+
+  function isChatInput(el) {
+    return el && CHAT_INPUT_IDS.indexOf(el.id) !== -1;
+  }
+
+  function scrollLastMessageIntoView() {
+    const active = document.activeElement;
+    if (!isChatInput(active)) return;
+    const box = document.getElementById(CHAT_BOX_MAP[active.id]);
+    if (!box || !box.lastElementChild) return;
+    try {
+      box.lastElementChild.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    } catch (_) {
+      // older browsers
+      box.lastElementChild.scrollIntoView(false);
+    }
+  }
+
+  function adjustInputForViewport() {
+    const inputRow = document.querySelector('.input-row');
+    if (!inputRow) return;
+    if (!window.visualViewport) return;
+    const vv = window.visualViewport;
+    // キーボードが占めるレイアウトビューポート下部の高さ
+    const keyboardOffset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+    inputRow.style.bottom = keyboardOffset + 'px';
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      adjustInputForViewport();
+      // resize 完了を待ってから最新メッセージを表示
+      requestAnimationFrame(scrollLastMessageIntoView);
+    });
+    window.visualViewport.addEventListener('scroll', adjustInputForViewport);
+  }
+
+  document.addEventListener('focusin', (e) => {
+    if (!isChatInput(e.target)) return;
+    // キーボードアニメーション完了を待つ
+    setTimeout(() => {
+      adjustInputForViewport();
+      scrollLastMessageIntoView();
+    }, 300);
+  });
+
+  document.addEventListener('focusout', (e) => {
+    if (!isChatInput(e.target)) return;
+    const inputRow = document.querySelector('.input-row');
+    if (inputRow) inputRow.style.bottom = '0';
+  });
+})();
 
 function persistAIChat({ sourceType, sourceId, messages, summary }) {
   const idx = state.aiChats.findIndex(c => c.sourceType === sourceType && c.sourceId === sourceId);
