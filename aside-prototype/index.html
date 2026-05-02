@@ -529,6 +529,422 @@
 .moya-altview-card.selected .moya-altview-num { color: #5C7E60; }
 [data-theme="dark"] .moya-altview-card.selected .moya-altview-num { color: #C0D8B7; }
 
+/* AIで別の見方を生成中のローディング */
+.moya-loading {
+  text-align: center;
+  padding: 50px 20px 30px;
+}
+.moya-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(123, 168, 118, 0.18);
+  border-top-color: #7BA876;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  animation: moya-spin 0.9s linear infinite;
+}
+[data-theme="dark"] .moya-loading-spinner {
+  border-color: rgba(167, 196, 160, 0.22);
+  border-top-color: #A7C4A0;
+}
+@keyframes moya-spin { to { transform: rotate(360deg); } }
+.moya-loading-text {
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   もやもや整理レター v0.7.5（添付画像準拠デザイン）
+   ============================================================ */
+.letter-screen {
+  padding: 0 0 170px;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+.letter-pageheader {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  padding: 14px 16px 8px;
+  gap: 8px;
+}
+.letter-pageheader .lph-back,
+.letter-pageheader .lph-share {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text);
+  font-size: 18px;
+}
+[data-theme="dark"] .letter-pageheader .lph-back,
+[data-theme="dark"] .letter-pageheader .lph-share { background: rgba(47, 62, 62, 0.55); }
+.letter-pageheader .lph-center { text-align: center; }
+.letter-pageheader .lph-title { font-size: 16px; font-weight: 500; color: var(--text); }
+.letter-pageheader .lph-date { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.letter-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* 中央: クリーム色のレター本体 */
+.letter-card {
+  background: #FBF7EE;
+  color: #3F3526;
+  border-radius: 16px;
+  padding: 36px 26px 28px;
+  position: relative;
+  font-family: 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+  border: 1px solid rgba(180, 160, 110, 0.22);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+/* 飾り: 角の葉 */
+.letter-leaf {
+  position: absolute;
+  width: 80px; height: 80px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+.letter-leaf-tl { top: 8px; left: 4px; }
+.letter-leaf-tr { top: 12px; right: 14px; transform: scaleX(-1); }
+.letter-leaf-bl { bottom: 8px; left: 4px; transform: scaleY(-1); }
+.letter-leaf-br { bottom: 8px; right: 4px; transform: scale(-1, -1); }
+
+/* 消印 */
+.letter-postmark {
+  position: absolute;
+  top: 26px;
+  right: 26px;
+  width: 64px; height: 64px;
+  border: 1.5px solid rgba(120, 95, 50, 0.42);
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  font-family: 'Times New Roman', serif;
+  color: rgba(120, 95, 50, 0.7);
+  transform: rotate(-4deg);
+  letter-spacing: 0.5px;
+}
+.letter-postmark::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 0.8px solid rgba(120, 95, 50, 0.32);
+  border-radius: 50%;
+}
+.letter-postmark .lp-year { font-size: 10px; line-height: 1; }
+.letter-postmark .lp-date { font-size: 14px; font-weight: 700; line-height: 1.2; margin: 1px 0; }
+.letter-postmark .lp-day { font-size: 8px; line-height: 1; }
+
+/* レター見出し */
+.letter-foryou {
+  text-align: center;
+  font-style: italic;
+  color: rgba(120, 95, 50, 0.7);
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin: 4px 0 6px;
+  font-family: 'Times New Roman', serif;
+}
+.letter-h1 {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 600;
+  color: #3F3526;
+  margin: 0 0 6px;
+  letter-spacing: 2px;
+}
+.letter-sub {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(63, 53, 38, 0.65);
+  margin: 0 0 24px;
+}
+.letter-intro {
+  font-size: 13px;
+  line-height: 1.95;
+  text-align: center;
+  color: rgba(63, 53, 38, 0.85);
+  margin: 0 8px 24px;
+}
+
+/* スコア変化カード */
+.letter-score {
+  background: #FFFCF5;
+  border: 1px solid rgba(180, 160, 110, 0.25);
+  border-radius: 14px;
+  padding: 18px 16px 14px;
+  margin: 0 0 26px;
+}
+.letter-score-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5C7E60;
+  margin: 0 0 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.letter-score-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.letter-score-col { text-align: center; }
+.letter-score-label { font-size: 12px; color: rgba(63, 53, 38, 0.85); font-weight: 500; }
+.letter-score-sublabel { font-size: 10px; color: rgba(63, 53, 38, 0.55); margin: 1px 0 4px; min-height: 28px; line-height: 1.4; }
+.letter-score-num {
+  font-size: 38px;
+  font-weight: 600;
+  font-family: 'Noto Serif JP', serif;
+  line-height: 1.1;
+}
+.letter-score-num .ls-suffix { font-size: 13px; color: rgba(63, 53, 38, 0.55); margin-left: 2px; }
+.letter-score-num.before { color: #D77B5B; }
+.letter-score-num.after { color: #5C7E60; }
+.letter-score-arrow {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #6B8F71;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  margin: 0 auto;
+}
+.letter-score-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+.letter-score-tag.before { background: #FAD9C9; color: #C25E3F; }
+.letter-score-tag.after { background: #D6E5CB; color: #4F7256; }
+.letter-score-delta {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(63, 53, 38, 0.85);
+  margin-top: 14px;
+  border-top: 1px dashed rgba(180, 160, 110, 0.35);
+  padding-top: 12px;
+}
+.letter-score-delta strong {
+  color: #D77B5B;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 2px;
+}
+
+/* 整理のポイント */
+.letter-section-h {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5C7E60;
+  margin: 6px 0 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.letter-section-h::after {
+  content: '';
+  flex: 1;
+  border-top: 1px dotted rgba(180, 160, 110, 0.5);
+  margin-left: 6px;
+}
+.letter-points { display: flex; flex-direction: column; gap: 16px; margin-bottom: 26px; }
+.letter-point {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+.letter-point-icon {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.letter-point-icon.event   { background: #E1ECDB; }
+.letter-point-icon.emotion { background: #FAD9C9; }
+.letter-point-icon.view    { background: #FBE7B8; }
+.letter-point-icon.message { background: #DDE5DC; }
+.letter-point-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 4px 0 4px;
+}
+.letter-point-title.event   { color: #5C7E60; }
+.letter-point-title.emotion { color: #C25E3F; }
+.letter-point-title.view    { color: #B07F2F; }
+.letter-point-title.message { color: #5C6E5E; }
+.letter-point p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(63, 53, 38, 0.9);
+}
+.letter-point .lp-extra { color: rgba(63, 53, 38, 0.7); font-size: 12px; margin-top: 4px; }
+.letter-point .lp-sub-h {
+  font-size: 12px;
+  color: rgba(63, 53, 38, 0.7);
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+
+/* まめこからの言葉 */
+.letter-mameko {
+  background: #ECEFE3;
+  border: 1px solid rgba(150, 175, 120, 0.32);
+  border-radius: 14px;
+  padding: 16px 16px;
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+  position: relative;
+}
+.letter-mameko-img {
+  width: 60px; height: 60px;
+  background: rgba(255,255,255,0.45);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.letter-mameko-img img { width: 56px; height: 56px; object-fit: contain; }
+.letter-mameko-content { color: rgba(63, 53, 38, 0.9); }
+.letter-mameko-title {
+  font-size: 12px;
+  color: #B07F2F;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.letter-mameko-content p { margin: 0 0 2px; font-size: 13px; line-height: 1.75; }
+.letter-mameko-en {
+  text-align: right;
+  font-style: italic;
+  font-family: 'Times New Roman', serif;
+  color: rgba(120, 95, 50, 0.7);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* 右サイド: 整理サマリー */
+.letter-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.letter-summary-h {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+  margin: 0 0 4px;
+  padding: 4px 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.letter-summary-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  align-items: start;
+  border: 1px solid var(--divider);
+}
+[data-theme="dark"] .letter-summary-card { background: rgba(47, 62, 62, 0.55); border-color: rgba(255,255,255,0.05); }
+.letter-summary-icon { font-size: 14px; opacity: 0.85; padding-top: 2px; }
+.letter-summary-stepname {
+  font-size: 11px;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+}
+.letter-summary-content {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+  word-break: break-word;
+}
+.letter-summary-content.accent { color: #7BA876; font-weight: 500; }
+[data-theme="dark"] .letter-summary-content.accent { color: #A7C4A0; }
+.letter-summary-foot {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  border: 1px solid var(--divider);
+  margin-top: 6px;
+}
+[data-theme="dark"] .letter-summary-foot { background: rgba(47, 62, 62, 0.55); border-color: rgba(255,255,255,0.05); }
+.letter-summary-foot-icon { font-size: 14px; padding-top: 2px; }
+.letter-summary-foot p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+/* 下部バー（アクション + 最初からやり直す） */
+.letter-bottombar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, var(--bg) 78%, rgba(0,0,0,0));
+  padding: 14px 14px 12px;
+  z-index: 30;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.letter-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 8px;
+}
+.letter-action-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 12px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: background 0.15s ease;
+}
+[data-theme="dark"] .letter-action-btn { background: rgba(47, 62, 62, 0.7); border-color: rgba(255,255,255,0.06); }
+.letter-action-btn:hover { background: var(--bg-soft); }
+.letter-action-btn.primary {
+  background: #6B8F71;
+  color: #fff;
+  border-color: #6B8F71;
+}
+[data-theme="dark"] .letter-action-btn.primary { background: #6B8F71; color: #fff; }
+.letter-action-btn.primary:hover { background: #5C7E60; }
+.letter-restart {
+  text-align: center;
+  margin-top: 8px;
+}
+.letter-restart button {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+}
+
 /* ============================================================
    気持ち入力フル画面 (v3.6 画像準拠)
    ============================================================ */
@@ -2784,10 +3200,40 @@ function viewMoyamoya() {
     `);
   }
   if (s.step === 4) {
-    if (!s.alternativeViews) {
-      s.alternativeViews = generateAlternativeViews(s.eventText, s.emotion);
-      s.alternativeViewsRevealed = 3;
+    // 初回到達時に AI 生成を発火（既に生成済みなら何もしない）
+    if (!s.alternativeViewsFetched) {
+      s.alternativeViewsFetched = true;
+      s.alternativeViewsLoading = true;
+      const sessionRef = s;
+      generateAlternativeViewsAI(s.eventText, s.emotion, s.emotionScoreBefore).then(views => {
+        if (moyamoya !== sessionRef) return; // 中断/離脱
+        sessionRef.alternativeViews = views || generateAlternativeViewsTemplate(sessionRef.eventText, sessionRef.emotion);
+        sessionRef.alternativeViewsRevealed = 3;
+        sessionRef.alternativeViewsLoading = false;
+        sessionRef.alternativeViewsAIUsed = !!views;
+        render();
+      }).catch(() => {
+        if (moyamoya !== sessionRef) return;
+        sessionRef.alternativeViews = generateAlternativeViewsTemplate(sessionRef.eventText, sessionRef.emotion);
+        sessionRef.alternativeViewsRevealed = 3;
+        sessionRef.alternativeViewsLoading = false;
+        sessionRef.alternativeViewsAIUsed = false;
+        render();
+      });
     }
+
+    if (s.alternativeViewsLoading || !s.alternativeViews) {
+      return moyamoyaScreen(stepLabel, '別の見方を考えています...', `
+        <div class="moya-loading">
+          <div class="moya-loading-spinner"></div>
+          <p class="moya-loading-text">あなたのできごとに合わせて、<br>AIが認知行動療法の観点から考え中です。</p>
+        </div>
+        <div style="margin-top:8px;">
+          <button class="btn-ghost" data-act="moya-cancel" style="width:100%;">キャンセル</button>
+        </div>
+      `);
+    }
+
     const visible = s.alternativeViews.slice(0, s.alternativeViewsRevealed);
     const canMore = s.alternativeViewsRevealed < s.alternativeViews.length;
     const selectedIdx = s.alternativeViewSelectedIndex;
@@ -2835,21 +3281,7 @@ function viewMoyamoya() {
       s.letterTitle = letter.title;
       s.letterBody = letter.body;
     }
-    return `
-      <div class="screen active">
-        <div class="page-header">
-          <button class="page-back" data-act="moya-cancel">‹</button>
-          <span class="page-title">${escapeHtml(s.letterTitle)}</span>
-          <span style="width:36px;"></span>
-        </div>
-        <div class="card-warm" style="padding:24px; line-height:2; font-family:'Noto Serif JP', serif; white-space:pre-wrap;">${escapeHtml(s.letterBody)}</div>
-        <p class="text-tiny text-muted mt-2 text-center">⚠️ AIが推定した参考情報です。</p>
-        <div style="margin-top:24px; display:grid; gap:10px;">
-          <button class="btn btn-primary" data-act="moya-save">レターを保存して終わる</button>
-          <button class="btn-ghost" data-act="moya-cancel">破棄して終わる</button>
-        </div>
-      </div>
-    `;
+    return renderMoyamoyaLetter(s);
   }
   return '';
 }
@@ -2881,8 +3313,8 @@ window.moyaSetScoreAfter = function(v) {
   if (el) el.textContent = v;
 };
 
-// v3.7: 6個の別の見方を返す。3個ずつ表示。
-function generateAlternativeViews(eventText, emotion) {
+// v3.8 テンプレ版（フォールバック用）
+function generateAlternativeViewsTemplate(eventText, emotion) {
   const short = (eventText || '').slice(0, 28) + ((eventText || '').length > 28 ? '…' : '');
   const emo = emotion || 'つらさ';
   return [
@@ -2894,9 +3326,71 @@ function generateAlternativeViews(eventText, emotion) {
     `「もし友達が同じ状況にいたら、何て言ってあげる？」その言葉を、今のあなた自身にも、優しくかけてみてもいいかもしれません。`,
   ];
 }
-// 旧API互換
+
+// v0.7.5 CBT (認知行動療法) ベースのAI別の見方生成
+async function generateAlternativeViewsAI(eventText, emotion, score) {
+  if (!getApiKey()) return null;
+  const sys = `あなたは認知行動療法（CBT）に基づいてサポートする経験豊富なセラピストです。
+22-28歳の若者の相談に対し、認知再構成（cognitive restructuring）の観点から「別の見方」を6つ提示してください。
+
+# CBTの認知の歪み（代表例）
+- 全か無か思考（白黒で決めつける）
+- 過度の一般化（いつも・絶対・どうせ）
+- 心の読みすぎ（相手の気持ちを断定）
+- 運命の先読み（将来を悲観的に決める）
+- すべき思考（〜すべき・〜しなきゃ）
+- 自分への関連付け（全部自分のせい）
+- マイナス思考（良いことを打ち消す）
+- レッテル貼り（自分はダメ・無価値）
+
+# 出力ルール
+- 6つはそれぞれ違う角度の視点（共感・別解釈・時間軸・他者視点・自己への優しさ・小さな事実 など）
+- 否定せず共感ベース。「〜かもしれない」「〜と考えてみてもいいかも」など断定を避ける
+- 各見方は2-3文・80-130字
+- 22-28歳の若者に話しかける温かい口語トーン
+- 必ず JSON 配列のみで出力（説明・コードブロック・前置き不要）
+
+# 出力フォーマット
+["見方1のテキスト","見方2のテキスト","見方3のテキスト","見方4のテキスト","見方5のテキスト","見方6のテキスト"]`;
+
+  const user = `# 相談内容
+- できごと: ${eventText}
+- 主な感情: ${emotion}
+- 強さ: ${score}/10
+
+上記について、別の見方を6つ JSON 配列で出力してください。`;
+
+  try {
+    const text = await callGemini(sys, [{ role: 'user', content: user }], { temperature: 0.95, maxTokens: 1800 });
+    if (!text) return null;
+    const cleaned = text.trim()
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/```\s*$/, '')
+      .trim();
+    // 先頭に余計な文字がある場合は最初の[から]までを抽出
+    const start = cleaned.indexOf('[');
+    const end = cleaned.lastIndexOf(']');
+    if (start < 0 || end < 0 || end <= start) return null;
+    const arr = JSON.parse(cleaned.slice(start, end + 1));
+    if (!Array.isArray(arr)) return null;
+    const views = arr.filter(v => typeof v === 'string' && v.trim().length > 0).map(v => v.trim());
+    if (views.length < 3) return null;
+    // 6個に揃える（不足分はテンプレ補填）
+    const fb = generateAlternativeViewsTemplate(eventText, emotion);
+    while (views.length < 6) views.push(fb[views.length]);
+    return views.slice(0, 6);
+  } catch (e) {
+    console.warn('[CBT-AI] failed', e);
+    return null;
+  }
+}
+
+// 旧API互換（テンプレ）
+function generateAlternativeViews(eventText, emotion) {
+  return generateAlternativeViewsTemplate(eventText, emotion);
+}
 function generateAlternativeView(eventText, emotion) {
-  return generateAlternativeViews(eventText, emotion).join('\n\n');
+  return generateAlternativeViewsTemplate(eventText, emotion).join('\n\n');
 }
 
 function generateLetter(s) {
@@ -2911,10 +3405,277 @@ function generateLetter(s) {
     : diff > 0
     ? '気持ちは少しずつほぐれていきます。今日は書けただけでも一歩。'
     : '今日はまだ重く感じるかもしれない。それでも書いてくれたこと、覚えておこう。';
-  // alternativeView は step4 で alternativeViews から組み立てたものを使う（互換）
+  // alternativeView は step4 で1つ選択された見方
   const altText = s.alternativeView || (Array.isArray(s.alternativeViews) ? s.alternativeViews.slice(0, s.alternativeViewsRevealed || 3).map((v, i) => `${i+1}. ${v}`).join('\n\n') : '');
   const body = `今日起きたこと\n${s.eventText}\n\n感じていたこと\n${s.emotion}（強さ ${s.emotionScoreBefore} / 10）\n\n別の見方\n${altText}\n\n少し楽になるための一言\n${closing}`;
   return { title, body };
+}
+
+// ============================================================
+// レター用ヘルパー（v0.7.5）
+// ============================================================
+const EMOTION_NEEDS_MAP = {
+  '不安':       '安心したい、認められたい気持ちがあるのかもしれません。',
+  '悲しい':     '理解されたい、寄り添ってほしい気持ちがあるのかもしれません。',
+  '怒り':       '尊重されたい、わかってほしい気持ちがあるのかもしれません。',
+  '焦り':       '自分のペースを取り戻したい気持ちがあるのかもしれません。',
+  '恥ずかしい': '受け入れられたい、自分らしくいたい気持ちがあるのかもしれません。',
+  '孤独':       '誰かとつながりたい、わかり合いたい気持ちがあるのかもしれません。',
+  '悔しい':     '認められたい、力を発揮したい気持ちがあるのかもしれません。',
+  '無力感':     '自分にもできると感じたい気持ちがあるのかもしれません。',
+  '罪悪感':     '誰かを傷つけたくない、優しくありたい気持ちがあるのかもしれません。',
+  '嫉妬':       '自分も大切にされたい気持ちがあるのかもしれません。',
+  '疲れ':       '休みたい、何も考えずに過ごしたい気持ちがあるのかもしれません。',
+  '混乱':       '自分の気持ちを整理して理解したい気持ちがあるのかもしれません。',
+  '緊張':       'うまくいってほしい、安心したい気持ちがあるのかもしれません。',
+  '恐れ':       '安全でいたい、守られたい気持ちがあるのかもしれません。',
+  'がっかり':   '期待が叶ってほしかった気持ちがあるのかもしれません。',
+  'ショック':   'もう一度落ち着きたい、状況を受けとめたい気持ちがあるのかもしれません。',
+  '自己嫌悪':   '自分にもう少しやさしくしたい気持ちがあるのかもしれません。',
+  '後悔':       '次はうまくやりたい、自分を許したい気持ちがあるのかもしれません。',
+  '切ない':     '大切にされたい、つながっていたい気持ちがあるのかもしれません。',
+  'うんざり':   '少し距離を置きたい、自分を大切にしたい気持ちがあるのかもしれません。',
+  'ゆううつ':   '心を休めたい、気持ちが軽くなる時間がほしいのかもしれません。',
+  '動揺':       '落ち着きたい、安心できる場所がほしい気持ちがあるのかもしれません。',
+  '諦め':       '本当はまだ大切にしたい何かがあるのかもしれません。',
+  '違和感':     '自分の感覚を信じたい、丁寧に確かめたい気持ちがあるのかもしれません。',
+  'もやもや':   '気持ちを言葉にしたい、整理したい気持ちがあるのかもしれません。',
+  'むなしい':   '何かが欠けている感覚を、誰かに分かってほしいのかもしれません。',
+  '傷ついた':   'やさしくされたい、回復するための時間がほしいのかもしれません。',
+};
+function getEmotionNeed(emotion) {
+  return EMOTION_NEEDS_MAP[emotion] || '今のあなたが何を大切にしたいのか、もう少し丁寧に見つめてみてもいいかもしれません。';
+}
+function getScoreLabel(score) {
+  const n = score == null ? 5 : score;
+  if (n >= 8) return { text: 'つらい', emoji: '😨' };
+  if (n >= 6) return { text: 'しんどい', emoji: '😣' };
+  if (n >= 4) return { text: '重い', emoji: '😟' };
+  if (n >= 2) return { text: '少し感じる', emoji: '😐' };
+  return { text: 'ほぼ感じない', emoji: '😌' };
+}
+function getScoreAfterLabel(before, after) {
+  const b = before == null ? 5 : before;
+  const a = after == null ? b : after;
+  const diff = b - a;
+  if (diff >= 1) return { text: 'すこし楽になった', emoji: '😌' };
+  if (diff === 0) return { text: 'いつも通り', emoji: '😐' };
+  return { text: 'まだ重い', emoji: '😶' };
+}
+function formatLetterDate(d) {
+  const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  return {
+    full: `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`,
+    year: d.getFullYear(),
+    md: `${d.getMonth()+1}/${d.getDate()}`,
+    day: days[d.getDay()] + '.'
+  };
+}
+
+// 角に飾る葉のSVG（簡易）
+function letterLeafSVG() {
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="#9CB880" opacity="0.6">
+      <path d="M5,80 C20,55 35,40 55,30 Q40,55 25,75 Q15,82 5,80Z"/>
+      <ellipse cx="50" cy="32" rx="13" ry="5" transform="rotate(-30 50 32)" fill="#A8C089"/>
+      <ellipse cx="35" cy="52" rx="11" ry="4.5" transform="rotate(-50 35 52)" fill="#9CB880"/>
+      <ellipse cx="22" cy="72" rx="9" ry="4" transform="rotate(-65 22 72)" fill="#8FB374"/>
+    </g>
+    <path d="M55,22 Q35,55 8,82" stroke="#7BA876" stroke-width="1.2" fill="none" opacity="0.55"/>
+  </svg>`;
+}
+
+// もやもや整理レター（v0.7.5 添付画像準拠）
+function renderMoyamoyaLetter(s) {
+  const date = new Date();
+  const dateInfo = formatLetterDate(date);
+  const before = s.emotionScoreBefore == null ? 5 : s.emotionScoreBefore;
+  const after = s.emotionScoreAfter == null ? before : s.emotionScoreAfter;
+  const diff = before - after;
+  const beforeLbl = getScoreLabel(before);
+  const afterLbl = getScoreAfterLabel(before, after);
+  const need = getEmotionNeed(s.emotion);
+  const closing = diff >= 2
+    ? '少しだけ心が軽くなったね。それで十分です。'
+    : diff > 0
+    ? '気持ちは少しずつほぐれていきます。今日は書けただけでも一歩。'
+    : '今日はまだ重く感じるかもしれない。それでも書いてくれたこと、覚えておこう。';
+  const altText = s.alternativeView || '';
+  const eventText = s.eventText || '';
+  const emotion = s.emotion || '';
+
+  const summaryAltShort = altText.length > 60 ? altText.slice(0, 58) + '…' : altText;
+
+  return `
+    <div class="screen active letter-screen">
+      <div class="letter-pageheader">
+        <button class="lph-back" data-act="moya-cancel" aria-label="戻る">‹</button>
+        <div class="lph-center">
+          <div class="lph-title">もやもや整理レター</div>
+          <div class="lph-date">${dateInfo.full}</div>
+        </div>
+        <button class="lph-share" data-act="letter-share" aria-label="共有">↑</button>
+      </div>
+
+      <div class="letter-grid">
+        <!-- 中央: レター本体 -->
+        <div class="letter-card" id="letterCard">
+          <div class="letter-leaf letter-leaf-tl">${letterLeafSVG()}</div>
+          <div class="letter-leaf letter-leaf-tr">${letterLeafSVG()}</div>
+          <div class="letter-leaf letter-leaf-bl">${letterLeafSVG()}</div>
+          <div class="letter-leaf letter-leaf-br">${letterLeafSVG()}</div>
+
+          <div class="letter-postmark">
+            <div class="lp-year">${dateInfo.year}</div>
+            <div class="lp-date">${dateInfo.md}</div>
+            <div class="lp-day">${dateInfo.day}</div>
+          </div>
+
+          <p class="letter-foryou">for you</p>
+          <h1 class="letter-h1">今日のあなたへ</h1>
+          <p class="letter-sub">心を整えるための、やさしい整理レター</p>
+
+          <p class="letter-intro">
+            5つのステップで気持ちを整理してくれて、ありがとう。<br>
+            あなたの気持ちを、ここにそっと形にしてお届けします。
+          </p>
+
+          <!-- スコア変化カード -->
+          <div class="letter-score">
+            <div class="letter-score-title">📈 気持ちの強さの変化</div>
+            <div class="letter-score-row">
+              <div class="letter-score-col">
+                <div class="letter-score-label">整理前</div>
+                <div class="letter-score-sublabel">（はじめに選んだ気持ち）</div>
+                <div class="letter-score-num before">${before}<span class="ls-suffix">/10</span></div>
+                <div class="letter-score-tag before">${beforeLbl.text} ${beforeLbl.emoji}</div>
+              </div>
+              <div class="letter-score-arrow">→</div>
+              <div class="letter-score-col">
+                <div class="letter-score-label">整理後</div>
+                <div class="letter-score-sublabel">（いまの気持ち）</div>
+                <div class="letter-score-num after">${after}<span class="ls-suffix">/10</span></div>
+                <div class="letter-score-tag after">${afterLbl.text} ${afterLbl.emoji}</div>
+              </div>
+            </div>
+            <div class="letter-score-delta">
+              ${diff > 0
+                ? `気持ちの強さが <strong>${diff}</strong> 下がりました ✨`
+                : diff === 0
+                ? `気持ちの強さは <strong>同じ</strong>でした`
+                : `気持ちの強さが <strong>${Math.abs(diff)}</strong> 上がりました`}
+            </div>
+          </div>
+
+          <!-- 整理のポイント -->
+          <h3 class="letter-section-h">🌿 整理のポイント</h3>
+          <div class="letter-points">
+            <div class="letter-point">
+              <span class="letter-point-icon event">🌱</span>
+              <div>
+                <div class="letter-point-title event">今日起きたこと</div>
+                <p>${escapeHtml(eventText)}</p>
+              </div>
+            </div>
+            <div class="letter-point">
+              <span class="letter-point-icon emotion">❤</span>
+              <div>
+                <div class="letter-point-title emotion">主な感情</div>
+                <p>${escapeHtml(emotion)}（強さ：${before} → ${after}）</p>
+                <p class="lp-extra">${escapeHtml(need)}</p>
+              </div>
+            </div>
+            <div class="letter-point">
+              <span class="letter-point-icon view">💡</span>
+              <div>
+                <div class="letter-point-title view">別の見方</div>
+                <p>${escapeHtml(altText).replace(/\n/g, '<br>')}</p>
+              </div>
+            </div>
+            <div class="letter-point">
+              <span class="letter-point-icon message">🌿</span>
+              <div>
+                <div class="letter-point-title message">あなたへのメッセージ</div>
+                <p>感情はあなたを守るために働いているサイン。<br>それを否定する必要はありません。</p>
+                <div class="lp-sub-h">少し楽になるための一言</div>
+                <p>${escapeHtml(closing)}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- まめこからの言葉 -->
+          <div class="letter-mameko">
+            <div class="letter-mameko-img">
+              <img src="assets/mameko/growth/stage1-tane.png" alt="まめこ" onerror="this.style.display='none'">
+            </div>
+            <div class="letter-mameko-content">
+              <div class="letter-mameko-title">今日のあなたに贈る言葉</div>
+              <p>大丈夫、少しずつでいいよ。</p>
+              <p>あなたは、あなたのままで十分がんばってる。</p>
+              <p class="letter-mameko-en">You did well today.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右: あなたの整理サマリー -->
+        <aside class="letter-summary">
+          <div class="letter-summary-h">🌱 あなたの整理サマリー</div>
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">🌱</div>
+            <div>
+              <div class="letter-summary-stepname">1 / 何があった？</div>
+              <div class="letter-summary-content">${escapeHtml(eventText)}</div>
+            </div>
+          </div>
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">❤</div>
+            <div>
+              <div class="letter-summary-stepname">2 / どんな気持ち？</div>
+              <div class="letter-summary-content">${escapeHtml(emotion)}（強さ：${before}/10）</div>
+              <div class="letter-summary-content accent">→ いまは ${after}/10</div>
+            </div>
+          </div>
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">💡</div>
+            <div>
+              <div class="letter-summary-stepname">3 / 強さはどのくらい？</div>
+              <div class="letter-summary-content">整理前の強さ<br>${before} / 10</div>
+            </div>
+          </div>
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">🌱</div>
+            <div>
+              <div class="letter-summary-stepname">4 / 別の見方</div>
+              <div class="letter-summary-content">${escapeHtml(summaryAltShort)}</div>
+            </div>
+          </div>
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">🌱</div>
+            <div>
+              <div class="letter-summary-stepname">5 / いまの強さは？</div>
+              <div class="letter-summary-content">${after} / 10</div>
+            </div>
+          </div>
+          <div class="letter-summary-foot">
+            <div class="letter-summary-foot-icon">✉</div>
+            <p>このレターは、あなたの気持ちを大切にするための記録です。必要なときに、いつでも見返してくださいね。</p>
+          </div>
+        </aside>
+      </div>
+
+      <!-- アクションバー -->
+      <div class="letter-bottombar">
+        <div class="letter-actions">
+          <button class="letter-action-btn" data-act="letter-save-image">📥 画像で保存</button>
+          <button class="letter-action-btn primary" data-act="letter-send">✉ レターを送る</button>
+          <button class="letter-action-btn" data-act="moya-save">📝 メモに残す</button>
+        </div>
+        <div class="letter-restart">
+          <button data-act="letter-restart">最初からやり直す</button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function saveMoyamoyaRecord() {
@@ -4265,6 +5026,31 @@ function handleAction(act, el, ev) {
     moyamoya = null;
     if (r) toast('レターを保存しました');
     go('home');
+    return;
+  }
+  if (act === 'letter-restart') {
+    moyamoya = { step: 1 };
+    render();
+    return;
+  }
+  if (act === 'letter-share' || act === 'letter-send') {
+    const s = moyamoya;
+    if (!s) return;
+    const text = (s.letterBody || '') + '\n\n— Asideでもやもや整理しました';
+    if (navigator.share) {
+      navigator.share({ title: s.letterTitle || 'もやもや整理レター', text }).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(
+        () => toast('レターをコピーしました'),
+        () => toast('共有に失敗しました')
+      );
+    } else {
+      toast('共有がサポートされていません');
+    }
+    return;
+  }
+  if (act === 'letter-save-image') {
+    toast('画像保存は近日公開予定です');
     return;
   }
 
