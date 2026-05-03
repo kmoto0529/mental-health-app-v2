@@ -3567,6 +3567,7 @@ function render() {
     case 'kiroku-distortions':  html = viewKirokuDistortions(); break;
     case 'kiroku-trend':        html = viewKirokuTrend(); break;
     case 'kiroku-radar':        html = viewKirokuRadar(); break;
+    case 'kiroku-ai-analysis':  html = viewKirokuAiAnalysis(); break;
     default:                html = viewHome();
   }
   document.getElementById('main').innerHTML = html;
@@ -6789,10 +6790,106 @@ function viewKirokuDistortions() {
           </div>
         ` : ''}
 
+        <button class="dd-entry-card" data-act="open-ai-analysis" style="margin-top:14px;">
+          <span class="dd-entry-icon">🤖</span>
+          <div>
+            <div class="dd-entry-title">AIで詳しく分析する <span style="font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(220,180,100,0.18); color:#B07F2F; margin-left:4px;">近日公開</span></div>
+            <div class="dd-entry-desc">Geminiでクセの組み合わせ・きっかけ・改善のヒントを深掘り</div>
+          </div>
+        </button>
+
         <div style="display:grid; gap: 10px; margin-top: 18px;">
           <button class="btn btn-primary" data-act="open-trend">グラフで詳しく見る</button>
           <button class="btn btn-secondary" data-act="open-radar">バランスを確認する</button>
           <button class="btn-ghost" data-act="back-record">きろくに戻る</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// AI分析プレビュー画面（v0.9.4 UI shell - 実装は後日タスク）
+// ============================================================
+function viewKirokuAiAnalysis() {
+  const records = state.moyamoyaRecords || [];
+  const top = analyzeDistortions(records, 28).slice(0, 3);
+  return `
+    <div class="screen active" style="padding-bottom:40px;">
+      <div class="kr-det-page-h">
+        <button class="kr-det-back" data-act="open-distortions">‹</button>
+        <span style="font-size:14px; font-weight:500;">AIで詳しく分析</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div style="padding: 0 16px;">
+        <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 14px;">
+          <div>${suplan({ stage: 'futaba', expression: 'calm', size: 56 })}</div>
+          <div style="flex:1;">
+            <h2 style="margin: 0 0 4px; font-size: 18px; font-family:'Noto Serif JP', serif;">AIによる詳しい分析</h2>
+            <div class="text-tiny text-muted">記録を Gemini が読み解いて、より深い気づきをお届けします</div>
+          </div>
+        </div>
+
+        <div style="background: rgba(220,180,100,0.1); border: 1px solid rgba(220,180,100,0.3); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+          <div style="font-size: 12px; font-weight: 600; color: #B07F2F; margin-bottom: 4px;">⚙ この機能は準備中です</div>
+          <div style="font-size: 12px; line-height: 1.7; color: var(--text);">
+            記録が10件以上溜まった段階で先行公開予定です。<br>
+            現在は下記レイアウトのプレビューのみご覧いただけます。
+          </div>
+        </div>
+
+        <div class="text-tiny text-muted" style="margin: 14px 0 6px;">現在の分析（ルールベース・参考）</div>
+        ${top.length === 0 ? `
+          <div class="card" style="padding:18px; text-align:center; color:var(--text-soft); font-size:12px;">
+            記録が蓄積されると、ここに現状の分析が表示されます
+          </div>
+        ` : top.map((d, i) => `
+          <div class="kr-distort-card" style="opacity:0.7;">
+            <div class="kr-distort-rank">${i + 1}</div>
+            <div>
+              <div class="kr-distort-name" style="font-size:13px;">${escapeHtml(d.name)}</div>
+              <div class="kr-distort-desc" style="font-size:11px;">${escapeHtml(d.desc)}</div>
+            </div>
+            <span class="kr-distort-badge ${d.level.tone}">${d.level.label}</span>
+          </div>
+        `).join('')}
+
+        <div class="text-tiny text-muted" style="margin: 18px 0 6px;">AIで分析するとこんなことがわかります</div>
+
+        <div class="kr-det-card" style="padding:14px;">
+          <div class="kr-det-section">
+            <div class="kr-det-section-h fact">🔗 クセ同士のつながり</div>
+            <p style="font-size:12px;">過度な一般化と自己否定が同時に現れやすい場面の特定。1つのクセがもう1つを引き起こしているパターンの検出。</p>
+            <p class="text-tiny text-muted" style="margin-top:4px;">例：「うまくいかなかった→いつもこう→自分はダメ」の連鎖を検出</p>
+          </div>
+          <div class="kr-det-section">
+            <div class="kr-det-section-h interp">⚡ きっかけのパターン</div>
+            <p style="font-size:12px;">どんな状況・人間関係・時間帯にクセが出やすいか、文脈ごとに整理。</p>
+            <p class="text-tiny text-muted" style="margin-top:4px;">例：「仕事のプレッシャー時に過度な一般化が増える」</p>
+          </div>
+          <div class="kr-det-section">
+            <div class="kr-det-section-h emotion">💡 あなた専用の改善のヒント</div>
+            <p style="font-size:12px;">テンプレ的なアドバイスではなく、あなたの実際の言葉や場面に即した書き換え練習を提案。</p>
+            <p class="text-tiny text-muted" style="margin-top:4px;">例：あなたの「絶対」の使い方に合わせた具体的な書き換え例</p>
+          </div>
+          <div class="kr-det-section">
+            <div class="kr-det-section-h action">📊 推移の質的な解釈</div>
+            <p style="font-size:12px;">数字の上がり下がりだけでなく、何が変わったから減ったのか、何がきっかけで強まったかをやさしく言語化。</p>
+            <p class="text-tiny text-muted" style="margin-top:4px;">例：「5月中旬から仕事の話題が減り、自己否定の出現も減っている」</p>
+          </div>
+        </div>
+
+        <div class="ippo-do-card" style="margin-top: 18px;">
+          <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
+          <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">
+            あなたの記録が増えるほど、AI も精度を上げていきます。<br>
+            まずは小さな一歩から、いっしょに続けていこうね。
+          </p>
+        </div>
+
+        <div style="display:grid; gap: 10px; margin-top: 18px;">
+          <button class="btn btn-secondary" disabled style="opacity:0.6; cursor: not-allowed;">分析を実行する（近日公開）</button>
+          <button class="btn-ghost" data-act="open-distortions">‹ クセ分析に戻る</button>
         </div>
       </div>
     </div>
@@ -7575,6 +7672,7 @@ function handleAction(act, el, ev) {
   if (act === 'open-distortions') { go('kiroku-distortions'); return; }
   if (act === 'open-trend') { go('kiroku-trend'); return; }
   if (act === 'open-radar') { go('kiroku-radar'); return; }
+  if (act === 'open-ai-analysis') { go('kiroku-ai-analysis'); return; }
   if (act === 'open-action') { go('action'); return; }
   if (act === 'record-filter') {
     state.ui.recordFilter = el.dataset.filter;
