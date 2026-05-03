@@ -945,6 +945,24 @@
   font-family: inherit;
 }
 
+/* AIプロンプト管理モーダル */
+.ai-prompt-pre {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 4px 0 0;
+  max-height: 280px;
+  overflow-y: auto;
+  color: var(--text);
+  font-family: ui-monospace, 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+}
+[data-theme="dark"] .ai-prompt-pre { background: rgba(20, 30, 30, 0.6); border-color: rgba(255,255,255,0.06); }
+
 /* ============================================================
    気持ち入力フル画面 (v3.6 画像準拠)
    ============================================================ */
@@ -3109,7 +3127,10 @@ async function moodChatSend() {
     const cats = (log?.categories || []).map(id => CATEGORIES.find(c => c.id === id)?.name).filter(Boolean).join('・');
     const ctx = `ユーザーが記録した気持ち: ${moodLabel}${cats ? '、テーマ: ' + cats : ''}${log?.comment ? '、ひとこと: ' + log.comment : ''}`;
     const history = moodChatSession.messages.filter(m => !m.typing);
-    aiText = await callGemini(MOOD_AI_SYSTEM + '\n\n' + ctx, history);
+    aiText = await callGemini(AI_PROMPTS.mood_chat.systemPrompt + '\n\n' + ctx, history, {
+      temperature: AI_PROMPTS.mood_chat.temperature,
+      maxTokens: AI_PROMPTS.mood_chat.maxTokens,
+    });
   }
   if (!aiText) {
     aiText = generateMoodAIReply(log, text, moodChatSession.messages.filter(m => !m.typing));
@@ -3328,40 +3349,18 @@ function generateAlternativeViewsTemplate(eventText, emotion) {
 }
 
 // v0.7.5 CBT (認知行動療法) ベースのAI別の見方生成
+// プロンプトは AI_PROMPTS.cbt_alternative_views を参照
 async function generateAlternativeViewsAI(eventText, emotion, score) {
   if (!getApiKey()) return null;
-  const sys = `あなたは認知行動療法（CBT）に基づいてサポートする経験豊富なセラピストです。
-22-28歳の若者の相談に対し、認知再構成（cognitive restructuring）の観点から「別の見方」を6つ提示してください。
-
-# CBTの認知の歪み（代表例）
-- 全か無か思考（白黒で決めつける）
-- 過度の一般化（いつも・絶対・どうせ）
-- 心の読みすぎ（相手の気持ちを断定）
-- 運命の先読み（将来を悲観的に決める）
-- すべき思考（〜すべき・〜しなきゃ）
-- 自分への関連付け（全部自分のせい）
-- マイナス思考（良いことを打ち消す）
-- レッテル貼り（自分はダメ・無価値）
-
-# 出力ルール
-- 6つはそれぞれ違う角度の視点（共感・別解釈・時間軸・他者視点・自己への優しさ・小さな事実 など）
-- 否定せず共感ベース。「〜かもしれない」「〜と考えてみてもいいかも」など断定を避ける
-- 各見方は2-3文・80-130字
-- 22-28歳の若者に話しかける温かい口語トーン
-- 必ず JSON 配列のみで出力（説明・コードブロック・前置き不要）
-
-# 出力フォーマット
-["見方1のテキスト","見方2のテキスト","見方3のテキスト","見方4のテキスト","見方5のテキスト","見方6のテキスト"]`;
-
-  const user = `# 相談内容
-- できごと: ${eventText}
-- 主な感情: ${emotion}
-- 強さ: ${score}/10
-
-上記について、別の見方を6つ JSON 配列で出力してください。`;
+  const def = AI_PROMPTS.cbt_alternative_views;
+  const sys = def.systemPrompt;
+  const user = def.userTemplate
+    .replace('{eventText}', eventText || '')
+    .replace('{emotion}', emotion || '')
+    .replace('{score}', score == null ? 5 : score);
 
   try {
-    const text = await callGemini(sys, [{ role: 'user', content: user }], { temperature: 0.95, maxTokens: 1800 });
+    const text = await callGemini(sys, [{ role: 'user', content: user }], { temperature: def.temperature, maxTokens: def.maxTokens });
     if (!text) return null;
     const cleaned = text.trim()
       .replace(/^```(?:json)?\s*/i, '')
@@ -3606,7 +3605,7 @@ function renderMoyamoyaLetter(s) {
           <!-- まめこからの言葉 -->
           <div class="letter-mameko">
             <div class="letter-mameko-img">
-              <img src="assets/mameko/growth/stage1-tane.png" alt="まめこ" onerror="this.style.display='none'">
+              ${mameko({ stage: 'tane', expression: 'calm', size: 56 })}
             </div>
             <div class="letter-mameko-content">
               <div class="letter-mameko-title">今日のあなたに贈る言葉</div>
@@ -4178,7 +4177,8 @@ function mameko(opts = {}) {
   const seasonal = opts.seasonal || null;
   const size = opts.size || 96;
   const stageIdx = MAMEKO_STAGES.indexOf(stage) + 1;
-  const imgTag = (cat, name) => `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none; object-fit: contain;">`;
+  // PNG ロード失敗時に SVG フォールバックへ自動切替（onerror）
+  const imgTag = (cat, name) => `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none; object-fit: contain;" onerror="window.mamekoImgFail && window.mamekoImgFail(this, '${cat}', '${name}', ${size})">`;
 
   // 候補PNGを優先順に並べる
   const candidates = [];
@@ -4197,6 +4197,19 @@ function mameko(opts = {}) {
   // PNG が一切無い場合のみ SVG プレースホルダー
   return mamekoSvg({ stage, expression, pose, size });
 }
+
+// PNG ロード失敗時に SVG へ確実に置換するためのグローバル関数
+// （SW のフォールバックや一時的な fetch 失敗で IMG が壊れるのを防ぐ）
+window.mamekoImgFail = function(imgEl, cat, name, size) {
+  if (!imgEl || !imgEl.parentNode) return;
+  // キャッシュも false に戻して再 probe させない
+  _mamekoAssetCache[`${cat}/${name}`] = false;
+  try {
+    imgEl.outerHTML = mamekoSvg({ size: size || 96 });
+  } catch (_) {
+    imgEl.style.display = 'none';
+  }
+};
 
 // SVGプレースホルダー生成器（合成）
 function mamekoSvg(opts = {}) {
@@ -4436,14 +4449,98 @@ async function callGemini(systemPrompt, messages, options = {}) {
   }
 }
 
-const MOOD_AI_SYSTEM = `あなたは「ナナメの関係」のAI伴走者。22-28歳のメンタルヘルスサポートアプリ「Aside」。
+// ============================================================
+// AI プロンプト レジストリ（v0.7.6）
+//
+// 全システムプロンプトをここに集約。
+// 設定 → AIプロンプト管理 から閲覧でき、心理士レビュー時にも参照可能。
+// プロンプトを修正する際は lastUpdated と changeNote も合わせて更新する。
+// ============================================================
+const AI_PROMPTS = {
+  mood_chat: {
+    id: 'mood_chat',
+    title: '気分チャット（AIと話す）',
+    purpose: '気分を記録した直後の単発AI対話。気持ちを受けとめて寄り添う伴走者として応答する。',
+    triggerLocation: 'ホーム → 気分入力 → 「保存してAIと話す」',
+    callSite: 'moodChatSend() → callGemini(AI_PROMPTS.mood_chat.systemPrompt + ctx, history)',
+    model: 'gemini-2.5-flash',
+    temperature: 0.8,
+    maxTokens: 512,
+    outputFormat: '自然文（2-3文・80字目安）',
+    fallbackBehavior: 'API未設定 / 失敗時はパターン応答（generateMoodAIReply）',
+    safetyChecks: [
+      'detectCrisis でクライシスワード検知（severity 4 以上は専門窓口モーダル）',
+      'API失敗時はテンプレ応答にフォールバック',
+    ],
+    systemPrompt: `あなたは「ナナメの関係」のAI伴走者。22-28歳のメンタルヘルスサポートアプリ「Aside」。
 原則:
 - まず受け止める。決めつけない。診断しない。
 - 1ターンは2-3文・80字目安。
 - 「~してください」より「~してみてもいいかも」など柔らかく。
 - 必要なら別の見方を提示。最後は小さな行動につなげる。
 - 「死にたい」「消えたい」など重大ワードが出たら、専門窓口（よりそいホットライン 0120-279-338 / いのちの電話 0570-064-556）を紹介。
-- 医療行為や診断はしない。`;
+- 医療行為や診断はしない。`,
+    contextTemplate: `ユーザーが記録した気持ち: {moodLabel}{categoryHint}{commentHint}
+（moodLabel: つらい/少しつらい/ふつう/少しよい/とてもよい のいずれか）`,
+    lastUpdated: '2026-04-30',
+    changeNote: 'v0.5.0 で「ナナメの関係」「医療行為しない」原則を明記',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  cbt_alternative_views: {
+    id: 'cbt_alternative_views',
+    title: 'もやもや整理 - 別の見方（CBT）',
+    purpose: '相談者のできごとと感情から、認知行動療法（CBT）の認知再構成の観点で6つの別の見方を生成する。',
+    triggerLocation: 'ホーム → もやもや整理 → Step 4（強さ入力後の自動遷移）',
+    callSite: 'generateAlternativeViewsAI() → callGemini(AI_PROMPTS.cbt_alternative_views.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.95,
+    maxTokens: 1800,
+    outputFormat: 'JSON 配列（6つの文字列。各 80-130 字）',
+    fallbackBehavior: 'API未設定 / 失敗 / JSONパース失敗時はテンプレ6個（generateAlternativeViewsTemplate）',
+    safetyChecks: [
+      'detectCrisis（Step 1 で検知済み）',
+      'JSON 抽出 / パース失敗時は静かにテンプレへフォールバック',
+      '生成失敗時もユーザーには loading 解除後にテンプレで表示',
+    ],
+    systemPrompt: `あなたは認知行動療法（CBT）に基づいてサポートする経験豊富なセラピストです。
+22-28歳の若者の相談に対し、認知再構成（cognitive restructuring）の観点から「別の見方」を6つ提示してください。
+
+# CBTの認知の歪み（代表例）
+- 全か無か思考（白黒で決めつける）
+- 過度の一般化（いつも・絶対・どうせ）
+- 心の読みすぎ（相手の気持ちを断定）
+- 運命の先読み（将来を悲観的に決める）
+- すべき思考（〜すべき・〜しなきゃ）
+- 自分への関連付け（全部自分のせい）
+- マイナス思考（良いことを打ち消す）
+- レッテル貼り（自分はダメ・無価値）
+
+# 出力ルール
+- 6つはそれぞれ違う角度の視点（共感・別解釈・時間軸・他者視点・自己への優しさ・小さな事実 など）
+- 否定せず共感ベース。「〜かもしれない」「〜と考えてみてもいいかも」など断定を避ける
+- 各見方は2-3文・80-130字
+- 22-28歳の若者に話しかける温かい口語トーン
+- 必ず JSON 配列のみで出力（説明・コードブロック・前置き不要）
+
+# 出力フォーマット
+["見方1のテキスト","見方2のテキスト","見方3のテキスト","見方4のテキスト","見方5のテキスト","見方6のテキスト"]`,
+    userTemplate: `# 相談内容
+- できごと: {eventText}
+- 主な感情: {emotion}
+- 強さ: {score}/10
+
+上記について、別の見方を6つ JSON 配列で出力してください。`,
+    lastUpdated: '2026-05-02',
+    changeNote: 'v0.7.5 で初版（CBT 8種の認知の歪みを踏まえて生成）',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+};
+
+// 旧API互換: 既存の参照を残すための alias
+const MOOD_AI_SYSTEM = AI_PROMPTS.mood_chat.systemPrompt;
 
 // ============================================================
 // チャット共通
@@ -4846,6 +4943,17 @@ function viewSettingsModal() {
 
       <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
 
+      <div>
+        <div class="text-tiny text-muted">AIプロンプト管理</div>
+        <p class="text-tiny text-muted" style="margin-top:4px; line-height:1.5;">
+          アプリで使われている全AIプロンプトを閲覧できます。<br>
+          心理士レビュー用にコピー可能。
+        </p>
+        <button class="btn btn-secondary" data-act="open-ai-prompts" style="margin-top:8px; font-size:13px; padding:8px 12px;">プロンプト一覧を見る</button>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
+
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
@@ -4855,6 +4963,150 @@ function viewSettingsModal() {
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
     </div>
   `;
+}
+
+// ============================================================
+// AIプロンプト管理モーダル（v0.7.6）
+//   - AI_PROMPTS の全エントリを読みやすい形で表示
+//   - 心理士レビュー用にコピーボタンを提供
+// ============================================================
+function viewAIPromptsModal(expandedId) {
+  const ids = Object.keys(AI_PROMPTS);
+  const cards = ids.map(id => {
+    const p = AI_PROMPTS[id];
+    const isOpen = expandedId === id;
+    const review = p.psychologistReviewStatus || 'レビュー待ち';
+    const reviewColor = /完了|済/.test(review) ? '#7BA876' : 'var(--text-muted)';
+    return `
+      <div class="ai-prompt-card" style="background: var(--bg-soft); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:14px;">${escapeHtml(p.title)}</div>
+            <div class="text-tiny text-muted" style="margin-top:3px;">${escapeHtml(p.triggerLocation)}</div>
+          </div>
+          <div class="text-tiny" style="color:${reviewColor}; flex-shrink:0;">${escapeHtml(review)}</div>
+        </div>
+        <div class="text-tiny" style="color:var(--text-soft); margin-top:8px; line-height:1.6;">${escapeHtml(p.purpose)}</div>
+        <div style="display:flex; gap:8px; margin-top:10px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" data-act="${isOpen ? 'ai-prompt-collapse' : 'ai-prompt-expand'}" data-prompt-id="${id}" style="font-size:12px; padding:6px 12px;">${isOpen ? '閉じる' : '詳細を見る'}</button>
+          <button class="btn-ghost" data-act="ai-prompt-copy" data-prompt-id="${id}" style="font-size:12px; padding:6px 12px;">📋 コピー（心理士共有用）</button>
+        </div>
+        ${isOpen ? `
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--divider); display:grid; gap:10px;">
+            <div>
+              <div class="text-tiny text-muted">モデル / 温度 / 最大トークン</div>
+              <div class="text-small" style="margin-top:2px;">${escapeHtml(p.model)} / ${p.temperature} / ${p.maxTokens}</div>
+            </div>
+            <div>
+              <div class="text-tiny text-muted">出力フォーマット</div>
+              <div class="text-small" style="margin-top:2px;">${escapeHtml(p.outputFormat)}</div>
+            </div>
+            <div>
+              <div class="text-tiny text-muted">フォールバック挙動</div>
+              <div class="text-small" style="margin-top:2px; line-height:1.6;">${escapeHtml(p.fallbackBehavior)}</div>
+            </div>
+            <div>
+              <div class="text-tiny text-muted">セーフティチェック</div>
+              <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; line-height:1.7;">
+                ${(p.safetyChecks || []).map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+              </ul>
+            </div>
+            <div>
+              <div class="text-tiny text-muted">システムプロンプト</div>
+              <pre class="ai-prompt-pre">${escapeHtml(p.systemPrompt)}</pre>
+            </div>
+            ${p.contextTemplate ? `
+              <div>
+                <div class="text-tiny text-muted">コンテキストテンプレート（実行時に動的挿入）</div>
+                <pre class="ai-prompt-pre">${escapeHtml(p.contextTemplate)}</pre>
+              </div>
+            ` : ''}
+            ${p.userTemplate ? `
+              <div>
+                <div class="text-tiny text-muted">ユーザーメッセージテンプレート</div>
+                <pre class="ai-prompt-pre">${escapeHtml(p.userTemplate)}</pre>
+              </div>
+            ` : ''}
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div>
+                <div class="text-tiny text-muted">最終更新</div>
+                <div class="text-small" style="margin-top:2px;">${escapeHtml(p.lastUpdated)}</div>
+              </div>
+              <div>
+                <div class="text-tiny text-muted">変更履歴ノート</div>
+                <div class="text-small" style="margin-top:2px;">${escapeHtml(p.changeNote || '-')}</div>
+              </div>
+            </div>
+            ${p.psychologistReviewNote ? `
+              <div>
+                <div class="text-tiny text-muted">心理士レビューノート</div>
+                <div class="text-small" style="margin-top:2px; padding:8px 12px; background:var(--bg-card); border-radius:8px;">${escapeHtml(p.psychologistReviewNote)}</div>
+              </div>
+            ` : ''}
+            <div>
+              <div class="text-tiny text-muted">呼び出し箇所（コード）</div>
+              <pre class="ai-prompt-pre" style="font-family: monospace; font-size:11px;">${escapeHtml(p.callSite)}</pre>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <h2 class="modal-title">AIプロンプト管理</h2>
+    <p class="text-tiny text-muted" style="margin-bottom:12px; line-height:1.6;">
+      アプリ内でAIに渡している全プロンプトです。<br>
+      心理士レビューのために「コピー」を使うと整形済みテキストがクリップボードに入ります。
+    </p>
+    <div style="max-height:65vh; overflow-y:auto; padding-right:4px;">
+      ${cards}
+    </div>
+    <div style="margin-top:16px; display:grid; gap:8px;">
+      <button class="btn btn-secondary" data-act="ai-prompt-copy-all">📋 全プロンプトをまとめてコピー</button>
+      <button class="btn-ghost" data-act="open-settings">‹ 設定に戻る</button>
+    </div>
+  `;
+}
+
+function aiPromptToCopyText(p) {
+  const lines = [
+    `# ${p.title}`,
+    `(ID: ${p.id})`,
+    '',
+    `## 目的`,
+    p.purpose,
+    '',
+    `## トリガー箇所`,
+    p.triggerLocation,
+    '',
+    `## モデル設定`,
+    `- model: ${p.model}`,
+    `- temperature: ${p.temperature}`,
+    `- maxTokens: ${p.maxTokens}`,
+    `- 出力フォーマット: ${p.outputFormat}`,
+    '',
+    `## フォールバック挙動`,
+    p.fallbackBehavior,
+    '',
+    `## セーフティチェック`,
+    ...(p.safetyChecks || []).map(s => `- ${s}`),
+    '',
+    `## システムプロンプト`,
+    '```',
+    p.systemPrompt,
+    '```',
+  ];
+  if (p.contextTemplate) {
+    lines.push('', '## コンテキストテンプレート（動的挿入）', '```', p.contextTemplate, '```');
+  }
+  if (p.userTemplate) {
+    lines.push('', '## ユーザーメッセージテンプレート', '```', p.userTemplate, '```');
+  }
+  lines.push('', `## 最終更新 / 変更履歴`, `${p.lastUpdated} — ${p.changeNote || '-'}`);
+  lines.push('', `## 心理士レビュー状態`, `- 状態: ${p.psychologistReviewStatus || '未設定'}`);
+  if (p.psychologistReviewNote) lines.push(`- ノート: ${p.psychologistReviewNote}`);
+  return lines.join('\n');
 }
 
 // ============================================================
@@ -5110,6 +5362,41 @@ function handleAction(act, el, ev) {
 
   // 設定
   if (act === 'open-settings') { modal(viewSettingsModal()); return; }
+  if (act === 'open-ai-prompts') { modal(viewAIPromptsModal()); return; }
+  if (act === 'ai-prompt-expand') {
+    modal(viewAIPromptsModal(el.dataset.promptId));
+    return;
+  }
+  if (act === 'ai-prompt-collapse') {
+    modal(viewAIPromptsModal());
+    return;
+  }
+  if (act === 'ai-prompt-copy') {
+    const p = AI_PROMPTS[el.dataset.promptId];
+    if (!p) return;
+    const text = aiPromptToCopyText(p);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(
+        () => toast(`「${p.title}」をコピーしました`),
+        () => toast('コピーに失敗しました')
+      );
+    } else {
+      toast('クリップボードAPIが使えません');
+    }
+    return;
+  }
+  if (act === 'ai-prompt-copy-all') {
+    const all = Object.keys(AI_PROMPTS).map(id => aiPromptToCopyText(AI_PROMPTS[id])).join('\n\n---\n\n');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(all).then(
+        () => toast('全プロンプトをコピーしました'),
+        () => toast('コピーに失敗しました')
+      );
+    } else {
+      toast('クリップボードAPIが使えません');
+    }
+    return;
+  }
   if (act === 'api-key-save') {
     const v = (document.getElementById('apiKeyInput')||{}).value || '';
     const trimmed = v.trim();
