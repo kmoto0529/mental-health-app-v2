@@ -1111,6 +1111,155 @@
   text-align: center; padding: 28px 16px 16px;
 }
 
+/* ============================================================
+   深掘りループ（v0.9.1 下向き矢印法）
+   ============================================================ */
+.dd-screen { padding: 18px 16px 100px; }
+.dd-h1 { font-size: 22px; font-weight: 600; margin: 0 0 6px; font-family: 'Noto Serif JP', serif; }
+.dd-step { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+.dd-q { font-size: 16px; font-weight: 500; margin: 4px 0 8px; color: var(--text); }
+.dd-q-sub { font-size: 12px; color: var(--text-soft); margin-bottom: 12px; line-height: 1.6; }
+.dd-prev {
+  background: var(--bg-soft);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 12px;
+  border-left: 3px solid #7BA876;
+  line-height: 1.7;
+}
+[data-theme="dark"] .dd-prev { background: rgba(47, 62, 62, 0.45); border-left-color: #A7C4A0; }
+.dd-prev-label { color: var(--text-muted); font-size: 11px; margin-bottom: 2px; }
+
+/* テーマ選択カード */
+.dd-theme-grid { display: grid; gap: 10px; margin-bottom: 16px; }
+.dd-theme-card {
+  background: var(--bg-card);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit; color: var(--text);
+  transition: all 0.15s ease;
+  display: flex; align-items: center; gap: 10px;
+}
+[data-theme="dark"] .dd-theme-card { background: rgba(47, 62, 62, 0.55); }
+.dd-theme-card.selected { border-color: #7BA876; box-shadow: 0 0 0 2px rgba(123,168,118,0.18); }
+.dd-theme-icon { font-size: 22px; width: 28px; }
+.dd-theme-name { font-weight: 600; font-size: 14px; }
+
+/* 確信度ラベル */
+.dd-confidence-row {
+  display: flex; align-items: center; gap: 8px;
+  margin: 8px 0 4px;
+  font-size: 12px; color: var(--text-soft);
+}
+
+/* 深掘り成果カード */
+.dd-outcome-belief {
+  background: #FFFCF5;
+  color: #3F3526;
+  border-radius: 14px;
+  padding: 16px 18px;
+  font-family: 'Noto Serif JP', serif;
+  border: 1px solid rgba(180, 160, 110, 0.25);
+  line-height: 1.85;
+  margin-bottom: 16px;
+}
+[data-theme="dark"] .dd-outcome-belief { background: rgba(80, 70, 50, 0.4); color: #EAEAEA; border-color: rgba(180,160,110,0.18); }
+.dd-outcome-belief-label { font-size: 11px; color: rgba(63,53,38,0.6); margin-bottom: 4px; }
+[data-theme="dark"] .dd-outcome-belief-label { color: var(--text-muted); }
+
+.dd-tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
+.dd-tag {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(123, 168, 118, 0.15);
+  color: #5C7E60;
+  font-size: 12px;
+  font-weight: 600;
+}
+[data-theme="dark"] .dd-tag { background: rgba(167,196,160,0.18); color: #A7C4A0; }
+
+.dd-reflection {
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+[data-theme="dark"] .dd-reflection { background: rgba(47, 62, 62, 0.45); }
+
+/* 精度向上の見える化（仕様書 §7） */
+.acc-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 18px;
+  margin: 12px 0;
+}
+[data-theme="dark"] .acc-card { background: rgba(47, 62, 62, 0.55); }
+.acc-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.acc-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+.acc-chart {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 6px; height: 100px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--divider);
+}
+.acc-bar-col {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 4px; height: 100%;
+  justify-content: flex-end;
+}
+.acc-bar {
+  width: 100%; max-width: 28px;
+  background: linear-gradient(to top, #6B8F71, #A8D5A8);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.4s ease;
+}
+.acc-bar-pct { font-size: 10px; color: var(--text-soft); font-weight: 600; }
+.acc-x-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--text-muted);
+  padding: 6px 4px 0;
+}
+.acc-insight-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.acc-insight-item {
+  font-size: 12px;
+  color: var(--text-soft);
+  display: flex; gap: 8px; align-items: flex-start;
+  line-height: 1.7;
+}
+.acc-insight-check { color: #7BA876; font-weight: 700; }
+[data-theme="dark"] .acc-insight-check { color: #A7C4A0; }
+
+/* 深掘りカード（きろく入口） */
+.dd-entry-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 12px 0;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  width: 100%; text-align: left;
+  font: inherit; color: var(--text);
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .dd-entry-card { background: rgba(47, 62, 62, 0.55); }
+.dd-entry-card:hover { border-color: rgba(123,168,118,0.35); }
+.dd-entry-icon { font-size: 22px; }
+.dd-entry-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.dd-entry-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
 /* AIプロンプト管理モーダル */
 .ai-prompt-pre {
   background: var(--bg-card);
@@ -2833,6 +2982,10 @@ const defaultState = () => ({
   // === きょうのいっぽ（v0.9.0 仕様書 §6 データモデル準拠 簡易版） ===
   ippoSessions: [],      // {id, moodLabel, moodIntensity, actionId, score, beforeIntensity, afterIntensity, changeValue, completedAt}
 
+  // === 深掘りループ（v0.9.1 仕様書 §5 §6） ===
+  deepDiveSessions: [],  // {id, themeType, event, firstThought, deeper:[depth1,depth2,depth3], coreBelief, beliefSince, confidence, extractedBelief, tags[], gentleReflection, startedAt, completedAt}
+  coreBeliefTags: [],    // {id, tagCode, confidence(0-1), updatedAt} — 抽出タグの集計
+
   // === UI状態（永続化される一時状態） ===
   ui: {
     currentTab: 'home',         // 'home' | 'action' | 'record'
@@ -3034,6 +3187,7 @@ function render() {
     case 'mood-full':       html = viewMoodFull(); break;
     case 'mood-chat':       html = viewMoodChat(); break;
     case 'moyamoya':        html = viewMoyamoya(); break;
+    case 'deepdive':        html = viewDeepDive(); break;
     case 'action':          html = viewAction(); break;
     case 'goal-chat':       html = viewGoalChat(); break;
     case 'policy-select':   html = viewPolicySelect(); break;
@@ -4287,8 +4441,29 @@ function viewIppoStep6(s) {
         <button class="btn btn-primary" data-act="ippo-save">保存してホームに戻る</button>
         <button class="btn-ghost" data-act="ippo-back" data-to="5">‹ 戻る</button>
       </div>
+      ${shouldSuggestDeepDive() ? `
+        <button class="dd-entry-card" style="margin-top:18px;" data-act="ippo-save-then-dd">
+          <span class="dd-entry-icon">🔎</span>
+          <div>
+            <div class="dd-entry-title">もし時間があれば、深く知ってみる？</div>
+            <div class="dd-entry-desc">同じ気分が続いているようです。根っこにある考えを探ってみるのも一案です</div>
+          </div>
+        </button>
+      ` : ''}
     </div>
   `;
+}
+
+// 深掘りの発動条件（仕様書 §5 発動のきっかけ）
+function shouldSuggestDeepDive() {
+  const sessions = (state.ippoSessions || []).slice(-3);
+  if (sessions.length < 2) return false;
+  // 同じ気分が2日以上続く OR 強さ7以上が2日以上
+  const sameMood = sessions.filter(s => s.moodLabel === sessions[sessions.length - 1].moodLabel).length >= 2;
+  const highIntensity = sessions.filter(s => (s.moodIntensity || 0) >= 7).length >= 2;
+  // 変化値が小さい
+  const lowChange = sessions.filter(s => (s.changeValue || 0) < 1).length >= 2;
+  return sameMood || highIntensity || lowChange;
 }
 
 // 完了済みの日（再来時の表示）
@@ -4315,6 +4490,366 @@ function viewIppoTodayDone(session) {
 }
 
 // 旧UI（goal/policy/action）— 当面は viewAction から呼ばれないが互換のため残す
+// ============================================================
+// 深掘りループ（v0.9.1 仕様書 §5 下向き矢印法）
+// ============================================================
+let deepDive = null;  // 進行中のセッション
+
+const DD_THEMES = [
+  { id: 'moyamoya',  icon: '🌫️', name: 'モヤモヤ・悩み' },
+  { id: 'recurring', icon: '🔁', name: '繰り返す思考' },
+  { id: 'relations', icon: '👥', name: '人間関係' },
+  { id: 'self',      icon: '🌱', name: '自分のこと（自己嫌悪）' },
+  { id: 'free',      icon: '✏️', name: '自由入力で始める' },
+];
+
+const DD_BELIEF_TAGS = [
+  '自己否定が強い',
+  '評価に敏感',
+  '失敗を恐れやすい',
+  '見捨てられ不安',
+  '完璧主義傾向',
+  '他者比較しやすい',
+  '助けを求めにくい',
+  '過剰責任',
+];
+
+function viewDeepDive() {
+  if (!deepDive) deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString() };
+  const s = deepDive;
+  switch (s.step) {
+    case 1: return viewDdTheme(s);
+    case 2: return viewDdEvent(s);
+    case 3: return viewDdFirstThought(s);
+    case 4: return viewDdDeeper(s);
+    case 5: return viewDdCoreBelief(s);
+    case 6: return viewDdOutcome(s);
+    default: deepDive = null; return viewDdTheme({ step: 1, deeper: ['', '', ''], depthLevel: 0 });
+  }
+}
+
+function ddHeader(stepNo, total = 6) {
+  return `
+    <div class="page-header">
+      <button class="page-back" data-act="dd-cancel">‹</button>
+      <span class="page-title">深掘り</span>
+      <span class="text-tiny text-muted">Step ${stepNo} / ${total}</span>
+    </div>
+  `;
+}
+
+// Step 1: テーマを選ぶ
+function viewDdTheme(s) {
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(1)}
+      <div class="dd-q">深く知りたいことは？</div>
+      <p class="dd-q-sub">日常で繰り返すモヤモヤやネガティブな思考の「根っこ」を探ります。</p>
+      <div class="dd-theme-grid">
+        ${DD_THEMES.map(t => `
+          <button class="dd-theme-card ${s.themeType === t.id ? 'selected' : ''}"
+                  data-act="dd-step1-pick" data-theme="${t.id}">
+            <span class="dd-theme-icon">${t.icon}</span>
+            <span class="dd-theme-name">${t.name}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div style="display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step1-next" ${!s.themeType ? 'disabled' : ''}>次へ</button>
+        <button class="btn-ghost" data-act="dd-cancel">キャンセル</button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 2: きっかけとなる出来事
+function viewDdEvent(s) {
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(2)}
+      <div class="dd-q">きっかけとなる出来事</div>
+      <p class="dd-q-sub">最近あった、気になる出来事は？</p>
+      <textarea class="textarea-block" id="ddEventInput" placeholder="例：上司に注意された" rows="4">${escapeHtml(s.event || '')}</textarea>
+      <div style="margin-top:16px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step2-next">次へ</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="1">‹ 戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 3: その時の考え・感情
+function viewDdFirstThought(s) {
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(3)}
+      <div class="dd-q">その時の考え・感情</div>
+      <p class="dd-q-sub">その時、どんなことを考えましたか？</p>
+      <div class="dd-prev">
+        <div class="dd-prev-label">きっかけ</div>
+        ${escapeHtml(s.event)}
+      </div>
+      <textarea class="textarea-block" id="ddFirstThoughtInput" placeholder="例：自分がダメだと思った" rows="4">${escapeHtml(s.firstThought || '')}</textarea>
+      <div style="margin-top:16px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step3-next">さらに深く</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="2">‹ 戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 4: さらに深く（depth 0..2）
+function viewDdDeeper(s) {
+  const lv = s.depthLevel || 0;  // 0,1,2
+  const prevAnswer = lv === 0 ? s.firstThought : s.deeper[lv - 1];
+  const questions = [
+    'それはどういう意味ですか？',
+    'その意味は、あなたにとって何を意味しますか？',
+    'さらに、その根本にある考えは何でしょうか？',
+  ];
+  const examples = [
+    '例：失敗するから、嫌われる',
+    '例：人として価値がない',
+    '例：誰からも必要とされない',
+  ];
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(4)}
+      <div class="dd-q">さらに深く（${lv + 1}/3）</div>
+      <p class="dd-q-sub">${escapeHtml(questions[lv])}</p>
+      <div class="dd-prev">
+        <div class="dd-prev-label">${lv === 0 ? '最初の考え' : `Lv.${lv} の答え`}</div>
+        ${escapeHtml(prevAnswer || '')}
+      </div>
+      <textarea class="textarea-block" id="ddDeeperInput" placeholder="${examples[lv]}" rows="4">${escapeHtml(s.deeper[lv] || '')}</textarea>
+      <div style="margin-top:16px; display:grid; gap:10px;">
+        ${lv < 2 ? `
+          <button class="btn btn-primary" data-act="dd-step4-deeper">さらに深く</button>
+          <button class="btn btn-secondary" data-act="dd-step4-stop">ここまでにする</button>
+        ` : `
+          <button class="btn btn-primary" data-act="dd-step4-stop">コア信念を整理する</button>
+        `}
+        <button class="btn-ghost" data-act="dd-back" data-to="${lv === 0 ? 3 : 4}">‹ 戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 5: コア信念の候補
+function viewDdCoreBelief(s) {
+  // 最後の deeper が初期値（自動入力）
+  if (!s.coreBelief) {
+    const lastDeep = [s.deeper[2], s.deeper[1], s.deeper[0]].find(t => t && t.trim());
+    s.coreBelief = lastDeep || s.firstThought || '';
+  }
+  const conf = s.confidence == null ? 5 : s.confidence;
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(5)}
+      <div class="dd-q">コア信念の候補</div>
+      <p class="dd-q-sub">たどり着いた考え・信念は？</p>
+      <textarea class="textarea-block" id="ddCoreBeliefInput" placeholder="例：自分は価値がない" rows="3">${escapeHtml(s.coreBelief || '')}</textarea>
+
+      <p class="dd-q-sub" style="margin-top:14px;">そう思うようになったのはいつから？</p>
+      <textarea class="textarea-block" id="ddSinceInput" placeholder="例：小さい頃から / 大学生の頃から" rows="2" style="min-height:auto;">${escapeHtml(s.beliefSince || '')}</textarea>
+
+      <p class="dd-q-sub" style="margin-top:14px;">確信度はどのくらい？</p>
+      <div style="text-align:center; margin: 8px 0;">
+        <div id="ddConfNum" style="font-size:36px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1;">${conf}</div>
+        <div class="text-tiny text-muted">0=低い / 10=高い</div>
+      </div>
+      <div class="moya-scale-row">
+        ${Array.from({length: 11}, (_, n) => `
+          <button class="moya-scale-btn ${conf === n ? 'selected' : ''}" data-act="dd-step5-conf" data-score="${n}">${n}</button>
+        `).join('')}
+      </div>
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step5-next">保存して結果を見る</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="4">‹ 戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 6: 深掘りの成果
+function viewDdOutcome(s) {
+  const tags = s.tags && s.tags.length > 0 ? s.tags : ['自己否定が強い'];
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(6)}
+      <div style="text-align:center; margin: 20px 0 14px;">
+        <div style="margin: 0 auto 8px;">${suplan({ stage: 'futaba', expression: 'calm', size: 64 })}</div>
+        <div class="dd-q" style="margin-bottom:0;">深掘りができたね</div>
+        <p class="text-tiny text-muted mt-1">${s.aiUsed ? '⚠️ AIが推定した参考情報です' : '※ 簡易ルールで抽出した候補です'}</p>
+      </div>
+
+      <div class="dd-outcome-belief">
+        <div class="dd-outcome-belief-label">あなたのコア信念の候補</div>
+        ${escapeHtml(s.extractedBelief || s.coreBelief)}
+      </div>
+
+      <div class="text-tiny text-muted" style="margin-bottom:6px;">抽出されたタグ（あなたの傾向）</div>
+      <div class="dd-tag-list">
+        ${tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
+      </div>
+
+      ${s.gentleReflection ? `
+        <div class="dd-reflection">${escapeHtml(s.gentleReflection)}</div>
+      ` : ''}
+
+      <p class="text-tiny text-muted" style="margin-bottom:14px; line-height:1.7;">
+        これらのタグは「きょうのいっぽ」のレコメンド精度向上に活用されます。<br>
+        変化の推移はきろくタブで見られます。
+      </p>
+      <div style="display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-save">保存して終わる</button>
+        <button class="btn-ghost" data-act="dd-cancel">破棄して終わる</button>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// 深掘り: コア信念抽出（AI / フォールバック）
+// ============================================================
+function extractCoreBeliefRule(s) {
+  const allText = [s.event, s.firstThought, ...(s.deeper || []), s.coreBelief].filter(Boolean).join(' ');
+  const tags = [];
+  // ルールベースのキーワード判定
+  if (/ダメ|無価値|価値.*ない|存在.*意味/.test(allText)) tags.push('自己否定が強い');
+  if (/評価|嫌われ|ダメな人|どう見られ/.test(allText)) tags.push('評価に敏感');
+  if (/失敗|うまくいかない|ミス|落ちこぼれ/.test(allText)) tags.push('失敗を恐れやすい');
+  if (/捨て|見捨て|ひとり|孤独|去られる/.test(allText)) tags.push('見捨てられ不安');
+  if (/完璧|きちんと|ちゃんと|完全|妥協/.test(allText)) tags.push('完璧主義傾向');
+  if (/比べ|周りは|みんな|あの人/.test(allText)) tags.push('他者比較しやすい');
+  if (/迷惑|頼れない|甘え|助け.*求め/.test(allText)) tags.push('助けを求めにくい');
+  if (/全部.*せい|私のせい|責任|全て.*悪い/.test(allText)) tags.push('過剰責任');
+  return {
+    extractedBelief: s.coreBelief,
+    tags: tags.slice(0, 3).length > 0 ? tags.slice(0, 3) : ['自己否定が強い'],
+    gentleReflection: 'たどり着いた考えは、これまでのあなたを守ろうとしてきた一部かもしれません。決めつけず、ゆっくり眺めてみるだけでも十分です。',
+  };
+}
+
+async function extractCoreBeliefAI(s) {
+  if (!getApiKey()) return null;
+  const def = AI_PROMPTS.deep_dive_extraction;
+  const user = def.userTemplate
+    .replace('{event}', s.event || '')
+    .replace('{firstThought}', s.firstThought || '')
+    .replace('{deeper1}', (s.deeper && s.deeper[0]) || '')
+    .replace('{deeper2}', (s.deeper && s.deeper[1]) || '')
+    .replace('{deeper3}', (s.deeper && s.deeper[2]) || '')
+    .replace('{coreBelief}', s.coreBelief || '')
+    .replace('{beliefSince}', s.beliefSince || '')
+    .replace('{confidence}', s.confidence == null ? 5 : s.confidence);
+
+  try {
+    const text = await callGemini(def.systemPrompt, [{ role: 'user', content: user }], { temperature: def.temperature, maxTokens: def.maxTokens });
+    if (!text) return null;
+    const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+    const start = cleaned.indexOf('{'), end = cleaned.lastIndexOf('}');
+    if (start < 0 || end <= start) return null;
+    const parsed = JSON.parse(cleaned.slice(start, end + 1));
+    if (typeof parsed.extractedBelief !== 'string') return null;
+    // タグは固定候補にフィルタ
+    const tags = (parsed.tags || []).filter(t => DD_BELIEF_TAGS.includes(t));
+    return {
+      extractedBelief: parsed.extractedBelief,
+      tags: tags.length > 0 ? tags.slice(0, 3) : null,
+      gentleReflection: typeof parsed.gentleReflection === 'string' ? parsed.gentleReflection : '',
+    };
+  } catch (e) {
+    console.warn('[DD-AI] failed', e);
+    return null;
+  }
+}
+
+// ============================================================
+// 精度向上の見える化（v0.9.1 仕様書 §7）
+// ============================================================
+function calcAccuracyTimeline(days = 5) {
+  // 直近 N 日について、その日に完了した ippoSession の score 平均を出す
+  const today = new Date();
+  const result = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const sessionsOfDay = (state.ippoSessions || []).filter(s =>
+      s.completedAt && sameDay(new Date(s.completedAt), d)
+    );
+    const avg = sessionsOfDay.length === 0 ? null
+      : Math.round(sessionsOfDay.reduce((a, x) => a + (x.score || 0), 0) / sessionsOfDay.length);
+    result.push({
+      date: `${d.getMonth() + 1}/${d.getDate()}`,
+      pct: avg,
+    });
+  }
+  return result;
+}
+
+function calcRecentInsights() {
+  const sessions = (state.ippoSessions || []).slice(-10);
+  const insights = [];
+  if (sessions.length >= 3) {
+    // 平均 changeValue が上昇しているか
+    const half = Math.floor(sessions.length / 2);
+    const oldAvg = sessions.slice(0, half).reduce((a, s) => a + (s.changeValue || 0), 0) / half;
+    const newAvg = sessions.slice(half).reduce((a, s) => a + (s.changeValue || 0), 0) / (sessions.length - half);
+    if (newAvg > oldAvg + 0.5) insights.push('気分が軽くなる行動を見つけられるようになってきました');
+    // バリエーション
+    const uniq = new Set(sessions.map(s => s.actionId)).size;
+    if (uniq >= Math.min(3, sessions.length)) insights.push('行動のバリエーションが増えています');
+    // 深掘り
+    if ((state.deepDiveSessions || []).length > 0) insights.push('あなたの傾向がより明確になってきました');
+  }
+  return insights;
+}
+
+function viewAccuracyCard() {
+  const timeline = calcAccuracyTimeline(5);
+  const hasData = timeline.some(t => t.pct != null);
+  if (!hasData) {
+    return `
+      <div class="acc-card">
+        <div class="acc-title">📈 おすすめ精度の推移</div>
+        <div class="acc-sub">日次ループを3日以上続けると、精度の変化が見えてきます。</div>
+        <p class="text-small text-soft mt-2">まずは「いっぽ」タブから今日の一歩を選んでみよう。</p>
+      </div>
+    `;
+  }
+  const max = 100;
+  const insights = calcRecentInsights();
+  return `
+    <div class="acc-card">
+      <div class="acc-title">📈 おすすめ精度の推移</div>
+      <div class="acc-sub">あなたに合う一歩がどんどん見つかってきています</div>
+      <div class="acc-chart">
+        ${timeline.map(t => `
+          <div class="acc-bar-col">
+            <div class="acc-bar-pct">${t.pct == null ? '—' : t.pct + '%'}</div>
+            <div class="acc-bar" style="height: ${t.pct == null ? 0 : (t.pct / max) * 90}%;"></div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="acc-x-labels">
+        ${timeline.map(t => `<span>${t.date}</span>`).join('')}
+      </div>
+      ${insights.length > 0 ? `
+        <div class="acc-insight-list" style="margin-top:14px;">
+          <div class="text-tiny text-muted" style="margin-bottom:4px;">最近の変化</div>
+          ${insights.map(i => `
+            <div class="acc-insight-item">
+              <span class="acc-insight-check">✓</span>
+              <span>${escapeHtml(i)}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
 function viewActionLegacy() {
   const goal = activeGoal();
   const policy = activePolicy();
@@ -5136,6 +5671,62 @@ const AI_PROMPTS = {
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
+
+  deep_dive_extraction: {
+    id: 'deep_dive_extraction',
+    title: '深掘りループ - コア信念抽出（CBT下向き矢印法）',
+    purpose: '下向き矢印法によって深掘りされた一連の回答から、根本にあるコア信念と思考パターンタグを抽出する。',
+    triggerLocation: 'いっぽタブ または きろくタブ → 深掘り → 最終ステップで保存時',
+    callSite: 'extractCoreBeliefAI() → callGemini(AI_PROMPTS.deep_dive_extraction.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.6,
+    maxTokens: 800,
+    outputFormat: 'JSON {extractedBelief, tags[1-3 from fixed candidates], gentleReflection}',
+    fallbackBehavior: 'API未設定 / 失敗時はキーワードルールベースで抽出（extractCoreBeliefRule）',
+    safetyChecks: [
+      'JSON抽出失敗時はルールベースへフォールバック',
+      '本人が言語化したコア信念は必ず保持し、AI抽出は補助情報として扱う',
+      'tags は固定の候補リストからのみ採用（誤ラベル防止）',
+    ],
+    systemPrompt: `あなたは認知行動療法（CBT）のセラピストです。
+クライエントが下向き矢印法で深掘りした一連の回答から、
+根本にあるコア信念と思考パターンタグを抽出してください。
+
+# CBT 思考パターンタグ候補（必ずこの中から1〜3個選ぶ）
+- 自己否定が強い
+- 評価に敏感
+- 失敗を恐れやすい
+- 見捨てられ不安
+- 完璧主義傾向
+- 他者比較しやすい
+- 助けを求めにくい
+- 過剰責任
+
+# 出力ルール
+- 必ず JSON のみ出力（説明・コードブロック・前置き不要）
+- extractedBelief: 60字程度で根本のコア信念を1文に要約
+- tags: 上記候補から1-3個。最も該当度が高い順に並べる
+- gentleReflection: 90字程度のやさしい返し。決めつけない、押し付けない
+- 22-28歳の若者に話しかける温かい口語トーン
+
+# 出力フォーマット
+{"extractedBelief":"...","tags":["...","..."],"gentleReflection":"..."}`,
+    userTemplate: `# 深掘りログ
+- きっかけのできごと: {event}
+- 最初の考え・感情: {firstThought}
+- 深掘り Lv.1: {deeper1}
+- 深掘り Lv.2: {deeper2}
+- 深掘り Lv.3: {deeper3}
+- 本人が言語化したコア信念: {coreBelief}
+- そう思うようになった時期: {beliefSince}
+- 確信度: {confidence}/10
+
+上記からコア信念とタグを抽出して JSON で出力してください。`,
+    lastUpdated: '2026-05-03',
+    changeNote: 'v0.9.1 で初版（下向き矢印法 + 8種パターンタグ）',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
 };
 
 // 旧API互換: 既存の参照を残すための alias
@@ -5275,6 +5866,31 @@ function viewRecord() {
         <button data-act="record-sub" data-sub="calendar" style="padding:8px 14px; background:${sub==='calendar'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='calendar'?'var(--accent-deep)':'var(--text-soft)'};">カレンダー</button>
         <button data-act="record-sub" data-sub="report" style="padding:8px 14px; background:${sub==='report'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='report'?'var(--accent-deep)':'var(--text-soft)'};">レポート</button>
       </div>
+
+      ${viewAccuracyCard()}
+
+      <button class="dd-entry-card" data-act="dd-start">
+        <span class="dd-entry-icon">🔎</span>
+        <div>
+          <div class="dd-entry-title">深掘り（下向き矢印法）</div>
+          <div class="dd-entry-desc">繰り返すモヤモヤやネガティブな思考の根っこを探ります</div>
+        </div>
+      </button>
+
+      ${(state.deepDiveSessions || []).length > 0 ? `
+        <h3 class="section-title" style="margin-top:18px;">これまでの深掘り</h3>
+        ${state.deepDiveSessions.slice(-3).reverse().map(d => `
+          <div class="card" style="padding:14px;">
+            <div class="text-tiny text-muted">${formatDate(d.completedAt)}</div>
+            <div class="mt-1" style="font-weight:500;">${escapeHtml(d.extractedBelief || d.coreBelief || '-')}</div>
+            ${d.tags && d.tags.length > 0 ? `
+              <div class="dd-tag-list" style="margin-top:8px;">
+                ${d.tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `).join('')}
+      ` : ''}
 
       ${sub === 'calendar' ? viewCalendarSection() : viewReportSection()}
     </div>
@@ -5556,7 +6172,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.0-beta.1（きょうのいっぽ 日次ループ実装）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.1-beta.1（深掘りループ + 精度可視化）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -6026,6 +6642,177 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  // 深掘り（v0.9.1）
+  if (act === 'dd-start') {
+    deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString() };
+    go('deepdive');
+    return;
+  }
+  if (act === 'dd-cancel') { deepDive = null; go('record'); return; }
+  if (act === 'dd-back') {
+    if (deepDive) {
+      const to = parseInt(el.dataset.to, 10) || 1;
+      deepDive.step = to;
+      if (to === 4 && deepDive.depthLevel > 0) deepDive.depthLevel -= 1;
+    }
+    render();
+    return;
+  }
+  if (act === 'dd-step1-pick') {
+    if (deepDive) deepDive.themeType = el.dataset.theme;
+    render();
+    return;
+  }
+  if (act === 'dd-step1-next') {
+    if (!deepDive || !deepDive.themeType) { toast('テーマを選んでね'); return; }
+    deepDive.step = 2;
+    render();
+    return;
+  }
+  if (act === 'dd-step2-next') {
+    const v = (document.getElementById('ddEventInput') || {}).value || '';
+    if (!v.trim()) { toast('気になる出来事を書いてみて'); return; }
+    if (!deepDive) return;
+    deepDive.event = v.trim();
+    const c = detectCrisis(v);
+    if (c && c.sev >= 4) { showCrisisModal(c.sev); return; }
+    deepDive.step = 3;
+    render();
+    return;
+  }
+  if (act === 'dd-step3-next') {
+    const v = (document.getElementById('ddFirstThoughtInput') || {}).value || '';
+    if (!v.trim()) { toast('その時の考えを書いてみて'); return; }
+    if (!deepDive) return;
+    deepDive.firstThought = v.trim();
+    deepDive.depthLevel = 0;
+    deepDive.step = 4;
+    render();
+    return;
+  }
+  if (act === 'dd-step4-deeper' || act === 'dd-step4-stop') {
+    const v = (document.getElementById('ddDeeperInput') || {}).value || '';
+    if (!v.trim()) { toast('言葉にしてみよう（短くてOK）'); return; }
+    if (!deepDive) return;
+    deepDive.deeper[deepDive.depthLevel] = v.trim();
+    if (act === 'dd-step4-deeper' && deepDive.depthLevel < 2) {
+      deepDive.depthLevel += 1;
+      render();
+    } else {
+      deepDive.step = 5;
+      render();
+    }
+    return;
+  }
+  if (act === 'dd-step5-conf') {
+    if (deepDive) deepDive.confidence = parseInt(el.dataset.score, 10);
+    // 入力中のテキストを保持
+    if (deepDive) {
+      deepDive.coreBelief = (document.getElementById('ddCoreBeliefInput') || {}).value || deepDive.coreBelief || '';
+      deepDive.beliefSince = (document.getElementById('ddSinceInput') || {}).value || deepDive.beliefSince || '';
+    }
+    render();
+    return;
+  }
+  if (act === 'dd-step5-next') {
+    if (!deepDive) return;
+    const cb = (document.getElementById('ddCoreBeliefInput') || {}).value || '';
+    const sn = (document.getElementById('ddSinceInput') || {}).value || '';
+    if (!cb.trim()) { toast('コア信念を1行で書いてみよう'); return; }
+    deepDive.coreBelief = cb.trim();
+    deepDive.beliefSince = sn.trim();
+    if (deepDive.confidence == null) deepDive.confidence = 5;
+    // AI抽出（バックグラウンド、フォールバックあり）
+    deepDive.step = 6;
+    deepDive.extractedBelief = deepDive.coreBelief;
+    deepDive.tags = ['抽出中...'];
+    deepDive.gentleReflection = '';
+    deepDive.aiUsed = false;
+    render();
+    const sessionRef = deepDive;
+    extractCoreBeliefAI(sessionRef).then(result => {
+      if (deepDive !== sessionRef) return;
+      if (result) {
+        sessionRef.extractedBelief = result.extractedBelief;
+        sessionRef.tags = result.tags || [];
+        sessionRef.gentleReflection = result.gentleReflection;
+        sessionRef.aiUsed = true;
+      } else {
+        const r = extractCoreBeliefRule(sessionRef);
+        sessionRef.extractedBelief = r.extractedBelief;
+        sessionRef.tags = r.tags;
+        sessionRef.gentleReflection = r.gentleReflection;
+        sessionRef.aiUsed = false;
+      }
+      render();
+    });
+    return;
+  }
+  if (act === 'dd-save') {
+    if (!deepDive) return;
+    state.deepDiveSessions.push({
+      id: uid(),
+      themeType: deepDive.themeType,
+      event: deepDive.event,
+      firstThought: deepDive.firstThought,
+      deeper: deepDive.deeper,
+      coreBelief: deepDive.coreBelief,
+      beliefSince: deepDive.beliefSince,
+      confidence: deepDive.confidence,
+      extractedBelief: deepDive.extractedBelief,
+      tags: deepDive.tags || [],
+      gentleReflection: deepDive.gentleReflection || '',
+      aiUsed: !!deepDive.aiUsed,
+      startedAt: deepDive.startedAt,
+      completedAt: new Date().toISOString(),
+    });
+    // タグ集計の更新
+    (deepDive.tags || []).forEach(tagCode => {
+      const existing = state.coreBeliefTags.find(t => t.tagCode === tagCode);
+      if (existing) {
+        existing.confidence = Math.min(1, (existing.confidence || 0) + 0.15);
+        existing.updatedAt = new Date().toISOString();
+      } else {
+        state.coreBeliefTags.push({
+          id: uid(),
+          tagCode,
+          confidence: 0.4,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    });
+    saveState();
+    if (window.MoyaLogger) MoyaLogger.event('deepdive_saved', { tags: deepDive.tags || [], theme: deepDive.themeType });
+    deepDive = null;
+    toast('深掘りを保存しました');
+    go('record');
+    return;
+  }
+  if (act === 'ippo-save-then-dd') {
+    // 先に ippo を保存してから深掘りへ
+    if (ippoToday) {
+      const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
+      state.ippoSessions.push({
+        id: uid(),
+        moodLabel: ippoToday.moodLabel,
+        moodIntensity: ippoToday.moodIntensity,
+        actionId: ippoToday.selectedActionId,
+        score: c?.score.total || null,
+        reasons: c?.reasons || [],
+        beforeIntensity: ippoToday.beforeIntensity,
+        afterIntensity: ippoToday.afterIntensity,
+        changeValue: ippoToday.beforeIntensity - ippoToday.afterIntensity,
+        startedAt: ippoToday.startedAt,
+        completedAt: new Date().toISOString(),
+      });
+      saveState();
+    }
+    ippoToday = null;
+    deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString() };
+    go('deepdive');
+    return;
+  }
+
   if (act === 'ippo-save') {
     if (!ippoToday) return;
     const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
