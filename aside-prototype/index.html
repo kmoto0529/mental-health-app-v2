@@ -5580,23 +5580,95 @@ function shouldSuggestDeepDive() {
 }
 
 // 完了済みの日（再来時の表示）
+// 完了済みの日（再来時の表示）— Step 6 と同じ「改善の可視化」デザインを使用
 function viewIppoTodayDone(session) {
-  const action = ACTIONS.find(a => a.id === session.actionId);
+  const before = session.beforeIntensity;
+  const after = session.afterIntensity;
+  const change = session.changeValue;
+
+  // 統計指標
+  const streak = calcIppoStreakDays();
+  const totalCount = (state.ippoSessions || []).length;
+  const avgMatch = calcAvgMatchScore();
+  const bestAction = calcMostEffectiveAction();
+  const insight = calcRecentTrendInsight();
+
+  // 気分絵文字
+  const moodObj = IPPO_MOODS.find(m => m.label === session.moodLabel);
+  const beforeEmoji = moodObj ? moodObj.emoji : '😟';
+  const afterEmoji = after <= 3 ? '😊' : after <= 5 ? '😌' : after <= 7 ? '😐' : '😟';
+
   return `
     <div class="screen active ippo-screen">
-      <h1 class="ippo-h1">きょうのいっぽ</h1>
-      <p class="text-tiny text-muted mb-3">今日のいっぽは記録済みです</p>
-      <div class="ippo-done-hero">
-        <div style="margin: 0 auto 8px;">${suplan({ stage: 'futaba', expression: 'happy', size: 80 })}</div>
-        <div class="ippo-q">今日もよくやったね！</div>
+      <div class="page-header">
+        <span style="width:36px;"></span>
+        <h1 class="ippo-h1" style="margin:0; flex:1; text-align:center; font-size:18px;">きょうのいっぽ</h1>
+        <button class="page-back" data-act="ippo-todaydone-share" aria-label="共有" style="font-size:16px;">↑</button>
       </div>
-      <div class="ippo-summary-card">
-        <div class="ippo-summary-row"><span class="label">今の気分</span><span class="value">${escapeHtml(session.moodLabel)}（強さ ${session.moodIntensity}/10）</span></div>
-        <div class="ippo-summary-row"><span class="label">選んだ一歩</span><span class="value">${escapeHtml(action?.title || '-')}</span></div>
-        <div class="ippo-summary-row"><span class="label">気持ちの変化</span><span class="value green">${session.beforeIntensity}/10 → ${session.afterIntensity}/10（${session.changeValue >= 0 ? '+' : ''}${session.changeValue}点）</span></div>
+      <p class="text-tiny text-muted text-center" style="margin: 0 0 10px;">今日のいっぽは記録済みです</p>
+
+      <!-- ヒーロー -->
+      <div class="ippo-hero-card">
+        <div style="text-align:center; margin-bottom:8px;">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
+        <div class="ippo-hero-title">今日もよくやったね！</div>
+        <div class="ippo-hero-row">
+          <div class="ippo-hero-col">
+            <div class="ippo-hero-emoji">${beforeEmoji}</div>
+            <div class="ippo-hero-num">${before}<span class="ippo-hero-suf">/10</span></div>
+          </div>
+          <div class="ippo-hero-arrow">→</div>
+          <div class="ippo-hero-col">
+            <div class="ippo-hero-emoji">${afterEmoji}</div>
+            <div class="ippo-hero-num green">${after}<span class="ippo-hero-suf">/10</span></div>
+          </div>
+        </div>
+        ${change > 0 ? `<div class="ippo-hero-delta">+${change} 改善</div>`
+          : change === 0 ? `<div class="ippo-hero-delta" style="color:var(--text-muted);">±0</div>`
+          : `<div class="ippo-hero-delta" style="color:#D77B5B;">${change}</div>`}
       </div>
-      <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-secondary" data-act="ippo-restart">もう一歩、やってみる</button>
+
+      <!-- あなたの積み重ね -->
+      <div class="ippo-stat-card">
+        <div class="ippo-stat-h">📊 あなたの積み重ね</div>
+        <div class="ippo-stat-row">
+          <div class="ippo-stat-cell">
+            <div class="ippo-stat-num">${streak}<span class="ippo-stat-suf">日目</span></div>
+            <div class="ippo-stat-label">連続日数</div>
+          </div>
+          <div class="ippo-stat-cell">
+            <div class="ippo-stat-num">${totalCount}<span class="ippo-stat-suf">回</span></div>
+            <div class="ippo-stat-label">これまでのいっぽ</div>
+          </div>
+          <div class="ippo-stat-cell">
+            <div class="ippo-stat-num">${avgMatch == null ? '—' : avgMatch + '%'}</div>
+            <div class="ippo-stat-label">マッチ度平均</div>
+          </div>
+        </div>
+      </div>
+
+      ${bestAction ? `
+        <div class="ippo-stat-card">
+          <div class="ippo-stat-h">💗 よく効くいっぽ</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+            <span class="ippo-best-tag">${escapeHtml(bestAction.action?.title || '-')}</span>
+            <span style="font-size:13px; color:var(--text-soft);">平均 <strong style="color:#6B8F71; font-size:15px;">${bestAction.avg >= 0 ? '-' : '+'}${Math.abs(bestAction.avg).toFixed(1)}</strong></span>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="ippo-stat-card">
+        <div class="ippo-stat-h">🌱 最近の傾向</div>
+        <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+          <p style="flex:1; margin:0; font-size:12px; line-height:1.7; color:var(--text-soft);">${escapeHtml(insight)}</p>
+          <div style="flex-shrink:0;">${suplan({ stage: 'futaba', expression: 'calm', size: 44 })}</div>
+        </div>
+      </div>
+
+      <!-- もう一歩 CTA -->
+      <div class="ippo-cta-card">
+        <p class="text-tiny text-muted text-center" style="margin: 0 0 4px;">もし余裕があれば...</p>
+        <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もう一歩やってみる？</p>
+        <button class="btn btn-primary" data-act="ippo-do-another" style="width:100%;">もう一歩やる</button>
       </div>
     </div>
   `;
@@ -7988,7 +8060,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.7-beta.1（いっぽ初回オンボーディング画面追加）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.8-beta.1（記録済み画面を改善の可視化デザインに統一）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -8417,6 +8489,51 @@ function handleAction(act, el, ev) {
     const startStep = (state.user && state.user.direction) ? 1 : 0;
     ippoToday = { step: startStep, startedAt: new Date().toISOString() };
     render();
+    return;
+  }
+  // 完了済日からの「もう一歩やる」: 直近セッションをベースに次の推薦で即Step 4
+  if (act === 'ippo-do-another') {
+    const last = ippoCompletedToday();
+    if (!last) {
+      // フォールバック: 通常の新規開始
+      const startStep = (state.user && state.user.direction) ? 1 : 0;
+      ippoToday = { step: startStep, startedAt: new Date().toISOString() };
+      render();
+      return;
+    }
+    const nextCands = getNextStepRecommendations({
+      moodLabel: last.moodLabel,
+      moodIntensity: last.moodIntensity,
+      afterIntensity: last.afterIntensity,
+      selectedActionId: last.actionId,
+    }, 3);
+    if (nextCands.length === 0) {
+      // 候補なし → 通常の新規開始
+      const startStep = (state.user && state.user.direction) ? 1 : 0;
+      ippoToday = { step: startStep, startedAt: new Date().toISOString() };
+      render();
+      return;
+    }
+    const next = nextCands[0];
+    ippoToday = {
+      step: 4,
+      moodLabel: last.moodLabel,
+      moodIntensity: last.afterIntensity,  // 直近の状態を引き継ぎ
+      directionId: state.user.direction,
+      candidates: [next],
+      selectedActionId: next.action.id,
+      startedAt: new Date().toISOString(),
+    };
+    render();
+    return;
+  }
+  if (act === 'ippo-todaydone-share') {
+    const last = ippoCompletedToday();
+    if (!last) return;
+    const action = ACTIONS.find(a => a.id === last.actionId);
+    const text = `きょうのいっぽ\n${action?.title || ''}\n${last.beforeIntensity}/10 → ${last.afterIntensity}/10`;
+    if (navigator.share) navigator.share({ title: 'きょうのいっぽ', text }).catch(() => {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast('コピーしました'));
     return;
   }
   if (act === 'ippo-back') {
