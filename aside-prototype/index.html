@@ -3893,6 +3893,7 @@ const defaultState = () => ({
 
   // === きょうのいっぽ（v0.9.0 仕様書 §6 データモデル準拠 簡易版） ===
   ippoSessions: [],      // {id, moodLabel, moodIntensity, actionId, score, beforeIntensity, afterIntensity, changeValue, completedAt}
+  ippoPending: [],       // 「あとでやる」で保留した行動 {id, actionId, moodLabel, moodIntensity, directionId, savedAt}
 
   // === 深掘りループ（v0.9.1 仕様書 §5 §6） ===
   deepDiveSessions: [],  // {id, themeType, event, firstThought, deeper:[depth1,depth2,depth3], coreBelief, beliefSince, confidence, extractedBelief, tags[], gentleReflection, startedAt, completedAt}
@@ -5251,6 +5252,8 @@ function viewAction() {
     const startStep = (state.user && state.user.direction) ? 1 : 0;
     ippoToday = { step: startStep, startedAt: new Date().toISOString() };
   }
+  // 新5ステップ構成（v0.9.13）
+  // 0: 方向 / 1: 気分+強さ / 2: 推薦 / 3: いまやる-あとでやる / 4: 変化記録 / 5: サマリ
   switch (ippoToday.step) {
     case 0: return viewIppoStep0(ippoToday);
     case 1: return viewIppoStep1(ippoToday);
@@ -5258,8 +5261,6 @@ function viewAction() {
     case 3: return viewIppoStep3(ippoToday);
     case 4: return viewIppoStep4(ippoToday);
     case 5: return viewIppoStep5(ippoToday);
-    case 6: return viewIppoStep6(ippoToday);
-    case 7: return viewIppoStep7(ippoToday);
     default: ippoToday = null; return viewAction();
   }
 }
@@ -5267,7 +5268,7 @@ function viewAction() {
 function ippoHeader(stepNo) {
   return `
     <h1 class="ippo-h1">きょうのいっぽ</h1>
-    <div class="ippo-step">Step ${stepNo}${stepNo === 0 ? ' — 方向設定' : ' / 6'}</div>
+    <div class="ippo-step">Step ${stepNo}${stepNo === 0 ? ' — 方向設定' : ' / 4'}</div>
   `;
 }
 
@@ -5510,15 +5511,16 @@ function viewIppoStep0(s) {
   `;
 }
 
-// Step 1: 気分を選ぶ（10択 / 9 + なんとなく）
+// Step 1（v0.9.13 新設）: 気分 + 強さを統合（旧Step1+Step2をマージ）
 function viewIppoStep1(s) {
   const mainMoods = IPPO_MOODS.filter(m => m.label !== 'なんとなく');
   const nantonaku = IPPO_MOODS.find(m => m.label === 'なんとなく');
+  const v = s.moodIntensity == null ? 5 : s.moodIntensity;
   return `
     <div class="screen active ippo-screen">
       ${ippoHeader(1)}
       ${ippoDirectionLine()}
-      <div class="ippo-q">今の気分に一番近いものを選んでください</div>
+      <div class="ippo-q">今の気分を選んでください</div>
       <div class="ippo-mood-grid" style="grid-template-columns: repeat(3, 1fr);">
         ${mainMoods.map(m => `
           <button class="ippo-mood-item ${s.moodLabel === m.label ? 'selected' : ''}"
@@ -5537,6 +5539,23 @@ function viewIppoStep1(s) {
           </button>
         </div>
       ` : ''}
+
+      <div class="ippo-q" style="margin-top: 22px;">気分の強さは？</div>
+      <p class="text-tiny text-muted mb-3">数字が大きいほど、つらい状態です</p>
+      <div style="text-align:center; margin: 8px 0 12px;">
+        <div id="ippoIntNum" style="font-size:36px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1;">
+          ${v}<span style="font-size:14px; color: var(--text-muted); margin-left:2px;">/10</span>
+        </div>
+      </div>
+      <div class="moya-scale-row">
+        ${Array.from({length: 11}, (_, n) => `
+          <button class="moya-scale-btn ${v === n ? 'selected' : ''}" data-act="ippo-step1-int" data-score="${n}">${n}</button>
+        `).join('')}
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); margin-top:6px; padding: 0 4px;">
+        <span>軽い</span><span>つらい</span>
+      </div>
+
       <div style="margin-top:24px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="ippo-step1-next" ${!s.moodLabel ? 'disabled' : ''}>次へ</button>
         <button class="btn-ghost" data-act="ippo-cancel">キャンセル</button>
@@ -5545,41 +5564,8 @@ function viewIppoStep1(s) {
   `;
 }
 
-// Step 2: 強さを教えてください（intensity 0-10）
+// Step 2（v0.9.13）: 推薦カード（旧Step3）
 function viewIppoStep2(s) {
-  const v = s.moodIntensity == null ? 5 : s.moodIntensity;
-  const moodObj = IPPO_MOODS.find(m => m.label === s.moodLabel);
-  return `
-    <div class="screen active ippo-screen">
-      ${ippoHeader(2)}
-      ${ippoDirectionLine()}
-      <div class="ippo-q">その気分の強さはどのくらいですか？</div>
-      <p class="text-tiny text-muted mb-3">数字が大きいほど、つらい状態です</p>
-      <div style="text-align:center; margin: 24px 0 8px;">
-        <div style="font-size:60px; line-height:1;">${moodObj ? moodObj.emoji : '😟'}</div>
-        <div class="text-small mt-2" style="font-weight:500;">${escapeHtml(s.moodLabel || '')}</div>
-        <div id="ippoIntNum" style="font-size:48px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1; margin-top:10px;">
-          ${v}<span style="font-size:18px; color: var(--text-muted);">/10</span>
-        </div>
-      </div>
-      <div class="moya-scale-row">
-        ${Array.from({length: 11}, (_, n) => `
-          <button class="moya-scale-btn ${v === n ? 'selected' : ''}" data-act="ippo-step2-int" data-score="${n}">${n}</button>
-        `).join('')}
-      </div>
-      <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); margin-top:6px; padding: 0 4px;">
-        <span>軽い</span><span>つらい</span>
-      </div>
-      <div style="margin-top:24px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step2-next">次へ</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="1">‹ 戻る</button>
-      </div>
-    </div>
-  `;
-}
-
-// Step 3: あなたに合いそうな一歩を提案します（duration filter + reasons inline on selection）
-function viewIppoStep3(s) {
   if (!s.candidates) {
     s.candidates = getTopRecommendations({
       moodLabel: s.moodLabel,
@@ -5593,12 +5579,11 @@ function viewIppoStep3(s) {
   const visible = s.candidates.slice(0, visibleCount);
   const canMore = visibleCount < s.candidates.length;
   const selectedId = s.selectedActionId;
-  const selectedCandidate = s.candidates.find(c => c.action.id === selectedId);
   const dur = s.durationPref || '1min';
 
   return `
     <div class="screen active ippo-screen">
-      ${ippoHeader(3)}
+      ${ippoHeader(2)}
       ${ippoDirectionLine()}
       <div class="ippo-q">あなたに合いそうな一歩を提案します</div>
       <p class="text-tiny text-muted mb-3">${dur === '1min' ? 'まずは、1分でできるものから' : dur === '3min' ? '3分くらいでできるもの' : '5分以上、じっくり取り組めるもの'}</p>
@@ -5608,7 +5593,7 @@ function viewIppoStep3(s) {
           const purposeChips = (tags.purpose || []).slice(0, 2).map(p => `<span class="ippo-purpose-chip">${escapeHtml(p)}</span>`).join('');
           return `
             <button class="ippo-rec-card ${selectedId === c.action.id ? 'selected' : ''}"
-                    data-act="ippo-step3-pick" data-action-id="${c.action.id}">
+                    data-act="ippo-step2-pick" data-action-id="${c.action.id}">
               <div class="ippo-rec-head">
                 <span class="ippo-rec-icon">${c.action.icon}</span>
                 <span class="ippo-rec-title">${escapeHtml(c.action.title)}（${c.action.time}）</span>
@@ -5629,35 +5614,36 @@ function viewIppoStep3(s) {
         }).join('')}
       </div>
       ${canMore ? `
-        <button class="btn btn-secondary" data-act="ippo-step3-more" style="margin-top:12px; width:100%;">他の一歩を見る</button>
+        <button class="btn btn-secondary" data-act="ippo-step2-more" style="margin-top:12px; width:100%;">他の一歩を見る</button>
       ` : ''}
 
       <!-- もっとできそう？(duration filter) -->
       <div style="margin-top:18px; padding:14px 16px; background:var(--bg-soft); border-radius:12px;">
         <div class="text-tiny text-muted mb-2">もっとできそう？</div>
         <div style="display:flex; gap:8px;">
-          <button class="ippo-dur-btn ${dur === '1min' ? 'selected' : ''}" data-act="ippo-step3-dur" data-dur="1min">1分くらい</button>
-          <button class="ippo-dur-btn ${dur === '3min' ? 'selected' : ''}" data-act="ippo-step3-dur" data-dur="3min">3分くらい</button>
-          <button class="ippo-dur-btn ${dur === '5min' ? 'selected' : ''}" data-act="ippo-step3-dur" data-dur="5min">5分以上</button>
+          <button class="ippo-dur-btn ${dur === '1min' ? 'selected' : ''}" data-act="ippo-step2-dur" data-dur="1min">1分くらい</button>
+          <button class="ippo-dur-btn ${dur === '3min' ? 'selected' : ''}" data-act="ippo-step2-dur" data-dur="3min">3分くらい</button>
+          <button class="ippo-dur-btn ${dur === '5min' ? 'selected' : ''}" data-act="ippo-step2-dur" data-dur="5min">5分以上</button>
         </div>
       </div>
 
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step3-next" ${!selectedId ? 'disabled' : ''}>この一歩を選ぶ</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
+        <button class="btn btn-primary" data-act="ippo-step2-next" ${!selectedId ? 'disabled' : ''}>この一歩を選ぶ</button>
+        <button class="btn-ghost" data-act="ippo-back" data-to="1">‹ 戻る</button>
       </div>
     </div>
   `;
 }
 
-// Step 4: やってみよう
-function viewIppoStep4(s) {
+// Step 3（v0.9.13 新設）: いまやる / あとでやる の選択
+function viewIppoStep3(s) {
   const c = s.candidates.find(x => x.action.id === s.selectedActionId);
-  if (!c) { s.step = 3; return viewIppoStep3(s); }
+  if (!c) { s.step = 2; return viewIppoStep2(s); }
   return `
     <div class="screen active ippo-screen">
-      ${ippoHeader(4)}
-      <div class="ippo-q">やってみよう</div>
+      ${ippoHeader(3)}
+      <div class="ippo-q">この一歩、いつやる？</div>
+      <p class="text-tiny text-muted mb-3">無理しないで、自分のペースでだいじょうぶ</p>
       <div class="ippo-do-card">
         <div class="ippo-do-suplan">${suplan({ stage: 'tane', expression: 'happy', size: 64 })}</div>
         <div class="ippo-do-icon">${c.action.icon}</div>
@@ -5665,26 +5651,26 @@ function viewIppoStep4(s) {
         <div class="ippo-do-desc">${escapeHtml(c.action.desc)}</div>
         <div class="ippo-do-time">⏱ 目安時間 ${c.action.time}</div>
       </div>
-      <p class="text-tiny text-muted text-center" style="margin: 14px 0 6px;">
-        自分のペースでだいじょうぶ。<br>
-        できたらタップして次へ。
-      </p>
-      <div style="margin-top:14px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step4-done">できた！次へ</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="3">‹ 戻る</button>
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="ippo-step3-now">いまやる →</button>
+        <button class="btn btn-secondary" data-act="ippo-step3-later">あとでやる（保留）</button>
+        <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
       </div>
+      <p class="text-tiny text-muted text-center" style="margin-top:10px;">
+        「あとでやる」と、サマリ画面の「もう一歩」に保留されます
+      </p>
     </div>
   `;
 }
 
-// Step 5: どのくらい楽になりましたか？
-function viewIppoStep5(s) {
+// Step 4（v0.9.13）: 気分の変化記録（旧Step5）
+function viewIppoStep4(s) {
   const before = s.beforeIntensity == null ? s.moodIntensity : s.beforeIntensity;
   const after = s.afterIntensity == null ? Math.max(0, before - 2) : s.afterIntensity;
   const moodObj = IPPO_MOODS.find(m => m.label === s.moodLabel);
   return `
     <div class="screen active ippo-screen">
-      ${ippoHeader(5)}
+      ${ippoHeader(4)}
       <div class="ippo-q">どのくらい楽になりましたか？</div>
       <p class="text-tiny text-muted mb-3">変化した度合いを教えてください</p>
       <div class="ippo-eval-row">
@@ -5702,7 +5688,7 @@ function viewIppoStep5(s) {
       </div>
       <div class="moya-scale-row">
         ${Array.from({length: 11}, (_, n) => `
-          <button class="moya-scale-btn ${after === n ? 'selected' : ''}" data-act="ippo-step5-after" data-score="${n}">${n}</button>
+          <button class="moya-scale-btn ${after === n ? 'selected' : ''}" data-act="ippo-step4-after" data-score="${n}">${n}</button>
         `).join('')}
       </div>
       <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); margin-top:6px; padding: 0 4px;">
@@ -5712,8 +5698,8 @@ function viewIppoStep5(s) {
         <span style="font-size:13px;">💗 記録してくれてありがとう。<br>小さな変化も、とても大切です ✨</span>
       </div>
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step5-next">次へ</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="4">‹ 戻る</button>
+        <button class="btn btn-primary" data-act="ippo-step4-next">記録する</button>
+        <button class="btn-ghost" data-act="ippo-back" data-to="3">‹ 戻る</button>
       </div>
     </div>
   `;
@@ -5794,7 +5780,8 @@ function calcRecentTrendInsight() {
   return '少しずつ、自分に合うパターンが見えてきています';
 }
 
-function viewIppoStep6(s) {
+// Step 5（v0.9.13）: 行動後サマリ画面（旧Step6を改名・「もう一歩」ロジック更新）
+function viewIppoStep5(s) {
   const c = s.candidates.find(x => x.action.id === s.selectedActionId);
   const before = s.beforeIntensity;
   const after = s.afterIntensity;
@@ -5807,14 +5794,10 @@ function viewIppoStep6(s) {
   const bestAction = calcMostEffectiveAction();
   const insight = calcRecentTrendInsight();
 
-  // 気分の絵文字（before/after）
+  // 気分の絵文字
   const moodObj = IPPO_MOODS.find(m => m.label === s.moodLabel);
   const beforeEmoji = moodObj ? moodObj.emoji : '😟';
   const afterEmoji = after <= 3 ? '😊' : after <= 5 ? '😌' : after <= 7 ? '😐' : '😟';
-
-  // 次の一歩（初回1回だけ計算）
-  if (!s.nextCandidates) s.nextCandidates = getNextStepRecommendations(s, 3);
-  const nextSelectedId = s.nextSelectedActionId;
 
   return `
     <div class="screen active ippo-screen">
@@ -5824,7 +5807,6 @@ function viewIppoStep6(s) {
         <span style="width:36px;"></span>
       </div>
 
-      <!-- ヒーロー: すぷらん + before→after -->
       <div class="ippo-hero-card">
         <div style="text-align:center; margin-bottom:8px;">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
         <div class="ippo-hero-title">今日もよくやったね！</div>
@@ -5839,10 +5821,11 @@ function viewIppoStep6(s) {
             <div class="ippo-hero-num green">${after}<span class="ippo-hero-suf">/10</span></div>
           </div>
         </div>
-        ${change > 0 ? `<div class="ippo-hero-delta">+${change} 改善</div>` : change === 0 ? `<div class="ippo-hero-delta" style="color:var(--text-muted);">±0</div>` : `<div class="ippo-hero-delta" style="color:#D77B5B;">${change}</div>`}
+        ${change > 0 ? `<div class="ippo-hero-delta">+${change} 改善</div>`
+          : change === 0 ? `<div class="ippo-hero-delta" style="color:var(--text-muted);">±0</div>`
+          : `<div class="ippo-hero-delta" style="color:#D77B5B;">${change}</div>`}
       </div>
 
-      <!-- あなたの積み重ね -->
       <div class="ippo-stat-card">
         <div class="ippo-stat-h">📊 あなたの積み重ね</div>
         <div class="ippo-stat-row">
@@ -5861,7 +5844,6 @@ function viewIppoStep6(s) {
         </div>
       </div>
 
-      <!-- よく効くいっぽ -->
       ${bestAction ? `
         <div class="ippo-stat-card">
           <div class="ippo-stat-h">💗 よく効くいっぽ</div>
@@ -5872,7 +5854,6 @@ function viewIppoStep6(s) {
         </div>
       ` : ''}
 
-      <!-- 最近の傾向 -->
       <div class="ippo-stat-card">
         <div class="ippo-stat-h">🌱 最近の傾向</div>
         <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
@@ -5881,12 +5862,7 @@ function viewIppoStep6(s) {
         </div>
       </div>
 
-      <!-- もう一歩やってみる？ -->
-      <div class="ippo-cta-card">
-        <p class="text-tiny text-muted text-center" style="margin: 0 0 4px;">もし余裕があれば...</p>
-        <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もう一歩やってみる？</p>
-        <button class="btn btn-primary" data-act="ippo-step6-do-next-quick" style="width:100%;">もう一歩やる</button>
-      </div>
+      ${renderPendingOrMoreCta()}
 
       ${shouldSuggestDeepDive() ? `
         <button class="dd-entry-card" style="margin-top:14px;" data-act="ippo-save-then-dd">
@@ -5901,8 +5877,40 @@ function viewIppoStep6(s) {
   `;
 }
 
-// Step 7 は使用しない（仕様書ステップは0-6で完結）— 将来の拡張用
-function viewIppoStep7(s) { s.step = 6; return viewIppoStep6(s); }
+// 「もう一歩」CTA共通レンダラ — 保留があれば保留優先表示
+function renderPendingOrMoreCta() {
+  const pending = (state.ippoPending || []).slice().reverse();  // 最新順
+  if (pending.length > 0) {
+    return `
+      <div class="ippo-cta-card">
+        <p class="text-tiny text-muted text-center" style="margin: 0 0 6px;">あとでやるとした行動</p>
+        <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もう一歩やってみる？</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${pending.slice(0, 3).map(p => {
+            const act = ACTIONS.find(a => a.id === p.actionId);
+            return `
+              <button class="ippo-rec-card" style="padding:10px 14px;" data-act="ippo-resume-pending" data-pending-id="${p.id}">
+                <div class="ippo-rec-head" style="margin-bottom:0;">
+                  <span class="ippo-rec-icon" style="font-size:18px;">${act?.icon || '🌱'}</span>
+                  <span class="ippo-rec-title" style="font-size:13px;">${escapeHtml(act?.title || '保留中')}（${act?.time || ''}）</span>
+                  <span class="ippo-rec-pct" style="font-size:11px;">▶ いまやる</span>
+                </div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <button class="btn-ghost" data-act="ippo-do-another" style="margin-top:8px; width:100%; font-size:12px;">別の一歩を見る</button>
+      </div>
+    `;
+  }
+  return `
+    <div class="ippo-cta-card">
+      <p class="text-tiny text-muted text-center" style="margin: 0 0 4px;">もし余裕があれば...</p>
+      <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もう一歩やってみる？</p>
+      <button class="btn btn-primary" data-act="ippo-do-another" style="width:100%;">もう一歩やる</button>
+    </div>
+  `;
+}
 
 // 深掘りの発動条件（仕様書 §5 発動のきっかけ）
 function shouldSuggestDeepDive() {
@@ -6001,12 +6009,7 @@ function viewIppoTodayDone(session) {
         </div>
       </div>
 
-      <!-- もう一歩 CTA -->
-      <div class="ippo-cta-card">
-        <p class="text-tiny text-muted text-center" style="margin: 0 0 4px;">もし余裕があれば...</p>
-        <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もう一歩やってみる？</p>
-        <button class="btn btn-primary" data-act="ippo-do-another" style="width:100%;">もう一歩やる</button>
-      </div>
+      ${renderPendingOrMoreCta()}
     </div>
   `;
 }
@@ -8397,7 +8400,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.12-beta.1（新しい1日画面追加）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.13-beta.1（5ステップ再設計 / いまやる-あとでやる）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -8842,37 +8845,10 @@ function handleAction(act, el, ev) {
     return;
   }
   // 完了済日からの「もう一歩やる」: 直近セッションをベースに Step 3（複数選択）へ
+  // 「もう一歩やる」: 仕様変更（v0.9.13）— 必ず Step 1 から開始
+  // Step 0 (方向) はいつでも変えられる、ただし2回目以降は Step 1 直行
   if (act === 'ippo-do-another') {
-    const last = ippoCompletedToday();
-    if (!last) {
-      // フォールバック: 通常の新規開始
-      const startStep = (state.user && state.user.direction) ? 1 : 0;
-      ippoToday = { step: startStep, startedAt: new Date().toISOString() };
-      render();
-      return;
-    }
-    const nextCands = getNextStepRecommendations({
-      moodLabel: last.moodLabel,
-      moodIntensity: last.moodIntensity,
-      afterIntensity: last.afterIntensity,
-      selectedActionId: last.actionId,
-    }, 5);
-    if (nextCands.length === 0) {
-      const startStep = (state.user && state.user.direction) ? 1 : 0;
-      ippoToday = { step: startStep, startedAt: new Date().toISOString() };
-      render();
-      return;
-    }
-    ippoToday = {
-      step: 3,
-      moodLabel: last.moodLabel,
-      moodIntensity: last.afterIntensity,  // 直近の状態を引き継ぎ
-      directionId: state.user.direction,
-      candidates: nextCands,
-      candidatesShown: 3,
-      durationPref: '1min',
-      startedAt: new Date().toISOString(),
-    };
+    ippoToday = { step: 1, startedAt: new Date().toISOString() };
     render();
     return;
   }
@@ -8915,78 +8891,91 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // Step 1: 気分選択
+  // ====== 新5ステップフロー（v0.9.13） ======
+  // Step 1: 気分 + 強さ
   if (act === 'ippo-step1-mood') {
     if (ippoToday) ippoToday.moodLabel = el.dataset.mood;
     render();
     return;
   }
-  if (act === 'ippo-step1-next') {
-    if (!ippoToday || !ippoToday.moodLabel) { toast('気分を選んでね'); return; }
-    ippoToday.step = 2;
-    render();
-    return;
-  }
-  // Step 2: 強さ
-  if (act === 'ippo-step2-int') {
+  if (act === 'ippo-step1-int') {
     if (ippoToday) ippoToday.moodIntensity = parseInt(el.dataset.score, 10);
     render();
     return;
   }
-  if (act === 'ippo-step2-next') {
-    if (!ippoToday) return;
+  if (act === 'ippo-step1-next') {
+    if (!ippoToday || !ippoToday.moodLabel) { toast('気分を選んでね'); return; }
     if (ippoToday.moodIntensity == null) ippoToday.moodIntensity = 5;
-    ippoToday.candidates = null; // duration filter等変更時に再計算するため
-    ippoToday.step = 3;
+    ippoToday.candidates = null;  // 推薦再計算
+    ippoToday.step = 2;
     render();
     return;
   }
-  // Step 3: 推薦
-  if (act === 'ippo-step3-pick') {
+  // Step 2: 推薦
+  if (act === 'ippo-step2-pick') {
     if (ippoToday) ippoToday.selectedActionId = el.dataset.actionId;
     render();
     return;
   }
-  if (act === 'ippo-step3-more') {
+  if (act === 'ippo-step2-more') {
     if (ippoToday) ippoToday.candidatesShown = Math.min(5, (ippoToday.candidatesShown || 3) + 2);
     render();
     return;
   }
-  if (act === 'ippo-step3-dur') {
+  if (act === 'ippo-step2-dur') {
     if (ippoToday) {
       ippoToday.durationPref = el.dataset.dur;
-      ippoToday.candidates = null; // 再計算
+      ippoToday.candidates = null;
       ippoToday.candidatesShown = 3;
     }
     render();
     return;
   }
-  if (act === 'ippo-step3-next') {
+  if (act === 'ippo-step2-next') {
     if (!ippoToday || !ippoToday.selectedActionId) { toast('一歩を選んでね'); return; }
+    ippoToday.step = 3;
+    render();
+    return;
+  }
+  // Step 3: いまやる / あとでやる
+  if (act === 'ippo-step3-now') {
+    if (!ippoToday || !ippoToday.selectedActionId) return;
+    ippoToday.beforeIntensity = ippoToday.moodIntensity;
     ippoToday.step = 4;
     render();
     return;
   }
-  // Step 4: 実行
-  if (act === 'ippo-step4-done') {
-    if (ippoToday) {
-      ippoToday.beforeIntensity = ippoToday.moodIntensity;
-      ippoToday.step = 5;
-    }
-    render();
+  if (act === 'ippo-step3-later') {
+    if (!ippoToday || !ippoToday.selectedActionId) return;
+    // 保留に追加
+    state.ippoPending = state.ippoPending || [];
+    state.ippoPending.push({
+      id: uid(),
+      actionId: ippoToday.selectedActionId,
+      moodLabel: ippoToday.moodLabel,
+      moodIntensity: ippoToday.moodIntensity,
+      directionId: state.user.direction,
+      savedAt: new Date().toISOString(),
+    });
+    saveState();
+    toast('「あとでやる」に保存しました');
+    // 完了済セッションがあれば todayDone、なければホームへ
+    ippoToday = null;
+    if (ippoCompletedToday()) render();
+    else go('home');
     return;
   }
-  // Step 5: 変化記録
-  if (act === 'ippo-step5-after') {
+  // Step 4: 変化記録
+  if (act === 'ippo-step4-after') {
     if (ippoToday) ippoToday.afterIntensity = parseInt(el.dataset.score, 10);
     render();
     return;
   }
-  if (act === 'ippo-step5-next') {
+  if (act === 'ippo-step4-next') {
     if (!ippoToday) return;
     if (ippoToday.afterIntensity == null) ippoToday.afterIntensity = Math.max(0, ippoToday.beforeIntensity - 2);
-    // Step 6 遷移時に自動保存（行動後サマリーは保存後の振り返り画面）
-    if (!ippoToday.savedAtStep6) {
+    // Step 5 (サマリ) 遷移時に自動保存
+    if (!ippoToday.savedAtSummary) {
       const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
       state.ippoSessions.push({
         id: uid(),
@@ -9002,6 +8991,10 @@ function handleAction(act, el, ev) {
         startedAt: ippoToday.startedAt,
         completedAt: new Date().toISOString(),
       });
+      // 保留から消す（再開していた場合）
+      if (ippoToday.resumedPendingId) {
+        state.ippoPending = (state.ippoPending || []).filter(p => p.id !== ippoToday.resumedPendingId);
+      }
       saveState();
       if (window.MoyaLogger) MoyaLogger.event('ippo_completed', {
         moodLabel: ippoToday.moodLabel,
@@ -9009,90 +9002,41 @@ function handleAction(act, el, ev) {
         actionId: ippoToday.selectedActionId,
         directionId: state.user.direction,
       });
-      ippoToday.savedAtStep6 = true;
+      ippoToday.savedAtSummary = true;
     }
-    ippoToday.step = 6;
+    ippoToday.step = 5;
     render();
     return;
   }
-  // Step 6: AIフィードバック + 次の一歩
-  if (act === 'ippo-step6-pick-next') {
-    if (ippoToday) ippoToday.nextSelectedActionId = el.dataset.actionId;
-    render();
-    return;
-  }
-  // 「もう一歩やる」: Step 3（推薦複数件から選択）へ
-  if (act === 'ippo-step6-do-next-quick') {
-    if (!ippoToday) return;
-    // Step 6 で計算済みの nextCandidates を引き継ぎ。なければ再計算
-    let cands = ippoToday.nextCandidates;
-    if (!cands || cands.length === 0) {
-      cands = getNextStepRecommendations({
-        moodLabel: ippoToday.moodLabel,
-        moodIntensity: ippoToday.moodIntensity,
-        afterIntensity: ippoToday.afterIntensity,
-        selectedActionId: ippoToday.selectedActionId,
-      }, 5);
-    }
-    if (!cands || cands.length === 0) {
-      toast('おすすめが見つからないみたい');
-      return;
-    }
+  // 保留からの再開: Step 3 から
+  if (act === 'ippo-resume-pending') {
+    const pid = el.dataset.pendingId;
+    const p = (state.ippoPending || []).find(x => x.id === pid);
+    if (!p) return;
+    // 保留時の文脈を再構築。candidates にはこの行動だけ入れて Step 3 から
+    const action = ACTIONS.find(a => a.id === p.actionId);
+    if (!action) return;
+    const score = scoreAction(action, {
+      moodLabel: p.moodLabel,
+      intensity: p.moodIntensity,
+      directionId: p.directionId,
+      durationPref: '1min',
+      history: state.ippoSessions || [],
+    });
+    const reasons = generateActionReasons(action, score, {
+      moodLabel: p.moodLabel,
+      history: state.ippoSessions || [],
+    });
     ippoToday = {
       step: 3,
-      moodLabel: ippoToday.moodLabel,
-      moodIntensity: ippoToday.afterIntensity,  // 直近の状態を引き継ぎ
-      directionId: state.user.direction,
-      candidates: cands,
-      candidatesShown: 3,
-      durationPref: ippoToday.durationPref || '1min',
+      moodLabel: p.moodLabel,
+      moodIntensity: p.moodIntensity,
+      directionId: p.directionId,
+      candidates: [{ action, score, reasons }],
+      selectedActionId: p.actionId,
+      resumedPendingId: p.id,
       startedAt: new Date().toISOString(),
     };
-    render();
-    return;
-  }
-  if (act === 'ippo-step6-share') {
-    // 共有（Web Share API があれば、なければトーストでスキップ）
-    const c = ippoToday?.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
-    if (!ippoToday || !c) return;
-    const text = `きょうのいっぽ\n${c.action.title}\n${ippoToday.beforeIntensity}/10 → ${ippoToday.afterIntensity}/10`;
-    if (navigator.share) navigator.share({ title: 'きょうのいっぽ', text }).catch(() => {});
-    else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast('コピーしました'));
-    return;
-  }
-  if (act === 'ippo-step6-do-next') {
-    // 現在のセッションを保存して、選んだ次の一歩で新セッション開始
-    if (!ippoToday || !ippoToday.nextSelectedActionId) return;
-    const nextId = ippoToday.nextSelectedActionId;
-    const nextC = ippoToday.nextCandidates?.find(x => x.action.id === nextId);
-    // 現在を保存
-    const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
-    state.ippoSessions.push({
-      id: uid(),
-      moodLabel: ippoToday.moodLabel,
-      moodIntensity: ippoToday.moodIntensity,
-      directionId: state.user.direction,
-      actionId: ippoToday.selectedActionId,
-      score: c?.score.total || null,
-      reasons: c?.reasons || [],
-      beforeIntensity: ippoToday.beforeIntensity,
-      afterIntensity: ippoToday.afterIntensity,
-      changeValue: ippoToday.beforeIntensity - ippoToday.afterIntensity,
-      startedAt: ippoToday.startedAt,
-      completedAt: new Date().toISOString(),
-    });
-    saveState();
-    // 新セッションへ - 選んだ次の一歩を candidates に注入してStep 4へ
-    ippoToday = {
-      step: 4,
-      moodLabel: ippoToday.moodLabel,
-      moodIntensity: ippoToday.afterIntensity, // 直近の状態
-      directionId: state.user.direction,
-      candidates: nextC ? [nextC] : [],
-      selectedActionId: nextId,
-      startedAt: new Date().toISOString(),
-    };
-    toast('一歩を記録しました。次へ進みます');
     render();
     return;
   }
