@@ -1203,6 +1203,174 @@
 }
 [data-theme="dark"] .ippo-best-tag { background: rgba(167,196,160,0.2); color: #A7C4A0; }
 
+/* オンボーディング（v0.9.7 初回未使用時の説明画面） */
+.ippo-ob-screen { padding: 24px 18px 80px; }
+.ippo-ob-h1 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Noto Serif JP', serif;
+  line-height: 1.5;
+  margin: 8px 0 14px;
+  color: var(--text);
+}
+.ippo-ob-lead {
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--text-soft);
+  margin: 0 0 18px;
+}
+.ippo-ob-mascot { text-align: center; margin: 6px 0 18px; display: flex; justify-content: center; }
+.ippo-ob-mascot img, .ippo-ob-mascot svg { margin: 0 auto; }
+.ippo-ob-flow-card {
+  background: var(--bg-soft);
+  border-radius: 14px;
+  padding: 18px 14px;
+  margin-bottom: 18px;
+}
+[data-theme="dark"] .ippo-ob-flow-card { background: rgba(47, 62, 62, 0.45); }
+.ippo-ob-flow-h {
+  text-align: center;
+  font-size: 13px;
+  color: #6B8F71;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+[data-theme="dark"] .ippo-ob-flow-h { color: #A7C4A0; }
+.ippo-ob-flow-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  align-items: start;
+  position: relative;
+}
+.ippo-ob-flow-row::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 16%; right: 16%;
+  border-top: 1.5px dotted #C8D5C0;
+  z-index: 0;
+}
+[data-theme="dark"] .ippo-ob-flow-row::before { border-top-color: rgba(167,196,160,0.3); }
+.ippo-ob-flow-cell { text-align: center; position: relative; z-index: 1; }
+.ippo-ob-flow-icon {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px;
+  font-size: 20px;
+  border: 1.5px solid var(--divider);
+}
+[data-theme="dark"] .ippo-ob-flow-icon { background: var(--bg-card); }
+.ippo-ob-flow-text {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+.ippo-ob-flow-text strong {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 2px;
+}
+.ippo-ob-section-h {
+  text-align: center;
+  font-size: 13px;
+  color: #6B8F71;
+  font-weight: 600;
+  margin: 18px 0 12px;
+}
+[data-theme="dark"] .ippo-ob-section-h { color: #A7C4A0; }
+.ippo-ob-compare {
+  display: grid;
+  grid-template-columns: 1fr 18px 1fr;
+  gap: 6px;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+.ippo-ob-compare-card {
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 12px 10px;
+}
+[data-theme="dark"] .ippo-ob-compare-card { background: rgba(47, 62, 62, 0.45); }
+.ippo-ob-compare-badge {
+  display: inline-block;
+  background: var(--bg-card);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .ippo-ob-compare-badge { background: rgba(255,255,255,0.06); }
+.ippo-ob-compare-badge.late {
+  background: rgba(123, 168, 118, 0.18);
+  color: #5C7E60;
+}
+[data-theme="dark"] .ippo-ob-compare-badge.late { color: #A7C4A0; background: rgba(167,196,160,0.2); }
+.ippo-ob-compare-desc {
+  font-size: 10px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin: 0 0 8px;
+  text-align: center;
+}
+.ippo-ob-compare-item {
+  background: var(--bg-card);
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 11px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text);
+  line-height: 1.3;
+}
+[data-theme="dark"] .ippo-ob-compare-item { background: rgba(47, 62, 62, 0.7); }
+.ippo-ob-compare-item-match {
+  margin-left: auto;
+  font-size: 9px;
+  color: #6B8F71;
+  background: rgba(123, 168, 118, 0.15);
+  padding: 3px 6px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+[data-theme="dark"] .ippo-ob-compare-item-match { color: #A7C4A0; background: rgba(167,196,160,0.15); }
+.ippo-ob-compare-arrow {
+  color: var(--text-muted);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ippo-ob-privacy {
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+[data-theme="dark"] .ippo-ob-privacy { background: rgba(47, 62, 62, 0.45); }
+.ippo-ob-privacy-icon { font-size: 18px; color: #6B8F71; }
+.ippo-ob-privacy-text {
+  flex: 1;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-soft);
+}
+
 /* もう一歩やってみる CTA カード */
 .ippo-cta-card {
   background: var(--bg-card);
@@ -4865,6 +5033,10 @@ function viewAction() {
   // 今日すでに完了 + 進行中セッションなし → 完了サマリー表示
   const done = ippoCompletedToday();
   if (done && !ippoToday) return viewIppoTodayDone(done);
+  // 一度も使っていない & 進行中なし → オンボーディング画面
+  if (!ippoToday && (state.ippoSessions || []).length === 0) {
+    return viewIppoOnboarding();
+  }
   // 新規開始: 方向未設定なら Step 0 から、設定済みなら Step 1 から
   if (!ippoToday) {
     const startStep = (state.user && state.user.direction) ? 1 : 0;
@@ -4899,6 +5071,77 @@ function ippoDirectionLine() {
       <span>今日の方向性：</span>
       <span style="color:#7BA876; font-weight:600;">${escapeHtml(d.name)}</span>
       <button class="btn-ghost" data-act="ippo-change-direction" style="font-size:11px; padding:2px 8px; margin-left:4px;">変更</button>
+    </div>
+  `;
+}
+
+// オンボーディング画面（v0.9.7 初回未使用時）
+function viewIppoOnboarding() {
+  return `
+    <div class="screen active ippo-ob-screen">
+      <h1 class="ippo-ob-h1">使うほど、<br>あなただけの<br>「効く一歩」が<br>見つかります 🌱</h1>
+      <p class="ippo-ob-lead">
+        あなたの気分や行動の記録をもとに、<br>
+        AIがあなただけに合う行動を学習して、<br>
+        より効果的な一歩をレコメンドします。
+      </p>
+      <div class="ippo-ob-mascot">${suplan({ stage: 'tane', expression: 'happy', size: 80 })}</div>
+
+      <div class="ippo-ob-flow-card">
+        <div class="ippo-ob-flow-h">使うほど、どんどんパーソナライズ</div>
+        <div class="ippo-ob-flow-row">
+          <div class="ippo-ob-flow-cell">
+            <div class="ippo-ob-flow-icon">🌱</div>
+            <div class="ippo-ob-flow-text">はじめは、いろいろな<strong>一歩をご提案</strong></div>
+          </div>
+          <div class="ippo-ob-flow-cell">
+            <div class="ippo-ob-flow-icon">📊</div>
+            <div class="ippo-ob-flow-text">あなたの反応や変化を<strong>AIが学習</strong></div>
+          </div>
+          <div class="ippo-ob-flow-cell">
+            <div class="ippo-ob-flow-icon">💗</div>
+            <div class="ippo-ob-flow-text">あなたにぴったりの<strong>「効く一歩」を提案</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ippo-ob-section-h">例えば、こんなふうに変わっていきます</div>
+      <div class="ippo-ob-compare">
+        <div class="ippo-ob-compare-card">
+          <div style="text-align:center;">
+            <span class="ippo-ob-compare-badge">はじめの頃</span>
+          </div>
+          <p class="ippo-ob-compare-desc">あなたに合いそうな様々な行動をご提案します</p>
+          <div class="ippo-ob-compare-item">🌱 植物の世話 (3分)</div>
+          <div class="ippo-ob-compare-item">🎧 1分聴く</div>
+          <div class="ippo-ob-compare-item">💗 好きな香り (1分)</div>
+          <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:6px;">など</div>
+        </div>
+        <div class="ippo-ob-compare-arrow">→</div>
+        <div class="ippo-ob-compare-card">
+          <div style="text-align:center;">
+            <span class="ippo-ob-compare-badge late">使い続けると...</span>
+          </div>
+          <p class="ippo-ob-compare-desc">あなたの傾向から、「効く」一歩を優先してご提案します</p>
+          <div class="ippo-ob-compare-item">🌱 植物の世話 (3分)<span class="ippo-ob-compare-item-match">マッチ度<br>92%</span></div>
+          <div class="ippo-ob-compare-item">☕ お風呂 (5分)<span class="ippo-ob-compare-item-match">マッチ度<br>88%</span></div>
+          <div class="ippo-ob-compare-item">🎧 1分聴く<span class="ippo-ob-compare-item-match">マッチ度<br>85%</span></div>
+          <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:6px;">など</div>
+        </div>
+      </div>
+
+      <div class="ippo-ob-privacy">
+        <div class="ippo-ob-privacy-icon">🛡</div>
+        <div class="ippo-ob-privacy-text">
+          すべての記録はあなたのものだけ。<br>
+          安心してご利用いただけます。
+        </div>
+        <div style="font-size:14px;">🌱</div>
+      </div>
+
+      <button class="btn btn-primary" data-act="ippo-onboarding-start" style="width:100%;">
+        さっそく始める →
+      </button>
     </div>
   `;
 }
@@ -7745,7 +7988,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.6-beta.1（行動後サマリー / 改善の可視化）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.7-beta.1（いっぽ初回オンボーディング画面追加）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -8170,6 +8413,12 @@ function handleAction(act, el, ev) {
   // 設定
   // きょうのいっぽ（v0.9.2 仕様書準拠 Steps 0-6）
   if (act === 'ippo-cancel') { ippoToday = null; go('home'); return; }
+  if (act === 'ippo-onboarding-start') {
+    const startStep = (state.user && state.user.direction) ? 1 : 0;
+    ippoToday = { step: startStep, startedAt: new Date().toISOString() };
+    render();
+    return;
+  }
   if (act === 'ippo-back') {
     if (ippoToday) ippoToday.step = parseInt(el.dataset.to, 10) || 1;
     render();
