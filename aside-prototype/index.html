@@ -8061,7 +8061,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.8-beta.1（記録済み画面を改善の可視化デザインに統一）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.10-beta.1（もう一歩やる→Step 3 複数選択へ）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -8492,7 +8492,7 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // 完了済日からの「もう一歩やる」: 直近セッションをベースに次の推薦で即Step 4
+  // 完了済日からの「もう一歩やる」: 直近セッションをベースに Step 3（複数選択）へ
   if (act === 'ippo-do-another') {
     const last = ippoCompletedToday();
     if (!last) {
@@ -8507,22 +8507,21 @@ function handleAction(act, el, ev) {
       moodIntensity: last.moodIntensity,
       afterIntensity: last.afterIntensity,
       selectedActionId: last.actionId,
-    }, 3);
+    }, 5);
     if (nextCands.length === 0) {
-      // 候補なし → 通常の新規開始
       const startStep = (state.user && state.user.direction) ? 1 : 0;
       ippoToday = { step: startStep, startedAt: new Date().toISOString() };
       render();
       return;
     }
-    const next = nextCands[0];
     ippoToday = {
-      step: 4,
+      step: 3,
       moodLabel: last.moodLabel,
       moodIntensity: last.afterIntensity,  // 直近の状態を引き継ぎ
       directionId: state.user.direction,
-      candidates: [next],
-      selectedActionId: next.action.id,
+      candidates: nextCands,
+      candidatesShown: 3,
+      durationPref: '1min',
       startedAt: new Date().toISOString(),
     };
     render();
@@ -8673,17 +8672,31 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // 「もう一歩やる」: 推薦TOP1で即Step 4へ（保存は完了済）
+  // 「もう一歩やる」: Step 3（推薦複数件から選択）へ
   if (act === 'ippo-step6-do-next-quick') {
-    if (!ippoToday || !ippoToday.nextCandidates || ippoToday.nextCandidates.length === 0) return;
-    const next = ippoToday.nextCandidates[0];
+    if (!ippoToday) return;
+    // Step 6 で計算済みの nextCandidates を引き継ぎ。なければ再計算
+    let cands = ippoToday.nextCandidates;
+    if (!cands || cands.length === 0) {
+      cands = getNextStepRecommendations({
+        moodLabel: ippoToday.moodLabel,
+        moodIntensity: ippoToday.moodIntensity,
+        afterIntensity: ippoToday.afterIntensity,
+        selectedActionId: ippoToday.selectedActionId,
+      }, 5);
+    }
+    if (!cands || cands.length === 0) {
+      toast('おすすめが見つからないみたい');
+      return;
+    }
     ippoToday = {
-      step: 4,
+      step: 3,
       moodLabel: ippoToday.moodLabel,
       moodIntensity: ippoToday.afterIntensity,  // 直近の状態を引き継ぎ
       directionId: state.user.direction,
-      candidates: [next],
-      selectedActionId: next.action.id,
+      candidates: cands,
+      candidatesShown: 3,
+      durationPref: ippoToday.durationPref || '1min',
       startedAt: new Date().toISOString(),
     };
     render();
