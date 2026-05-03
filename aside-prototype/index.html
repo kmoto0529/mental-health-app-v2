@@ -2359,6 +2359,76 @@ h3 { font-size: 16px; font-weight: 500; }
   resize: none;
   max-height: 120px;
 }
+
+/* ============================================================
+   気分チャット フルスクリーン flex（v0.9.5 キーボード対応強化）
+   - 画面全体を 100dvh の縦flexに
+   - チャットリストが flex:1 で独立スクロール
+   - 入力欄は下部固定（fixed ではなく flex-shrink:0）
+   - キーボード表示時、レイアウトビューポートが縮小しても
+     直前のAIメッセージが自然に可視領域内に保たれる
+   ============================================================ */
+.mood-chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: 0;
+  animation: fadeIn 0.4s var(--ease);
+}
+.mood-chat-header {
+  flex-shrink: 0;
+  display: flex; align-items: center;
+  padding: 14px 16px 8px;
+}
+.mood-chat-header .page-back { margin-right: 4px; }
+.mood-chat-header .page-title { flex: 1; text-align: center; font-weight: 500; }
+
+.mood-chat-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.mood-chat-bottom {
+  flex-shrink: 0;
+  background: var(--bg);
+  border-top: 1px solid var(--divider);
+  padding: 8px 12px 10px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+[data-theme="dark"] .mood-chat-bottom { background: var(--bg); border-top-color: rgba(255,255,255,0.06); }
+
+/* クイックリプライ */
+.quick-reply-row {
+  display: flex; flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.quick-reply-chip {
+  background: var(--bg-soft);
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1 1 calc(50% - 3px);
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-theme="dark"] .quick-reply-chip { background: rgba(47,62,62,0.55); border-color: rgba(255,255,255,0.06); }
+.quick-reply-chip:hover {
+  background: rgba(123,168,118,0.15);
+  border-color: #7BA876;
+  color: #6B8F71;
+}
+[data-theme="dark"] .quick-reply-chip:hover { color: #A7C4A0; border-color: #A7C4A0; }
 .input-text::placeholder { color: var(--text-muted); }
 .input-send {
   background: var(--accent);
@@ -3366,6 +3436,46 @@ const defaultState = () => ({
 
 let state = loadState();
 
+// ============================================================
+// 1ヶ月超の記録を自動クリーンアップ（v0.9.5 容量コントロール）
+// ============================================================
+function cleanupOldRecords() {
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  const cutoff = oneMonthAgo.getTime();
+  const isRecent = (iso) => iso && new Date(iso).getTime() >= cutoff;
+  let removed = 0;
+  const before = {
+    moodLogs: (state.moodLogs || []).length,
+    moyamoyaRecords: (state.moyamoyaRecords || []).length,
+    aiChats: (state.aiChats || []).length,
+    ippoSessions: (state.ippoSessions || []).length,
+    deepDiveSessions: (state.deepDiveSessions || []).length,
+  };
+  state.moodLogs        = (state.moodLogs || []).filter(r => isRecent(r.createdAt));
+  state.moyamoyaRecords = (state.moyamoyaRecords || []).filter(r => isRecent(r.createdAt));
+  state.aiChats         = (state.aiChats || []).filter(r => isRecent(r.createdAt));
+  state.ippoSessions    = (state.ippoSessions || []).filter(r => isRecent(r.completedAt || r.startedAt));
+  state.deepDiveSessions = (state.deepDiveSessions || []).filter(r => isRecent(r.completedAt || r.startedAt));
+  removed = (before.moodLogs - state.moodLogs.length)
+          + (before.moyamoyaRecords - state.moyamoyaRecords.length)
+          + (before.aiChats - state.aiChats.length)
+          + (before.ippoSessions - state.ippoSessions.length)
+          + (before.deepDiveSessions - state.deepDiveSessions.length);
+  state.lastCleanup = Date.now();
+  if (removed > 0) { try { saveState(); } catch (_) {} }
+  return removed;
+}
+
+// 起動時 1日1回までクリーンアップ実行
+(function maybeCleanupOnInit() {
+  const last = state.lastCleanup || 0;
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  if (Date.now() - last > ONE_DAY) {
+    try { cleanupOldRecords(); } catch (_) {}
+  }
+})();
+
 function loadState() {
   try {
     // v3 を優先
@@ -3568,6 +3678,7 @@ function render() {
     case 'kiroku-trend':        html = viewKirokuTrend(); break;
     case 'kiroku-radar':        html = viewKirokuRadar(); break;
     case 'kiroku-ai-analysis':  html = viewKirokuAiAnalysis(); break;
+    case 'kiroku-chat':         html = viewKirokuChat(); break;
     default:                html = viewHome();
   }
   document.getElementById('main').innerHTML = html;
@@ -3912,23 +4023,38 @@ let moodChatSession = null;
 function viewMoodChat() {
   if (!moodChatSession) return '';
   const log = state.moodLogs.find(l => l.id === moodChatSession.logId);
+  // 最後のAIメッセージとユーザーターン数を計算
+  const msgs = moodChatSession.messages.filter(m => !m.typing);
+  const lastAi = [...msgs].reverse().find(m => m.role === 'assistant');
+  const userTurns = msgs.filter(m => m.role === 'user').length;
+  const isAwaitingUser = lastAi && (msgs[msgs.length - 1] === lastAi);
+  const replies = isAwaitingUser ? generateQuickReplies(log, lastAi?.content || '', userTurns) : [];
+
   return `
-    <div class="screen active" style="padding-bottom:120px;">
-      <div class="page-header">
+    <div class="screen active mood-chat-screen">
+      <div class="mood-chat-header">
         <button class="page-back" data-act="end-mood-chat">‹</button>
         <span class="page-title">AIと話す</span>
         <span style="width:36px;"></span>
       </div>
 
-      ${log ? renderMoodLogCard(log) : ''}
-
-      <div id="moodChatBox" style="margin-top:8px;">
-        ${moodChatSession.messages.map(m => renderChatBubble(m)).join('')}
+      <div class="mood-chat-list" id="moodChatList">
+        ${log ? renderMoodLogCard(log) : ''}
+        <div id="moodChatBox" style="margin-top:8px;">
+          ${moodChatSession.messages.map(m => renderChatBubble(m)).join('')}
+        </div>
       </div>
 
-      <div class="input-row" style="position:fixed; left:0; right:0; bottom:0; max-width:480px; margin:0 auto; z-index:50;">
-        <textarea class="input-text" id="moodChatInput" placeholder="気持ちを書いてみる…" rows="1" oninput="window.autoExpand(this)"></textarea>
-        <button class="input-send" data-act="mood-chat-send">↑</button>
+      <div class="mood-chat-bottom">
+        ${replies.length > 0 ? `
+          <div class="quick-reply-row">
+            ${replies.map(r => `<button class="quick-reply-chip" data-act="mood-quick-reply" data-text="${escapeHtml(r)}">${escapeHtml(r)}</button>`).join('')}
+          </div>
+        ` : ''}
+        <div class="input-row" style="position:relative; max-width:none; margin:0;">
+          <textarea class="input-text" id="moodChatInput" placeholder="気持ちを書いてみる…" rows="1" oninput="window.autoExpand(this)"></textarea>
+          <button class="input-send" data-act="mood-chat-send">↑</button>
+        </div>
       </div>
     </div>
   `;
@@ -3949,10 +4075,52 @@ function generateMoodAIOpening(log) {
     : mood && mood.id === 3
     ? `${cats.length ? cats.join('・') + 'のことなんだね。' : ''}今日はくもり気味なんだね。`
     : `${cats.length ? cats.join('・') + 'のことだね。' : ''}少し光が差してきたかな。`;
-  const ask = log.comment
-    ? '書いてくれた言葉、もう少し聞かせてもらってもいい？'
-    : 'よかったら、もう少し聞かせてくれる？';
-  return `${intro}\n\n${ask}`;
+
+  // ひとこと（任意）に記載があれば、引用してそこから会話を開始
+  if (log.comment && log.comment.trim()) {
+    const c = log.comment.trim();
+    const quoted = c.length > 80 ? c.slice(0, 78) + '…' : c;
+    return `${intro}\n\n「${quoted}」\nって書いてくれたんだね。\nそのことを、もう少し聞かせてもらえる？`;
+  }
+  return `${intro}\n\nよかったら、もう少し聞かせてくれる？`;
+}
+
+// 4つのクイックリプライ（タップで会話できる）— v0.9.5 タスク2b
+// AI 応答の文脈とユーザーターン数に応じて適切な選択肢を生成
+function generateQuickReplies(log, lastAiMessage, userTurns) {
+  // 初回ターン: ひとこと引用後 or 一般的な聞き出し
+  if (userTurns === 0) {
+    if (log && log.comment && log.comment.trim()) {
+      return [
+        'もう少し詳しく話したい',
+        '実は別のことが気になってる',
+        '今は言葉にならない',
+        'アドバイスがほしい',
+      ];
+    }
+    return [
+      '仕事のことで…',
+      '人間関係のことで…',
+      '体調・睡眠のことで…',
+      'うまく言葉にできない',
+    ];
+  }
+  // ターン1-2: 深掘り段階
+  if (userTurns <= 2) {
+    return [
+      'もう少し話す',
+      '別の見方が知りたい',
+      '小さくできる行動を知りたい',
+      '聞いてくれてありがとう',
+    ];
+  }
+  // 終盤: まとめ・ケア
+  return [
+    '小さな一歩を一緒に決めたい',
+    'もう少し気持ちを話したい',
+    'きろくに残しておく',
+    '今日はここまで',
+  ];
 }
 
 async function moodChatSend() {
@@ -5781,22 +5949,37 @@ function suplanExpression() {
   return 'calm';
 }
 
-// PNG資産の存在確認（読み込めたものから順次差し替え）
-const _suplanAssetCache = {};
-function suplanProbeAsset(category, name) {
-  const key = `${category}/${name}`;
-  if (key in _suplanAssetCache) return _suplanAssetCache[key];
-  _suplanAssetCache[key] = false;
-  const img = new Image();
-  img.onload = () => { _suplanAssetCache[key] = true; if (typeof render === 'function' && currentScreen) render(); };
-  img.onerror = () => { _suplanAssetCache[key] = false; };
-  img.src = `./assets/suplan/${key}.png`;
-  return false;
+// ============================================================
+// すぷらん画像レンダリング（v0.9.5 同期 IMG + onerror チェーン）
+//
+// 旧実装の問題: `suplanProbeAsset` が初回必ず false を返すため
+// 初回レンダリング時はSVG。currentScreen ガードで再レンダーが走らない
+// 場合（モーダル内、深いネスト、画面遷移直後など）SVGのまま残ってしまう。
+//
+// 新実装: <img> を直接出力し、onerror で次候補にチェーン。
+// ブラウザが既にキャッシュしているPNGは即時表示（SVGフラッシュなし）。
+// 全候補失敗時のみ最終フォールバックとして SVG 描画。
+// ============================================================
+const _suplanAssetCache = {};  // path → true (success) / false (404確認済) / undefined (未試行)
+
+// 起動時に確実存在する資産をプリウォームし、初回IMG src選択を高速化
+function preWarmSuplanAssets() {
+  const known = ['growth/stage1-tane'];
+  known.forEach(p => {
+    if (p in _suplanAssetCache) return;
+    const img = new Image();
+    img.onload  = () => { _suplanAssetCache[p] = true; };
+    img.onerror = () => { _suplanAssetCache[p] = false; };
+    img.src = `./assets/suplan/${p}.png`;
+  });
 }
 
-// メイン関数：HTMLを返す（PNG > SVG）
-// 優先順: 個別ファイル → growth-stage → 普遍フォールバック(tane) → SVG
-// 個別PNGを追加するだけで自動切替。配置されていない場所はtane PNGで埋める。
+// 旧API互換: 同期チェック用（cache 参照のみ、async 起動はしない）
+function suplanProbeAsset(category, name) {
+  return _suplanAssetCache[`${category}/${name}`] === true;
+}
+
+// メイン関数: PNG優先、IMG が連鎖的に onerror で次候補へ。最終はSVG
 function suplan(opts = {}) {
   const stage = opts.stage || suplanStage();
   const expression = opts.expression || suplanExpression();
@@ -5804,39 +5987,74 @@ function suplan(opts = {}) {
   const seasonal = opts.seasonal || null;
   const size = opts.size || 96;
   const stageIdx = SUPLAN_STAGES.indexOf(stage) + 1;
-  // PNG ロード失敗時に SVG フォールバックへ自動切替（onerror）
-  const imgTag = (cat, name) => `<img src="./assets/suplan/${cat}/${name}.png" width="${size}" height="${size}" alt="すぷらん" style="display:block; pointer-events:none; object-fit: contain;" onerror="window.suplanImgFail && window.suplanImgFail(this, '${cat}', '${name}', ${size})">`;
 
-  // 候補PNGを優先順に並べる
-  const candidates = [];
-  if (pose) candidates.push(['poses', pose]);
-  if (seasonal) candidates.push(['seasonal', seasonal]);
-  if (expression !== 'calm') candidates.push(['expressions', expression]);
-  candidates.push(['growth', `stage${stageIdx}-${stage}`]);
-  // 普遍フォールバック: tane（最低1枚は配置されていることが多い）
-  if (stageIdx !== 1) candidates.push(['growth', 'stage1-tane']);
+  // 優先順候補
+  const allPaths = [];
+  if (pose)        allPaths.push(`poses/${pose}`);
+  if (seasonal)    allPaths.push(`seasonal/${seasonal}`);
+  if (expression && expression !== 'calm') allPaths.push(`expressions/${expression}`);
+  allPaths.push(`growth/stage${stageIdx}-${stage}`);
+  if (stageIdx !== 1) allPaths.push(`growth/stage1-tane`);  // 普遍フォールバック
 
-  for (const [cat, name] of candidates) {
-    if (suplanProbeAsset(cat, name)) {
-      return imgTag(cat, name);
-    }
+  // 既知 false（404確認済）はチェーンから除外
+  const tryOrder = allPaths.filter(p => _suplanAssetCache[p] !== false);
+  // 既知 true（成功確認済）があれば最優先に
+  tryOrder.sort((a, b) => (_suplanAssetCache[b] === true ? 1 : 0) - (_suplanAssetCache[a] === true ? 1 : 0));
+
+  if (tryOrder.length === 0) {
+    return suplanSvg({ stage, expression, pose, size });
   }
-  // PNG が一切無い場合のみ SVG プレースホルダー
-  return suplanSvg({ stage, expression, pose, size });
+
+  const primary = tryOrder[0];
+  const chain = tryOrder.slice(1);
+  const safeAttr = (s) => String(s).replace(/[<>"&]/g, '');
+
+  return `<img src="./assets/suplan/${primary}.png"
+    width="${size}" height="${size}" alt="すぷらん"
+    data-suplan-chain="${chain.join('|')}"
+    data-suplan-size="${size}"
+    data-suplan-stage="${safeAttr(stage)}"
+    data-suplan-expression="${safeAttr(expression)}"
+    style="display:block; pointer-events:none; object-fit: contain;"
+    onload="window.suplanImgLoad && window.suplanImgLoad(this)"
+    onerror="window.suplanImgChainFail && window.suplanImgChainFail(this)">`;
 }
 
-// PNG ロード失敗時に SVG へ確実に置換するためのグローバル関数
-// （SW のフォールバックや一時的な fetch 失敗で IMG が壊れるのを防ぐ）
-window.suplanImgFail = function(imgEl, cat, name, size) {
-  if (!imgEl || !imgEl.parentNode) return;
-  // キャッシュも false に戻して再 probe させない
-  _suplanAssetCache[`${cat}/${name}`] = false;
+// IMG 成功時: キャッシュに記録（次回以降即座にこのパスを最優先）
+window.suplanImgLoad = function(img) {
+  const m = (img.src || '').match(/assets\/suplan\/(.+)\.png/);
+  if (m && m[1]) _suplanAssetCache[m[1]] = true;
+};
+
+// IMG 失敗時: 次候補にチェーン or 最終 SVG
+window.suplanImgChainFail = function(img) {
+  if (!img || !img.parentNode) return;
+  const m = (img.src || '').match(/assets\/suplan\/(.+)\.png/);
+  if (m && m[1]) _suplanAssetCache[m[1]] = false;
+
+  const chain = (img.dataset.suplanChain || '').split('|').filter(Boolean);
+  if (chain.length > 0) {
+    const next = chain.shift();
+    img.dataset.suplanChain = chain.join('|');
+    img.src = `./assets/suplan/${next}.png`;
+    return;
+  }
+  // 全候補失敗 → SVG置換
+  const size = parseInt(img.dataset.suplanSize, 10) || 96;
+  const stage = img.dataset.suplanStage || 'tane';
+  const expression = img.dataset.suplanExpression || 'calm';
   try {
-    imgEl.outerHTML = suplanSvg({ size: size || 96 });
+    img.outerHTML = suplanSvg({ stage, expression, size });
   } catch (_) {
-    imgEl.style.display = 'none';
+    img.style.display = 'none';
   }
 };
+
+// 旧API互換
+window.suplanImgFail = window.suplanImgChainFail;
+
+// 起動時プリウォーム（先頭で実行）
+preWarmSuplanAssets();
 
 // SVGプレースホルダー生成器（合成）
 function suplanSvg(opts = {}) {
@@ -6384,6 +6602,13 @@ function renderChatBubble(m) {
 }
 
 function scrollChatToBottom() {
+  // mood-chat-screen は flex レイアウトで .mood-chat-list が独立スクロール
+  const list = document.getElementById('moodChatList');
+  if (list) {
+    list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+    return;
+  }
+  // 旧来の goal-chat 等は document スクロール
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
 
@@ -6393,62 +6618,67 @@ window.autoExpand = function(el) {
 };
 
 // ============================================================
-// モバイルキーボード対応（AIと話す / 目標を決める チャット画面）
-//   - iOS Safari は position:fixed 要素がキーボードに隠れるので
-//     VisualViewport で検知して .input-row を持ち上げる
-//   - フォーカス時に最新メッセージを可視領域にスクロール
+// モバイルキーボード対応（v0.9.5 強化版）
+//   - mood-chat-screen は 100dvh flex レイアウトに変更したため、
+//     キーボード表示時にレイアウトviewportが縮小すれば自動で
+//     .mood-chat-list が縮み、入力欄は常に下に張り付く
+//   - フォーカス時に最新AIメッセージを確実に可視領域へスクロール
+//   - VisualViewport API は補助的に使用（goal-chat等の旧画面用）
 // ============================================================
 (function setupChatKeyboard() {
   const CHAT_INPUT_IDS = ['moodChatInput', 'goalChatInput'];
-  const CHAT_BOX_MAP = { moodChatInput: 'moodChatBox', goalChatInput: 'goalChatBox' };
 
   function isChatInput(el) {
     return el && CHAT_INPUT_IDS.indexOf(el.id) !== -1;
   }
 
-  function scrollLastMessageIntoView() {
-    const active = document.activeElement;
-    if (!isChatInput(active)) return;
-    const box = document.getElementById(CHAT_BOX_MAP[active.id]);
-    if (!box || !box.lastElementChild) return;
-    try {
-      box.lastElementChild.scrollIntoView({ block: 'end', behavior: 'smooth' });
-    } catch (_) {
-      // older browsers
-      box.lastElementChild.scrollIntoView(false);
+  // mood-chat-list（flex 独立スクロール）の最終行を可視領域に
+  function scrollMoodChatBottom() {
+    const list = document.getElementById('moodChatList');
+    if (!list) return;
+    list.scrollTop = list.scrollHeight;
+  }
+  // 旧 goal-chat（document スクロール）の最終要素を可視領域に
+  function scrollLegacyChatBottom() {
+    const box = document.getElementById('goalChatBox');
+    if (box && box.lastElementChild) {
+      try { box.lastElementChild.scrollIntoView({ block: 'end', behavior: 'smooth' }); }
+      catch (_) { box.lastElementChild.scrollIntoView(false); }
     }
   }
 
-  function adjustInputForViewport() {
+  function adjustLegacyInputForViewport() {
+    // mood-chat-screen は flex で対応されるので除外
+    if (document.querySelector('.mood-chat-screen')) return;
     const inputRow = document.querySelector('.input-row');
-    if (!inputRow) return;
-    if (!window.visualViewport) return;
+    if (!inputRow || !window.visualViewport) return;
     const vv = window.visualViewport;
-    // キーボードが占めるレイアウトビューポート下部の高さ
     const keyboardOffset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
     inputRow.style.bottom = keyboardOffset + 'px';
   }
 
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
-      adjustInputForViewport();
-      // resize 完了を待ってから最新メッセージを表示
-      requestAnimationFrame(scrollLastMessageIntoView);
+      adjustLegacyInputForViewport();
+      requestAnimationFrame(() => {
+        scrollMoodChatBottom();
+        scrollLegacyChatBottom();
+      });
     });
-    window.visualViewport.addEventListener('scroll', adjustInputForViewport);
   }
 
   document.addEventListener('focusin', (e) => {
     if (!isChatInput(e.target)) return;
-    // キーボードアニメーション完了を待つ
     setTimeout(() => {
-      adjustInputForViewport();
-      scrollLastMessageIntoView();
+      adjustLegacyInputForViewport();
+      scrollMoodChatBottom();
+      scrollLegacyChatBottom();
     }, 300);
   });
 
   document.addEventListener('focusout', (e) => {
     if (!isChatInput(e.target)) return;
+    if (document.querySelector('.mood-chat-screen')) return;  // flexは何もしない
     const inputRow = document.querySelector('.input-row');
     if (inputRow) inputRow.style.bottom = '0';
   });
@@ -6662,12 +6892,15 @@ function viewCalendarSection() {
       } else if (it.kind === 'mood') {
         const m = it.data;
         const moodObj = MOODS.find(x => x.id === m.moodScore);
+        const chat = (state.aiChats || []).find(c => c.sourceType === 'mood_log' && c.sourceId === m.id);
+        const hasChat = chat && (chat.messages || []).length > 1;
         html += `
-          <div class="kr-rec-card" style="cursor:default;">
-            <div class="kr-rec-meta">${formatDate(m.createdAt)} ・ 気分の記録</div>
+          <button class="kr-rec-card" ${hasChat ? `data-act="kiroku-chat" data-chat-id="${chat.id}"` : 'style="cursor:default;"'}>
+            <div class="kr-rec-meta">${formatDate(m.createdAt)} ・ 気分の記録${hasChat ? ' ・ AI会話あり' : ''}</div>
             <div class="kr-rec-title">${moodObj ? moodObj.emoji + ' ' + moodObj.label : ''}</div>
             ${m.comment ? `<div class="kr-rec-emo">${escapeHtml(m.comment)}</div>` : ''}
-          </div>
+            ${hasChat ? `<div class="kr-rec-memo">💬 タップで会話履歴を見る（${(chat.messages || []).length}件）</div>` : ''}
+          </button>
         `;
       } else if (it.kind === 'deepdive') {
         const d = it.data;
@@ -6803,6 +7036,43 @@ function viewKirokuDistortions() {
           <button class="btn btn-secondary" data-act="open-radar">バランスを確認する</button>
           <button class="btn-ghost" data-act="back-record">きろくに戻る</button>
         </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// 会話履歴閲覧画面（v0.9.5 タスク3 過去履歴閲覧）
+// ============================================================
+function viewKirokuChat() {
+  const chatId = viewParams.chatId;
+  const chat = (state.aiChats || []).find(c => c.id === chatId);
+  if (!chat) { setTimeout(() => go('record'), 0); return ''; }
+  const log = chat.sourceType === 'mood_log'
+    ? state.moodLogs.find(l => l.id === chat.sourceId)
+    : null;
+  const moodObj = log ? MOODS.find(x => x.id === log.moodScore) : null;
+  return `
+    <div class="screen active" style="padding-bottom:40px;">
+      <div class="kr-det-page-h">
+        <button class="kr-det-back" data-act="back-record">‹</button>
+        <span style="font-size:14px; font-weight:500;">会話の履歴</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div style="padding: 0 16px;">
+        <div class="text-tiny text-muted">${formatDate(chat.createdAt)}${moodObj ? ' ・ ' + moodObj.emoji + ' ' + moodObj.label : ''}</div>
+        ${log && log.comment ? `
+          <div class="kr-rec-memo" style="margin: 8px 0 14px;">
+            ひとこと: ${escapeHtml(log.comment)}
+          </div>
+        ` : ''}
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+          ${(chat.messages || []).map(m => renderChatBubble(m)).join('')}
+        </div>
+        <p class="text-tiny text-muted text-center" style="margin-top: 18px;">
+          ※ 会話の保存期間は1か月です。古い記録は自動的に削除されます
+        </p>
+        <button class="btn-ghost" data-act="back-record" style="width:100%; margin-top: 12px;">‹ 一覧に戻る</button>
       </div>
     </div>
   `;
@@ -7266,7 +7536,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.3-beta.1（きろくタブ全面刷新 / 思考のクセ TOP3・推移・レーダー）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.5-beta.1（画像安定 / クイックリプライ / 履歴閲覧 / 1ヶ月クリーンアップ）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -7525,6 +7795,12 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'mood-chat-send') { moodChatSend(); return; }
+  if (act === 'mood-quick-reply') {
+    const input = document.getElementById('moodChatInput');
+    if (input) { input.value = el.dataset.text || ''; }
+    moodChatSend();
+    return;
+  }
   if (act === 'end-mood-chat')  { endMoodChat(); return; }
 
   // もやもや整理
@@ -7669,6 +7945,7 @@ function handleAction(act, el, ev) {
   }
   if (act === 'day-detail') { viewParams.dateKey = el.dataset.date; go('day-detail'); return; }
   if (act === 'kiroku-detail') { viewParams.recordId = el.dataset.recordId; go('kiroku-detail'); return; }
+  if (act === 'kiroku-chat')   { viewParams.chatId = el.dataset.chatId;     go('kiroku-chat');   return; }
   if (act === 'open-distortions') { go('kiroku-distortions'); return; }
   if (act === 'open-trend') { go('kiroku-trend'); return; }
   if (act === 'open-radar') { go('kiroku-radar'); return; }
