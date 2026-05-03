@@ -1273,6 +1273,250 @@
 .acc-insight-check { color: #7BA876; font-weight: 700; }
 [data-theme="dark"] .acc-insight-check { color: #A7C4A0; }
 
+/* ============================================================
+   きろくタブ v0.9.3（仕様書 §6画面フロー: カレンダー/一覧/詳細/分析/推移/レーダー）
+   ============================================================ */
+
+/* 共通: きろく Hero メッセージ */
+.kr-hero-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0;
+}
+[data-theme="dark"] .kr-hero-card { background: rgba(47, 62, 62, 0.55); }
+.kr-hero-title { font-size: 12px; color: #B07F2F; font-weight: 600; margin-bottom: 4px; }
+[data-theme="dark"] .kr-hero-title { color: #D4B373; }
+.kr-hero-msg { font-size: 13px; line-height: 1.85; color: var(--text); }
+
+/* フィルタチップ */
+.kr-filter-row {
+  display: flex; gap: 8px;
+  margin-bottom: 14px; flex-wrap: wrap;
+}
+.kr-filter-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  border: 1.5px solid transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-soft);
+  font-family: inherit;
+  cursor: pointer;
+}
+[data-theme="dark"] .kr-filter-chip { background: rgba(47,62,62,0.45); }
+.kr-filter-chip.selected {
+  background: rgba(123,168,118,0.2);
+  border-color: #7BA876;
+  color: #6B8F71;
+  font-weight: 600;
+}
+[data-theme="dark"] .kr-filter-chip.selected { color: #A7C4A0; border-color: #A7C4A0; }
+
+/* 記録カード（一覧） */
+.kr-rec-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s ease;
+}
+[data-theme="dark"] .kr-rec-card { background: rgba(47,62,62,0.55); }
+.kr-rec-card:hover { border-color: rgba(123,168,118,0.3); }
+.kr-rec-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.kr-rec-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.kr-rec-emo { font-size: 12px; color: var(--text-soft); margin-bottom: 8px; }
+.kr-rec-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.kr-rec-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(123,168,118,0.15);
+  color: #5C7E60;
+}
+[data-theme="dark"] .kr-rec-tag { background: rgba(167,196,160,0.18); color: #A7C4A0; }
+.kr-rec-memo {
+  font-size: 11px;
+  color: #B07F2F;
+  background: rgba(220, 180, 100, 0.08);
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+[data-theme="dark"] .kr-rec-memo { color: #D4B373; background: rgba(220,180,100,0.1); }
+
+/* 詳細画面 セクション */
+.kr-det-page-h {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 8px;
+}
+.kr-det-back, .kr-det-more {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: 0; color: var(--text);
+  font-size: 18px; cursor: pointer;
+}
+.kr-det-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 18px;
+}
+[data-theme="dark"] .kr-det-card { background: rgba(47,62,62,0.55); }
+.kr-det-section {
+  background: var(--bg-soft);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 10px 0;
+}
+[data-theme="dark"] .kr-det-section { background: rgba(47,62,62,0.4); }
+.kr-det-section-h {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.kr-det-section-h.fact     { color: #6B8F71; }
+.kr-det-section-h.interp   { color: #D77B5B; }
+.kr-det-section-h.emotion  { color: #A86A8E; }
+.kr-det-section-h.action   { color: #5C7E80; }
+.kr-det-section p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--text);
+}
+.kr-det-emo-bar {
+  display: flex; align-items: center;
+  margin-top: 8px;
+  gap: 8px;
+}
+.kr-det-emo-bar-track {
+  flex: 1; height: 6px;
+  background: linear-gradient(to right, #6B8F71, #FAD9C9, #D77B5B);
+  border-radius: 999px;
+  position: relative;
+}
+.kr-det-emo-bar-thumb {
+  position: absolute;
+  top: -3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #6B8F71;
+  transform: translateX(-50%);
+}
+
+/* 思考のクセ TOP3 */
+.kr-distort-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+[data-theme="dark"] .kr-distort-card { background: rgba(47,62,62,0.55); }
+.kr-distort-rank {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(123,168,118,0.18);
+  color: #6B8F71;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'Noto Serif JP', serif;
+}
+[data-theme="dark"] .kr-distort-rank { background: rgba(167,196,160,0.2); color: #A7C4A0; }
+.kr-distort-name { font-weight: 600; font-size: 14px; }
+.kr-distort-desc { font-size: 12px; color: var(--text-soft); margin-top: 4px; line-height: 1.7; }
+.kr-distort-badge {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.kr-distort-badge.high { background: rgba(215,123,91,0.18); color: #C25E3F; }
+.kr-distort-badge.mid  { background: rgba(220,180,100,0.18); color: #B07F2F; }
+.kr-distort-badge.low  { background: rgba(123,168,118,0.18); color: #6B8F71; }
+.kr-distort-badge.none { background: var(--bg-soft); color: var(--text-muted); }
+[data-theme="dark"] .kr-distort-badge.low { color: #A7C4A0; }
+
+/* 変化の推移 */
+.kr-trend-row {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+[data-theme="dark"] .kr-trend-row { background: rgba(47,62,62,0.55); }
+.kr-trend-name { font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+.kr-trend-bars {
+  display: grid;
+  grid-template-columns: 50px 1fr 60px;
+  gap: 10px;
+  align-items: center;
+  margin: 4px 0;
+}
+.kr-trend-label-old { font-size: 11px; color: var(--text-muted); }
+.kr-trend-label-new { font-size: 11px; color: #6B8F71; font-weight: 600; }
+[data-theme="dark"] .kr-trend-label-new { color: #A7C4A0; }
+.kr-trend-bar-bg {
+  height: 14px; background: var(--bg-soft);
+  border-radius: 999px; overflow: hidden;
+}
+[data-theme="dark"] .kr-trend-bar-bg { background: rgba(47,62,62,0.3); }
+.kr-trend-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: var(--text-muted);
+}
+.kr-trend-bar-fill.new {
+  background: linear-gradient(to right, #A8D5A8, #6B8F71);
+}
+.kr-trend-pct { text-align: right; font-size: 12px; }
+.kr-trend-delta {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Noto Serif JP', serif;
+  text-align: right;
+  margin-top: 6px;
+}
+.kr-trend-delta.improved { color: #6B8F71; }
+[data-theme="dark"] .kr-trend-delta.improved { color: #A7C4A0; }
+.kr-trend-delta.worsened { color: #D77B5B; }
+
+/* レーダーチャート */
+.kr-radar-wrap {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 18px;
+  margin: 12px 0;
+}
+[data-theme="dark"] .kr-radar-wrap { background: rgba(47,62,62,0.55); }
+.kr-radar-legend {
+  display: flex; gap: 14px; justify-content: center;
+  margin-bottom: 10px; font-size: 11px;
+}
+.kr-radar-legend-item { display: flex; align-items: center; gap: 5px; }
+.kr-radar-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
 /* 深掘りカード（きろく入口） */
 .dd-entry-card {
   background: var(--bg-card);
@@ -3319,6 +3563,10 @@ function render() {
     case 'action-eval':     html = viewActionEval(); break;
     case 'record':          html = viewRecord(); break;
     case 'day-detail':      html = viewDayDetail(); break;
+    case 'kiroku-detail':       html = viewKirokuDetail(); break;
+    case 'kiroku-distortions':  html = viewKirokuDistortions(); break;
+    case 'kiroku-trend':        html = viewKirokuTrend(); break;
+    case 'kiroku-radar':        html = viewKirokuRadar(); break;
     default:                html = viewHome();
   }
   document.getElementById('main').innerHTML = html;
@@ -5977,6 +6225,153 @@ const AI_PROMPTS = {
 const MOOD_AI_SYSTEM = AI_PROMPTS.mood_chat.systemPrompt;
 
 // ============================================================
+// きろく分析エンジン（v0.9.3 仕様書 §5 思考のクセ分析）
+//   - DISTORTIONS の examples（キーワード）を使ってルールベースで検出
+//   - eventText + letterBody から認知の歪みパターンをスコアリング
+//   - TOP3 を「少しだけ／ややあり／ちょっと強め」のラベル付きで返す
+// ============================================================
+function distortionLabel(score) {
+  if (score >= 50) return { label: 'ちょっと強め', tone: 'high', color: '#D77B5B' };
+  if (score >= 25) return { label: 'ややあり',     tone: 'mid',  color: '#B07F2F' };
+  if (score >= 8)  return { label: '少しだけ',     tone: 'low',  color: '#7BA876' };
+  return { label: 'ほぼなし', tone: 'none', color: 'var(--text-muted)' };
+}
+
+function analyzeDistortions(records, daysWindow = 28) {
+  const since = new Date();
+  since.setDate(since.getDate() - daysWindow);
+  const recent = (records || []).filter(r => new Date(r.createdAt) >= since);
+  const total = Math.max(1, recent.length);
+
+  return DISTORTIONS.map(d => {
+    let hits = 0;
+    let hitRecords = 0;
+    recent.forEach(r => {
+      const text = (r.eventText || '') + ' ' + (r.letterBody || '') + ' ' + (r.alternativeView || '');
+      let hitInThis = 0;
+      d.examples.forEach(ex => {
+        const re = new RegExp(ex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+        const m = text.match(re);
+        if (m) hitInThis += m.length;
+      });
+      hits += hitInThis;
+      if (hitInThis > 0) hitRecords++;
+    });
+    // ratio of records that hit, weighted by hit density
+    const ratio = hitRecords / total;
+    const density = hits / total;
+    const score = Math.min(100, Math.round(ratio * 70 + density * 30));
+    return {
+      id: d.id,
+      name: d.name,
+      desc: d.desc,
+      counter: d.counter,
+      tier: d.tier,
+      hits, hitRecords, total,
+      score,
+      level: distortionLabel(score),
+    };
+  }).sort((a, b) => b.score - a.score);
+}
+
+function getDistortionTrend(records, days = 60, halfDays = 30) {
+  // 直近halfDays vs その前halfDays（合計days）を比較
+  const now = new Date();
+  const old = new Date(now); old.setDate(old.getDate() - days);
+  const mid = new Date(now); mid.setDate(mid.getDate() - halfDays);
+  const inRange = (r, from, to) => {
+    const t = new Date(r.createdAt);
+    return t >= from && t < to;
+  };
+  const recentRecords = (records || []).filter(r => inRange(r, mid, now));
+  const olderRecords  = (records || []).filter(r => inRange(r, old, mid));
+
+  const scoreAtSet = (set) => {
+    return DISTORTIONS.map(d => {
+      const t = Math.max(1, set.length);
+      let hitRecs = 0;
+      set.forEach(r => {
+        const text = (r.eventText || '') + ' ' + (r.letterBody || '') + ' ' + (r.alternativeView || '');
+        if (d.examples.some(ex => text.includes(ex))) hitRecs++;
+      });
+      return { id: d.id, name: d.name, score: Math.min(100, Math.round((hitRecs / t) * 100)) };
+    });
+  };
+  const before = scoreAtSet(olderRecords);
+  const after  = scoreAtSet(recentRecords);
+  return DISTORTIONS.map((d, i) => ({
+    id: d.id,
+    name: d.name,
+    before: before[i].score,
+    after: after[i].score,
+    delta: after[i].score - before[i].score,
+  })).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+}
+
+// 1記録 から「事実 / 解釈 / 感情 / 行動」に分解（仕様書 §5 詳細）
+function decomposeRecord(record) {
+  // 事実: eventText
+  const fact = record.eventText || '';
+  // 解釈: letterBody から「別の見方」直前のネガ思考を抽出（無ければ未記録）
+  let interp = '';
+  if (record.alternativeView) {
+    // alternativeView は AI の new view なので、ネガ思考そのものではないが、推測の手がかり
+    interp = '（このきろくでは元のネガティブ思考は明示記録されていません）';
+  }
+  // 感情
+  const emo = {
+    label: record.emotion || '',
+    before: record.emotionScoreBefore,
+    after: record.emotionScoreAfter,
+  };
+  // 行動: 同日の ippoSession から取得
+  const sameDay = (state.ippoSessions || []).find(s =>
+    s.completedAt && record.createdAt && sameDay2(new Date(s.completedAt), new Date(record.createdAt))
+  );
+  let action = '';
+  if (sameDay) {
+    const a = ACTIONS.find(x => x.id === sameDay.actionId);
+    action = a ? `${a.title}（${a.time}）— 強さ ${sameDay.beforeIntensity}→${sameDay.afterIntensity}` : '記録あり';
+  }
+
+  // 検出された認知の歪み（このレコードから）
+  const text = fact + ' ' + (record.letterBody || '') + ' ' + (record.alternativeView || '');
+  const detectedDistortions = DISTORTIONS.filter(d => d.examples.some(ex => text.includes(ex)))
+    .map(d => ({ id: d.id, name: d.name }));
+
+  return { fact, interp, emo, action, detectedDistortions };
+}
+function sameDay2(a, b) { return a.toDateString() === b.toDateString(); }
+
+// 1記録 ごとに「まめこメモ」を生成（記録一覧で表示）
+function generateRecordMemo(record) {
+  const dec = decomposeRecord(record);
+  if (dec.detectedDistortions.length > 0) {
+    const top = dec.detectedDistortions[0];
+    return `${top.name}のパターンがあるかも`;
+  }
+  if (dec.emo.before != null && dec.emo.after != null) {
+    const change = dec.emo.before - dec.emo.after;
+    if (change >= 3) return '気持ちがしっかり軽くなった日';
+    if (change >= 1) return 'すこし気持ちが軽くなった';
+    if (change <= -1) return 'まだ少し重く感じた日かも';
+  }
+  return null;
+}
+
+// カレンダーすぷらんからのひとこと（曜日・気分パターンから）
+function generateWeeklySuplanMessage() {
+  const recent = (state.moodLogs || []).slice(-14);
+  if (recent.length < 3) return 'まだ記録が少ないみたい。少しずつでだいじょうぶ。';
+  const lowDays = recent.filter(m => m.moodScore <= 2).length;
+  const ratio = lowDays / recent.length;
+  if (ratio >= 0.5) return '直近、気分がしんどい日が多かったみたい。一歩を小さくして、自分を労わる時間を増やしてもいいかも。';
+  if (ratio >= 0.3) return '気分の波が少し大きいみたい。睡眠と休息を少しだけ大事にしてみよっか。';
+  if (ratio >= 0.15) return 'おだやかな日が増えてきてるね。今のペースを大事にしていこう。';
+  return 'いい感じのリズムが続いてるよ。すこしずつ積み重なってる証拠だよ。';
+}
+
+// ============================================================
 // チャット共通
 // ============================================================
 function renderChatBubble(m) {
@@ -6173,28 +6568,386 @@ function viewCalendarSection() {
     </div>
   </div>`;
 
-  const recentLogs = [...state.moodLogs].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10);
-  const recentMoyamoya = [...state.moyamoyaRecords].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+  // 5色凡例
+  html += `<div class="text-tiny text-muted text-center" style="margin: 8px 0 14px;">
+    <span style="margin-right:6px;">⛈ とてもつらい</span>
+    <span style="margin-right:6px;">🌧 つらい</span>
+    <span style="margin-right:6px;">☁ ふつう</span>
+    <span style="margin-right:6px;">🌤 よい</span>
+    <span>☀ とてもよい</span>
+  </div>`;
 
-  if (recentLogs.length === 0 && recentMoyamoya.length === 0) {
+  // 思考のクセ分析カード（直近4週間）
+  const distortions = analyzeDistortions(state.moyamoyaRecords || [], 28);
+  const top1 = distortions[0];
+  if (top1 && top1.score >= 8) {
+    html += `
+      <button class="dd-entry-card" data-act="open-distortions">
+        <span class="dd-entry-icon">🧠</span>
+        <div>
+          <div class="dd-entry-title">思考のクセ分析（直近4週間）</div>
+          <div class="dd-entry-desc">最も多く見られるクセ: ${escapeHtml(top1.name)}（${top1.level.label}）</div>
+        </div>
+      </button>
+    `;
+  } else {
+    html += `
+      <button class="dd-entry-card" data-act="open-distortions">
+        <span class="dd-entry-icon">🧠</span>
+        <div>
+          <div class="dd-entry-title">思考のクセ分析</div>
+          <div class="dd-entry-desc">記録が増えると、あなたの思考パターンが見えてきます</div>
+        </div>
+      </button>
+    `;
+  }
+
+  // すぷらんからのひとこと
+  html += `
+    <div class="kr-hero-card">
+      <div style="width:48px; height:48px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
+      <div>
+        <div class="kr-hero-title">今週のすぷらんからのひとこと</div>
+        <div class="kr-hero-msg">${escapeHtml(generateWeeklySuplanMessage())}</div>
+      </div>
+    </div>
+  `;
+
+  // 記録一覧（フィルタ + まめこメモ）
+  const filter = state.ui.recordFilter || 'all';
+  html += `
+    <h3 class="section-title">最近のきろく</h3>
+    <div class="kr-filter-row">
+      <button class="kr-filter-chip ${filter==='all'?'selected':''}" data-act="record-filter" data-filter="all">すべて</button>
+      <button class="kr-filter-chip ${filter==='mood'?'selected':''}" data-act="record-filter" data-filter="mood">気分</button>
+      <button class="kr-filter-chip ${filter==='moyamoya'?'selected':''}" data-act="record-filter" data-filter="moyamoya">もやもや</button>
+      <button class="kr-filter-chip ${filter==='deepdive'?'selected':''}" data-act="record-filter" data-filter="deepdive">深掘り</button>
+    </div>
+  `;
+
+  // フィルタに応じて結合
+  let items = [];
+  if (filter === 'all' || filter === 'mood') {
+    items = items.concat((state.moodLogs || []).map(m => ({ kind: 'mood', t: m.createdAt, data: m })));
+  }
+  if (filter === 'all' || filter === 'moyamoya') {
+    items = items.concat((state.moyamoyaRecords || []).map(r => ({ kind: 'moyamoya', t: r.createdAt, data: r })));
+  }
+  if (filter === 'all' || filter === 'deepdive') {
+    items = items.concat((state.deepDiveSessions || []).map(d => ({ kind: 'deepdive', t: d.completedAt, data: d })));
+  }
+  items.sort((a, b) => new Date(b.t) - new Date(a.t));
+  items = items.slice(0, 12);
+
+  if (items.length === 0) {
     html += `<div class="card mt-3 text-center text-soft" style="padding:30px 20px;">
       まだ記録がありません。<br>ホームから「きもち」を残してみよう。
     </div>`;
   } else {
-    html += '<h3 class="section-title">最近のきろく</h3>';
-    if (recentMoyamoya.length > 0) {
-      html += recentMoyamoya.map(r => `
-        <div class="card" style="padding:14px;">
-          <div class="text-tiny text-muted">${formatDate(r.createdAt)} ・ もやもや整理</div>
-          <div class="mt-1" style="font-weight:500;">${escapeHtml(r.letterTitle || (r.eventText || '').slice(0, 30))}</div>
-          <div class="text-small text-soft mt-1">${escapeHtml(r.emotion || '')}（${r.emotionScoreBefore}→${r.emotionScoreAfter}）</div>
-        </div>
-      `).join('');
-    }
-    html += recentLogs.map(m => renderMoodLogCard(m, false)).join('');
+    items.forEach(it => {
+      if (it.kind === 'moyamoya') {
+        const r = it.data;
+        const memo = generateRecordMemo(r);
+        const titleText = r.letterTitle || (r.eventText || '').slice(0, 30);
+        const emoLine = `${r.emotion || ''}（${r.emotionScoreBefore}→${r.emotionScoreAfter}）`;
+        html += `
+          <button class="kr-rec-card" data-act="kiroku-detail" data-record-id="${r.id}">
+            <div class="kr-rec-meta">${formatDate(r.createdAt)} ・ もやもや整理</div>
+            <div class="kr-rec-title">${escapeHtml(titleText)}</div>
+            <div class="kr-rec-emo">${escapeHtml(emoLine)}</div>
+            ${memo ? `<div class="kr-rec-memo">🌱 まめこメモ: ${escapeHtml(memo)}</div>` : ''}
+          </button>
+        `;
+      } else if (it.kind === 'mood') {
+        const m = it.data;
+        const moodObj = MOODS.find(x => x.id === m.moodScore);
+        html += `
+          <div class="kr-rec-card" style="cursor:default;">
+            <div class="kr-rec-meta">${formatDate(m.createdAt)} ・ 気分の記録</div>
+            <div class="kr-rec-title">${moodObj ? moodObj.emoji + ' ' + moodObj.label : ''}</div>
+            ${m.comment ? `<div class="kr-rec-emo">${escapeHtml(m.comment)}</div>` : ''}
+          </div>
+        `;
+      } else if (it.kind === 'deepdive') {
+        const d = it.data;
+        html += `
+          <div class="kr-rec-card" style="cursor:default;">
+            <div class="kr-rec-meta">${formatDate(d.completedAt)} ・ 深掘り</div>
+            <div class="kr-rec-title">${escapeHtml(d.extractedBelief || d.coreBelief || '')}</div>
+            ${(d.tags || []).length > 0 ? `<div class="kr-rec-tags">${d.tags.map(t => `<span class="kr-rec-tag">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+          </div>
+        `;
+      }
+    });
   }
 
   return html;
+}
+
+// ============================================================
+// きろく詳細画面（仕様書 §3 1件の記録）
+// ============================================================
+function viewKirokuDetail() {
+  const recordId = viewParams.recordId;
+  const r = (state.moyamoyaRecords || []).find(x => x.id === recordId);
+  if (!r) { setTimeout(() => go('record'), 0); return ''; }
+  const dec = decomposeRecord(r);
+  const beforePos = (dec.emo.before || 5) * 10;  // 0-10 → 0-100
+  return `
+    <div class="screen active" style="padding-bottom:40px;">
+      <div class="kr-det-page-h">
+        <button class="kr-det-back" data-act="back-record">‹</button>
+        <span style="font-size:14px; font-weight:500;">記録の詳細</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div style="padding: 0 16px;">
+        <div class="text-tiny text-muted">${formatDate(r.createdAt)} ・ もやもや整理</div>
+        <h2 style="margin: 6px 0 4px; font-family:'Noto Serif JP', serif;">${escapeHtml(r.letterTitle || (r.eventText || '').slice(0, 40))}</h2>
+        <div class="text-small text-soft" style="margin-bottom: 14px;">${escapeHtml(r.emotion || '')}（${r.emotionScoreBefore}→${r.emotionScoreAfter}）</div>
+
+        <div class="kr-det-card">
+          <div class="kr-det-section">
+            <div class="kr-det-section-h fact">🌱 事実（客観的な出来事）</div>
+            <p>${escapeHtml(dec.fact)}</p>
+          </div>
+          <div class="kr-det-section">
+            <div class="kr-det-section-h interp">💭 解釈（頭に浮かんだ考え）</div>
+            <p>${escapeHtml(dec.interp || '（このきろくでは記録されていません）')}</p>
+          </div>
+          <div class="kr-det-section">
+            <div class="kr-det-section-h emotion">💗 感情（そのときの気持ち）</div>
+            <p>${escapeHtml(dec.emo.label)}（強さ ${dec.emo.before}/10 → ${dec.emo.after}/10）</p>
+            <div class="kr-det-emo-bar">
+              <span class="text-tiny text-muted">とてもつらい</span>
+              <div class="kr-det-emo-bar-track">
+                <div class="kr-det-emo-bar-thumb" style="left: ${beforePos}%;"></div>
+              </div>
+              <span class="text-tiny text-muted">とてもよい</span>
+            </div>
+          </div>
+          <div class="kr-det-section">
+            <div class="kr-det-section-h action">🌿 行動（とった行動・反応）</div>
+            <p>${escapeHtml(dec.action || '（記録されていません）')}</p>
+          </div>
+
+          ${dec.detectedDistortions.length > 0 ? `
+            <div class="text-tiny text-muted" style="margin: 12px 0 4px;">この記録から検出された認知のクセ</div>
+            <div style="display:flex; flex-wrap:wrap; gap: 6px;">
+              ${dec.detectedDistortions.map(d => `<span class="dd-tag">#${escapeHtml(d.name)}</span>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+
+        <button class="btn btn-primary" data-act="open-distortions" style="margin-top: 18px; width:100%;">この記録をもとに振り返る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// 思考のクセ TOP3 画面（仕様書 §4）
+// ============================================================
+function viewKirokuDistortions() {
+  const records = state.moyamoyaRecords || [];
+  const top = analyzeDistortions(records, 28).slice(0, 3);
+  const totalRecs = Math.min(records.length, 28);
+  return `
+    <div class="screen active" style="padding-bottom:40px;">
+      <div class="kr-det-page-h">
+        <button class="kr-det-back" data-act="back-record">‹</button>
+        <span style="font-size:14px; font-weight:500;">思考のクセの分析</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div style="padding: 0 16px;">
+        <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 14px;">
+          <div>${suplan({ stage: 'futaba', expression: 'happy', size: 56 })}</div>
+          <div style="flex:1;">
+            <h2 style="margin: 0 0 4px; font-size: 18px; font-family:'Noto Serif JP', serif;">あなたによく見られる<br>思考のクセ TOP3</h2>
+            <div class="text-tiny text-muted">直近4週間（${totalRecs}件）の記録から分析しました</div>
+          </div>
+        </div>
+
+        ${top.length === 0 ? `
+          <div class="card" style="padding:30px 20px; text-align:center; color:var(--text-soft);">
+            分析するための記録が足りないみたい。<br>もやもや整理を続けると、傾向が見えてきます。
+          </div>
+        ` : top.map((d, i) => `
+          <div class="kr-distort-card">
+            <div class="kr-distort-rank">${i + 1}</div>
+            <div>
+              <div class="kr-distort-name">${escapeHtml(d.name)}</div>
+              <div class="kr-distort-desc">${escapeHtml(d.desc)}</div>
+            </div>
+            <span class="kr-distort-badge ${d.level.tone}">${d.level.label}</span>
+          </div>
+        `).join('')}
+
+        ${top.length > 0 && top[0].counter ? `
+          <div class="ippo-do-card" style="margin-top: 14px;">
+            <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
+            <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">${escapeHtml(top[0].counter)}</p>
+          </div>
+        ` : ''}
+
+        <div style="display:grid; gap: 10px; margin-top: 18px;">
+          <button class="btn btn-primary" data-act="open-trend">グラフで詳しく見る</button>
+          <button class="btn btn-secondary" data-act="open-radar">バランスを確認する</button>
+          <button class="btn-ghost" data-act="back-record">きろくに戻る</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// 思考のクセの変化（仕様書 §5 推移）
+// ============================================================
+function viewKirokuTrend() {
+  const records = state.moyamoyaRecords || [];
+  const trends = getDistortionTrend(records, 60, 30).slice(0, 5);
+  const overall = trends.reduce((s, t) => s + t.delta, 0);
+  return `
+    <div class="screen active" style="padding-bottom:40px;">
+      <div class="kr-det-page-h">
+        <button class="kr-det-back" data-act="open-distortions">‹</button>
+        <span style="font-size:14px; font-weight:500;">思考のクセの変化</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div style="padding: 0 16px;">
+        <h2 style="font-size: 18px; font-family:'Noto Serif JP', serif; margin: 6px 0 4px;">直近2ヶ月の変化</h2>
+        <div class="text-tiny text-muted" style="margin-bottom:12px;">
+          <span style="display:inline-block; width:10px; height:10px; background:var(--text-muted); border-radius:50%; margin-right:5px;"></span>2ヶ月前
+          <span style="display:inline-block; width:10px; height:10px; background:#6B8F71; border-radius:50%; margin: 0 5px 0 12px;"></span>現在
+        </div>
+
+        ${trends.map(t => `
+          <div class="kr-trend-row">
+            <div class="kr-trend-name">${escapeHtml(t.name)}</div>
+            <div class="kr-trend-bars">
+              <div class="kr-trend-label-old">2ヶ月前</div>
+              <div class="kr-trend-bar-bg"><div class="kr-trend-bar-fill" style="width:${t.before}%;"></div></div>
+              <div class="kr-trend-pct">${t.before}%</div>
+            </div>
+            <div class="kr-trend-bars">
+              <div class="kr-trend-label-new">現在</div>
+              <div class="kr-trend-bar-bg"><div class="kr-trend-bar-fill new" style="width:${t.after}%;"></div></div>
+              <div class="kr-trend-pct">${t.after}%</div>
+            </div>
+            <div class="kr-trend-delta ${t.delta < 0 ? 'improved' : t.delta > 0 ? 'worsened' : ''}">
+              ${t.delta === 0 ? '±0%' : (t.delta < 0 ? t.delta + '%' : '+' + t.delta + '%')}
+            </div>
+          </div>
+        `).join('')}
+
+        <div class="ippo-do-card" style="margin-top: 14px;">
+          <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
+          <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">
+            ${overall < -10 ? 'この調子だよ〜！気づくことが、変化のいちばんの第一歩なんだ。' :
+              overall < 0 ? '少しずつでもいい方向に進んでるね。' :
+              overall === 0 ? '今は安定期。続けていると、ゆっくり動き出すよ。' :
+              '波があるのは自然なこと。記録を続けることで、見えてくるものがあるよ。'}
+          </p>
+          <div style="margin-top:8px; padding: 4px 10px; border-radius: 999px; background: rgba(123,168,118,0.18); display:inline-block; font-size:11px; color:#5C7E60; font-weight:600;">
+            ${overall <= 0 ? '全体として改善傾向 ↗' : '波の途中 ↗↘'}
+          </div>
+        </div>
+
+        <div style="display:grid; gap: 10px; margin-top: 18px;">
+          <button class="btn btn-primary" data-act="open-radar">レーダーチャートで見る</button>
+          <button class="btn-ghost" data-act="open-distortions">‹ クセ分析に戻る</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// 思考のクセ レーダーチャート（仕様書 §6）
+// ============================================================
+function viewKirokuRadar() {
+  const records = state.moyamoyaRecords || [];
+  const distortions = analyzeDistortions(records, 28);
+  // レーダー軸: 主要5パターン
+  const axes = [
+    distortions.find(d => d.id === 'overgeneralization') || { name: '過度な一般化', score: 0 },
+    distortions.find(d => d.id === 'mind_reading')       || { name: '心の読みすぎ', score: 0 },
+    distortions.find(d => d.id === 'labeling')           || { name: 'レッテル貼り', score: 0 },
+    distortions.find(d => d.id === 'all_or_nothing')     || { name: '感情的決めつけ', score: 0 },
+    distortions.find(d => d.id === 'should')             || { name: 'べき思考', score: 0 },
+  ];
+
+  // SVGレーダーチャート
+  const cx = 150, cy = 150, R = 110;
+  const N = axes.length;
+  const angle = (i) => -Math.PI / 2 + (2 * Math.PI * i / N);
+  const point = (i, frac) => `${cx + Math.cos(angle(i)) * R * frac},${cy + Math.sin(angle(i)) * R * frac}`;
+
+  // 同心円（4段階）
+  const grid = [0.25, 0.5, 0.75, 1].map(f => {
+    const pts = Array.from({length: N}, (_, i) => point(i, f)).join(' ');
+    return `<polygon points="${pts}" fill="none" stroke="var(--divider)" stroke-width="1" />`;
+  }).join('');
+
+  // 平均参考線（全部30%固定）
+  const avgPts = Array.from({length: N}, (_, i) => point(i, 0.3)).join(' ');
+  // ユーザーデータ
+  const userPts = axes.map((a, i) => point(i, Math.min(1, a.score / 100))).join(' ');
+  // 軸線
+  const axisLines = Array.from({length: N}, (_, i) => `<line x1="${cx}" y1="${cy}" x2="${point(i, 1).split(',')[0]}" y2="${point(i, 1).split(',')[1]}" stroke="var(--divider)" stroke-width="1" />`).join('');
+  // ラベル
+  const labels = axes.map((a, i) => {
+    const lp = point(i, 1.18).split(',');
+    return `<text x="${lp[0]}" y="${lp[1]}" text-anchor="middle" font-size="11" fill="var(--text)" alignment-baseline="middle">${a.name}</text>`;
+  }).join('');
+  // ラベル下の状態
+  const subLabels = axes.map((a, i) => {
+    const lp = point(i, 1.32).split(',');
+    const lvl = distortionLabel(a.score || 0);
+    return `<text x="${lp[0]}" y="${lp[1]}" text-anchor="middle" font-size="10" fill="${lvl.color}">${lvl.label}</text>`;
+  }).join('');
+
+  return `
+    <div class="screen active" style="padding-bottom:40px;">
+      <div class="kr-det-page-h">
+        <button class="kr-det-back" data-act="open-trend">‹</button>
+        <span style="font-size:14px; font-weight:500;">思考のクセのバランス</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div style="padding: 0 16px;">
+        <div class="kr-radar-legend">
+          <div class="kr-radar-legend-item"><span class="kr-radar-legend-dot" style="background:#D77B5B;"></span>あなた</div>
+          <div class="kr-radar-legend-item"><span class="kr-radar-legend-dot" style="background:var(--text-muted);"></span>平均</div>
+        </div>
+        <div class="kr-radar-wrap">
+          <svg viewBox="0 0 300 320" style="width:100%; height:auto;" aria-label="思考のクセのバランス">
+            ${grid}
+            ${axisLines}
+            <polygon points="${avgPts}" fill="rgba(120,120,120,0.08)" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 3" />
+            <polygon points="${userPts}" fill="rgba(215,123,91,0.18)" stroke="#D77B5B" stroke-width="1.5" />
+            ${axes.map((a, i) => {
+              const p = point(i, Math.min(1, a.score / 100)).split(',');
+              return `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#D77B5B" />`;
+            }).join('')}
+            ${labels}
+            ${subLabels}
+          </svg>
+        </div>
+
+        <div class="ippo-do-card" style="margin-top: 14px;">
+          <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'calm', size: 48 })}</div>
+          <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">
+            バランスを知ることで、もっと自分をラクにしてあげようね。<br>
+            強く出ているクセほど、ちょっとしたきっかけで気づきやすいよ。
+          </p>
+        </div>
+
+        <div style="display:grid; gap: 10px; margin-top: 18px;">
+          <button class="btn btn-primary" data-act="open-action">行動のヒントを見る</button>
+          <button class="btn-ghost" data-act="open-trend">‹ 推移に戻る</button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function viewDayDetail() {
@@ -6416,7 +7169,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.2-beta.1（方向選択 / 気分10択 / マッチ度 / 次の一歩）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.3-beta.1（きろくタブ全面刷新 / 思考のクセ TOP3・推移・レーダー）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -6818,6 +7571,17 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'day-detail') { viewParams.dateKey = el.dataset.date; go('day-detail'); return; }
+  if (act === 'kiroku-detail') { viewParams.recordId = el.dataset.recordId; go('kiroku-detail'); return; }
+  if (act === 'open-distortions') { go('kiroku-distortions'); return; }
+  if (act === 'open-trend') { go('kiroku-trend'); return; }
+  if (act === 'open-radar') { go('kiroku-radar'); return; }
+  if (act === 'open-action') { go('action'); return; }
+  if (act === 'record-filter') {
+    state.ui.recordFilter = el.dataset.filter;
+    saveState();
+    render();
+    return;
+  }
 
   // 設定
   // きょうのいっぽ（v0.9.2 仕様書準拠 Steps 0-6）
