@@ -1,6 +1,6 @@
 # 行動カタログ更新ガイド（Google Sheets運用）
 
-**対象**: Aside β版
+**対象**: もやの森 β版
 **真実の源**: Google Sheets（公開CSV）
 **仕組み**: アプリ起動時に Sheets の CSV を取得 → ACTION_CATALOG を上書き → 表示反映
 
@@ -11,7 +11,7 @@
 ### Step 1. Google Sheets を新規作成
 
 1. https://sheets.new で新規スプレッドシート作成
-2. ファイル名: 「**Aside 行動カタログ**」
+2. ファイル名: 「**もやの森 行動カタログ**」
 3. 1行目に**そのままヘッダー**を貼り付け（重要：列順を守る）：
 
 ```
@@ -110,7 +110,7 @@ window.ASIDE_CONFIG = {
 | Sheets取得失敗（オフライン等） | localStorageキャッシュを使用。それも無ければバンドル既定値 |
 | パース不能 | バンドル既定値にfallback |
 
-→ **シートが壊れてもアプリは死なない**。ただしConsoleに警告が出るので、編集後は念のため DevTools Console で `[AsideCatalog]` 警告がないか確認推奨。
+→ **シートが壊れてもアプリは死なない**。ただしConsoleに警告が出るので、編集後は念のため DevTools Console で `[MoyaCatalog]` 警告がないか確認推奨。
 
 ---
 
@@ -120,12 +120,12 @@ window.ASIDE_CONFIG = {
 
 - 成功時:
   ```
-  [AsideCatalog] キャッシュから 120 件適用 (2分前)
-  [AsideCatalog] sheets から 122 件読み込み完了 (skip: 0)
+  [MoyaCatalog] キャッシュから 120 件適用 (2分前)
+  [MoyaCatalog] sheets から 122 件読み込み完了 (skip: 0)
   ```
 - 設定ミス時:
   ```
-  [AsideCatalog] バリデーションエラー (3件、最初の5件表示):
+  [MoyaCatalog] バリデーションエラー (3件、最初の5件表示):
     - L15 (act_xx): type 不正 "ap"
   ```
 
@@ -148,7 +148,7 @@ window.ASIDE_CONFIG = {
 
 - Sheetsの**公開**設定を再確認（共有とは別。「ウェブに公開」が必要）
 - Sheetsのキャッシュは最大15分。時間を置いて再リロード
-- DevTools Console で `[AsideCatalog]` の取得結果を確認
+- DevTools Console で `[MoyaCatalog]` の取得結果を確認
 - それでもダメなら `localStorage.removeItem('aside_catalog_cache_v1')` してリロード
 
 ### URLを変えたい / シートを別のものに切り替えたい

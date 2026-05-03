@@ -1,5 +1,5 @@
 /*
- * AsideLogger — Aside (ひといき) β版 ログSDK
+ * MoyaLogger — もやの森 (ひといき) β版 ログSDK
  *
  * 役割:
  *   - 匿名ID発行・localStorage保存
@@ -21,7 +21,7 @@
  *   <script src="js/logger.js"></script>
  *
  *   // 同意取得後に:
- *   AsideLogger.init();
+ *   MoyaLogger.init();
  */
 
 (function (global) {
@@ -90,11 +90,11 @@
         keepalive: true
       }).then((res) => {
         if (!res.ok) {
-          console.warn('[AsideLogger]', method, path, res.status, res.statusText);
+          console.warn('[MoyaLogger]', method, path, res.status, res.statusText);
         }
         return null;  // return=minimal なので body は読まない
       }).catch((err) => {
-        console.warn('[AsideLogger] network error:', err && err.message);
+        console.warn('[MoyaLogger] network error:', err && err.message);
         return null;
       });
     };
@@ -206,7 +206,7 @@
       if (initialized) return api;
       const c = Object.assign({}, global.ASIDE_CONFIG || {}, configOverride || {});
       if (!c.supabaseUrl || !c.supabaseAnonKey) {
-        console.warn('[AsideLogger] ASIDE_CONFIG.supabaseUrl / supabaseAnonKey が未設定。ログは送信されません。');
+        console.warn('[MoyaLogger] ASIDE_CONFIG.supabaseUrl / supabaseAnonKey が未設定。ログは送信されません。');
         return api;
       }
       cfg = {
@@ -366,6 +366,6 @@
     }
   };
 
-  global.AsideLogger = api;
+  global.MoyaLogger = api;
 
 })(typeof window !== 'undefined' ? window : this);

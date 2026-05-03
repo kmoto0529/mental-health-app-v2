@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-<title>Aside — ひとりで抱えてる、を、ちょっとずつ整理する。</title>
+<title>もやの森 — ひとりで抱えてる、を、ちょっとずつ整理する。</title>
 
 <!-- PWA / iOSホーム画面追加 -->
 <link rel="manifest" href="manifest.json">
@@ -11,7 +11,7 @@
 <meta name="description" content="相談したいけどハードルで相談できていない方が、毎日3-5分で気持ちと行動を整理するアプリ">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Aside">
+<meta name="apple-mobile-web-app-title" content="もやの森">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -23,11 +23,11 @@
 
 <style>
 /* ============================================================
-   Aside v2.1 — ナナメトーンデザインシステム
+   もやの森 v2.1 — ナナメトーンデザインシステム
    ============================================================ */
 :root {
   /* ============================================================
-     Aside Design Tokens v2 — デザイン部統合版 2026-04-30
+     もやの森 Design Tokens v2 — デザイン部統合版 2026-04-30
      - Primary: Sage Green (デザイン部 v1 準拠)
      - Secondary/FAB: Warm Sand (ブリーフ「ブラウン系」準拠)
      - Crisis: Sage (ブリーフ「赤NG・ブラウン or 緑」準拠)
@@ -799,8 +799,8 @@
   font-weight: 600;
 }
 
-/* まめこからの言葉 */
-.letter-mameko {
+/* すぷらんからの言葉 */
+.letter-suplan {
   background: #ECEFE3;
   border: 1px solid rgba(150, 175, 120, 0.32);
   border-radius: 14px;
@@ -812,23 +812,23 @@
   margin-top: 4px;
   position: relative;
 }
-.letter-mameko-img {
+.letter-suplan-img {
   width: 60px; height: 60px;
   background: rgba(255,255,255,0.45);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
 }
-.letter-mameko-img img { width: 56px; height: 56px; object-fit: contain; }
-.letter-mameko-content { color: rgba(63, 53, 38, 0.9); }
-.letter-mameko-title {
+.letter-suplan-img img { width: 56px; height: 56px; object-fit: contain; }
+.letter-suplan-content { color: rgba(63, 53, 38, 0.9); }
+.letter-suplan-title {
   font-size: 12px;
   color: #B07F2F;
   font-weight: 600;
   margin-bottom: 6px;
 }
-.letter-mameko-content p { margin: 0 0 2px; font-size: 13px; line-height: 1.75; }
-.letter-mameko-en {
+.letter-suplan-content p { margin: 0 0 2px; font-size: 13px; line-height: 1.75; }
+.letter-suplan-en {
   text-align: right;
   font-style: italic;
   font-family: 'Times New Roman', serif;
@@ -1312,9 +1312,9 @@
 }
 
 /* ============================================================
-   Welcome まめこ版
+   Welcome すぷらん版
    ============================================================ */
-.welcome-mameko {
+.welcome-suplan {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1323,14 +1323,14 @@
   padding: 60px 32px;
   background: linear-gradient(180deg, #FAF7F2 0%, #F1E8D5 100%);
 }
-.welcome-mameko .welcome-content {
+.welcome-suplan .welcome-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   max-width: 320px;
 }
-.welcome-mameko-art {
+.welcome-suplan-art {
   width: 160px;
   height: 176px;
   margin-bottom: 28px;
@@ -1338,8 +1338,8 @@
   align-items: center;
   justify-content: center;
 }
-.welcome-mameko-art svg, .welcome-mameko-art img { width: 100%; height: 100%; object-fit: contain; }
-.welcome-mameko .welcome-logo {
+.welcome-suplan-art svg, .welcome-suplan-art img { width: 100%; height: 100%; object-fit: contain; }
+.welcome-suplan .welcome-logo {
   font-family: 'Noto Serif JP', serif;
   font-size: 30px;
   font-weight: 600;
@@ -1347,7 +1347,7 @@
   margin-bottom: 18px;
   letter-spacing: 0.05em;
 }
-.welcome-mameko .welcome-message {
+.welcome-suplan .welcome-message {
   font-family: 'Noto Serif JP', serif;
   font-size: 15px;
   line-height: 2;
@@ -1355,7 +1355,7 @@
   text-align: center;
   margin-bottom: 38px;
 }
-.welcome-mameko .welcome-cta {
+.welcome-suplan .welcome-cta {
   width: 100%;
   background: #7BA876;
   color: #FFF;
@@ -1367,7 +1367,7 @@
   margin-bottom: 12px;
   cursor: pointer;
 }
-.welcome-mameko .welcome-skip {
+.welcome-suplan .welcome-skip {
   background: transparent;
   border: 0;
   color: #9E9E9E;
@@ -2677,8 +2677,8 @@ let currentScreen = 'welcome';
 
 function go(screen, opts = {}) {
   currentScreen = screen;
-  if (window.AsideLogger) {
-    AsideLogger.screenView(screen, opts);
+  if (window.MoyaLogger) {
+    MoyaLogger.screenView(screen, opts);
   }
   render();
   window.scrollTo(0, 0);
@@ -2724,12 +2724,12 @@ function render() {
 // ============================================================
 function viewWelcome() {
   return `
-    <div class="welcome-screen welcome-mameko">
+    <div class="welcome-screen welcome-suplan">
       <div class="welcome-content">
-        <div class="welcome-mameko-art" aria-hidden="true">
-          ${mameko({ stage: 'tane', expression: 'calm', size: 160 })}
+        <div class="welcome-suplan-art" aria-hidden="true">
+          ${suplan({ stage: 'tane', expression: 'calm', size: 160 })}
         </div>
-        <div class="welcome-logo">Aside</div>
+        <div class="welcome-logo">もやの森</div>
         <div class="welcome-message">
           ここは、あなたの気持ちを<br>静かに受け止める場所です。
         </div>
@@ -2747,10 +2747,10 @@ function viewConsent() {
   return `
     <div class="screen active">
       <h1 class="mb-3">はじめる前に</h1>
-      <p class="text-soft mb-4">Aside を使う前に、いくつか大事なことをお伝えします。</p>
+      <p class="text-soft mb-4">もやの森 を使う前に、いくつか大事なことをお伝えします。</p>
 
       <ul class="consent-points">
-        <li>📌 Aside は気持ちと行動を整理するセルフケアアプリです。<strong>医療行為や診断ではありません</strong>。深刻な悩みは専門の相談機関や医療機関へ。</li>
+        <li>📌 もやの森 は気持ちと行動を整理するセルフケアアプリです。<strong>医療行為や診断ではありません</strong>。深刻な悩みは専門の相談機関や医療機関へ。</li>
         <li>🤖 AI が分析・提案を行いますが、すべて<strong>AIが推定した参考情報</strong>です。</li>
         <li>🔒 メールアドレスは不要。匿名IDで使えます。</li>
         <li>📊 サービス改善のため、利用ログを匿名で記録します。</li>
@@ -2838,14 +2838,14 @@ function viewHome() {
           <p class="home-subtitle">${getHomeSubtitle()}</p>
         </div>
         <div class="home-mascot" aria-hidden="true">
-          ${mameko({ size: 56 })}
+          ${suplan({ size: 56 })}
         </div>
       </header>
 
       <!-- 気持ち入力カード -->
       <div class="home-mood-card">
         <div class="home-mood-illust" aria-hidden="true">
-          ${mameko({ pose: 'watering', size: 96 })}
+          ${suplan({ pose: 'watering', size: 96 })}
         </div>
         <div class="home-mood-body">
           <h2 class="home-mood-title">いまのきもちを教えてください</h2>
@@ -2868,7 +2868,7 @@ function viewHome() {
       <!-- もやもや整理カード -->
       <div class="home-moya-card">
         <div class="home-moya-illust" aria-hidden="true">
-          ${mameko({ pose: 'bulb', size: 80 })}
+          ${suplan({ pose: 'bulb', size: 80 })}
         </div>
         <div class="home-moya-body">
           <h2 class="home-moya-title">もやもやを整理する</h2>
@@ -2949,7 +2949,7 @@ function viewMoodFull() {
           <p>いまどんな感じ？</p>
         </div>
         <div class="moodfull-mascot">
-          ${mameko({ size: 56 })}
+          ${suplan({ size: 56 })}
         </div>
       </header>
 
@@ -3002,7 +3002,7 @@ function viewMoodFull() {
 
       <div class="moodfull-encourage">
         <div class="moodfull-encourage-mascot">
-          ${mameko({ size: 36 })}
+          ${suplan({ size: 36 })}
         </div>
         <div class="moodfull-encourage-text">
           気持ちを記録すると、<br>自分のこころの変化に気づきやすくなります
@@ -3046,7 +3046,7 @@ function saveMoodLog() {
   };
   state.moodLogs.push(log);
   saveState();
-  if (window.AsideLogger) AsideLogger.event('mood_logged', { score: d.moodScore, categories: d.categories });
+  if (window.MoyaLogger) MoyaLogger.event('mood_logged', { score: d.moodScore, categories: d.categories });
   return log;
 }
 
@@ -3602,16 +3602,16 @@ function renderMoyamoyaLetter(s) {
             </div>
           </div>
 
-          <!-- まめこからの言葉 -->
-          <div class="letter-mameko">
-            <div class="letter-mameko-img">
-              ${mameko({ stage: 'tane', expression: 'calm', size: 56 })}
+          <!-- すぷらんからの言葉 -->
+          <div class="letter-suplan">
+            <div class="letter-suplan-img">
+              ${suplan({ stage: 'tane', expression: 'calm', size: 56 })}
             </div>
-            <div class="letter-mameko-content">
-              <div class="letter-mameko-title">今日のあなたに贈る言葉</div>
+            <div class="letter-suplan-content">
+              <div class="letter-suplan-title">今日のあなたに贈る言葉</div>
               <p>大丈夫、少しずつでいいよ。</p>
               <p>あなたは、あなたのままで十分がんばってる。</p>
-              <p class="letter-mameko-en">You did well today.</p>
+              <p class="letter-suplan-en">You did well today.</p>
             </div>
           </div>
         </div>
@@ -3692,7 +3692,7 @@ function saveMoyamoyaRecord() {
   };
   state.moyamoyaRecords.push(r);
   saveState();
-  if (window.AsideLogger) AsideLogger.event('moyamoya_saved', { emotion: r.emotion, deltaScore: (r.emotionScoreBefore - r.emotionScoreAfter) });
+  if (window.MoyaLogger) MoyaLogger.event('moyamoya_saved', { emotion: r.emotion, deltaScore: (r.emotionScoreBefore - r.emotionScoreAfter) });
   return r;
 }
 
@@ -3902,7 +3902,7 @@ function confirmGoal() {
   persistAIChat({ sourceType: 'goal', sourceId: goal.id, messages: goalChat.messages.slice() });
   saveState();
   goalChat = null;
-  if (window.AsideLogger) AsideLogger.event('goal_set');
+  if (window.MoyaLogger) MoyaLogger.event('goal_set');
   toast('目標を決めました');
   go('action');
 }
@@ -3965,7 +3965,7 @@ function pickPolicy(text, depth) {
   };
   state.policies.push(policy);
   saveState();
-  if (window.AsideLogger) AsideLogger.event('policy_picked', { depth });
+  if (window.MoyaLogger) MoyaLogger.event('policy_picked', { depth });
   toast('方針を選びました');
   go('action');
 }
@@ -4046,7 +4046,7 @@ function pickAction(text) {
   };
   state.actions.push(action);
   saveState();
-  if (window.AsideLogger) AsideLogger.event('action_picked');
+  if (window.MoyaLogger) MoyaLogger.event('action_picked');
   toast('今日のアクションを設定しました');
   go('action');
 }
@@ -4117,36 +4117,36 @@ function saveActionEval() {
   };
   state.actionLogs.push(log);
   saveState();
-  if (window.AsideLogger) AsideLogger.event('action_evaluated', { rating: evalRating });
+  if (window.MoyaLogger) MoyaLogger.event('action_evaluated', { rating: evalRating });
   evalAction = null; evalRating = null; evalComment = '';
   toast('記録しました。今日もおつかれさま。');
   go('action');
 }
 
 // ============================================================
-// まめこキャラクター（成長段階+表情+ポーズ / PNGフォールバック付きSVG）
+// すぷらんキャラクター（成長段階+表情+ポーズ / PNGフォールバック付きSVG）
 // ============================================================
-const MAMEKO_PT = { mood: 1, moyamoya: 2, action: 3 };
-const MAMEKO_STAGES = ['tane', 'futaba', 'nae', 'hana', 'ookii'];
-const MAMEKO_STAGE_THRESHOLDS = [0, 3, 10, 25, 50];
+const SUPLAN_PT = { mood: 1, moyamoya: 2, action: 3 };
+const SUPLAN_STAGES = ['tane', 'futaba', 'nae', 'hana', 'ookii'];
+const SUPLAN_STAGE_THRESHOLDS = [0, 3, 10, 25, 50];
 
-function mamekoTotalPoints() {
-  const m = (state.moodLogs || []).length * MAMEKO_PT.mood;
-  const my = (state.moyamoyaRecords || []).length * MAMEKO_PT.moyamoya;
-  const a = (state.actionLogs || []).filter(l => l.rating > 0).length * MAMEKO_PT.action;
+function suplanTotalPoints() {
+  const m = (state.moodLogs || []).length * SUPLAN_PT.mood;
+  const my = (state.moyamoyaRecords || []).length * SUPLAN_PT.moyamoya;
+  const a = (state.actionLogs || []).filter(l => l.rating > 0).length * SUPLAN_PT.action;
   return m + my + a;
 }
-function mamekoStage() {
-  const pt = mamekoTotalPoints();
-  for (let i = MAMEKO_STAGE_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (pt >= MAMEKO_STAGE_THRESHOLDS[i]) return MAMEKO_STAGES[i];
+function suplanStage() {
+  const pt = suplanTotalPoints();
+  for (let i = SUPLAN_STAGE_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (pt >= SUPLAN_STAGE_THRESHOLDS[i]) return SUPLAN_STAGES[i];
   }
   return 'tane';
 }
-function mamekoStageNumber() {
-  return MAMEKO_STAGES.indexOf(mamekoStage()) + 1;
+function suplanStageNumber() {
+  return SUPLAN_STAGES.indexOf(suplanStage()) + 1;
 }
-function mamekoExpression() {
+function suplanExpression() {
   const last = state.moodLogs && state.moodLogs[state.moodLogs.length - 1];
   if (!last) return 'calm';
   if (last.moodScore <= 2) return 'sad';
@@ -4155,30 +4155,30 @@ function mamekoExpression() {
 }
 
 // PNG資産の存在確認（読み込めたものから順次差し替え）
-const _mamekoAssetCache = {};
-function mamekoProbeAsset(category, name) {
+const _suplanAssetCache = {};
+function suplanProbeAsset(category, name) {
   const key = `${category}/${name}`;
-  if (key in _mamekoAssetCache) return _mamekoAssetCache[key];
-  _mamekoAssetCache[key] = false;
+  if (key in _suplanAssetCache) return _suplanAssetCache[key];
+  _suplanAssetCache[key] = false;
   const img = new Image();
-  img.onload = () => { _mamekoAssetCache[key] = true; if (typeof render === 'function' && currentScreen) render(); };
-  img.onerror = () => { _mamekoAssetCache[key] = false; };
-  img.src = `./assets/mameko/${key}.png`;
+  img.onload = () => { _suplanAssetCache[key] = true; if (typeof render === 'function' && currentScreen) render(); };
+  img.onerror = () => { _suplanAssetCache[key] = false; };
+  img.src = `./assets/suplan/${key}.png`;
   return false;
 }
 
 // メイン関数：HTMLを返す（PNG > SVG）
 // 優先順: 個別ファイル → growth-stage → 普遍フォールバック(tane) → SVG
 // 個別PNGを追加するだけで自動切替。配置されていない場所はtane PNGで埋める。
-function mameko(opts = {}) {
-  const stage = opts.stage || mamekoStage();
-  const expression = opts.expression || mamekoExpression();
+function suplan(opts = {}) {
+  const stage = opts.stage || suplanStage();
+  const expression = opts.expression || suplanExpression();
   const pose = opts.pose || null;
   const seasonal = opts.seasonal || null;
   const size = opts.size || 96;
-  const stageIdx = MAMEKO_STAGES.indexOf(stage) + 1;
+  const stageIdx = SUPLAN_STAGES.indexOf(stage) + 1;
   // PNG ロード失敗時に SVG フォールバックへ自動切替（onerror）
-  const imgTag = (cat, name) => `<img src="./assets/mameko/${cat}/${name}.png" width="${size}" height="${size}" alt="まめこ" style="display:block; pointer-events:none; object-fit: contain;" onerror="window.mamekoImgFail && window.mamekoImgFail(this, '${cat}', '${name}', ${size})">`;
+  const imgTag = (cat, name) => `<img src="./assets/suplan/${cat}/${name}.png" width="${size}" height="${size}" alt="すぷらん" style="display:block; pointer-events:none; object-fit: contain;" onerror="window.suplanImgFail && window.suplanImgFail(this, '${cat}', '${name}', ${size})">`;
 
   // 候補PNGを優先順に並べる
   const candidates = [];
@@ -4190,29 +4190,29 @@ function mameko(opts = {}) {
   if (stageIdx !== 1) candidates.push(['growth', 'stage1-tane']);
 
   for (const [cat, name] of candidates) {
-    if (mamekoProbeAsset(cat, name)) {
+    if (suplanProbeAsset(cat, name)) {
       return imgTag(cat, name);
     }
   }
   // PNG が一切無い場合のみ SVG プレースホルダー
-  return mamekoSvg({ stage, expression, pose, size });
+  return suplanSvg({ stage, expression, pose, size });
 }
 
 // PNG ロード失敗時に SVG へ確実に置換するためのグローバル関数
 // （SW のフォールバックや一時的な fetch 失敗で IMG が壊れるのを防ぐ）
-window.mamekoImgFail = function(imgEl, cat, name, size) {
+window.suplanImgFail = function(imgEl, cat, name, size) {
   if (!imgEl || !imgEl.parentNode) return;
   // キャッシュも false に戻して再 probe させない
-  _mamekoAssetCache[`${cat}/${name}`] = false;
+  _suplanAssetCache[`${cat}/${name}`] = false;
   try {
-    imgEl.outerHTML = mamekoSvg({ size: size || 96 });
+    imgEl.outerHTML = suplanSvg({ size: size || 96 });
   } catch (_) {
     imgEl.style.display = 'none';
   }
 };
 
 // SVGプレースホルダー生成器（合成）
-function mamekoSvg(opts = {}) {
+function suplanSvg(opts = {}) {
   const stage = opts.stage || 'futaba';
   const expression = opts.expression || 'calm';
   const pose = opts.pose || null;
@@ -4472,7 +4472,7 @@ const AI_PROMPTS = {
       'detectCrisis でクライシスワード検知（severity 4 以上は専門窓口モーダル）',
       'API失敗時はテンプレ応答にフォールバック',
     ],
-    systemPrompt: `あなたは「ナナメの関係」のAI伴走者。22-28歳のメンタルヘルスサポートアプリ「Aside」。
+    systemPrompt: `あなたは「ナナメの関係」のAI伴走者。22-28歳のメンタルヘルスサポートアプリ「もやの森」。
 原則:
 - まず受け止める。決めつけない。診断しない。
 - 1ターンは2-3文・80字目安。
@@ -4655,7 +4655,7 @@ function showCrisisModal(severity) {
     <p class="text-tiny text-muted text-center mt-3">緊急時は地域の救急窓口または 119 に連絡してください</p>
   `;
   modal(html);
-  if (window.AsideLogger) AsideLogger.event('crisis_shown', { severity });
+  if (window.MoyaLogger) MoyaLogger.event('crisis_shown', { severity });
 }
 
 // ============================================================
@@ -4885,19 +4885,19 @@ function viewSettingsModal() {
   const action = activeAction();
   const apiKey = (state.preferences && state.preferences.geminiApiKey) || '';
   const masked = apiKey ? apiKey.slice(0, 6) + '••••••' + apiKey.slice(-4) : '';
-  const stage = mamekoStage();
-  const stageLabels = { tane: 'たねのまめこ', futaba: 'ふたばのまめこ', nae: 'なえのまめこ', hana: 'はなのまめこ', ookii: 'おおきなまめこ' };
-  const pt = mamekoTotalPoints();
-  const stageIdx = MAMEKO_STAGES.indexOf(stage);
-  const nextThreshold = MAMEKO_STAGE_THRESHOLDS[stageIdx + 1];
+  const stage = suplanStage();
+  const stageLabels = { tane: 'たねのすぷらん', futaba: 'ふたばのすぷらん', nae: 'なえのすぷらん', hana: 'はなのすぷらん', ookii: 'おおきなすぷらん' };
+  const pt = suplanTotalPoints();
+  const stageIdx = SUPLAN_STAGES.indexOf(stage);
+  const nextThreshold = SUPLAN_STAGE_THRESHOLDS[stageIdx + 1];
   const progressTxt = nextThreshold ? `${pt} / ${nextThreshold} pt` : `${pt} pt（最大段階）`;
   return `
     <h2 class="modal-title">設定</h2>
     <div style="display:flex; flex-direction:column; gap:14px; max-height:70vh; overflow-y:auto;">
       <div style="display:flex; align-items:center; gap:14px; padding:12px; background: var(--bg-soft); border-radius: 14px;">
-        <div style="width:64px; height:64px; flex-shrink:0;">${mameko({ size: 64 })}</div>
+        <div style="width:64px; height:64px; flex-shrink:0;">${suplan({ size: 64 })}</div>
         <div style="flex:1;">
-          <div class="text-tiny text-muted">いまのまめこ</div>
+          <div class="text-tiny text-muted">いまのすぷらん</div>
           <div style="font-family:'Noto Serif JP', serif; font-weight:600; margin-top:2px;">${stageLabels[stage]}</div>
           <div class="text-tiny" style="color: var(--primary); margin-top:4px;">${progressTxt}</div>
         </div>
@@ -4957,7 +4957,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">Aside v0.5.0-beta.1</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.8.0-beta.1（旧Aside / すぷらんと一緒に）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -5124,7 +5124,7 @@ function handleAction(act, el, ev) {
   if (act === 'consent-agree') {
     state.consent = { given: true, version: (window.ASIDE_CONFIG && window.ASIDE_CONFIG.consentVersion) || 'v1', at: Date.now() };
     saveState();
-    if (window.AsideLogger) AsideLogger.recordConsent();
+    if (window.MoyaLogger) MoyaLogger.recordConsent();
     go('nickname');
     return;
   }
@@ -5161,9 +5161,9 @@ function handleAction(act, el, ev) {
     });
     state.initialDone = true;
     saveState();
-    if (window.AsideLogger) {
-      AsideLogger.logEmotion(score, '');
-      AsideLogger.setSessionMoodAfter(score);
+    if (window.MoyaLogger) {
+      MoyaLogger.logEmotion(score, '');
+      MoyaLogger.setSessionMoodAfter(score);
     }
     toast('ありがとう、覚えとくね');
     go('home');
@@ -5288,7 +5288,7 @@ function handleAction(act, el, ev) {
   if (act === 'letter-share' || act === 'letter-send') {
     const s = moyamoya;
     if (!s) return;
-    const text = (s.letterBody || '') + '\n\n— Asideでもやもや整理しました';
+    const text = (s.letterBody || '') + '\n\n— もやの森でもやもや整理しました';
     if (navigator.share) {
       navigator.share({ title: s.letterTitle || 'もやもや整理レター', text }).catch(() => {});
     } else if (navigator.clipboard) {
@@ -5498,9 +5498,9 @@ function init() {
   // ヒーロー画像の存在を確認（無ければ CSS フォールバック）
   probeHeroImage();
 
-  // AsideLogger 初期化
-  if (window.AsideLogger) {
-    AsideLogger.init();
+  // MoyaLogger 初期化
+  if (window.MoyaLogger) {
+    MoyaLogger.init();
   }
 
   // ルーティング判定
@@ -5519,7 +5519,7 @@ function init() {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js').catch(err => {
-      console.warn('[Aside] SW registration failed:', err && err.message);
+      console.warn('[もやの森] SW registration failed:', err && err.message);
     });
   });
 }

@@ -1,6 +1,6 @@
 {
-  "name": "Aside — 気持ちを整えるアプリ",
-  "short_name": "Aside",
+  "name": "もやの森 — 気持ちを整えるアプリ",
+  "short_name": "もやの森",
   "description": "日々の気持ちと小さな行動を、すこし立ち止まって整えるセルフケアアプリ（β版）",
   "start_url": "./",
   "scope": "./",

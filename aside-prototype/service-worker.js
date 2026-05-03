@@ -1,4 +1,4 @@
-/* Aside β版 Service Worker
+/* もやの森 β版 Service Worker
  *
  * 方針（β段階）:
  *   - ネットワークファースト（開発イテレーション中は常に最新を取りたい）
@@ -8,7 +8,7 @@
  * バージョンを上げる度にキャッシュ破棄して新しい資産に切り替わる。
  */
 
-const CACHE_VERSION = 'aside-v0.7.6-beta.1';
+const CACHE_VERSION = 'moyanomori-v0.8.0-beta.1';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -16,7 +16,7 @@ const CORE_ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
-  './assets/mameko/growth/stage1-tane.png'
+  './assets/suplan/growth/stage1-tane.png'
 ];
 
 // 1x1 透明PNG（画像フェッチ失敗時のフォールバック - 壊れた画像アイコンを防ぐ）

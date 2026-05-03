@@ -29,5 +29,5 @@ http.createServer((req, res) => {
     res.end(data);
   });
 }).listen(PORT, () => {
-  console.log(`Aside prototype: http://localhost:${PORT}`);
+  console.log(`もやの森 prototype: http://localhost:${PORT}`);
 });

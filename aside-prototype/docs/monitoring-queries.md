@@ -1,6 +1,6 @@
 # モニタリング・クエリ集
 
-**対象**: Aside β版
+**対象**: もやの森 β版
 **前提**: Supabase Dashboard > SQL Editor で実行
 **schema**: [supabase/schema.sql](../supabase/schema.sql) v1.0 適用済み
 

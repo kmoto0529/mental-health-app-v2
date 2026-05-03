@@ -1,5 +1,5 @@
 /*
- * AsideCatalog — Aside β版 行動カタログ ローダー
+ * MoyaCatalog — もやの森 β版 行動カタログ ローダー
  *
  * 役割:
  *   Google Sheets で公開された CSV を取得して
@@ -13,7 +13,7 @@
  *
  * 使い方 (index.html):
  *   ASIDE_CONFIG.actionCatalogUrl = 'https://docs.google.com/.../pub?output=csv';
- *   AsideCatalog.init({
+ *   MoyaCatalog.init({
  *     target: ACTION_CATALOG,
  *     url: ASIDE_CONFIG.actionCatalogUrl,
  *     onUpdate: () => render()
@@ -160,7 +160,7 @@
     try {
       const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) {
-        console.warn('[AsideCatalog] fetch failed:', res.status, res.statusText);
+        console.warn('[MoyaCatalog] fetch failed:', res.status, res.statusText);
         return { failed: true, status: res.status };
       }
       const text = await res.text();
@@ -168,26 +168,26 @@
       const objs = rowsToObjects(rows);
       const { errors, validList } = validate(objs);
       if (errors.length > 0) {
-        console.warn('[AsideCatalog] バリデーションエラー (' + errors.length + '件、最初の5件表示):');
+        console.warn('[MoyaCatalog] バリデーションエラー (' + errors.length + '件、最初の5件表示):');
         errors.slice(0, 5).forEach(e => console.warn('  -', e));
       }
       if (validList.length === 0) {
-        console.warn('[AsideCatalog] 有効な行が0件。既存カタログを維持します');
+        console.warn('[MoyaCatalog] 有効な行が0件。既存カタログを維持します');
         return { failed: true, reason: 'no_valid_rows' };
       }
       applyToCatalog(validList, target);
       saveCache(validList);
-      console.log('[AsideCatalog] sheets から ' + validList.length + ' 件読み込み完了 (skip: ' + errors.length + ')');
+      console.log('[MoyaCatalog] sheets から ' + validList.length + ' 件読み込み完了 (skip: ' + errors.length + ')');
       if (typeof onUpdate === 'function') onUpdate(validList);
       return { ok: true, count: validList.length, skipped: errors.length };
     } catch (e) {
-      console.warn('[AsideCatalog] fetch error:', e && e.message);
+      console.warn('[MoyaCatalog] fetch error:', e && e.message);
       return { failed: true, error: e && e.message };
     }
   }
 
   // Public API
-  global.AsideCatalog = {
+  global.MoyaCatalog = {
     /**
      * 起動時に1回呼ぶ。
      * @param {object} opts
@@ -200,7 +200,7 @@
       const target = opts.target;
       const url = opts.url;
       if (!Array.isArray(target)) {
-        console.warn('[AsideCatalog] init: target 配列が必要');
+        console.warn('[MoyaCatalog] init: target 配列が必要');
         return;
       }
       // 1. キャッシュ優先で即適用（オフライン耐性）
@@ -208,7 +208,7 @@
       if (cached && cached.actions && cached.actions.length > 0) {
         applyToCatalog(cached.actions, target);
         const ageMin = Math.floor((Date.now() - cached.fetchedAt) / 60000);
-        console.log('[AsideCatalog] キャッシュから ' + cached.actions.length + ' 件適用 (' + ageMin + '分前)');
+        console.log('[MoyaCatalog] キャッシュから ' + cached.actions.length + ' 件適用 (' + ageMin + '分前)');
       }
       // 2. 裏で最新取得を試行
       if (url) {
