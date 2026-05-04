@@ -3088,74 +3088,86 @@ h3 { font-size: 16px; font-weight: 500; }
 }
 .modal-title { font-family: 'Noto Serif JP', serif; font-size: 18px; margin-bottom: 12px; font-weight: 500; }
 
-/* ===== すぷらん紹介モーダル ===== */
+/* ===== すぷらん紹介モーダル =====
+ * デザイン部レビュー反映:
+ *  - 背景: クリーム (#FAF7F2 = --bg) でやさしい印象
+ *  - 角を 28px とより丸く（モバイル想定の優しさ）
+ *  - 本文 14px / 行間 1.9 で22-28歳ターゲットに見やすく
+ */
+.suplan-info-modal-card {
+  background: var(--bg);
+  border-radius: 28px;
+  padding: 22px 20px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: var(--shadow-lift);
+  max-height: 88vh;
+  overflow-y: auto;
+  position: relative;
+}
+[data-theme="dark"] .suplan-info-modal-card { background: #2A3838; }
 .suplan-info-close {
   position: absolute; top: 14px; right: 14px;
-  width: 32px; height: 32px; border-radius: 50%;
-  border: none; background: var(--bg-soft); cursor: pointer;
-  font-size: 18px; line-height: 1; color: var(--text-soft);
+  width: 36px; height: 36px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.85); cursor: pointer;
+  font-size: 20px; line-height: 1; color: var(--text-soft);
   display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-[data-theme="dark"] .suplan-info-close { background: rgba(47,62,62,0.55); }
-.modal-card { position: relative; }
+[data-theme="dark"] .suplan-info-close { background: rgba(47,62,62,0.85); color: #DDD; }
 .suplan-info-hero {
-  display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center;
-  margin: 8px 0 14px; padding-right: 36px;
+  display: grid; grid-template-columns: 100px 1fr; gap: 14px; align-items: center;
+  margin: 6px 0 16px; padding-right: 40px;
 }
-.suplan-info-hero-img { width: 96px; height: 96px; }
+.suplan-info-hero-img { width: 100px; height: 100px; }
 .suplan-info-hero-title {
   font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 22px;
-  color: #5C7E60; margin: 0 0 6px;
+  color: #5C7E60; margin: 0 0 8px;
 }
 [data-theme="dark"] .suplan-info-hero-title { color: #A7C4A0; }
-.suplan-info-hero-desc { font-size: 13px; line-height: 1.7; margin: 0; color: var(--text); }
+.suplan-info-hero-desc { font-size: 14px; line-height: 1.85; margin: 0; color: var(--text); }
 .suplan-info-divider { border: none; border-top: 1px solid var(--divider); margin: 14px 0 18px; }
-.suplan-info-section { margin: 0 0 18px; }
+.suplan-info-section { margin: 0 0 22px; }
 .suplan-info-h3 {
-  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 16px;
-  color: #5C7E60; margin: 0 0 8px;
+  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 17px;
+  color: #5C7E60; margin: 0 0 10px;
+  display: flex; align-items: center; gap: 6px;
 }
 [data-theme="dark"] .suplan-info-h3 { color: #A7C4A0; }
 .suplan-info-section-body {
-  display: grid; grid-template-columns: 1fr 96px; gap: 12px; align-items: flex-start;
+  display: grid; grid-template-columns: 1fr 110px; gap: 14px; align-items: center;
 }
-.suplan-info-text { font-size: 12.5px; line-height: 1.85; color: var(--text); }
-.suplan-info-text p { margin: 0 0 8px; }
+.suplan-info-text { font-size: 14px; line-height: 1.95; color: var(--text); }
+.suplan-info-text p { margin: 0 0 10px; }
 .suplan-info-text p:last-child { margin-bottom: 0; }
-.suplan-info-side { width: 96px; display: flex; align-items: center; justify-content: center; }
+.suplan-info-side {
+  width: 110px; min-height: 100px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 16px; overflow: hidden;
+  background: rgba(123,168,118,0.08);
+}
+[data-theme="dark"] .suplan-info-side { background: rgba(123,168,118,0.15); }
+.suplan-info-side img, .suplan-info-side svg { width: 100%; height: auto; display: block; }
 .suplan-info-cta-card {
   background: rgba(123,168,118,0.12);
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 16px;
+  padding: 16px;
   display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
-  margin: 8px 0 14px;
+  margin: 18px 0 4px;
 }
 [data-theme="dark"] .suplan-info-cta-card { background: rgba(123,168,118,0.18); }
 .suplan-info-cta-title {
-  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 13px;
+  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 14px;
   color: #5C7E60; margin: 0 0 4px;
+  display: flex; align-items: center; gap: 4px;
 }
 [data-theme="dark"] .suplan-info-cta-title { color: #A7C4A0; }
-.suplan-info-cta-desc { font-size: 11px; line-height: 1.6; color: var(--text-soft); margin: 0; }
+.suplan-info-cta-desc { font-size: 12px; line-height: 1.7; color: var(--text-soft); margin: 0; }
 .suplan-info-cta-btn {
   background: #B5C7B0; color: #fff;
-  padding: 10px 16px; font-size: 12px; border: none; border-radius: 999px;
+  padding: 11px 18px; font-size: 13px; border: none; border-radius: 999px;
   white-space: nowrap; cursor: not-allowed; opacity: 0.85;
-}
-.suplan-info-message {
-  border: 1.5px dashed rgba(123,168,118,0.5); border-radius: 12px;
-  padding: 14px; margin: 0 0 14px;
-  display: grid; grid-template-columns: 1fr 72px; gap: 10px; align-items: center;
-}
-.suplan-info-message-title {
-  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 13px; margin: 0 0 6px;
-  color: var(--text);
-}
-.suplan-info-message-body p { font-size: 11.5px; line-height: 1.85; margin: 0; color: var(--text); }
-.suplan-info-message-img { width: 72px; }
-.suplan-info-disclaimer {
-  font-size: 10px; line-height: 1.6; color: var(--text-muted); text-align: left;
-  margin: 0; padding: 0 4px;
 }
 
 /* ============================================================
@@ -4240,9 +4252,11 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-function modal(html) {
+function modal(html, extraClass) {
   const m = document.getElementById('modal');
-  document.getElementById('modalContent').innerHTML = html;
+  const c = document.getElementById('modalContent');
+  c.className = 'modal-card' + (extraClass ? ' ' + extraClass : '');
+  c.innerHTML = html;
   m.classList.add('open');
   m.onclick = (e) => { if (e.target === m) closeModal(); };
 }
@@ -8766,76 +8780,75 @@ function generateGraphTrendSummary(tab, logs) {
 // すぷらん紹介モーダル（ホーム右上のすぷらんアイコンタップで表示）
 // ============================================================
 function viewSuplanInfoModal() {
+  // もやの森の風景画像。assets/suplan/scenes/moya_forest.png が存在すれば表示、
+  // 無ければ onerror で簡易SVGプレースホルダーへフォールバック。
+  const forestImg = `
+    <img src="./assets/suplan/scenes/moya_forest.png" alt="もやの森"
+      style="width:100%; height:100%; object-fit:cover; display:block; border-radius:16px;"
+      onerror="this.outerHTML = window.__moyaForestFallbackSVG();">
+  `;
   return `
     <button class="suplan-info-close" data-act="close-modal" aria-label="閉じる">×</button>
 
     <div class="suplan-info-hero">
-      <div class="suplan-info-hero-img">${suplan({ stage: 'futaba', expression: 'happy', size: 96 })}</div>
+      <div class="suplan-info-hero-img">${suplan({ stage: 'futaba', expression: 'happy', size: 100 })}</div>
       <div class="suplan-info-hero-body">
         <h2 class="suplan-info-hero-title">すぷらんって？</h2>
-        <p class="suplan-info-hero-desc">すぷらんは、あなたのきもちにそっと寄り添う、やさしいパートナーです。</p>
+        <p class="suplan-info-hero-desc">あなたのきもちにそっと寄り添う、やさしいパートナーです。</p>
       </div>
     </div>
 
     <hr class="suplan-info-divider">
 
     <section class="suplan-info-section">
-      <h3 class="suplan-info-h3">🌱 名前の由来</h3>
+      <h3 class="suplan-info-h3"><span>🌱</span><span>名前の由来</span></h3>
       <div class="suplan-info-section-body">
         <div class="suplan-info-text">
-          <p>「すぷらん（sprout）」は、<br>その小さな芽（sprout）を、<br>無理のない一歩（plan）に変えること。</p>
-          <p>小さな芽が、やがて大きく育つように、<br>あなたの気持ちや変化も、少しずつ育っていってほしい。<br>そんな願いを込めて名付けました。</p>
+          <p>「すぷらん（sprout）」は、その小さな芽を、無理のない一歩（plan）に変えること。</p>
+          <p>小さな芽が、やがて大きく育つように、あなたの気持ちや変化も、少しずつ育っていってほしい。そんな願いを込めて名付けました。</p>
         </div>
-        <div class="suplan-info-side">${suplan({ pose: 'heart', expression: 'happy', size: 96 })}</div>
+        <div class="suplan-info-side">${suplan({ pose: 'heart', expression: 'happy', size: 100 })}</div>
       </div>
     </section>
 
     <section class="suplan-info-section">
-      <h3 class="suplan-info-h3">🌱 もやの森って？</h3>
+      <h3 class="suplan-info-h3"><span>🌱</span><span>もやの森って？</span></h3>
       <div class="suplan-info-section-body">
         <div class="suplan-info-text">
-          <p>もやの森は、もやもやした気持ちをやさしく受けとめ、整理し、軽くするための場所です。</p>
+          <p>もやもやした気持ちをやさしく受けとめ、整理し、軽くするための場所です。</p>
           <p>木や花、いきものたちが見守る中で、あなたの心が少しずつ晴れていくことを応援します。</p>
         </div>
-        <div class="suplan-info-side">
-          <svg viewBox="0 0 96 80" width="96" height="80" aria-hidden="true">
-            <rect x="0" y="60" width="96" height="20" fill="#E5EFE0" rx="4"/>
-            <ellipse cx="20" cy="42" rx="14" ry="22" fill="#9BB89F"/>
-            <rect x="18" y="50" width="4" height="14" fill="#8B6F47"/>
-            <ellipse cx="74" cy="38" rx="16" ry="26" fill="#7BA876"/>
-            <rect x="72" y="48" width="4" height="16" fill="#8B6F47"/>
-            <rect x="38" y="56" width="22" height="14" fill="#D4B891" rx="2"/>
-            <text x="49" y="66" font-size="6" text-anchor="middle" fill="#5C4A2E">もやの森</text>
-            <circle cx="46" cy="48" r="2" fill="#7BA8D4"/>
-          </svg>
-        </div>
+        <div class="suplan-info-side">${forestImg}</div>
       </div>
     </section>
 
     <div class="suplan-info-cta-card">
       <div class="suplan-info-cta-body">
-        <h4 class="suplan-info-cta-title">🌱 すぷらんの世界をもっと知る</h4>
+        <h4 class="suplan-info-cta-title"><span>🌱</span><span>すぷらんの世界をもっと知る</span></h4>
         <p class="suplan-info-cta-desc">すぷらんの想いや機能を紹介する特設サイトをご覧いただけます。</p>
       </div>
       <button class="btn suplan-info-cta-btn" disabled aria-disabled="true">
         準備中
       </button>
     </div>
-
-    <div class="suplan-info-message">
-      <div class="suplan-info-message-body">
-        <h4 class="suplan-info-message-title">すぷらんからのメッセージ</h4>
-        <p>もやもやしても、だいじょうぶ。<br>うまくいかなくても、だいじょうぶ。<br>あなたのペースで、すこしずつでいいよ。<br>きょうの「すぷらん」を、いっしょに見つけようね。</p>
-      </div>
-      <div class="suplan-info-message-img">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
-    </div>
-
-    <p class="suplan-info-disclaimer">
-      ※すぷらんは、あなたの心の変化に気づくお手伝いをします。<br>
-      　医療行為や診断を目的としたサービスではありません。
-    </p>
   `;
 }
+
+// もやの森プレースホルダー SVG（PNG未配置時のフォールバック）
+window.__moyaForestFallbackSVG = function() {
+  return `
+    <svg viewBox="0 0 110 100" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="border-radius:16px; background:linear-gradient(180deg,#E8F0E2 0%, #F5EAD9 100%); display:block;">
+      <ellipse cx="22" cy="48" rx="16" ry="26" fill="#9BB89F"/>
+      <rect x="20" y="56" width="4" height="16" fill="#8B6F47"/>
+      <ellipse cx="84" cy="42" rx="18" ry="30" fill="#7BA876"/>
+      <rect x="82" y="52" width="4" height="20" fill="#8B6F47"/>
+      <rect x="42" y="62" width="26" height="16" fill="#D4B891" rx="2"/>
+      <text x="55" y="73" font-size="7" text-anchor="middle" fill="#5C4A2E" font-family="serif">もやの森</text>
+      <circle cx="50" cy="52" r="2" fill="#7BA8D4"/>
+      <rect x="0" y="78" width="110" height="22" fill="#D9E4CF"/>
+    </svg>
+  `;
+};
 
 // ============================================================
 // 設定モーダル
@@ -9780,7 +9793,7 @@ function handleAction(act, el, ev) {
   }
 
   if (act === 'open-settings') { modal(viewSettingsModal()); return; }
-  if (act === 'open-suplan-info') { modal(viewSuplanInfoModal()); return; }
+  if (act === 'open-suplan-info') { modal(viewSuplanInfoModal(), 'suplan-info-modal-card'); return; }
   if (act === 'open-ai-prompts') { modal(viewAIPromptsModal()); return; }
   if (act === 'ai-prompt-expand') {
     modal(viewAIPromptsModal(el.dataset.promptId));
