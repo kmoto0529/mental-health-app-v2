@@ -2555,7 +2555,7 @@ h3 { font-size: 16px; font-weight: 500; }
   min-height: 100vh;
   background: var(--bg);
   position: relative;
-  padding-bottom: 80px; /* タブバー分 */
+  padding-bottom: var(--app-pad-bottom, 80px); /* タブバー分。チャット時は0px */
 }
 
 .screen {
@@ -2902,24 +2902,38 @@ h3 { font-size: 16px; font-weight: 500; }
 }
 
 /* ============================================================
-   気分チャット フルスクリーン flex（v0.9.5 キーボード対応強化）
-   - 画面全体を 100dvh の縦flexに
-   - チャットリストが flex:1 で独立スクロール
-   - 入力欄は下部固定（fixed ではなく flex-shrink:0）
-   - キーボード表示時、レイアウトビューポートが縮小しても
-     直前のAIメッセージが自然に可視領域内に保たれる
+   気分チャット フルスクリーン flex（v0.9.7 ボディロック方式）
+   - body.in-chat-mode を付け、body / #app / #main / chat-screen
+     すべてを visualViewport にピッタリ重ねる
+   - これで「入力欄が下端から離れる」問題が iOS Safari/PWA でも解消
    ============================================================ */
-/*
- * NOTE: .screen.active { display: block } ((0,2,0)) が .mood-chat-screen ((0,1,0))
- * を上書きしてしまうため、同じ specificity の .mood-chat-screen.active で
- * display:flex を指定する。これがないと flex レイアウトが効かず、入力欄が
- * 画面下端に張り付かなくなる。
- */
+body.in-chat-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: var(--chat-vh, 100dvh);
+  overflow: hidden;
+}
+body.in-chat-mode #app {
+  height: 100%;
+  min-height: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+body.in-chat-mode main#main {
+  display: block;
+  height: 100%;
+}
 .mood-chat-screen.active {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: 100%;       /* 親 (= body / #app) が --chat-vh に合わせて縮む */
+  min-height: 0;       /* .screen の min-height:100vh を打ち消す */
+  max-height: 100%;
   padding: 0;
+  overflow: hidden;
   animation: fadeIn 0.4s var(--ease);
 }
 .mood-chat-header {
@@ -4316,6 +4330,10 @@ function render() {
     default:                html = viewHome();
   }
   document.getElementById('main').innerHTML = html;
+  // chat-screen をレンダー直後に viewport にフィットさせる
+  if (typeof window.fitChatScreenToViewport === 'function') {
+    requestAnimationFrame(window.fitChatScreenToViewport);
+  }
 }
 
 // ============================================================
@@ -4773,6 +4791,7 @@ async function moodChatSend() {
   // タイピング表示
   moodChatSession.messages.push({ role: 'assistant', content: '…', typing: true, createdAt: new Date().toISOString() });
   document.getElementById('main').innerHTML = viewMoodChat();
+  if (typeof window.fitChatScreenToViewport === 'function') requestAnimationFrame(window.fitChatScreenToViewport);
   setTimeout(scrollChatToBottom, 50);
 
   const log = state.moodLogs.find(l => l.id === moodChatSession.logId);
@@ -4796,6 +4815,7 @@ async function moodChatSend() {
   moodChatSession.messages.push({ role: 'assistant', content: aiText, createdAt: new Date().toISOString() });
   persistAIChat({ sourceType: 'mood_log', sourceId: moodChatSession.logId, messages: moodChatSession.messages.slice() });
   document.getElementById('main').innerHTML = viewMoodChat();
+  if (typeof window.fitChatScreenToViewport === 'function') requestAnimationFrame(window.fitChatScreenToViewport);
   setTimeout(scrollChatToBottom, 50);
 }
 
@@ -7556,12 +7576,17 @@ window.autoExpand = function(el) {
 };
 
 // ============================================================
-// モバイルキーボード対応（v0.9.5 強化版）
-//   - mood-chat-screen は 100dvh flex レイアウトに変更したため、
-//     キーボード表示時にレイアウトviewportが縮小すれば自動で
-//     .mood-chat-list が縮み、入力欄は常に下に張り付く
-//   - フォーカス時に最新AIメッセージを確実に可視領域へスクロール
-//   - VisualViewport API は補助的に使用（goal-chat等の旧画面用）
+// モバイルキーボード対応（v0.9.6: visualViewport 駆動）
+//
+// 問題: iOS Safari は 100dvh がキーボード表示時に縮まらない。
+//       かつ Safari の bottom toolbar の伸縮で chat-screen が
+//       viewport を埋めない場合がある。
+//
+// 解決: position:fixed の chat-screen を visualViewport.height に
+//       JS で合わせる。visualViewport.offsetTop も反映して
+//       常に「見えている領域」にピッタリ重ねる。
+//       これで通常時は最下端、キーボード時はキーボード直上に
+//       入力欄が張り付く（LINE/標準iOS Mail と同じ挙動）。
 // ============================================================
 (function setupChatKeyboard() {
   const CHAT_INPUT_IDS = ['moodChatInput', 'goalChatInput'];
@@ -7570,7 +7595,23 @@ window.autoExpand = function(el) {
     return el && CHAT_INPUT_IDS.indexOf(el.id) !== -1;
   }
 
-  // mood-chat-list（flex 独立スクロール）の最終行を可視領域に
+  // CSS変数 --chat-vh を「可視 viewport の高さ」に同期させる
+  // body.in-chat-mode を付けると body 自体が position:fixed; height:--chat-vh
+  // になり、入力欄が常に visualViewport の下端に張り付く
+  window.fitChatScreenToViewport = function fitChatScreenToViewport() {
+    const vv = window.visualViewport;
+    const h = vv ? vv.height : window.innerHeight;
+    document.documentElement.style.setProperty('--chat-vh', h + 'px');
+    const inChat = !!document.querySelector('.mood-chat-screen.active');
+    document.documentElement.style.setProperty('--app-pad-bottom', inChat ? '0px' : '80px');
+    document.body.classList.toggle('in-chat-mode', inChat);
+    if (inChat) {
+      // 余分なドキュメントスクロールがあれば一番上に戻す
+      if (window.scrollY > 0) window.scrollTo(0, 0);
+    }
+  };
+
+  // mood-chat-list の最終行を可視領域に
   function scrollMoodChatBottom() {
     const list = document.getElementById('moodChatList');
     if (!list) return;
@@ -7586,8 +7627,8 @@ window.autoExpand = function(el) {
   }
 
   function adjustLegacyInputForViewport() {
-    // mood-chat-screen は flex で対応されるので除外
-    if (document.querySelector('.mood-chat-screen')) return;
+    // mood-chat-screen は visualViewport 駆動で対応するので除外
+    if (document.querySelector('.mood-chat-screen.active')) return;
     const inputRow = document.querySelector('.input-row');
     if (!inputRow || !window.visualViewport) return;
     const vv = window.visualViewport;
@@ -7596,18 +7637,26 @@ window.autoExpand = function(el) {
   }
 
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => {
+    const onVVChange = () => {
+      window.fitChatScreenToViewport();
       adjustLegacyInputForViewport();
       requestAnimationFrame(() => {
         scrollMoodChatBottom();
         scrollLegacyChatBottom();
       });
-    });
+    };
+    window.visualViewport.addEventListener('resize', onVVChange);
+    window.visualViewport.addEventListener('scroll', onVVChange);
   }
+  // visualViewport 非対応時のフォールバック
+  window.addEventListener('resize', () => window.fitChatScreenToViewport());
+  // 通常スクロールでも追従させる（iOS Safari address bar 伸縮対策）
+  window.addEventListener('scroll', () => window.fitChatScreenToViewport(), { passive: true });
 
   document.addEventListener('focusin', (e) => {
     if (!isChatInput(e.target)) return;
     setTimeout(() => {
+      window.fitChatScreenToViewport();
       adjustLegacyInputForViewport();
       scrollMoodChatBottom();
       scrollLegacyChatBottom();
@@ -7616,7 +7665,8 @@ window.autoExpand = function(el) {
 
   document.addEventListener('focusout', (e) => {
     if (!isChatInput(e.target)) return;
-    if (document.querySelector('.mood-chat-screen')) return;  // flexは何もしない
+    setTimeout(() => window.fitChatScreenToViewport(), 100);
+    if (document.querySelector('.mood-chat-screen.active')) return;
     const inputRow = document.querySelector('.input-row');
     if (inputRow) inputRow.style.bottom = '0';
   });
