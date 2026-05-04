@@ -1991,6 +1991,68 @@
 .kr-radar-legend-item { display: flex; align-items: center; gap: 5px; }
 .kr-radar-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
+/* AI分析レポート: 気分グラフ */
+.kr-graph-h {
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px;
+}
+.kr-graph-icon { font-size: 18px; line-height: 1.2; padding-top: 1px; }
+.kr-graph-title { font-weight: 600; font-size: 14px; }
+.kr-graph-sub { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 2px; }
+.kr-graph-svg-wrap {
+  margin: 6px -4px 12px;
+  background: linear-gradient(180deg, rgba(123,168,118,0.04) 0%, rgba(123,168,118,0) 100%);
+  border-radius: 10px;
+  padding: 4px;
+}
+.kr-graph-suplan {
+  display: grid; grid-template-columns: 44px 1fr; gap: 10px;
+  background: var(--bg-soft);
+  border-radius: 12px; padding: 12px; margin: 8px 0 14px;
+}
+[data-theme="dark"] .kr-graph-suplan { background: rgba(47,62,62,0.55); }
+.kr-graph-suplan-icon { width: 40px; height: 40px; }
+.kr-graph-suplan-title { font-weight: 600; font-size: 12px; margin-bottom: 4px; color: var(--accent-deep, #5C7E60); }
+.kr-graph-suplan-msg { font-size: 12px; line-height: 1.7; white-space: pre-wrap; }
+.kr-graph-topics-h { margin: 14px 0 8px; font-size: 13px; font-weight: 600; }
+.kr-graph-topics-row {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  margin-bottom: 8px;
+}
+.kr-graph-topic-cell {
+  text-align: center; font-size: 10px; line-height: 1.3;
+  background: var(--bg-soft); border-radius: 8px; padding: 6px 2px;
+}
+[data-theme="dark"] .kr-graph-topic-cell { background: rgba(47,62,62,0.45); }
+.kr-graph-topic-date { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+.kr-graph-topic-text { font-size: 9px; min-height: 22px; }
+.kr-graph-topic-emoji { font-size: 14px; margin-top: 2px; }
+.kr-graph-topic-list { display: flex; flex-direction: column; gap: 8px; }
+.kr-graph-topic-row {
+  display: grid; grid-template-columns: 36px 1fr 110px; gap: 10px; align-items: center;
+  padding: 10px; background: var(--bg-soft); border-radius: 10px;
+}
+[data-theme="dark"] .kr-graph-topic-row { background: rgba(47,62,62,0.45); }
+.kr-graph-topic-row-icon {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;
+}
+.kr-graph-topic-row-title { font-weight: 600; font-size: 12px; }
+.kr-graph-topic-row-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
+.kr-graph-topic-row-side { font-size: 10px; line-height: 1.4; }
+.kr-graph-topic-row-side-h { color: var(--text-muted); font-size: 10px; margin-bottom: 2px; }
+.kr-graph-topic-row-side-t { font-size: 11px; }
+.kr-graph-summary {
+  margin-top: 14px; padding: 12px;
+  background: rgba(123,168,118,0.12); border-radius: 12px;
+}
+[data-theme="dark"] .kr-graph-summary { background: rgba(123,168,118,0.18); }
+.kr-graph-summary-h {
+  display: flex; align-items: center; gap: 6px;
+  font-weight: 600; font-size: 12px; color: var(--accent-deep, #5C7E60); margin-bottom: 4px;
+}
+.kr-graph-summary-icon { font-size: 14px; }
+.kr-graph-summary-msg { font-size: 12px; line-height: 1.7; white-space: pre-wrap; margin: 0; }
+
 /* 深掘りカード（きろく入口） */
 .dd-entry-card {
   background: var(--bg-card);
@@ -3903,6 +3965,8 @@ const defaultState = () => ({
   ui: {
     currentTab: 'home',         // 'home' | 'action' | 'record'
     recordSubtab: 'calendar',   // 'calendar' | 'report'
+    calendarMonthOffset: 0,     // カレンダー: 0=今月 / -1=先月 …
+    reportGraphTab: 'date',     // AI分析レポート気分グラフ: 'date' | 'hour' | 'weekday'
   },
 
   // === ユーザープリファレンス ===
@@ -7598,33 +7662,10 @@ function viewRecord() {
 
       <div style="display:flex; gap:6px; margin-bottom:14px;">
         <button data-act="record-sub" data-sub="calendar" style="padding:8px 14px; background:${sub==='calendar'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='calendar'?'var(--accent-deep)':'var(--text-soft)'};">カレンダー</button>
-        <button data-act="record-sub" data-sub="report" style="padding:8px 14px; background:${sub==='report'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='report'?'var(--accent-deep)':'var(--text-soft)'};">レポート</button>
+        <button data-act="record-sub" data-sub="report" style="padding:8px 14px; background:${sub==='report'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='report'?'var(--accent-deep)':'var(--text-soft)'};">AI分析レポート</button>
       </div>
 
       ${viewAccuracyCard()}
-
-      <button class="dd-entry-card" data-act="dd-start">
-        <span class="dd-entry-icon">🔎</span>
-        <div>
-          <div class="dd-entry-title">深掘り（下向き矢印法）</div>
-          <div class="dd-entry-desc">繰り返すモヤモヤやネガティブな思考の根っこを探ります</div>
-        </div>
-      </button>
-
-      ${(state.deepDiveSessions || []).length > 0 ? `
-        <h3 class="section-title" style="margin-top:18px;">これまでの深掘り</h3>
-        ${state.deepDiveSessions.slice(-3).reverse().map(d => `
-          <div class="card" style="padding:14px;">
-            <div class="text-tiny text-muted">${formatDate(d.completedAt)}</div>
-            <div class="mt-1" style="font-weight:500;">${escapeHtml(d.extractedBelief || d.coreBelief || '-')}</div>
-            ${d.tags && d.tags.length > 0 ? `
-              <div class="dd-tag-list" style="margin-top:8px;">
-                ${d.tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
-              </div>
-            ` : ''}
-          </div>
-        `).join('')}
-      ` : ''}
 
       ${sub === 'calendar' ? viewCalendarSection() : viewReportSection()}
     </div>
@@ -7633,10 +7674,13 @@ function viewRecord() {
 
 function viewCalendarSection() {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const offset = state.ui.calendarMonthOffset || 0;
+  const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  const year = base.getFullYear();
+  const month = base.getMonth();
   const first = new Date(year, month, 1).getDay();
   const days = new Date(year, month+1, 0).getDate();
+  const isCurrentMonth = (offset === 0);
 
   const moodMap = {};
   state.moodLogs.forEach(m => {
@@ -7646,7 +7690,11 @@ function viewCalendarSection() {
   });
 
   let html = `<div class="card">
-    <h3 class="mb-3">${year}年 ${month+1}月</h3>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <button data-act="cal-prev-month" aria-label="前の月" style="border:none; background:var(--bg-soft); width:32px; height:32px; border-radius:999px; cursor:pointer; color:var(--text);">‹</button>
+      <h3 style="margin:0;">${year}年 ${month+1}月</h3>
+      <button data-act="cal-next-month" aria-label="次の月" ${isCurrentMonth?'disabled style="border:none; background:transparent; width:32px; height:32px; border-radius:999px; opacity:0.25; cursor:not-allowed; color:var(--text);"':'style="border:none; background:var(--bg-soft); width:32px; height:32px; border-radius:999px; cursor:pointer; color:var(--text);"'}>›</button>
+    </div>
     <div class="calendar-grid">
       ${['日','月','火','水','木','金','土'].map(d => `<div class="cal-head">${d}</div>`).join('')}
       ${Array(first).fill('<div></div>').join('')}
@@ -7672,31 +7720,6 @@ function viewCalendarSection() {
     <span>☀ とてもよい</span>
   </div>`;
 
-  // 思考のクセ分析カード（直近4週間）
-  const distortions = analyzeDistortions(state.moyamoyaRecords || [], 28);
-  const top1 = distortions[0];
-  if (top1 && top1.score >= 8) {
-    html += `
-      <button class="dd-entry-card" data-act="open-distortions">
-        <span class="dd-entry-icon">🧠</span>
-        <div>
-          <div class="dd-entry-title">思考のクセ分析（直近4週間）</div>
-          <div class="dd-entry-desc">最も多く見られるクセ: ${escapeHtml(top1.name)}（${top1.level.label}）</div>
-        </div>
-      </button>
-    `;
-  } else {
-    html += `
-      <button class="dd-entry-card" data-act="open-distortions">
-        <span class="dd-entry-icon">🧠</span>
-        <div>
-          <div class="dd-entry-title">思考のクセ分析</div>
-          <div class="dd-entry-desc">記録が増えると、あなたの思考パターンが見えてきます</div>
-        </div>
-      </button>
-    `;
-  }
-
   // すぷらんからのひとこと
   html += `
     <div class="kr-hero-card">
@@ -7716,7 +7739,7 @@ function viewCalendarSection() {
       <button class="kr-filter-chip ${filter==='all'?'selected':''}" data-act="record-filter" data-filter="all">すべて</button>
       <button class="kr-filter-chip ${filter==='mood'?'selected':''}" data-act="record-filter" data-filter="mood">気分</button>
       <button class="kr-filter-chip ${filter==='moyamoya'?'selected':''}" data-act="record-filter" data-filter="moyamoya">もやもや</button>
-      <button class="kr-filter-chip ${filter==='deepdive'?'selected':''}" data-act="record-filter" data-filter="deepdive">深掘り</button>
+      <button class="kr-filter-chip ${filter==='ippo'?'selected':''}" data-act="record-filter" data-filter="ippo">いっぽ</button>
     </div>
   `;
 
@@ -7728,8 +7751,8 @@ function viewCalendarSection() {
   if (filter === 'all' || filter === 'moyamoya') {
     items = items.concat((state.moyamoyaRecords || []).map(r => ({ kind: 'moyamoya', t: r.createdAt, data: r })));
   }
-  if (filter === 'all' || filter === 'deepdive') {
-    items = items.concat((state.deepDiveSessions || []).map(d => ({ kind: 'deepdive', t: d.completedAt, data: d })));
+  if (filter === 'all' || filter === 'ippo') {
+    items = items.concat((state.ippoSessions || []).filter(s => s.completedAt).map(s => ({ kind: 'ippo', t: s.completedAt, data: s })));
   }
   items.sort((a, b) => new Date(b.t) - new Date(a.t));
   items = items.slice(0, 12);
@@ -7766,13 +7789,19 @@ function viewCalendarSection() {
             ${hasChat ? `<div class="kr-rec-memo">💬 タップで会話履歴を見る（${(chat.messages || []).length}件）</div>` : ''}
           </button>
         `;
-      } else if (it.kind === 'deepdive') {
-        const d = it.data;
+      } else if (it.kind === 'ippo') {
+        const s = it.data;
+        const action = (typeof ACTIONS !== 'undefined') ? ACTIONS.find(a => a.id === s.actionId) : null;
+        const actionTitle = action ? `${action.icon || ''} ${action.title}` : (s.actionId || '一歩');
+        const change = (typeof s.changeValue === 'number') ? s.changeValue : ((s.beforeIntensity || 0) - (s.afterIntensity || 0));
+        const moodLine = `${s.moodLabel || ''}（${s.beforeIntensity ?? '-'}/10 → ${s.afterIntensity ?? '-'}/10）`;
+        const memo = change > 0 ? `🌱 ${change}ポイント軽くなった` : change === 0 ? '🌱 落ち着いた状態をキープ' : '🌱 まずは行動できたのが大事だよ';
         html += `
           <div class="kr-rec-card" style="cursor:default;">
-            <div class="kr-rec-meta">${formatDate(d.completedAt)} ・ 深掘り</div>
-            <div class="kr-rec-title">${escapeHtml(d.extractedBelief || d.coreBelief || '')}</div>
-            ${(d.tags || []).length > 0 ? `<div class="kr-rec-tags">${d.tags.map(t => `<span class="kr-rec-tag">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+            <div class="kr-rec-meta">${formatDate(s.completedAt)} ・ きょうのいっぽ</div>
+            <div class="kr-rec-title">${escapeHtml(actionTitle)}</div>
+            <div class="kr-rec-emo">${escapeHtml(moodLine)}</div>
+            <div class="kr-rec-memo">${escapeHtml(memo)}</div>
           </div>
         `;
       }
@@ -8235,88 +8264,508 @@ function viewDayDetail() {
 }
 
 function viewReportSection() {
-  const r = generateReport();
-  if (!r) {
-    return `<div class="card text-center text-soft" style="padding:40px 20px;">
-      レポートには、もう少し記録が必要です。<br>あと${Math.max(1, 5 - state.moodLogs.length)}回くらい記録すると傾向が見えてきます。
-    </div>`;
-  }
-  return `
-    <div class="card-warm" style="padding:18px;">
-      <h2 class="mb-2">最近の傾向</h2>
-      <p style="line-height:1.9;">${r.summary}</p>
+  const moodLogs = state.moodLogs || [];
+  const distortions = analyzeDistortions(state.moyamoyaRecords || [], 28);
+  const top1 = distortions[0];
+
+  // ---- 上部ヘッダー: AI分析レポート見出し + すぷらん紹介 ----
+  let html = `
+    <div style="text-align:center; margin: 6px 0 14px;">
+      <h2 style="margin: 0 0 4px; font-family:'Noto Serif JP', serif; font-size: 20px;">
+        AI分析レポート
+        <span style="display:inline-block; width:24px; height:24px; vertical-align:-6px; margin-left:4px;">${suplan({ stage: 'futaba', expression: 'happy', size: 24 })}</span>
+      </h2>
+      <p class="text-tiny text-muted" style="margin:0;">気分の変化を多角的に分析して、あなたの傾向をすぷらんが教えてくれます</p>
     </div>
+  `;
 
-    ${r.distortionHint ? `
-      <h3 class="section-title">考え方のクセ</h3>
-      <div class="card" style="padding:18px;">
-        <p style="line-height:1.8;">${r.distortionHint}</p>
-        <p class="text-tiny text-muted mt-2">⚠️ 断定ではなく、AIが推定した参考情報です</p>
-      </div>
-    ` : ''}
+  // ---- 気分の変化グラフ ----
+  html += viewMoodGraphSection();
 
-    ${r.effectiveActions ? `
-      <h3 class="section-title">効果が出やすい行動</h3>
-      <div class="card" style="padding:18px;">
-        <p style="line-height:1.8;">${r.effectiveActions}</p>
-      </div>
-    ` : ''}
+  // ---- 思考のクセ分析 ----
+  html += `
+    <h3 class="section-title" style="margin-top:18px;">思考のクセ分析</h3>
+  `;
+  if (top1 && top1.score >= 8) {
+    html += `
+      <button class="dd-entry-card" data-act="open-distortions">
+        <span class="dd-entry-icon">🧠</span>
+        <div>
+          <div class="dd-entry-title">思考のクセ分析（直近4週間）</div>
+          <div class="dd-entry-desc">最も多く見られるクセ: ${escapeHtml(top1.name)}（${top1.level.label}）</div>
+        </div>
+      </button>
+    `;
+  } else {
+    html += `
+      <button class="dd-entry-card" data-act="open-distortions">
+        <span class="dd-entry-icon">🧠</span>
+        <div>
+          <div class="dd-entry-title">思考のクセ分析</div>
+          <div class="dd-entry-desc">記録が増えると、あなたの思考パターンが見えてきます</div>
+        </div>
+      </button>
+    `;
+  }
 
-    ${r.nextSuggestion ? `
-      <h3 class="section-title">次に試すとよさそうな行動</h3>
-      <div class="card" style="padding:18px;">
-        <p style="line-height:1.8;">${r.nextSuggestion}</p>
+  // ---- 深掘り分析 ----
+  html += `
+    <h3 class="section-title" style="margin-top:18px;">深掘り分析</h3>
+    <button class="dd-entry-card" data-act="dd-start">
+      <span class="dd-entry-icon">🔎</span>
+      <div>
+        <div class="dd-entry-title">深掘り（下向き矢印法）</div>
+        <div class="dd-entry-desc">繰り返すモヤモヤやネガティブな思考の根っこを探ります</div>
       </div>
-    ` : ''}
+    </button>
+  `;
+
+  if ((state.deepDiveSessions || []).length > 0) {
+    html += `<h4 class="text-small text-soft" style="margin: 14px 0 8px;">これまでの深掘り</h4>`;
+    state.deepDiveSessions.slice(-3).reverse().forEach(d => {
+      html += `
+        <div class="card" style="padding:14px; margin-bottom:8px;">
+          <div class="text-tiny text-muted">${formatDate(d.completedAt)}</div>
+          <div class="mt-1" style="font-weight:500;">${escapeHtml(d.extractedBelief || d.coreBelief || '-')}</div>
+          ${d.tags && d.tags.length > 0 ? `
+            <div class="dd-tag-list" style="margin-top:8px;">
+              ${d.tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
+  }
+
+  // 記録が少ないとき注釈
+  if (moodLogs.length < 3) {
+    html += `<p class="text-tiny text-muted text-center" style="margin-top:14px;">
+      ※ 記録があと${Math.max(1, 3 - moodLogs.length)}件たまると、グラフがより精度高く表示されます
+    </p>`;
+  }
+
+  return html;
+}
+
+// ============================================================
+// 気分の変化グラフセクション（日付別 / 時間帯別 / 曜日別）
+// ============================================================
+function viewMoodGraphSection() {
+  const tab = state.ui.reportGraphTab || 'date';
+  const moodLogs = state.moodLogs || [];
+
+  const tabBtn = (key, label) => `
+    <button data-act="report-graph-tab" data-graph-tab="${key}"
+      style="flex:1; padding:8px 0; background:${tab===key?'var(--accent-soft)':'var(--bg-soft)'};
+      border:none; border-radius:999px; cursor:pointer; font-weight:500; font-size:13px;
+      color:${tab===key?'var(--accent-deep)':'var(--text-soft)'};">${label}</button>
+  `;
+
+  let html = `
+    <div class="card" style="padding:16px;">
+      <div style="display:flex; gap:6px; margin-bottom:14px;">
+        ${tabBtn('date', '日付別')}
+        ${tabBtn('hour', '時間帯別')}
+        ${tabBtn('weekday', '曜日別')}
+      </div>
+  `;
+
+  if (moodLogs.length === 0) {
+    html += `<div class="text-center text-soft" style="padding: 24px 8px;">
+      まだ記録がありません。<br>ホームから「きもち」を残してみよう。
+    </div></div>`;
+    return html;
+  }
+
+  if (tab === 'date') {
+    const data = computeMoodByDate(moodLogs, 7);
+    html += `
+      <div class="kr-graph-h">
+        <span class="kr-graph-icon">📅</span>
+        <div>
+          <div class="kr-graph-title">日付別の気分の変化</div>
+          <div class="kr-graph-sub">日ごとの気分の上げ下げを確認できます</div>
+        </div>
+      </div>
+      <div class="text-tiny text-muted" style="margin: 6px 0 4px;">気分の強さ（0=つらい / 10=とても良い）</div>
+      ${renderLineChart(data.points, data.labels)}
+      <div class="kr-graph-suplan">
+        <div class="kr-graph-suplan-icon">${suplan({ stage: 'futaba', expression: 'happy', size: 40 })}</div>
+        <div>
+          <div class="kr-graph-suplan-title">すぷらんのひとこと</div>
+          <div class="kr-graph-suplan-msg">${escapeHtml(generateGraphSuplanMessage('date', data))}</div>
+        </div>
+      </div>
+      <h4 class="kr-graph-topics-h">日ごとのトピックス</h4>
+      <div class="kr-graph-topics-row">
+        ${data.points.map((p, i) => {
+          const moodObj = (p.mood != null) ? MOODS.find(m => m.id === Math.round(p.moodScore || 0)) : null;
+          return `
+            <div class="kr-graph-topic-cell">
+              <div class="kr-graph-topic-date">${data.labels[i]}</div>
+              <div class="kr-graph-topic-text">${escapeHtml(p.topic || '-')}</div>
+              <div class="kr-graph-topic-emoji">${moodObj ? moodObj.emoji : '·'}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } else if (tab === 'hour') {
+    const data = computeMoodByHour(moodLogs);
+    html += `
+      <div class="kr-graph-h">
+        <span class="kr-graph-icon">🕐</span>
+        <div>
+          <div class="kr-graph-title">時間帯別の気分の傾向</div>
+          <div class="kr-graph-sub">1日の中で、気分が上がりやすい・下がりやすい時間帯を確認できます</div>
+        </div>
+      </div>
+      <div class="text-tiny text-muted" style="margin: 6px 0 4px;">気分の強さ（0=つらい / 10=とても良い）</div>
+      ${renderLineChart(data.points, data.labels)}
+      <div class="kr-graph-suplan">
+        <div class="kr-graph-suplan-icon">${suplan({ stage: 'futaba', expression: 'happy', size: 40 })}</div>
+        <div>
+          <div class="kr-graph-suplan-title">すぷらんのひとこと</div>
+          <div class="kr-graph-suplan-msg">${escapeHtml(generateGraphSuplanMessage('hour', data))}</div>
+        </div>
+      </div>
+      <h4 class="kr-graph-topics-h">時間帯ごとのトピックス（よくあったこと）</h4>
+      <div class="kr-graph-topic-list">
+        ${data.buckets.map(b => `
+          <div class="kr-graph-topic-row">
+            <div class="kr-graph-topic-row-icon">${b.icon}</div>
+            <div class="kr-graph-topic-row-body">
+              <div class="kr-graph-topic-row-title">${escapeHtml(b.label)}</div>
+              <div class="kr-graph-topic-row-desc">${escapeHtml(b.note)}</div>
+            </div>
+            <div class="kr-graph-topic-row-side">
+              <div class="kr-graph-topic-row-side-h">よくあったこと</div>
+              <div class="kr-graph-topic-row-side-t">${escapeHtml(b.topic || '-')}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    const data = computeMoodByWeekday(moodLogs);
+    html += `
+      <div class="kr-graph-h">
+        <span class="kr-graph-icon">📅</span>
+        <div>
+          <div class="kr-graph-title">曜日別の気分の傾向</div>
+          <div class="kr-graph-sub">曜日ごとの気分の上げ下げを確認できます</div>
+        </div>
+      </div>
+      <div class="text-tiny text-muted" style="margin: 6px 0 4px;">気分の強さ（0=つらい / 10=とても良い）</div>
+      ${renderBarChart(data.points, data.labels)}
+      <div class="kr-graph-suplan">
+        <div class="kr-graph-suplan-icon">${suplan({ stage: 'futaba', expression: 'happy', size: 40 })}</div>
+        <div>
+          <div class="kr-graph-suplan-title">すぷらんのひとこと</div>
+          <div class="kr-graph-suplan-msg">${escapeHtml(generateGraphSuplanMessage('weekday', data))}</div>
+        </div>
+      </div>
+      <h4 class="kr-graph-topics-h">曜日ごとのトピックス（よくあったこと）</h4>
+      <div class="kr-graph-topic-list">
+        ${data.points.map((p, i) => {
+          const dayLabel = data.labels[i];
+          const tone = (p.value == null) ? 'ふつう' : (p.value >= 7 ? '気分が上がりやすい日' : p.value >= 5 ? '安定して過ごしやすい日' : '少し気分が下がる日');
+          return `
+            <div class="kr-graph-topic-row">
+              <div class="kr-graph-topic-row-icon" style="background:${weekdayBg(i)}; color:${weekdayFg(i)};">${dayLabel}</div>
+              <div class="kr-graph-topic-row-body">
+                <div class="kr-graph-topic-row-title">${escapeHtml(tone)}</div>
+                <div class="kr-graph-topic-row-desc">${p.value == null ? '記録なし' : '平均 '+p.value.toFixed(1)+'/10'}</div>
+              </div>
+              <div class="kr-graph-topic-row-side">
+                <div class="kr-graph-topic-row-side-h">よくあったこと</div>
+                <div class="kr-graph-topic-row-side-t">${escapeHtml(p.topic || '-')}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  // ---- 傾向まとめ ----
+  const summary = generateGraphTrendSummary(tab, moodLogs);
+  if (summary) {
+    html += `
+      <div class="kr-graph-summary">
+        <div class="kr-graph-summary-h">
+          <span class="kr-graph-summary-icon">${tab==='date' ? '🌱' : tab==='hour' ? '💡' : '💗'}</span>
+          <span>傾向まとめ</span>
+        </div>
+        <p class="kr-graph-summary-msg">${escapeHtml(summary)}</p>
+      </div>
+    `;
+  }
+
+  html += `
+      <p class="text-tiny text-muted text-center" style="margin-top:10px;">
+        ※気分の強さは、記録した気分の平均値をもとに表示しています
+      </p>
+    </div>
+  `;
+
+  return html;
+}
+
+// ============================================================
+// AI分析レポート: 気分グラフ用 ヘルパー関数群
+// ============================================================
+// moodScore (1-5) → 0-10 に変換
+function moodScoreTo10(s) {
+  if (s == null) return null;
+  return ((s - 1) / 4) * 10;
+}
+
+// 日ごとのトピックスを生成（カテゴリ・コメントから推測）
+function topicForMoodLog(m) {
+  if (!m) return '-';
+  if (m.comment && m.comment.length > 0) return m.comment.slice(0, 14);
+  const cats = (m.categories || []).map(id => (CATEGORIES.find(c => c.id === id) || {}).name).filter(Boolean);
+  if (cats.length > 0) return cats[0];
+  if (m.moodScore >= 4) return 'いい感じ';
+  if (m.moodScore <= 2) return 'モヤモヤした';
+  return 'ふつうの日';
+}
+
+// 日付別: 直近 N 日（既定7日）の平均気分
+function computeMoodByDate(logs, days = 7) {
+  const points = [];
+  const labels = [];
+  const today = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const sameDay = logs.filter(m => {
+      const md = new Date(m.createdAt);
+      return md.getFullYear() === d.getFullYear() && md.getMonth() === d.getMonth() && md.getDate() === d.getDate();
+    });
+    const avg = sameDay.length > 0 ? sameDay.reduce((s, m) => s + moodScoreTo10(m.moodScore), 0) / sameDay.length : null;
+    const moodScoreAvg = sameDay.length > 0 ? sameDay.reduce((s, m) => s + m.moodScore, 0) / sameDay.length : null;
+    const last = sameDay[sameDay.length - 1];
+    const wd = ['日','月','火','水','木','金','土'][d.getDay()];
+    labels.push(`${d.getMonth()+1}/${d.getDate()}\n${wd}`);
+    points.push({
+      key,
+      value: avg,
+      moodScore: moodScoreAvg,
+      mood: last ? last.moodScore : null,
+      topic: last ? topicForMoodLog(last) : null,
+      isToday: i === 0,
+    });
+  }
+  return { points, labels };
+}
+
+// 時間帯別: 4時間刻み 6バケット
+function computeMoodByHour(logs) {
+  const buckets = [
+    { id: 0, label: '深夜（0時〜3時）',   icon: '🌙', range: [0, 4],   note: '休息の時間帯です' },
+    { id: 1, label: '朝（4時〜9時）',     icon: '🌅', range: [4, 10],  note: '気分が上がりやすい時間帯です' },
+    { id: 2, label: '昼（10時〜15時）',   icon: '☀️', range: [10, 16], note: '気分が安定しやすい時間帯です' },
+    { id: 3, label: '夕方（16時〜19時）', icon: '🌇', range: [16, 20], note: '少し気分が下がりやすい時間帯です' },
+    { id: 4, label: '夜（20時〜23時）',   icon: '🌃', range: [20, 24], note: '気分が下がりやすい時間帯です' },
+  ];
+  buckets.forEach(b => { b.values = []; b.recent = null; });
+  logs.forEach(m => {
+    const h = new Date(m.createdAt).getHours();
+    const b = buckets.find(x => h >= x.range[0] && h < x.range[1]);
+    if (b) {
+      b.values.push(moodScoreTo10(m.moodScore));
+      if (!b.recent || new Date(m.createdAt) > new Date(b.recent.createdAt)) b.recent = m;
+    }
+  });
+  buckets.forEach(b => {
+    b.value = b.values.length > 0 ? b.values.reduce((s, v) => s + v, 0) / b.values.length : null;
+    b.topic = b.recent ? topicForMoodLog(b.recent) : null;
+  });
+  // ラインチャート用
+  const labels = ['0時','4時','8時','12時','16時','20時','24時'];
+  const points = [];
+  for (let i = 0; i < 7; i++) {
+    if (i === 0) points.push({ value: buckets[0].value, topic: buckets[0].topic });
+    else if (i === 6) points.push({ value: buckets[0].value, topic: buckets[0].topic });
+    else points.push({ value: buckets[i-1].value, topic: buckets[i-1].topic });
+  }
+  return { points, labels, buckets };
+}
+
+// 曜日別: 月-日 7曜日の平均気分
+function computeMoodByWeekday(logs) {
+  // 月始まり: 月,火,水,木,金,土,日 (index 0..6)
+  const labels = ['月','火','水','木','金','土','日'];
+  const buckets = labels.map(() => ({ values: [], topics: {}, recent: null }));
+  logs.forEach(m => {
+    const d = new Date(m.createdAt);
+    const idx = (d.getDay() + 6) % 7; // 月=0
+    const b = buckets[idx];
+    b.values.push(moodScoreTo10(m.moodScore));
+    const t = topicForMoodLog(m);
+    b.topics[t] = (b.topics[t] || 0) + 1;
+    if (!b.recent || new Date(m.createdAt) > new Date(b.recent.createdAt)) b.recent = m;
+  });
+  const points = buckets.map(b => {
+    const value = b.values.length > 0 ? b.values.reduce((s, v) => s + v, 0) / b.values.length : null;
+    const topic = b.recent ? topicForMoodLog(b.recent) : null;
+    return { value, topic };
+  });
+  return { points, labels };
+}
+
+// シンプル ライン折れ線チャート
+function renderLineChart(points, labels) {
+  const W = 320, H = 180, padX = 28, padY = 18;
+  const innerW = W - padX * 2;
+  const innerH = H - padY * 2;
+  const N = points.length;
+  const x = (i) => padX + (innerW * (i / Math.max(1, N - 1)));
+  const y = (v) => padY + innerH - (innerH * (Math.max(0, Math.min(10, v)) / 10));
+
+  // y軸グリッド (0,5,10)
+  const gridLines = [0, 5, 10].map(v => `
+    <line x1="${padX}" x2="${W - padX}" y1="${y(v)}" y2="${y(v)}" stroke="var(--divider)" stroke-width="1" stroke-dasharray="3 3" />
+    <text x="${padX - 4}" y="${y(v) + 3}" text-anchor="end" font-size="9" fill="var(--text-muted)">${v}</text>
+  `).join('');
+
+  // パス（null は飛ばす）
+  let pathD = '';
+  let started = false;
+  points.forEach((p, i) => {
+    if (p.value == null) { started = false; return; }
+    if (!started) { pathD += `M ${x(i)} ${y(p.value)}`; started = true; }
+    else { pathD += ` L ${x(i)} ${y(p.value)}`; }
+  });
+
+  // ドット + 値ラベル
+  const dots = points.map((p, i) => {
+    if (p.value == null) return '';
+    const cx = x(i), cy = y(p.value);
+    const color = p.value >= 7 ? '#7BA876' : p.value >= 4 ? '#D4A867' : '#B57272';
+    return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}" stroke="#fff" stroke-width="1.5" />`;
+  }).join('');
+
+  // x軸ラベル
+  const xLabels = labels.map((lab, i) => {
+    const lines = String(lab).split('\n');
+    return lines.map((l, li) => `
+      <text x="${x(i)}" y="${H - padY + 12 + li * 10}" text-anchor="middle" font-size="9" fill="var(--text-muted)">${escapeHtml(l)}</text>
+    `).join('');
+  }).join('');
+
+  return `
+    <div class="kr-graph-svg-wrap">
+      <svg viewBox="0 0 ${W} ${H + 14}" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;">
+        ${gridLines}
+        <path d="${pathD}" fill="none" stroke="#7BA876" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        ${dots}
+        ${xLabels}
+      </svg>
+    </div>
   `;
 }
 
-function generateReport() {
-  if (state.moodLogs.length < 3) return null;
-  const recent = state.moodLogs.filter(m => Date.now() - new Date(m.createdAt).getTime() < 7 * 86400000);
-  if (recent.length === 0) return null;
+// シンプル 棒グラフ（曜日別）
+function renderBarChart(points, labels) {
+  const W = 320, H = 180, padX = 28, padY = 18;
+  const innerW = W - padX * 2;
+  const innerH = H - padY * 2;
+  const N = points.length;
+  const slot = innerW / N;
+  const barW = Math.min(28, slot * 0.55);
 
-  const catCount = {};
-  recent.forEach(m => (m.categories || []).forEach(c => { catCount[c] = (catCount[c]||0)+1; }));
-  const topCat = Object.entries(catCount).sort((a,b) => b[1]-a[1])[0];
-  const topCatName = topCat ? CATEGORIES.find(c => c.id === topCat[0])?.name : '';
+  const yBase = padY + innerH;
+  const y = (v) => padY + innerH - (innerH * (Math.max(0, Math.min(10, v)) / 10));
 
-  const hourBuckets = { morning:0, day:0, evening:0, night:0 };
-  recent.forEach(m => {
-    const h = new Date(m.createdAt).getHours();
-    if (h >= 5 && h < 12) hourBuckets.morning++;
-    else if (h >= 12 && h < 17) hourBuckets.day++;
-    else if (h >= 17 && h < 22) hourBuckets.evening++;
-    else hourBuckets.night++;
-  });
-  const topHour = Object.entries(hourBuckets).sort((a,b) => b[1]-a[1])[0][0];
-  const hourLabel = { morning:'朝', day:'昼', evening:'夕方〜夜', night:'夜中' }[topHour];
+  const gridLines = [0, 5, 10].map(v => `
+    <line x1="${padX}" x2="${W - padX}" y1="${y(v)}" y2="${y(v)}" stroke="var(--divider)" stroke-width="1" stroke-dasharray="3 3" />
+    <text x="${padX - 4}" y="${y(v) + 3}" text-anchor="end" font-size="9" fill="var(--text-muted)">${v}</text>
+  `).join('');
 
-  const recentMoya = state.moyamoyaRecords.filter(r => Date.now() - new Date(r.createdAt).getTime() < 14 * 86400000);
-  let distortionHint = null;
-  if (recentMoya.length >= 2) {
-    const eventTexts = recentMoya.map(r => r.eventText).join(' ');
-    if (/全部|私が悪い|自分のせい|ダメ/.test(eventTexts)) {
-      distortionHint = '記録を見ると、「自分が全部悪い」と感じやすい場面が何度か見られます。これは、もしかすると "過度な自己責任化" に近い考え方かもしれません。';
+  const bars = points.map((p, i) => {
+    if (p.value == null) return '';
+    const cx = padX + slot * i + slot / 2;
+    const top = y(p.value);
+    const color = p.value >= 7 ? '#7BA876' : p.value >= 4 ? '#D4A867' : '#B57272';
+    return `<rect x="${cx - barW/2}" y="${top}" width="${barW}" height="${yBase - top}" fill="${color}" rx="3" />`;
+  }).join('');
+
+  const xLabels = labels.map((lab, i) => `
+    <text x="${padX + slot * i + slot / 2}" y="${H - padY + 12}" text-anchor="middle" font-size="10" fill="var(--text-muted)">${escapeHtml(lab)}</text>
+  `).join('');
+
+  return `
+    <div class="kr-graph-svg-wrap">
+      <svg viewBox="0 0 ${W} ${H + 14}" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;">
+        ${gridLines}
+        ${bars}
+        ${xLabels}
+      </svg>
+    </div>
+  `;
+}
+
+function weekdayBg(i) {
+  // 月-日
+  const colors = ['#E8F0E2', '#F5E8C8', '#E2EFE8', '#E8E2F0', '#FCE8D6', '#DDE8F0', '#F0DDE8'];
+  return colors[i] || '#EEE';
+}
+function weekdayFg(i) {
+  const colors = ['#5C7E60', '#A37D2C', '#5C7E60', '#7B5CA0', '#B07F2F', '#5C7898', '#A0567C'];
+  return colors[i] || '#444';
+}
+
+// すぷらん ひとこと（タブごと）
+function generateGraphSuplanMessage(tab, data) {
+  const valid = (data.points || []).filter(p => p.value != null);
+  if (valid.length === 0) return '記録がたまってくると、ここにすぷらんからのひとことが表示されるよ。';
+  const avg = valid.reduce((s, p) => s + p.value, 0) / valid.length;
+
+  if (tab === 'date') {
+    const lows = (data.points || []).filter(p => p.value != null && p.value < 4);
+    const highs = (data.points || []).filter(p => p.value != null && p.value >= 7);
+    if (lows.length >= 2 && highs.length === 0) {
+      return 'ここ最近は気分が落ち込みやすい日が続いているみたい。\n小さなセルフケアを大切にしようね。';
     }
-  }
-
-  let effectiveActions = null;
-  if (state.actionLogs.length >= 2) {
-    const high = state.actionLogs.filter(l => l.rating >= 4);
-    if (high.length > 0) {
-      const action = state.actions.find(a => a.id === high[high.length-1].actionId);
-      if (action) effectiveActions = `「${action.actionText}」を実行した日は、気分の改善傾向が見られます。`;
+    if (highs.length >= 2 && lows.length === 0) {
+      return 'いい感じの日が続いてるみたい。\nこのリズムを大切に、無理しない範囲で続けてみよう。';
     }
+    return '気分には波があるのが自然なこと。\n上がる日も下がる日も、そっと書きとめておくのが大事だよ。';
   }
+  if (tab === 'hour') {
+    const sorted = (data.buckets || []).filter(b => b.value != null).sort((a, b) => b.value - a.value);
+    if (sorted.length === 0) return '記録がたまってくると、時間帯ごとの傾向が見えてくるよ。';
+    const top = sorted[0];
+    const bottom = sorted[sorted.length - 1];
+    return `あなたは${top.label.split('（')[0]}に気分が上がりやすくて、\n${bottom.label.split('（')[0]}は少し下がりやすいみたいだよ。`;
+  }
+  if (tab === 'weekday') {
+    const wdLabels = ['月','火','水','木','金','土','日'];
+    const valued = (data.points || []).map((p, i) => ({ ...p, label: wdLabels[i] })).filter(p => p.value != null);
+    if (valued.length === 0) return '曜日ごとの記録がたまると、傾向が見えてくるよ。';
+    const sorted = [...valued].sort((a, b) => b.value - a.value);
+    const top = sorted[0], bottom = sorted[sorted.length - 1];
+    return `あなたは${top.label}曜日に気分が上がりやすく、\n${bottom.label}曜日は少しゆっくり休む時間にしてみよう。`;
+  }
+  return '';
+}
 
-  const nextSuggestion = recentMoya.length > 0
-    ? '注意された内容を、事実・解釈・感情に分けて書いてみる。'
-    : '寝る前に「今日できたこと」を1つだけ書く。';
-
-  const summary = `ここ1週間は、${topCatName ? topCatName + 'に関する' : ''}記録が多く、${hourLabel}の時間帯に気分が下がりやすい傾向があります。${distortionHint ? '\n\nまた、' + distortionHint.split('。')[0] + '。' : ''}`;
-
-  return { summary, distortionHint, effectiveActions, nextSuggestion };
+// 傾向まとめ メッセージ
+function generateGraphTrendSummary(tab, logs) {
+  if (!logs || logs.length < 3) return null;
+  if (tab === 'date') {
+    return '気分が上がった日は、好きな香りや音楽など\n「リラックスする行動」をしていることが多いよ';
+  }
+  if (tab === 'hour') {
+    return '夜のモヤモヤ対策に、「お風呂に入る」「深呼吸する」などの\nリラックス行動が役立っているよ';
+  }
+  if (tab === 'weekday') {
+    return '平日の中で調子が上がりやすい日と下がりやすい日があるみたい！\n下がる日は「休む日」として、自分をいたわってあげてね';
+  }
+  return null;
 }
 
 // ============================================================
@@ -8817,6 +9266,26 @@ function handleAction(act, el, ev) {
   if (act === 'open-action') { go('action'); return; }
   if (act === 'record-filter') {
     state.ui.recordFilter = el.dataset.filter;
+    saveState();
+    render();
+    return;
+  }
+  if (act === 'cal-prev-month') {
+    state.ui.calendarMonthOffset = (state.ui.calendarMonthOffset || 0) - 1;
+    saveState();
+    render();
+    return;
+  }
+  if (act === 'cal-next-month') {
+    const next = (state.ui.calendarMonthOffset || 0) + 1;
+    if (next > 0) return; // 未来の月は不可
+    state.ui.calendarMonthOffset = next;
+    saveState();
+    render();
+    return;
+  }
+  if (act === 'report-graph-tab') {
+    state.ui.reportGraphTab = el.dataset.graphTab;
     saveState();
     render();
     return;
