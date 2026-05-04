@@ -170,9 +170,14 @@
   justify-content: center;
   overflow: hidden;
   position: relative;
-  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease), transform 0.15s ease;
 }
-.home-mascot svg, .home-mascot img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.home-mascot:hover { transform: scale(1.04); }
+.home-mascot:active { transform: scale(0.97); }
+.home-mascot svg, .home-mascot img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; pointer-events: none; }
 [data-theme="dark"] .home-mascot {
   background: #243030;
   box-shadow: 0 0 0 1.5px rgba(167, 196, 160, 0.45),
@@ -3077,6 +3082,76 @@ h3 { font-size: 16px; font-weight: 500; }
 }
 .modal-title { font-family: 'Noto Serif JP', serif; font-size: 18px; margin-bottom: 12px; font-weight: 500; }
 
+/* ===== すぷらん紹介モーダル ===== */
+.suplan-info-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: var(--bg-soft); cursor: pointer;
+  font-size: 18px; line-height: 1; color: var(--text-soft);
+  display: flex; align-items: center; justify-content: center;
+}
+[data-theme="dark"] .suplan-info-close { background: rgba(47,62,62,0.55); }
+.modal-card { position: relative; }
+.suplan-info-hero {
+  display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center;
+  margin: 8px 0 14px; padding-right: 36px;
+}
+.suplan-info-hero-img { width: 96px; height: 96px; }
+.suplan-info-hero-title {
+  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 22px;
+  color: #5C7E60; margin: 0 0 6px;
+}
+[data-theme="dark"] .suplan-info-hero-title { color: #A7C4A0; }
+.suplan-info-hero-desc { font-size: 13px; line-height: 1.7; margin: 0; color: var(--text); }
+.suplan-info-divider { border: none; border-top: 1px solid var(--divider); margin: 14px 0 18px; }
+.suplan-info-section { margin: 0 0 18px; }
+.suplan-info-h3 {
+  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 16px;
+  color: #5C7E60; margin: 0 0 8px;
+}
+[data-theme="dark"] .suplan-info-h3 { color: #A7C4A0; }
+.suplan-info-section-body {
+  display: grid; grid-template-columns: 1fr 96px; gap: 12px; align-items: flex-start;
+}
+.suplan-info-text { font-size: 12.5px; line-height: 1.85; color: var(--text); }
+.suplan-info-text p { margin: 0 0 8px; }
+.suplan-info-text p:last-child { margin-bottom: 0; }
+.suplan-info-side { width: 96px; display: flex; align-items: center; justify-content: center; }
+.suplan-info-cta-card {
+  background: rgba(123,168,118,0.12);
+  border-radius: 12px;
+  padding: 14px;
+  display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+  margin: 8px 0 14px;
+}
+[data-theme="dark"] .suplan-info-cta-card { background: rgba(123,168,118,0.18); }
+.suplan-info-cta-title {
+  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 13px;
+  color: #5C7E60; margin: 0 0 4px;
+}
+[data-theme="dark"] .suplan-info-cta-title { color: #A7C4A0; }
+.suplan-info-cta-desc { font-size: 11px; line-height: 1.6; color: var(--text-soft); margin: 0; }
+.suplan-info-cta-btn {
+  background: #B5C7B0; color: #fff;
+  padding: 10px 16px; font-size: 12px; border: none; border-radius: 999px;
+  white-space: nowrap; cursor: not-allowed; opacity: 0.85;
+}
+.suplan-info-message {
+  border: 1.5px dashed rgba(123,168,118,0.5); border-radius: 12px;
+  padding: 14px; margin: 0 0 14px;
+  display: grid; grid-template-columns: 1fr 72px; gap: 10px; align-items: center;
+}
+.suplan-info-message-title {
+  font-family: 'Noto Serif JP', serif; font-weight: 500; font-size: 13px; margin: 0 0 6px;
+  color: var(--text);
+}
+.suplan-info-message-body p { font-size: 11.5px; line-height: 1.85; margin: 0; color: var(--text); }
+.suplan-info-message-img { width: 72px; }
+.suplan-info-disclaimer {
+  font-size: 10px; line-height: 1.6; color: var(--text-muted); text-align: left;
+  margin: 0; padding: 0 4px;
+}
+
 /* ============================================================
    クライシス検知（穏やかな寄り添い色）
    ============================================================ */
@@ -4341,9 +4416,9 @@ function viewHome() {
           <h1 class="home-greet-h1">${getGreeting()}、${escapeHtml(getUserName())}さん</h1>
           <p class="home-subtitle">${getHomeSubtitle()}</p>
         </div>
-        <div class="home-mascot" aria-hidden="true">
+        <button class="home-mascot" data-act="open-suplan-info" aria-label="すぷらんについて">
           ${suplan({ size: 56 })}
-        </div>
+        </button>
       </header>
 
       <!-- 気持ち入力カード -->
@@ -8682,6 +8757,81 @@ function generateGraphTrendSummary(tab, logs) {
 }
 
 // ============================================================
+// すぷらん紹介モーダル（ホーム右上のすぷらんアイコンタップで表示）
+// ============================================================
+function viewSuplanInfoModal() {
+  return `
+    <button class="suplan-info-close" data-act="close-modal" aria-label="閉じる">×</button>
+
+    <div class="suplan-info-hero">
+      <div class="suplan-info-hero-img">${suplan({ stage: 'futaba', expression: 'happy', size: 96 })}</div>
+      <div class="suplan-info-hero-body">
+        <h2 class="suplan-info-hero-title">すぷらんって？</h2>
+        <p class="suplan-info-hero-desc">すぷらんは、あなたのきもちにそっと寄り添う、やさしいパートナーです。</p>
+      </div>
+    </div>
+
+    <hr class="suplan-info-divider">
+
+    <section class="suplan-info-section">
+      <h3 class="suplan-info-h3">🌱 名前の由来</h3>
+      <div class="suplan-info-section-body">
+        <div class="suplan-info-text">
+          <p>「すぷらん（sprout）」は、<br>その小さな芽（sprout）を、<br>無理のない一歩（plan）に変えること。</p>
+          <p>小さな芽が、やがて大きく育つように、<br>あなたの気持ちや変化も、少しずつ育っていってほしい。<br>そんな願いを込めて名付けました。</p>
+        </div>
+        <div class="suplan-info-side">${suplan({ pose: 'heart', expression: 'happy', size: 96 })}</div>
+      </div>
+    </section>
+
+    <section class="suplan-info-section">
+      <h3 class="suplan-info-h3">🌱 もやの森って？</h3>
+      <div class="suplan-info-section-body">
+        <div class="suplan-info-text">
+          <p>もやの森は、もやもやした気持ちをやさしく受けとめ、整理し、軽くするための場所です。</p>
+          <p>木や花、いきものたちが見守る中で、あなたの心が少しずつ晴れていくことを応援します。</p>
+        </div>
+        <div class="suplan-info-side">
+          <svg viewBox="0 0 96 80" width="96" height="80" aria-hidden="true">
+            <rect x="0" y="60" width="96" height="20" fill="#E5EFE0" rx="4"/>
+            <ellipse cx="20" cy="42" rx="14" ry="22" fill="#9BB89F"/>
+            <rect x="18" y="50" width="4" height="14" fill="#8B6F47"/>
+            <ellipse cx="74" cy="38" rx="16" ry="26" fill="#7BA876"/>
+            <rect x="72" y="48" width="4" height="16" fill="#8B6F47"/>
+            <rect x="38" y="56" width="22" height="14" fill="#D4B891" rx="2"/>
+            <text x="49" y="66" font-size="6" text-anchor="middle" fill="#5C4A2E">もやの森</text>
+            <circle cx="46" cy="48" r="2" fill="#7BA8D4"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="suplan-info-cta-card">
+      <div class="suplan-info-cta-body">
+        <h4 class="suplan-info-cta-title">🌱 すぷらんの世界をもっと知る</h4>
+        <p class="suplan-info-cta-desc">すぷらんの想いや機能を紹介する特設サイトをご覧いただけます。</p>
+      </div>
+      <button class="btn suplan-info-cta-btn" disabled aria-disabled="true">
+        準備中
+      </button>
+    </div>
+
+    <div class="suplan-info-message">
+      <div class="suplan-info-message-body">
+        <h4 class="suplan-info-message-title">すぷらんからのメッセージ</h4>
+        <p>もやもやしても、だいじょうぶ。<br>うまくいかなくても、だいじょうぶ。<br>あなたのペースで、すこしずつでいいよ。<br>きょうの「すぷらん」を、いっしょに見つけようね。</p>
+      </div>
+      <div class="suplan-info-message-img">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
+    </div>
+
+    <p class="suplan-info-disclaimer">
+      ※すぷらんは、あなたの心の変化に気づくお手伝いをします。<br>
+      　医療行為や診断を目的としたサービスではありません。
+    </p>
+  `;
+}
+
+// ============================================================
 // 設定モーダル
 // ============================================================
 function viewSettingsModal() {
@@ -9624,6 +9774,7 @@ function handleAction(act, el, ev) {
   }
 
   if (act === 'open-settings') { modal(viewSettingsModal()); return; }
+  if (act === 'open-suplan-info') { modal(viewSuplanInfoModal()); return; }
   if (act === 'open-ai-prompts') { modal(viewAIPromptsModal()); return; }
   if (act === 'ai-prompt-expand') {
     modal(viewAIPromptsModal(el.dataset.promptId));
