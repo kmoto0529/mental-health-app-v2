@@ -6354,91 +6354,6 @@ async function extractCoreBeliefAI(s) {
   }
 }
 
-// ============================================================
-// 精度向上の見える化（v0.9.1 仕様書 §7）
-// ============================================================
-function calcAccuracyTimeline(days = 5) {
-  // 直近 N 日について、その日に完了した ippoSession の score 平均を出す
-  const today = new Date();
-  const result = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const sessionsOfDay = (state.ippoSessions || []).filter(s =>
-      s.completedAt && sameDay(new Date(s.completedAt), d)
-    );
-    const avg = sessionsOfDay.length === 0 ? null
-      : Math.round(sessionsOfDay.reduce((a, x) => a + (x.score || 0), 0) / sessionsOfDay.length);
-    result.push({
-      date: `${d.getMonth() + 1}/${d.getDate()}`,
-      pct: avg,
-    });
-  }
-  return result;
-}
-
-function calcRecentInsights() {
-  const sessions = (state.ippoSessions || []).slice(-10);
-  const insights = [];
-  if (sessions.length >= 3) {
-    // 平均 changeValue が上昇しているか
-    const half = Math.floor(sessions.length / 2);
-    const oldAvg = sessions.slice(0, half).reduce((a, s) => a + (s.changeValue || 0), 0) / half;
-    const newAvg = sessions.slice(half).reduce((a, s) => a + (s.changeValue || 0), 0) / (sessions.length - half);
-    if (newAvg > oldAvg + 0.5) insights.push('気分が軽くなる行動を見つけられるようになってきました');
-    // バリエーション
-    const uniq = new Set(sessions.map(s => s.actionId)).size;
-    if (uniq >= Math.min(3, sessions.length)) insights.push('行動のバリエーションが増えています');
-    // 深掘り
-    if ((state.deepDiveSessions || []).length > 0) insights.push('あなたの傾向がより明確になってきました');
-  }
-  return insights;
-}
-
-function viewAccuracyCard() {
-  const timeline = calcAccuracyTimeline(5);
-  const hasData = timeline.some(t => t.pct != null);
-  if (!hasData) {
-    return `
-      <div class="acc-card">
-        <div class="acc-title">📈 おすすめ精度の推移</div>
-        <div class="acc-sub">日次ループを3日以上続けると、精度の変化が見えてきます。</div>
-        <p class="text-small text-soft mt-2">まずは「いっぽ」タブから今日の一歩を選んでみよう。</p>
-      </div>
-    `;
-  }
-  const max = 100;
-  const insights = calcRecentInsights();
-  return `
-    <div class="acc-card">
-      <div class="acc-title">📈 おすすめ精度の推移</div>
-      <div class="acc-sub">あなたに合う一歩がどんどん見つかってきています</div>
-      <div class="acc-chart">
-        ${timeline.map(t => `
-          <div class="acc-bar-col">
-            <div class="acc-bar-pct">${t.pct == null ? '—' : t.pct + '%'}</div>
-            <div class="acc-bar" style="height: ${t.pct == null ? 0 : (t.pct / max) * 90}%;"></div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="acc-x-labels">
-        ${timeline.map(t => `<span>${t.date}</span>`).join('')}
-      </div>
-      ${insights.length > 0 ? `
-        <div class="acc-insight-list" style="margin-top:14px;">
-          <div class="text-tiny text-muted" style="margin-bottom:4px;">最近の変化</div>
-          ${insights.map(i => `
-            <div class="acc-insight-item">
-              <span class="acc-insight-check">✓</span>
-              <span>${escapeHtml(i)}</span>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
-    </div>
-  `;
-}
-
 function viewActionLegacy() {
   const goal = activeGoal();
   const policy = activePolicy();
@@ -7664,8 +7579,6 @@ function viewRecord() {
         <button data-act="record-sub" data-sub="calendar" style="padding:8px 14px; background:${sub==='calendar'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='calendar'?'var(--accent-deep)':'var(--text-soft)'};">カレンダー</button>
         <button data-act="record-sub" data-sub="report" style="padding:8px 14px; background:${sub==='report'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='report'?'var(--accent-deep)':'var(--text-soft)'};">AI分析レポート</button>
       </div>
-
-      ${viewAccuracyCard()}
 
       ${sub === 'calendar' ? viewCalendarSection() : viewReportSection()}
     </div>
