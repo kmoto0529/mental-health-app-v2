@@ -2909,7 +2909,13 @@ h3 { font-size: 16px; font-weight: 500; }
    - キーボード表示時、レイアウトビューポートが縮小しても
      直前のAIメッセージが自然に可視領域内に保たれる
    ============================================================ */
-.mood-chat-screen {
+/*
+ * NOTE: .screen.active { display: block } ((0,2,0)) が .mood-chat-screen ((0,1,0))
+ * を上書きしてしまうため、同じ specificity の .mood-chat-screen.active で
+ * display:flex を指定する。これがないと flex レイアウトが効かず、入力欄が
+ * 画面下端に張り付かなくなる。
+ */
+.mood-chat-screen.active {
   display: flex;
   flex-direction: column;
   height: 100dvh;
