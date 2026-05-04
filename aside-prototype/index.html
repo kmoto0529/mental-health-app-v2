@@ -6900,28 +6900,12 @@ function saveActionEval() {
 }
 
 // ============================================================
-// すぷらんキャラクター（成長段階+表情+ポーズ / PNGフォールバック付きSVG）
+// すぷらんキャラクター（v0.9.7: 成長段階を撤去し単一ベースに統合）
+//   - すぷらんはキャラクターとして成長しない方針
+//   - 画像は base.png 1枚を中心に、表情/ポーズ/季節/家族/日常で
+//     カテゴリ別 PNG を上書き表示する構造
+//   - PNG が無い場合は SVG プレースホルダーで描画
 // ============================================================
-const SUPLAN_PT = { mood: 1, moyamoya: 2, action: 3 };
-const SUPLAN_STAGES = ['tane', 'futaba', 'nae', 'hana', 'ookii'];
-const SUPLAN_STAGE_THRESHOLDS = [0, 3, 10, 25, 50];
-
-function suplanTotalPoints() {
-  const m = (state.moodLogs || []).length * SUPLAN_PT.mood;
-  const my = (state.moyamoyaRecords || []).length * SUPLAN_PT.moyamoya;
-  const a = (state.actionLogs || []).filter(l => l.rating > 0).length * SUPLAN_PT.action;
-  return m + my + a;
-}
-function suplanStage() {
-  const pt = suplanTotalPoints();
-  for (let i = SUPLAN_STAGE_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (pt >= SUPLAN_STAGE_THRESHOLDS[i]) return SUPLAN_STAGES[i];
-  }
-  return 'tane';
-}
-function suplanStageNumber() {
-  return SUPLAN_STAGES.indexOf(suplanStage()) + 1;
-}
 function suplanExpression() {
   const last = state.moodLogs && state.moodLogs[state.moodLogs.length - 1];
   if (!last) return 'calm';
@@ -6945,7 +6929,7 @@ const _suplanAssetCache = {};  // path → true (success) / false (404確認済)
 
 // 起動時に確実存在する資産をプリウォームし、初回IMG src選択を高速化
 function preWarmSuplanAssets() {
-  const known = ['growth/stage1-tane'];
+  const known = ['base'];
   known.forEach(p => {
     if (p in _suplanAssetCache) return;
     const img = new Image();
@@ -6961,21 +6945,23 @@ function suplanProbeAsset(category, name) {
 }
 
 // メイン関数: PNG優先、IMG が連鎖的に onerror で次候補へ。最終はSVG
+// opts.stage は後方互換のため受け取るが無視する（成長段階廃止）
 function suplan(opts = {}) {
-  const stage = opts.stage || suplanStage();
   const expression = opts.expression || suplanExpression();
   const pose = opts.pose || null;
   const seasonal = opts.seasonal || null;
+  const family = opts.family || null;
+  const daily = opts.daily || null;
   const size = opts.size || 96;
-  const stageIdx = SUPLAN_STAGES.indexOf(stage) + 1;
 
   // 優先順候補
   const allPaths = [];
+  if (family)      allPaths.push(`family/${family}`);
+  if (daily)       allPaths.push(`daily/${daily}`);
   if (pose)        allPaths.push(`poses/${pose}`);
   if (seasonal)    allPaths.push(`seasonal/${seasonal}`);
   if (expression && expression !== 'calm') allPaths.push(`expressions/${expression}`);
-  allPaths.push(`growth/stage${stageIdx}-${stage}`);
-  if (stageIdx !== 1) allPaths.push(`growth/stage1-tane`);  // 普遍フォールバック
+  allPaths.push(`base`);  // 単一ベース画像
 
   // 既知 false（404確認済）はチェーンから除外
   const tryOrder = allPaths.filter(p => _suplanAssetCache[p] !== false);
@@ -6983,7 +6969,7 @@ function suplan(opts = {}) {
   tryOrder.sort((a, b) => (_suplanAssetCache[b] === true ? 1 : 0) - (_suplanAssetCache[a] === true ? 1 : 0));
 
   if (tryOrder.length === 0) {
-    return suplanSvg({ stage, expression, pose, size });
+    return suplanSvg({ expression, pose, size });
   }
 
   const primary = tryOrder[0];
@@ -6994,7 +6980,6 @@ function suplan(opts = {}) {
     width="${size}" height="${size}" alt="すぷらん"
     data-suplan-chain="${chain.join('|')}"
     data-suplan-size="${size}"
-    data-suplan-stage="${safeAttr(stage)}"
     data-suplan-expression="${safeAttr(expression)}"
     style="display:block; pointer-events:none; object-fit: contain;"
     onload="window.suplanImgLoad && window.suplanImgLoad(this)"
@@ -7022,10 +7007,9 @@ window.suplanImgChainFail = function(img) {
   }
   // 全候補失敗 → SVG置換
   const size = parseInt(img.dataset.suplanSize, 10) || 96;
-  const stage = img.dataset.suplanStage || 'tane';
   const expression = img.dataset.suplanExpression || 'calm';
   try {
-    img.outerHTML = suplanSvg({ stage, expression, size });
+    img.outerHTML = suplanSvg({ expression, size });
   } catch (_) {
     img.style.display = 'none';
   }
@@ -7037,9 +7021,8 @@ window.suplanImgFail = window.suplanImgChainFail;
 // 起動時プリウォーム（先頭で実行）
 preWarmSuplanAssets();
 
-// SVGプレースホルダー生成器（合成）
+// SVGプレースホルダー生成器（合成）— 成長段階廃止後は単一ボディ形状
 function suplanSvg(opts = {}) {
-  const stage = opts.stage || 'futaba';
   const expression = opts.expression || 'calm';
   const pose = opts.pose || null;
   const size = opts.size || 96;
@@ -7055,70 +7038,17 @@ function suplanSvg(opts = {}) {
     blush: '#FFD8B5',
     flower: '#FFFFFF',
     flowerCenter: '#F4C566',
-    pot: '#A07854',
-    potShade: '#7A5A3E',
   };
 
-  // 頭の上（成長段階）
-  let head = '';
-  if (stage === 'tane') {
-    head = `<ellipse cx="50" cy="36" rx="2" ry="5" fill="${C.leafL}"/>`;
-  } else if (stage === 'futaba') {
-    head = `
-      <path d="M50 40 C 46 30, 38 26, 36 28 C 38 32, 44 36, 49 40 Z" fill="${C.leafM}"/>
-      <path d="M50 40 C 54 30, 62 26, 64 28 C 62 32, 56 36, 51 40 Z" fill="${C.leafM}"/>
-      <ellipse cx="50" cy="36" rx="2" ry="3" fill="${C.leafL}"/>
-    `;
-  } else if (stage === 'nae') {
-    head = `
-      <path d="M50 42 C 44 30, 34 24, 32 26 C 34 32, 42 38, 49 42 Z" fill="${C.leafM}"/>
-      <path d="M50 42 C 56 30, 66 24, 68 26 C 66 32, 58 38, 51 42 Z" fill="${C.leafM}"/>
-      <path d="M50 42 C 50 30, 48 22, 50 18 C 52 22, 50 30, 50 42 Z" fill="${C.leafL}"/>
-    `;
-  } else if (stage === 'hana') {
-    head = `
-      <path d="M50 42 C 44 32, 36 28, 34 30 C 36 34, 44 38, 49 42 Z" fill="${C.leafM}"/>
-      <path d="M50 42 C 56 32, 64 28, 66 30 C 64 34, 56 38, 51 42 Z" fill="${C.leafM}"/>
-      <g transform="translate(50,24)">
-        <circle cx="0" cy="-6" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
-        <circle cx="-5" cy="0" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
-        <circle cx="5" cy="0" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
-        <circle cx="-3" cy="-7" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
-        <circle cx="3" cy="-7" r="4" fill="${C.flower}" stroke="${C.bodyEdge}" stroke-width="0.5"/>
-        <circle cx="0" cy="-3" r="2.5" fill="${C.flowerCenter}"/>
-      </g>
-    `;
-  } else if (stage === 'ookii') {
-    head = `
-      <path d="M40 38 C 30 22, 20 18, 18 22 C 22 30, 32 36, 40 40 Z" fill="${C.leafM}"/>
-      <path d="M50 36 C 48 18, 50 12, 52 12 C 54 18, 52 30, 50 36 Z" fill="${C.leafL}"/>
-      <path d="M60 38 C 70 22, 80 18, 82 22 C 78 30, 68 36, 60 40 Z" fill="${C.leafM}"/>
-      <g transform="translate(36,16)">
-        <circle cx="0" cy="0" r="3" fill="${C.flower}"/>
-        <circle cx="-3" cy="2" r="3" fill="${C.flower}"/>
-        <circle cx="3" cy="2" r="3" fill="${C.flower}"/>
-        <circle cx="0" cy="0" r="1.5" fill="${C.flowerCenter}"/>
-      </g>
-      <g transform="translate(70,20)">
-        <circle cx="0" cy="0" r="2.5" fill="${C.flower}"/>
-        <circle cx="-2" cy="2" r="2.5" fill="${C.flower}"/>
-        <circle cx="2" cy="2" r="2.5" fill="${C.flower}"/>
-        <circle cx="0" cy="0" r="1" fill="${C.flowerCenter}"/>
-      </g>
-    `;
-  }
+  // 頭の上（標準: ふたば一対）
+  const head = `
+    <path d="M50 40 C 46 30, 38 26, 36 28 C 38 32, 44 36, 49 40 Z" fill="${C.leafM}"/>
+    <path d="M50 40 C 54 30, 62 26, 64 28 C 62 32, 56 36, 51 40 Z" fill="${C.leafM}"/>
+    <ellipse cx="50" cy="36" rx="2" ry="3" fill="${C.leafL}"/>
+  `;
 
-  // ボディ（鉢があるかどうかは ookii のみ）
-  let body = '';
-  if (stage === 'ookii') {
-    body = `
-      <ellipse cx="50" cy="58" rx="20" ry="20" fill="${C.body}" stroke="${C.bodyEdge}" stroke-width="1.5"/>
-      <path d="M28 84 L 30 100 L 70 100 L 72 84 Z" fill="${C.pot}" stroke="${C.potShade}" stroke-width="1"/>
-      <ellipse cx="50" cy="84" rx="22" ry="3" fill="${C.potShade}"/>
-    `;
-  } else {
-    body = `<ellipse cx="50" cy="64" rx="22" ry="26" fill="${C.body}" stroke="${C.bodyEdge}" stroke-width="1.5"/>`;
-  }
+  // ボディ（鉢無しの卵形）
+  const body = `<ellipse cx="50" cy="64" rx="22" ry="26" fill="${C.body}" stroke="${C.bodyEdge}" stroke-width="1.5"/>`;
 
   // 目（表情）
   let eyes = '';
@@ -7543,7 +7473,7 @@ function decomposeRecord(record) {
 }
 function sameDay2(a, b) { return a.toDateString() === b.toDateString(); }
 
-// 1記録 ごとに「まめこメモ」を生成（記録一覧で表示）
+// 1記録 ごとに「すぷらんメモ」を生成（記録一覧で表示）
 function generateRecordMemo(record) {
   const dec = decomposeRecord(record);
   if (dec.detectedDistortions.length > 0) {
@@ -7823,7 +7753,7 @@ function viewCalendarSection() {
     </div>
   `;
 
-  // 記録一覧（フィルタ + まめこメモ）
+  // 記録一覧（フィルタ + すぷらんメモ）
   const filter = state.ui.recordFilter || 'all';
   html += `
     <h3 class="section-title">最近のきろく</h3>
@@ -7865,7 +7795,7 @@ function viewCalendarSection() {
             <div class="kr-rec-meta">${formatDate(r.createdAt)} ・ もやもや整理</div>
             <div class="kr-rec-title">${escapeHtml(titleText)}</div>
             <div class="kr-rec-emo">${escapeHtml(emoLine)}</div>
-            ${memo ? `<div class="kr-rec-memo">🌱 まめこメモ: ${escapeHtml(memo)}</div>` : ''}
+            ${memo ? `<div class="kr-rec-memo">🌱 すぷらんメモ: ${escapeHtml(memo)}</div>` : ''}
           </button>
         `;
       } else if (it.kind === 'mood') {
@@ -8941,21 +8871,15 @@ function viewSettingsModal() {
   const action = activeAction();
   const apiKey = (state.preferences && state.preferences.geminiApiKey) || '';
   const masked = apiKey ? apiKey.slice(0, 6) + '••••••' + apiKey.slice(-4) : '';
-  const stage = suplanStage();
-  const stageLabels = { tane: 'たねのすぷらん', futaba: 'ふたばのすぷらん', nae: 'なえのすぷらん', hana: 'はなのすぷらん', ookii: 'おおきなすぷらん' };
-  const pt = suplanTotalPoints();
-  const stageIdx = SUPLAN_STAGES.indexOf(stage);
-  const nextThreshold = SUPLAN_STAGE_THRESHOLDS[stageIdx + 1];
-  const progressTxt = nextThreshold ? `${pt} / ${nextThreshold} pt` : `${pt} pt（最大段階）`;
   return `
     <h2 class="modal-title">設定</h2>
     <div style="display:flex; flex-direction:column; gap:14px; max-height:70vh; overflow-y:auto;">
       <div style="display:flex; align-items:center; gap:14px; padding:12px; background: var(--bg-soft); border-radius: 14px;">
         <div style="width:64px; height:64px; flex-shrink:0;">${suplan({ size: 64 })}</div>
         <div style="flex:1;">
-          <div class="text-tiny text-muted">いまのすぷらん</div>
-          <div style="font-family:'Noto Serif JP', serif; font-weight:600; margin-top:2px;">${stageLabels[stage]}</div>
-          <div class="text-tiny" style="color: var(--primary); margin-top:4px;">${progressTxt}</div>
+          <div class="text-tiny text-muted">マスコット</div>
+          <div style="font-family:'Noto Serif JP', serif; font-weight:600; margin-top:2px;">すぷらん</div>
+          <div class="text-tiny text-muted" style="margin-top:4px;">あなたの気持ちにそっと寄り添うパートナー</div>
         </div>
       </div>
 
