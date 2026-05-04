@@ -74,7 +74,26 @@ icon/
 
 ## 生成方法
 
-[`company/design/characters/suplan_v1_dalle_prompts_2026-05.md`](../../../../company/design/characters/suplan_v1_dalle_prompts_2026-05.md) に DALL-E / Midjourney / Imagen 用のプロンプトテンプレートが用意されています。コピー&ペーストで生成可能。
+### A. ChatGPT Plus + DALL-E (推奨・APIキー不要)
+
+[`company/design/characters/suplan_v1_chatgpt_batch_2026-05.md`](../../../../../company/design/characters/suplan_v1_chatgpt_batch_2026-05.md)
+に ChatGPT 用のペースト・テンプレ集 (Step 0 + Step 1〜30) があります。
+新規会話で Step 0 を1回貼り、Step 1〜30 を順番に貼って画像を保存してください。
+完成後 `node test-harness/verify-suplan-assets.js` で配置確認できます。
+
+### B. OpenAI API キーで自動化
+
+`OPENAI_API_KEY` を環境変数で渡せば一括生成できます。
+```
+$env:OPENAI_API_KEY="sk-..."
+node test-harness/generate-suplan-assets.js --quality=medium
+```
+
+### C. プロンプト原本
+
+[`company/design/characters/suplan_v1_dalle_prompts_2026-05.md`](../../../../../company/design/characters/suplan_v1_dalle_prompts_2026-05.md)
+に DALL-E / Midjourney / Imagen 用の元プロンプトテンプレートがあります。
+A・B のテンプレもこのファイルから派生しています。
 
 ## 一貫性チェック
 
