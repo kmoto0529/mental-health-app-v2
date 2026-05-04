@@ -5304,7 +5304,7 @@ function renderMoyamoyaLetter(s) {
           <!-- すぷらんからの言葉 -->
           <div class="letter-suplan">
             <div class="letter-suplan-img">
-              ${suplan({ stage: 'tane', expression: 'calm', size: 56 })}
+              ${suplan({ pose: 'heart', expression: 'happy', size: 56 })}
             </div>
             <div class="letter-suplan-content">
               <div class="letter-suplan-title">今日のあなたに贈る言葉</div>
@@ -6405,7 +6405,7 @@ function viewDdOutcome(s) {
     <div class="screen active dd-screen">
       ${ddHeader(6)}
       <div style="text-align:center; margin: 20px 0 14px;">
-        <div style="margin: 0 auto 8px;">${suplan({ stage: 'futaba', expression: 'calm', size: 64 })}</div>
+        <div style="margin: 0 auto 8px;">${suplan({ pose: 'bulb', size: 64 })}</div>
         <div class="dd-q" style="margin-bottom:0;">深掘りができたね</div>
         <p class="text-tiny text-muted mt-1">${s.aiUsed ? '⚠️ AIが推定した参考情報です' : '※ 簡易ルールで抽出した候補です'}</p>
       </div>
@@ -7909,7 +7909,7 @@ function viewKirokuDistortions() {
       </div>
       <div style="padding: 0 16px;">
         <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 14px;">
-          <div>${suplan({ stage: 'futaba', expression: 'happy', size: 56 })}</div>
+          <div>${suplan({ pose: 'bulb', size: 56 })}</div>
           <div style="flex:1;">
             <h2 style="margin: 0 0 4px; font-size: 18px; font-family:'Noto Serif JP', serif;">あなたによく見られる<br>思考のクセ TOP3</h2>
             <div class="text-tiny text-muted">直近4週間（${totalRecs}件）の記録から分析しました</div>
@@ -8008,7 +8008,7 @@ function viewKirokuAiAnalysis() {
       </div>
       <div style="padding: 0 16px;">
         <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 14px;">
-          <div>${suplan({ stage: 'futaba', expression: 'calm', size: 56 })}</div>
+          <div>${suplan({ pose: 'bulb', size: 56 })}</div>
           <div style="flex:1;">
             <h2 style="margin: 0 0 4px; font-size: 18px; font-family:'Noto Serif JP', serif;">AIによる詳しい分析</h2>
             <div class="text-tiny text-muted">記録を Gemini が読み解いて、より深い気づきをお届けします</div>
@@ -8065,7 +8065,7 @@ function viewKirokuAiAnalysis() {
         </div>
 
         <div class="ippo-do-card" style="margin-top: 18px;">
-          <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
+          <div style="margin: 0 auto 6px;">${suplan({ pose: 'watering', size: 48 })}</div>
           <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">
             あなたの記録が増えるほど、AI も精度を上げていきます。<br>
             まずは小さな一歩から、いっしょに続けていこうね。
@@ -8412,7 +8412,7 @@ function viewMoodGraphSection() {
       <div class="text-tiny text-muted" style="margin: 6px 0 4px;">気分の強さ（0=つらい / 10=とても良い）</div>
       ${renderLineChart(data.points, data.labels)}
       <div class="kr-graph-suplan">
-        <div class="kr-graph-suplan-icon">${suplan({ stage: 'futaba', expression: 'happy', size: 40 })}</div>
+        <div class="kr-graph-suplan-icon">${suplan({ size: 40 })}</div>
         <div>
           <div class="kr-graph-suplan-title">すぷらんのひとこと</div>
           <div class="kr-graph-suplan-msg">${escapeHtml(generateGraphSuplanMessage('date', data))}</div>
@@ -8445,7 +8445,7 @@ function viewMoodGraphSection() {
       <div class="text-tiny text-muted" style="margin: 6px 0 4px;">気分の強さ（0=つらい / 10=とても良い）</div>
       ${renderLineChart(data.points, data.labels)}
       <div class="kr-graph-suplan">
-        <div class="kr-graph-suplan-icon">${suplan({ stage: 'futaba', expression: 'happy', size: 40 })}</div>
+        <div class="kr-graph-suplan-icon">${suplan({ pose: 'bulb', size: 40 })}</div>
         <div>
           <div class="kr-graph-suplan-title">すぷらんのひとこと</div>
           <div class="kr-graph-suplan-msg">${escapeHtml(generateGraphSuplanMessage('hour', data))}</div>
