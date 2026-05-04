@@ -2959,6 +2959,19 @@ body.in-chat-mode main#main {
   padding-bottom: max(10px, env(safe-area-inset-bottom));
 }
 [data-theme="dark"] .mood-chat-bottom { background: var(--bg); border-top-color: rgba(255,255,255,0.06); }
+/*
+ * iOS は env(safe-area-inset-bottom) をキーボード表示中も home indicator の値
+ * (約34px) のまま返すため、入力欄が浮いた状態で見える原因になる。
+ * body.keyboard-open の時だけ home indicator 用の padding を切り、
+ * 入力欄をキーボード直上にぴったり張り付かせる。
+ */
+body.keyboard-open .mood-chat-bottom {
+  padding-top: 6px;
+  padding-bottom: 4px;
+}
+body.keyboard-open .mood-chat-bottom .input-row {
+  padding: 6px 16px;
+}
 
 /* クイックリプライ */
 .quick-reply-row {
@@ -7608,6 +7621,8 @@ window.autoExpand = function(el) {
   // CSS変数 --chat-vh を「可視 viewport の高さ」に同期させる
   // body.in-chat-mode を付けると body 自体が position:fixed; height:--chat-vh
   // になり、入力欄が常に visualViewport の下端に張り付く
+  // body.keyboard-open はキーボード表示判定。iOS の safe-area-inset-bottom が
+  // キーボード表示中も home indicator 値を返してしまうため、これで上書きする。
   window.fitChatScreenToViewport = function fitChatScreenToViewport() {
     const vv = window.visualViewport;
     const h = vv ? vv.height : window.innerHeight;
@@ -7615,9 +7630,18 @@ window.autoExpand = function(el) {
     const inChat = !!document.querySelector('.mood-chat-screen.active');
     document.documentElement.style.setProperty('--app-pad-bottom', inChat ? '0px' : '80px');
     document.body.classList.toggle('in-chat-mode', inChat);
+
+    // visualViewport が大幅に縮んでいればキーボードが出ている (80px 超の差)
+    const keyboardOpen = !!(vv && (window.innerHeight - vv.height - vv.offsetTop) > 80);
+    document.body.classList.toggle('keyboard-open', keyboardOpen);
+
     if (inChat) {
-      // 余分なドキュメントスクロールがあれば一番上に戻す
+      // CSS class が遅れて適用されるケース対策に body.style.height も直接書く
+      // (iOS Safari/PWA で稀に CSS変数が即時反映されない事象の保険)
+      document.body.style.height = h + 'px';
       if (window.scrollY > 0) window.scrollTo(0, 0);
+    } else {
+      document.body.style.height = '';
     }
   };
 

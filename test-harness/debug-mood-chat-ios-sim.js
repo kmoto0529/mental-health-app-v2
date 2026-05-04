@@ -150,6 +150,18 @@ async function setupSession(page) {
   console.log(`  body bottom gap:   ${bodyGap.toFixed(1)}px`, Math.abs(bodyGap) <= 5 ? '✅' : '❌');
   console.log(`  #app bottom gap:   ${appGap.toFixed(1)}px`,  Math.abs(appGap)  <= 5 ? '✅' : '❌');
   console.log(`  body has in-chat-mode class:`, m.bodyClass.includes('in-chat-mode') ? '✅' : '❌');
+  console.log(`  body has keyboard-open class:`, m.bodyClass.includes('keyboard-open') ? '✅' : '❌');
+
+  // input row 直下の textarea からキーボード(=vv 下端) までの実距離をチェック
+  const inputGap = await page.evaluate(() => {
+    const ta = document.getElementById('moodChatInput');
+    if (!ta || !window.visualViewport) return null;
+    const r = ta.getBoundingClientRect();
+    const vvBottom = window.visualViewport.height + (window.visualViewport.offsetTop || 0);
+    return { textareaBottom: r.bottom, vvBottom, gap: vvBottom - r.bottom };
+  });
+  console.log(`  textarea→vv bottom gap: ${inputGap?.gap?.toFixed(1)}px`,
+    inputGap && inputGap.gap >= 0 && inputGap.gap < 18 ? '✅ (キーボード直上)' : '❌ (浮いてる)');
 
   // ---- ケース3: チャットを抜けたあと body の position:fixed が解除されるか ----
   await page.evaluate(() => {
