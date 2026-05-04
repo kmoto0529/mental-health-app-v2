@@ -3,3 +3,6 @@
 node_modules/
 test-results/
 *.log
+
+# 画像変換ツールのバックアップ (test-harness/make-suplan-transparent.js)
+*.png.bak
