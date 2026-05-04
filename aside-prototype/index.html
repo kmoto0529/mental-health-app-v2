@@ -8794,10 +8794,10 @@ function generateGraphTrendSummary(tab, logs) {
 // すぷらん紹介モーダル（ホーム右上のすぷらんアイコンタップで表示）
 // ============================================================
 function viewSuplanInfoModal() {
-  // もやの森の風景画像。assets/suplan/scenes/moya_forest.png が存在すれば表示、
+  // もやの森の風景画像。assets/suplan/scenes/moyanomori.png が存在すれば表示、
   // 無ければ onerror で簡易SVGプレースホルダーへフォールバック。
   const forestImg = `
-    <img src="./assets/suplan/scenes/moya_forest.png" alt="もやの森"
+    <img src="./assets/suplan/scenes/moyanomori.png" alt="もやの森"
       style="width:100%; height:100%; object-fit:cover; display:block; border-radius:16px;"
       onerror="this.outerHTML = window.__moyaForestFallbackSVG();">
   `;
