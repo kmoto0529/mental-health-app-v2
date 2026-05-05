@@ -3606,12 +3606,17 @@ body.keyboard-open .mood-chat-bottom .input-row {
   max-height: 140px;
   object-fit: contain;
 }
-/* ダーク用画像が無い間はライト用 (クリーム背景) を流用するため
-   ダークモードでは角丸カード化して装飾パネルとして見せる
-   ダーク用画像が配置されればこの treatment は不要 (透明 or ダーク背景込みの画像になる) */
-[data-theme="dark"] .ob-consent-decor {
-  border-radius: 16px;
-  overflow: hidden;
+/* ダークモード時、画像bgはalphaが低めのグラデーション (alpha~24-32) で
+   ページbgと完全一致しないため、四辺をフェードアウトさせて滑らかに溶け込ませる */
+[data-theme="dark"] .ob-consent-decor-img {
+  -webkit-mask-image:
+    linear-gradient(to right,  transparent 0%, black 7%, black 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right,  transparent 0%, black 7%, black 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .ob-consent-cards {
