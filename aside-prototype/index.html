@@ -3888,20 +3888,33 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 .ob-nick-bubble {
   position: absolute;
-  top: 0;
-  right: calc(50% - 88px);
+  top: 18px;
+  left: calc(50% + 30px);
   background: var(--bg-card);
   color: var(--text);
   font-family: 'Noto Serif JP', serif;
   font-size: 14px;
-  padding: 8px 14px;
-  border-radius: 18px 18px 18px 4px;
+  padding: 9px 16px;
+  border-radius: 20px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   border: 1px solid var(--divider);
+  white-space: nowrap;
+}
+.ob-nick-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 14px;
+  width: 0; height: 0;
+  border-right: 8px solid transparent;
+  border-top: 9px solid var(--bg-card);
 }
 [data-theme="dark"] .ob-nick-bubble {
   background: rgba(47,62,62,0.85);
   border-color: rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .ob-nick-bubble::after {
+  border-top-color: rgba(47,62,62,0.85);
 }
 .ob-nick-suplan {
   width: 140px; height: 140px;
@@ -5086,7 +5099,6 @@ function viewConsentDetailsModal() {
           <div class="ob-details-body">
             <h3 class="ob-details-h ob-details-h-safety">安全について</h3>
             <p class="ob-details-p">強い不安やつらさがある場合は、医療機関や相談窓口をご利用ください。ひとりで抱え込まず、専門のサポートを受けることも大切です。</p>
-            <a class="ob-details-safety-cta" href="docs/safety.md" target="_blank">相談できる窓口を見る ›</a>
           </div>
         </div>
       </div>
