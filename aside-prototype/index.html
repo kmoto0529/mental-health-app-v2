@@ -3561,7 +3561,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
   width: 100%;
 }
 
-/* --- Step 1: Welcome (画像1枚 + CTA重ねのみ) --- */
+/* --- Step 1: Welcome (画像フルスクリーン + ボタン重ね) --- */
 .ob-welcome-screen {
   position: relative;
   min-height: 100vh;
@@ -3574,17 +3574,15 @@ body.keyboard-open .mood-chat-bottom .input-row {
   width: 100%;
   height: 100vh;
   object-fit: cover;
-  object-position: center top;
+  object-position: center;
 }
-/* 画像内に焼き込まれた「はじめます」ボタンの上に
-   実際のクリック可能ボタンを重ねる。位置は画像内ボタンに合わせて調整 */
 .ob-welcome-cta {
   position: absolute;
   left: 50%;
-  bottom: 7%;
+  bottom: 32px;
   transform: translateX(-50%);
-  width: 60%;
-  max-width: 280px;
+  width: calc(100% - 48px);
+  max-width: 320px;
   padding: 14px 20px;
   font-size: 15px;
   font-weight: 600;
