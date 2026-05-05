@@ -3595,7 +3595,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
   background: var(--bg);
 }
 .ob-consent-decor {
-  margin: 0 -8px 4px;
+  margin: 4px 0 12px;
   display: block;
   line-height: 0;  /* img 下の余白を消す */
 }
@@ -3605,6 +3605,13 @@ body.keyboard-open .mood-chat-bottom .input-row {
   height: auto;
   max-height: 140px;
   object-fit: contain;
+}
+/* ダーク用画像が無い間はライト用 (クリーム背景) を流用するため
+   ダークモードでは角丸カード化して装飾パネルとして見せる
+   ダーク用画像が配置されればこの treatment は不要 (透明 or ダーク背景込みの画像になる) */
+[data-theme="dark"] .ob-consent-decor {
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .ob-consent-cards {
@@ -4782,6 +4789,15 @@ function probeHeroImage() {
   img.src = './assets/welcome-hero.png';
 }
 
+// consent画面装飾 dark版の存在チェック
+// 配置されていればダークモード時に自動で切り替わる
+function probeConsentDecorDark() {
+  const img = new Image();
+  img.onload = () => { window.ASIDE_HAS_DECOR_DARK = true; if (currentScreen === 'consent') render(); };
+  img.onerror = () => { window.ASIDE_HAS_DECOR_DARK = false; };
+  img.src = './assets/suplan/scenes/consent-decor-dark.png';
+}
+
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -4926,10 +4942,18 @@ const OB_ICONS = {
 };
 
 // consent画面トップの装飾 (DALL-E生成画像、横長 16:5)
+// ライト/ダークで別画像を使う (透過のエッジ問題を完全回避するため)
+//   - light: ./assets/suplan/scenes/consent-decor-light.png  (クリーム背景版)
+//   - dark : ./assets/suplan/scenes/consent-decor-dark.png   (ダーク背景版)
+// dark画像が未配置のときは light にフォールバック
 function consentTopDecor() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const src = (isDark && window.ASIDE_HAS_DECOR_DARK)
+    ? './assets/suplan/scenes/consent-decor-dark.png'
+    : './assets/suplan/scenes/consent-decor-light.png';
   return `
     <div class="ob-consent-decor" aria-hidden="true">
-      <img src="./assets/suplan/scenes/consent-decor.png" alt="" class="ob-consent-decor-img">
+      <img src="${src}" alt="" class="ob-consent-decor-img">
     </div>
   `;
 }
@@ -5067,7 +5091,7 @@ function viewNickname() {
       <div class="ob-nick-input-area">
         <h2 class="ob-h2-center">なんて呼べばいい？</h2>
         <p class="ob-sub-center">あとから変更できるよ</p>
-        <input type="text" id="nicknameInput" class="ob-nick-input" maxlength="20" placeholder="ニックネームを入力（例：もと）">
+        <input type="text" id="nicknameInput" class="ob-nick-input" maxlength="20" placeholder="ニックネームを入力（例：すぷらん）">
       </div>
 
       <div class="ob-cta-area">
@@ -10734,6 +10758,7 @@ function init() {
 
   // ヒーロー画像の存在を確認（無ければ CSS フォールバック）
   probeHeroImage();
+  probeConsentDecorDark();
 
   // MoyaLogger 初期化
   if (window.MoyaLogger) {
