@@ -3577,10 +3577,13 @@ body.keyboard-open .mood-chat-bottom .input-row {
   object-position: center;
 }
 .ob-welcome-cta {
+  /* transform は .btn:active の scale(0.97) と衝突するため使わず
+     left:0; right:0; margin:0 auto で中央配置 */
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: 32px;
-  transform: translateX(-50%);
+  margin: 0 auto;
   width: calc(100% - 48px);
   max-width: 320px;
   padding: 14px 20px;
