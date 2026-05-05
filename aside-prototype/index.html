@@ -4798,6 +4798,14 @@ function probeConsentDecorDark() {
   img.src = './assets/suplan/scenes/consent-decor-dark.png';
 }
 
+// welcome画面 dark版の存在チェック
+function probeWelcomeDark() {
+  const img = new Image();
+  img.onload = () => { window.ASIDE_HAS_WELCOME_DARK = true; if (currentScreen === 'welcome') render(); };
+  img.onerror = () => { window.ASIDE_HAS_WELCOME_DARK = false; };
+  img.src = './assets/suplan/scenes/welcome-dark.png';
+}
+
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -4918,9 +4926,14 @@ function viewWelcome() {
   // 画像内に世界観・タイトル・メッセージが全て焼き込まれている
   // (もやの森 / ここは、あなたの気持ちを そっと整理できる場所 / ひとりで抱えこまなくていいよ。すぷらんが、そばにいるよ。)
   // CSS では「はじめます」ボタンだけを画像内のボタン位置に重ねる
+  // ライト/ダークで別画像を使う (dark未配置なら light にフォールバック)
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const src = (isDark && window.ASIDE_HAS_WELCOME_DARK)
+    ? './assets/suplan/scenes/welcome-dark.png'
+    : './assets/suplan/scenes/welcome-light.png';
   return `
     <div class="ob-welcome-screen">
-      <img src="./assets/suplan/scenes/welcome.png"
+      <img src="${src}"
            alt="もやの森へようこそ。ここは、あなたの気持ちをそっと整理できる場所。ひとりで抱えこまなくていいよ。すぷらんが、そばにいるよ。"
            class="ob-welcome-fullscene">
       <button class="btn btn-primary ob-welcome-cta" data-act="welcome-next">はじめます</button>
@@ -10759,6 +10772,7 @@ function init() {
   // ヒーロー画像の存在を確認（無ければ CSS フォールバック）
   probeHeroImage();
   probeConsentDecorDark();
+  probeWelcomeDark();
 
   // MoyaLogger 初期化
   if (window.MoyaLogger) {
