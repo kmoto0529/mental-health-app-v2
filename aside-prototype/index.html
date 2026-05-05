@@ -3561,93 +3561,35 @@ body.keyboard-open .mood-chat-bottom .input-row {
   width: 100%;
 }
 
-/* --- Step 1: Welcome (森背景) --- */
+/* --- Step 1: Welcome (画像1枚 + CTA重ねのみ) --- */
 .ob-welcome-screen {
   position: relative;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  display: block;
   overflow: hidden;
   background: var(--bg);
 }
-.ob-welcome-bg {
-  position: absolute; inset: 0;
-  z-index: 0;
-}
-.ob-welcome-bg-img {
-  width: 100%; height: 100%;
+.ob-welcome-fullscene {
+  display: block;
+  width: 100%;
+  height: 100vh;
   object-fit: cover;
-  object-position: center;
+  object-position: center top;
 }
-.ob-welcome-bg-mask {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg,
-    rgba(250,247,242,0.0) 0%,
-    rgba(250,247,242,0.0) 55%,
-    rgba(250,247,242,0.55) 75%,
-    rgba(250,247,242,0.92) 92%);
-}
-[data-theme="dark"] .ob-welcome-bg-mask {
-  background: linear-gradient(180deg,
-    rgba(31,42,42,0.0) 0%,
-    rgba(31,42,42,0.0) 55%,
-    rgba(31,42,42,0.7) 75%,
-    rgba(31,42,42,0.95) 92%);
-}
-/* すぷらんを広場に座らせる: 背景画像の clearing 領域に絶対配置
-   テキストブロック (CTA含む) より上に余白を確保するため top:38% に配置 */
-.ob-welcome-suplan-stage {
+/* 画像内に焼き込まれた「はじめます」ボタンの上に
+   実際のクリック可能ボタンを重ねる。位置は画像内ボタンに合わせて調整 */
+.ob-welcome-cta {
   position: absolute;
   left: 50%;
-  top: 38%;
-  transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
-  z-index: 1;
-  pointer-events: none;
-}
-.ob-welcome-suplan-stage img,
-.ob-welcome-suplan-stage svg {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(60,55,40,0.18));
-}
-.ob-welcome-content {
-  position: relative; z-index: 2;
-  margin-top: auto;
-  padding: 0 28px 48px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-/* 旧: コンテンツ内のすぷらん枠 (互換のため残すが新導線では使わない) */
-.ob-welcome-suplan {
-  width: 120px; height: 120px;
-  margin-bottom: 20px;
-}
-.ob-welcome-suplan img, .ob-welcome-suplan svg {
-  width: 100%; height: 100%; object-fit: contain;
-}
-.ob-welcome-title {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 30px;
+  bottom: 7%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 280px;
+  padding: 14px 20px;
+  font-size: 15px;
   font-weight: 600;
-  margin: 0 0 16px;
-  color: var(--text);
-  line-height: 1.4;
-  letter-spacing: 0.02em;
-}
-.ob-welcome-message {
-  font-size: 14px;
-  color: var(--text-soft);
-  line-height: 1.95;
-  margin: 0 0 32px;
-  max-width: 320px;
-}
-.ob-welcome-message-em {
-  color: var(--text);
-  font-weight: 500;
+  border-radius: 999px;
+  z-index: 2;
 }
 
 /* --- Step 2: Consent (3カード) --- */
@@ -4971,24 +4913,15 @@ function render() {
 // 画面: Welcome
 // ============================================================
 function viewWelcome() {
+  // 画像内に世界観・タイトル・メッセージが全て焼き込まれている
+  // (もやの森 / ここは、あなたの気持ちを そっと整理できる場所 / ひとりで抱えこまなくていいよ。すぷらんが、そばにいるよ。)
+  // CSS では「はじめます」ボタンだけを画像内のボタン位置に重ねる
   return `
     <div class="ob-welcome-screen">
-      <div class="ob-welcome-bg" aria-hidden="true">
-        <img src="./assets/suplan/scenes/welcome.png" alt="" class="ob-welcome-bg-img">
-        <div class="ob-welcome-bg-mask"></div>
-      </div>
-      <div class="ob-welcome-suplan-stage" aria-hidden="true">
-        ${suplan({ expression: 'happy', size: 130 })}
-      </div>
-      <div class="ob-welcome-content">
-        <h1 class="ob-welcome-title">もやの森へ<br>ようこそ</h1>
-        <p class="ob-welcome-message">
-          ここは、気持ちをそっと整理して、<br>
-          自分らしい一歩を見つける場所。<br>
-          <span class="ob-welcome-message-em">ひとりで抱えなくて、だいじょうぶ。</span>
-        </p>
-        <button class="btn btn-primary ob-cta" data-act="welcome-next">はじめる</button>
-      </div>
+      <img src="./assets/suplan/scenes/welcome.png"
+           alt="もやの森へようこそ。ここは、あなたの気持ちをそっと整理できる場所。ひとりで抱えこまなくていいよ。すぷらんが、そばにいるよ。"
+           class="ob-welcome-fullscene">
+      <button class="btn btn-primary ob-welcome-cta" data-act="welcome-next">はじめます</button>
     </div>
   `;
 }
