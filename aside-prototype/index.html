@@ -3614,8 +3614,8 @@ body.keyboard-open .mood-chat-bottom .input-row {
    (linear-gradient + mask-composite: intersect は Safari で挙動が不安定なため
     単一レイヤーの radial-gradient に変更) */
 [data-theme="dark"] .ob-consent-decor-img {
-  -webkit-mask-image: radial-gradient(ellipse 85% 75% at center, black 55%, transparent 100%);
-          mask-image: radial-gradient(ellipse 85% 75% at center, black 55%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at center, black 25%, transparent 100%);
+          mask-image: radial-gradient(ellipse closest-side at center, black 25%, transparent 100%);
 }
 
 .ob-consent-cards {
