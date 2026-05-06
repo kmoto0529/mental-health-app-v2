@@ -9742,10 +9742,21 @@ function viewSettingsModal() {
 
       <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
 
+      <div>
+        <div class="text-tiny text-muted">ご要望・改善依頼</div>
+        <p class="text-tiny text-muted" style="margin-top:4px; line-height:1.5;">
+          使いにくい点・あったらいい機能・不具合などをお気軽にお知らせください。<br>
+          いただいた声はアプリ改善に活用させていただきます。
+        </p>
+        <button class="btn btn-secondary" data-act="open-feedback" style="margin-top:8px; font-size:13px; padding:8px 12px;">フォームを開く</button>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
+
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.13-beta.1（5ステップ再設計 / いまやる-あとでやる）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.29-beta.1（要望フォーム追加）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -9853,6 +9864,65 @@ function viewAIPromptsModal(expandedId) {
     <div style="margin-top:16px; display:grid; gap:8px;">
       <button class="btn btn-secondary" data-act="ai-prompt-copy-all">📋 全プロンプトをまとめてコピー</button>
       <button class="btn-ghost" data-act="open-settings">‹ 設定に戻る</button>
+    </div>
+  `;
+}
+
+// ============================================================
+// 要望・改善依頼フォーム（v0.9.29）
+//   - app_events に event_type='feedback' で送信（schema.sql 変更不要）
+//   - 送信先: Supabase の app_events テーブル（payload に詳細）
+//   - 匿名 user_id 紐付け（誰の要望かはダッシュボード側で確認可能）
+// ============================================================
+const FEEDBACK_CATEGORIES = [
+  { id: 'bug',     label: '不具合・バグ報告' },
+  { id: 'request', label: '機能の要望' },
+  { id: 'usability', label: '使いにくい点' },
+  { id: 'other',   label: 'その他' }
+];
+
+function viewFeedbackModal(submitted) {
+  if (submitted) {
+    return `
+      <h2 class="modal-title">送信しました</h2>
+      <div style="padding: 20px 4px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 12px;">🌱</div>
+        <p style="line-height: 1.7; margin: 0 0 8px;">ご意見ありがとうございました。</p>
+        <p class="text-small text-soft" style="line-height: 1.7; margin: 0;">いただいた声は今後のアプリ改善に大切に活用させていただきます。</p>
+      </div>
+      <div style="margin-top:16px; display:grid; gap:8px;">
+        <button class="btn btn-primary" data-act="open-settings">‹ 設定に戻る</button>
+      </div>
+    `;
+  }
+  const selectedCat = state.ui.feedbackCategory || 'request';
+  const draftText = state.ui.feedbackDraft || '';
+  return `
+    <h2 class="modal-title">ご要望・改善依頼</h2>
+    <p class="text-tiny text-muted" style="margin-bottom:14px; line-height:1.6;">
+      いただいた内容は、匿名IDと一緒にβ運用ログに記録され、開発チームが内容を確認します。<br>
+      個人を特定する情報（氏名・連絡先など）は入力しないでください。
+    </p>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <div class="text-tiny text-muted" style="margin-bottom:6px;">カテゴリ</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          ${FEEDBACK_CATEGORIES.map(c => `
+            <button class="kr-filter-chip ${selectedCat === c.id ? 'selected' : ''}" data-act="feedback-cat" data-cat="${c.id}">${escapeHtml(c.label)}</button>
+          `).join('')}
+        </div>
+      </div>
+
+      <div>
+        <div class="text-tiny text-muted" style="margin-bottom:6px;">内容</div>
+        <textarea id="feedbackText" placeholder="気づいたこと・あったらいい機能・使いにくかった場面 など" style="width:100%; min-height:140px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font-family: inherit; font-size:14px; line-height:1.7; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(draftText)}</textarea>
+      </div>
+    </div>
+
+    <div style="margin-top:20px; display:grid; gap:8px;">
+      <button class="btn btn-primary" data-act="feedback-submit">送信する</button>
+      <button class="btn-ghost" data-act="open-settings">‹ キャンセル（設定に戻る）</button>
     </div>
   `;
 }
@@ -10641,6 +10711,42 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'open-ai-prompts') { modal(viewAIPromptsModal()); return; }
+  if (act === 'open-feedback') {
+    state.ui.feedbackCategory = state.ui.feedbackCategory || 'request';
+    state.ui.feedbackDraft = '';
+    modal(viewFeedbackModal(false));
+    return;
+  }
+  if (act === 'feedback-cat') {
+    // 入力中の文字列を退避してから再描画（textareaの内容を保持）
+    const ta = document.getElementById('feedbackText');
+    if (ta) state.ui.feedbackDraft = ta.value || '';
+    state.ui.feedbackCategory = el.dataset.cat || 'request';
+    modal(viewFeedbackModal(false));
+    return;
+  }
+  if (act === 'feedback-submit') {
+    const ta = document.getElementById('feedbackText');
+    const text = ((ta && ta.value) || '').trim();
+    if (!text) { toast('内容を入力してください'); return; }
+    if (text.length > 4000) { toast('長すぎます（4000文字以内）'); return; }
+    const cat = state.ui.feedbackCategory || 'request';
+    try {
+      if (window.MoyaLogger && typeof window.MoyaLogger.event === 'function') {
+        window.MoyaLogger.event('feedback', {
+          category: cat,
+          text: text,
+          screen: 'settings',
+          submitted_at: new Date().toISOString()
+        });
+      }
+    } catch (e) {
+      console.warn('feedback送信エラー:', e);
+    }
+    state.ui.feedbackDraft = '';
+    modal(viewFeedbackModal(true));
+    return;
+  }
   if (act === 'ai-prompt-expand') {
     modal(viewAIPromptsModal(el.dataset.promptId));
     return;
