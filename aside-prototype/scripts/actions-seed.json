@@ -1,2144 +1,648 @@
 [
   {
-    "id": "act_mood_one",
-    "goalKeys": [
-      "organize_feelings",
-      "understand_my_feelings",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "気持ちを一言だけ残す",
-    "desc": "しんどい日も、ひとことだけで大丈夫。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_reflect_once",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "もやもやを1回だけ整理する",
-    "desc": "頭の中を少し外に出すと楽になる。",
-    "ctaAct": "start-reflect",
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_one_event",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今日いちばん気になったことを1つ残す",
-    "desc": "全部じゃなくて、1つだけでいい。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_ai_one_line",
-    "goalKeys": [
-      "reduce_overthinking",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "もやもやしたらAIに一言だけ話す",
-    "desc": "うまく話せなくても、短く始めれば十分。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_phone_down",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 5,
-    "title": "今日は5分だけスマホを置いて休む",
-    "desc": "止めようとしなくていい。置くだけでいい。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_night_reset",
-    "goalKeys": [
-      "reduce_overthinking",
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 2,
-    "title": "寝る前に一言だけ置いて寝る",
-    "desc": "考えすぎる夜に、少しだけ外に出してみよう。",
-    "ctaAct": "goto-rescue-night",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_breath_10s",
-    "goalKeys": [
-      "reduce_overthinking",
-      "organize_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "10秒だけ呼吸する",
-    "desc": "長くやらなくていい。少しだけでいい。",
-    "ctaAct": "goto-rescue",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_mood_select",
-    "goalKeys": [
-      "understand_my_feelings",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "選ぶだけでも気持ちを残す",
-    "desc": "言葉にならなくても、選ぶだけでOK。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_mood_normal",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "「ふつう」の日も記録する",
-    "desc": "特別じゃない日を積み重ねるのが本当の軸になる。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_mood_night",
-    "goalKeys": [
-      "understand_my_feelings",
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "夜に一回、気分を選ぶ",
-    "desc": "夜はとくに、選ぶだけで十分。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_body_check",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "体の調子を一度だけ確認する",
-    "desc": "肩・お腹・顔、どれか1つだけ意識してみる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_rescue_once",
-    "goalKeys": [
-      "have_place_to_rely",
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "しんどい時に「ひといき」を開く",
-    "desc": "開くだけでも十分。使うかは後で決めていい。",
-    "ctaAct": "goto-rescue",
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_talk_fuzzy",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 2,
-    "title": "なんとなくの日に少しだけ話す",
-    "desc": "理由が言えなくても、話していい。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_choose_relied",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "social",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "頼れる相手候補を1人だけ思い浮かべる",
-    "desc": "連絡しなくていい。候補があるだけで、少し安心できる。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_safe_action",
-    "goalKeys": [
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 2,
-    "title": "しんどい時に落ち着く行動を1つ決めておく",
-    "desc": "お茶・散歩・音楽など、自分の「いつもの」を決めておく。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_open_anytime",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "1日1回、このアプリを開く",
-    "desc": "何もしなくていい。開くだけで大丈夫。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_try_anything",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "気分チェックか一言会話、どちらか1つ",
-    "desc": "合う方が、合っていきやすい。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_a04",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "出来事と気持ちを分けてみる",
-    "desc": "起きたことと、その時の気持ちを分けて考える。",
-    "ctaAct": "start-reflect",
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_a05",
-    "goalKeys": [
-      "organize_feelings",
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今いちばん強い気持ちに名前をつける",
-    "desc": "うれしい、いや、悲しい、近いものを見つけるだけ。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_a06",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今日の出来事をひとことでまとめる",
-    "desc": "「今日は○○な日だった」で終えてよい。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_a07",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "気になることを大事・急ぎで分ける",
-    "desc": "頭の中で混ざっているものを2つの軸で分ける。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_a08",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "今の悩みを「ひとつのテーマ」に絞る",
-    "desc": "あれこれ全部ではなく、今週はひとつだけ扱う。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_a09",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "AIにひとこと話して、言い換えをもらう",
-    "desc": "自分の言葉を少し整理して返してもらう。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_a10",
-    "goalKeys": [
-      "organize_feelings",
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今の気持ちに近い色を選ぶ",
-    "desc": "言葉にしにくい時は色から近い気分を見る。",
-    "ctaAct": null,
-    "states": [
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_a11",
-    "goalKeys": [
-      "organize_feelings",
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今の気持ちを「体の感じ」から見る",
-    "desc": "胸が重い、肩がこわい、落ち着かない、などを選ぶ。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_a12",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今日の気持ちを「増えた/減った」で見る",
-    "desc": "朝より気持ちが増えたか減ったかだけ見てみる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_a13",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "頭の中にあることを3つまで並べる",
-    "desc": "多くても3つまで。全部出し切らなくていい。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_a14",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "その悩みが起きやすい場面を1つ見つける",
-    "desc": "いつ、どこで、どんな時に出やすいかを見る。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_a15",
-    "goalKeys": [
-      "reduce_overthinking",
-      "organize_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "今週は考えなくていいことを1つ分ける",
-    "desc": "今向き合うことと、今は置いておくことを分ける。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_a16",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "今週向き合うことを1つ決める",
-    "desc": "頭の中にあること全部ではなく、今週扱うものを1つ選ぶ。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_a17",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "整理した内容を今週のテーマに言い換える",
-    "desc": "整理して終わりではなく、今週どう向き合うかを短く決める。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_a18",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "悩みについて「自分ができること」を1つ決める",
-    "desc": "考えるだけで終わらせず、小さい行動に変えてみる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_a19",
-    "goalKeys": [
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "AIにもやもやを話して次の一歩を決める",
-    "desc": "言葉にしたあと、そのまま今週の行動までつなげる。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_a20",
-    "goalKeys": [
-      "organize_feelings",
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "繰り返し気になるパターンを1つ見つける",
-    "desc": "どんな時に同じ気持ちになりやすいかまで見てみる。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_b02",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今すぐ決めなくていいことを1つ分ける",
-    "desc": "頭の中の「保留」を1つ作る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b03",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "頭の中にあることを1つだけ外に出す",
-    "desc": "メモでもAIでもよい。1つ出すだけでいい。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_b04",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "1分だけ別のものを見る",
-    "desc": "窓の外、手元、空の色など。考えごと以外に意識を向ける。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_b06",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "気になりごとで「今できること」を1つ選ぶ",
-    "desc": "考えるだけになっている時に、できることだけ拾う。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b07",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 3,
-    "title": "SNSを3分だけ閉じる",
-    "desc": "考えが広がりやすい時は、刺激を少し離してみる。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b08",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "今の不安を「事実/想像」に分ける",
-    "desc": "本当に起きていることと、予想していることを分ける。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b09",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 1,
-    "title": "考えごとの時間を1分だけ区切る",
-    "desc": "ずっと考えるのではなく、1分でいったん終える。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b10",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "今の悩みを「今日の分」だけにする",
-    "desc": "1週間先ではなく、今日扱うぶんだけ考える。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b12",
-    "goalKeys": [
-      "reduce_overthinking",
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今の考えにタイトルをつける",
-    "desc": "「未来の不安」「人間関係のこと」など名前をつけて距離をとる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b13",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "1分だけ歩くか体を伸ばす",
-    "desc": "頭の中だけで回っている時に、少し体に戻る。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_b14",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "夜のための一言を決める",
-    "desc": "「今は寝る時間」「明日の自分にまかせる」など短い言葉を持つ。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_b15",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "AIに「今は整理より休みたい」と伝える",
-    "desc": "進めるより止まる選択を、ちゃんと言葉にしてみる。",
-    "ctaAct": "start-chat",
-    "states": [
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_b16",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "考えごとが始まった時の切り替え行動を決める",
-    "desc": "呼吸する、立つ、AIを開くなど、自分用の切り替えを持つ。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b17",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "考えすぎやすいテーマの向き合い方を決める",
-    "desc": "全部ではなく、特に引っかかりやすいテーマに対策を持つ。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b18",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "不安に「今日やること/今はやらない」を決める",
-    "desc": "考えるだけを減らして、扱い方を分ける。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "E"
-  },
-  {
-    "id": "act_b19",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "AIと「考えすぎた時の流れ」を振り返る",
-    "desc": "いつ始まり、どう長引くかを見て、自分なりの対策を作る。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_b20",
-    "goalKeys": [
-      "reduce_overthinking"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "夜に考えすぎた時のルールを1つ作る",
-    "desc": "「23時以降は考えをメモに置いて終える」など。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_c02",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今の気分に近い言葉を1つ選ぶ",
-    "desc": "言い切れなくても、近いもので大丈夫。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c03",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "うれしい/いや/なんとも言えない を分ける",
-    "desc": "細かくなくていいので、まず3つに分けてみる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c05",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "気持ちと理由を1つずつ並べる",
-    "desc": "「さみしい/返信がこなかった」など1セットだけ書く。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_c06",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "AIに「この気持ちって何に近い？」と聞く",
-    "desc": "言いづらい時は、近い表現を一緒に探す。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_c07",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今の気分を体の感覚から見る",
-    "desc": "胸、肩、お腹、呼吸などの感じから今を知る。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_c08",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "スタンプや表情で今の気分を選ぶ",
-    "desc": "文字じゃなくても、近い感じを選ぶだけでいい。",
-    "ctaAct": "goto-mood",
-    "states": [
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c09",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "朝と夜の気分の違いを見てみる",
-    "desc": "1日の中で変わる感じを見つける。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c10",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "同じ気分になりやすい場面を1つ探す",
-    "desc": "気持ちが出やすいタイミングに気づいていく。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c11",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "よかった/しんどかったを1つずつ見る",
-    "desc": "両方を少しだけ見て、自分の反応を知る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c12",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今の自分に近い一文を選ぶ",
-    "desc": "用意された文から近いものを選んでみる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c13",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "気持ちの強さを0〜3で見る",
-    "desc": "ある/少しある/かなりある、くらいで十分。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c14",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "今の自分に優しく言うなら何て言うか",
-    "desc": "自分への言葉から、ほんとの気持ちを見つける。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "C"
-  },
-  {
-    "id": "act_c15",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 5,
-    "title": "1週間の気分の流れを振り返る",
-    "desc": "波があったか、似た日があったかを見る。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c16",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "気持ちが動いた場面を1日1回振り返る",
-    "desc": "何に反応しやすいかを少しずつつかんでいく。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_c17",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "AIと「最近よく出る気持ち」を整理する",
-    "desc": "ばらばらな気分をまとめて、傾向を見つける。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_c18",
-    "goalKeys": [
-      "understand_my_feelings",
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "気持ちごとに「してほしいこと」を1つ考える",
-    "desc": "悲しい時、疲れた時、イライラした時に何が必要かを見る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_c19",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "落ち着きやすいパターンを1つ見つける",
-    "desc": "話すと楽か、書くと整理できるか、休むと戻るかを見る。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_c20",
-    "goalKeys": [
-      "understand_my_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "今週の気分ログから自分の傾向をまとめる",
-    "desc": "ただ記録するだけでなく、自分の特徴に言葉をつける。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_d01",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "social",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "話せそうな人を1人だけ思い浮かべる",
-    "desc": "今すぐ連絡しなくていい。顔が浮かぶだけでOK。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d02",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "相談したい時の言い方を1つ見る",
-    "desc": "「ちょっと聞いてほしい」など、短い言い方を確認する。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d03",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "AIに相談の練習をする",
-    "desc": "誰かに言う前に、伝え方を少し試してみる。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_d04",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "困った時に使えそうな場所を1つ確認する",
-    "desc": "学校、家族、保健室、相談先など候補を1つ見る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_d05",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "「まだ相談じゃないけど…」の言い方を試す",
-    "desc": "重く言わなくていい入り方を知っておく。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d06",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "頼るのがこわい理由を1つだけ見る",
-    "desc": "何が引っかかっているかを少しだけ見てみる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d07",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "連絡しやすいタイミングを考える",
-    "desc": "朝、帰り道、夜など送りやすい時間を決める。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d08",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "送りやすい短文を1つ保存する",
-    "desc": "「ちょっと話したい」「少し聞いてほしい」などを持っておく。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d09",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "相談したい相手の条件を考える",
-    "desc": "安心、話しやすい、責めない、など大事な条件を見る。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_d10",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "人に言えない時の代わりの場所を確認する",
-    "desc": "AI、アプリ、相談窓口などの逃げ道を持っておく。",
-    "ctaAct": null,
-    "states": [
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_d11",
-    "goalKeys": [
-      "have_place_to_rely",
-      "organize_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "話したい内容を1文にしてみる",
-    "desc": "長く説明しなくても大丈夫な形にする。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d12",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "助けてほしい度合いを選ぶ",
-    "desc": "聞いてほしい/一緒に考えてほしい/そばにいてほしい、などを選ぶ。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d13",
-    "goalKeys": [
-      "have_place_to_rely",
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 3,
-    "title": "相談前にAIと会話して気持ちを整える",
-    "desc": "そのまま人に行く前に、少し言葉を整える。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_d14",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "しんどい時に開く場所を1つ決める",
-    "desc": "このアプリ、メモ、連絡先など最初に開く場所を決める。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_d15",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 3,
-    "title": "送らない前提で相談の練習を書く",
-    "desc": "送るかどうかは決めなくていい。文にするだけでよい。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d16",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "実際に送りやすい相談文を1つ完成させる",
-    "desc": "いざという時に使える短文を今のうちに用意する。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d17",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "AIと「誰に頼るか」を具体的に決める",
-    "desc": "思い浮かべるだけでなく、今の自分に合う相手を絞る。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d18",
-    "goalKeys": [
-      "have_place_to_rely",
-      "organize_feelings"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "相談する時に伝えたいこと3つを整理する",
-    "desc": "何を言えばいいかわからない状態を減らす。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d19",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "今週中に「相談の入り口」だけ作る",
-    "desc": "送る、会う、話すの前に、きっかけだけ作る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "F"
-  },
-  {
-    "id": "act_d20",
-    "goalKeys": [
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "困った時の頼り先を2段階で決める",
-    "desc": "まず最初に開く場所と、次に頼る先をセットで持つ。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_e03",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "AIにひとこと話してみる",
-    "desc": "まとまってなくてOK。今の一言だけでいい。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_e05",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今の自分に近い選択肢を1つ選ぶ",
-    "desc": "ぴったりじゃなくても、近いもので大丈夫。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_e06",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "アプリで使いやすい場所を1つ見つける",
-    "desc": "話す、整理する、ひと息の中で合いそうなものを見る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_e07",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今週は1分で終わることだけやってみる",
-    "desc": "続けることを優先して、軽い行動に絞る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_e08",
-    "goalKeys": [
-      "not_sure_yet",
-      "understand_my_feelings"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "よかった/しんどかったを1つずつ見る",
-    "desc": "自分の反応の出方を少し知る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_e09",
-    "goalKeys": [
-      "not_sure_yet",
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "困った時に何を開くか決める",
-    "desc": "迷った時の最初の一歩だけ持っておく。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_e10",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今週は「続けやすさ」で選ぶ",
-    "desc": "役に立ちそうかより、やれそうかを優先する。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_e11",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "合いそうな機能を1つ試して感想を残す",
-    "desc": "使ってみて合うかどうかを確かめる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_e12",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 5,
-    "title": "AIと「今の自分に必要そうなこと」を整理する",
-    "desc": "まだわからない状態を、そのまま材料にして方向性を見つける。",
-    "ctaAct": "start-chat",
-    "states": [
-      "calm"
-    ],
-    "category": "A"
-  },
-  {
-    "id": "act_e13",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "今週のテーマ候補2つを比べて1つ選ぶ",
-    "desc": "迷ったままにせず、今週だけの方向を仮で決める。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_e14",
-    "goalKeys": [
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "自分が続けやすい条件を1つ見つける",
-    "desc": "時間帯、長さ、場所など、やりやすさの条件を知る。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "H"
-  },
-  {
-    "id": "act_e15",
-    "goalKeys": [
-      "not_sure_yet",
-      "have_place_to_rely"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "しんどくなった時の戻り方を決める",
-    "desc": "正解を決めるより、戻れる形を持っておく。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_f01",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "肩の力を少し抜く",
-    "desc": "肩を上げて、下ろすだけでもよい。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f02",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "水をひと口飲む",
-    "desc": "まず体にやさしいことを1つする。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f03",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "座り直して深く座る",
-    "desc": "姿勢を少し整えるだけでも気分が変わることがある。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f04",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "目を閉じて10秒休む",
-    "desc": "刺激を少し減らして、いったん区切る。",
-    "ctaAct": null,
-    "states": [
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f05",
-    "goalKeys": [
-      "reduce_overthinking",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 1,
-    "title": "1分だけ静かな時間をつくる",
-    "desc": "スマホや音から少し離れる。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f06",
-    "goalKeys": [
-      "reduce_overthinking",
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "寝る前に画面を見る時間を少し減らす",
-    "desc": "夜に気持ちが乱れやすい時の準備として使う。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f07",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "いる場所を見回して3つ数える",
-    "desc": "頭の中から今いる場所に意識を戻す。",
-    "ctaAct": null,
-    "states": [
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f08",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "手を温める/さする",
-    "desc": "気持ちがふわふわする時に体に戻るきっかけ。",
-    "ctaAct": null,
-    "states": [
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f09",
-    "goalKeys": [
-      "reduce_overthinking",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "立って1回背伸びする",
-    "desc": "一度体を広げて、頭の詰まりを少しゆるめる。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f10",
-    "goalKeys": [
-      "reduce_overthinking",
-      "have_place_to_rely"
-    ],
-    "type": "daily",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "少しだけ外の空気を吸う",
-    "desc": "場所を少し変えて切り替える。",
-    "ctaAct": null,
-    "states": [
-      "mixed"
-    ],
-    "category": "D"
-  },
-  {
-    "id": "act_f11",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "自分に合う落ち着き方を1つ決める",
-    "desc": "呼吸、伸びる、歩く、水を飲むなど自分に効きやすいものを選ぶ。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_f12",
-    "goalKeys": [
-      "reduce_overthinking",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "戻りやすい身体の動きを1つ習慣にする",
-    "desc": "その場でできる身体の切り替えを決めて、使える形にする。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_g01",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "しんどい時のための一言メモを持つ",
-    "desc": "「今は休んでいい」など、自分に返す言葉を1つ決める。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_g02",
-    "goalKeys": [
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "今週しんどくなった時の逃げ道を1つ決める",
-    "desc": "このアプリ、メモ、誰か、など一番使いやすいものを決める。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_g03",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "やれた時のハードルを低く決める",
-    "desc": "「1回できたら十分」にしておく。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_g04",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "normal",
-    "duration": 3,
-    "title": "続かなかった時の戻り方を決める",
-    "desc": "できない日があっても、次どう戻るかだけ決める。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_g05",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "daily",
-    "difficulty": "easy",
-    "duration": 1,
-    "title": "今週は「1回できればOK」にする",
-    "desc": "毎日ではなく、まず1回できることを目標にする。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed",
-      "heavy"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_g06",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "今の自分に合う「続け方ルール」を1つ作る",
-    "desc": "時間帯、回数、無理しない条件などを決める。",
-    "ctaAct": null,
-    "states": [
-      "calm",
-      "mixed"
-    ],
-    "category": "G"
-  },
-  {
-    "id": "act_g07",
-    "goalKeys": [
-      "organize_feelings",
-      "reduce_overthinking",
-      "understand_my_feelings",
-      "have_place_to_rely",
-      "not_sure_yet"
-    ],
-    "type": "app",
-    "difficulty": "bold",
-    "duration": 3,
-    "title": "うまくいかなかった時の次の一歩を先に決める",
-    "desc": "止まった時の再開を楽にする。",
-    "ctaAct": null,
-    "states": [
-      "calm"
-    ],
-    "category": "G"
+    "id": "A001",
+    "cat": "physical",
+    "icon": "🚶",
+    "title": "5分だけ散歩",
+    "desc": "玄関を出て5分歩く。家の周りでもOK。",
+    "time": "5分",
+    "technique": "行動活性化",
+    "domains": [
+      "work",
+      "self",
+      "sleep"
+    ]
+  },
+  {
+    "id": "A002",
+    "cat": "physical",
+    "icon": "🌬",
+    "title": "深呼吸4-7-8",
+    "desc": "4秒吸って7秒止めて8秒吐く。これを3回。",
+    "time": "1分",
+    "technique": "リラクセーション",
+    "domains": [
+      "work",
+      "sleep",
+      "self",
+      "relationship"
+    ]
+  },
+  {
+    "id": "A003",
+    "cat": "physical",
+    "icon": "💧",
+    "title": "冷たい水を顔に",
+    "desc": "30秒間、冷水で顔を洗う。一気にスッキリする。",
+    "time": "1分",
+    "technique": "行動活性化",
+    "domains": [
+      "sleep",
+      "self"
+    ]
+  },
+  {
+    "id": "A004",
+    "cat": "physical",
+    "icon": "🌿",
+    "title": "ストレッチ3分",
+    "desc": "肩・首・背中を伸ばす。立っても座っててもOK。",
+    "time": "3分",
+    "technique": "リラクセーション",
+    "domains": [
+      "sleep",
+      "work"
+    ]
+  },
+  {
+    "id": "A005",
+    "cat": "physical",
+    "icon": "☕",
+    "title": "温かい飲み物",
+    "desc": "白湯やハーブティーをゆっくり一口ずつ。",
+    "time": "5分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self",
+      "sleep"
+    ]
+  },
+  {
+    "id": "A006",
+    "cat": "physical",
+    "icon": "🌅",
+    "title": "日光15分",
+    "desc": "朝の光を浴びる。窓辺やベランダでもOK。",
+    "time": "15分",
+    "technique": "行動活性化",
+    "domains": [
+      "sleep",
+      "self"
+    ]
+  },
+  {
+    "id": "A007",
+    "cat": "physical",
+    "icon": "🧹",
+    "title": "1ヶ所だけ片付ける",
+    "desc": "机の上、ベッド周り、玄関など1ヶ所だけ。",
+    "time": "5-10分",
+    "technique": "行動活性化",
+    "domains": [
+      "self",
+      "work"
+    ]
+  },
+  {
+    "id": "A008",
+    "cat": "physical",
+    "icon": "🌱",
+    "title": "植物の世話",
+    "desc": "水やりや葉拭き。観葉植物の動画でも。",
+    "time": "3分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A009",
+    "cat": "physical",
+    "icon": "🎵",
+    "title": "好きな音楽1曲",
+    "desc": "1曲だけ集中して聴く。歌詞や音に意識を。",
+    "time": "3-5分",
+    "technique": "行動活性化",
+    "domains": [
+      "self",
+      "work"
+    ]
+  },
+  {
+    "id": "A010",
+    "cat": "physical",
+    "icon": "🛁",
+    "title": "お風呂5分",
+    "desc": "湯船に5分だけ。シャワーの日は足湯でも。",
+    "time": "5分",
+    "technique": "リラクセーション",
+    "domains": [
+      "sleep",
+      "self"
+    ]
+  },
+  {
+    "id": "A011",
+    "cat": "physical",
+    "icon": "🍳",
+    "title": "簡単な料理1品",
+    "desc": "冷凍食品やレンジ調理でOK。1品作る達成感。",
+    "time": "10-15分",
+    "technique": "行動活性化",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A012",
+    "cat": "physical",
+    "icon": "📝",
+    "title": "頭の中を紙に書き出す",
+    "desc": "モヤモヤを5分で書く。単語の羅列でOK。",
+    "time": "5分",
+    "technique": "認知の外在化",
+    "domains": [
+      "work",
+      "relationship",
+      "self"
+    ]
+  },
+  {
+    "id": "A013",
+    "cat": "physical",
+    "icon": "💪",
+    "title": "肩をストン",
+    "desc": "肩をぐっと上げて10秒、ストンと落とす。3回。",
+    "time": "1分",
+    "technique": "リラクセーション",
+    "domains": [
+      "sleep",
+      "work"
+    ]
+  },
+  {
+    "id": "A014",
+    "cat": "physical",
+    "icon": "🌸",
+    "title": "好きな香り",
+    "desc": "アロマやコーヒー、好きな石鹸の香りを意識して。",
+    "time": "1分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self",
+      "sleep"
+    ]
+  },
+  {
+    "id": "A015",
+    "cat": "physical",
+    "icon": "📷",
+    "title": "今日の風景を1枚",
+    "desc": "スマホで今いる場所を1枚撮る。何でもOK。",
+    "time": "1分",
+    "technique": "行動活性化",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A016",
+    "cat": "cognitive",
+    "icon": "👀",
+    "title": "別の見方を3つ書く",
+    "desc": "同じ状況を他の人ならどう見るか3パターン。",
+    "time": "5分",
+    "technique": "認知再構成",
+    "domains": [
+      "work",
+      "relationship",
+      "self"
+    ]
+  },
+  {
+    "id": "A017",
+    "cat": "cognitive",
+    "icon": "✨",
+    "title": "良かったこと3つ",
+    "desc": "今日「ちょっと良かった」を3つ。小さなことでOK。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A018",
+    "cat": "cognitive",
+    "icon": "🔍",
+    "title": "事実と解釈を分ける",
+    "desc": "起きた事実 / 私の解釈 / 別の解釈を3行で。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A019",
+    "cat": "cognitive",
+    "icon": "⬇️",
+    "title": "なぜそう思う？を3回",
+    "desc": "「私はダメ」と思う理由をなぜなぜで3層深掘り。",
+    "time": "5分",
+    "technique": "下向き矢印法",
+    "domains": [
+      "self",
+      "work"
+    ]
+  },
+  {
+    "id": "A020",
+    "cat": "cognitive",
+    "icon": "🌈",
+    "title": "過去の成功を1つ",
+    "desc": "過去に上手くいった経験を1つ思い出して書く。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "self",
+      "work",
+      "future"
+    ]
+  },
+  {
+    "id": "A021",
+    "cat": "cognitive",
+    "icon": "🎯",
+    "title": "今日のホット",
+    "desc": "今日一番引っかかった瞬間を1つだけ書く。",
+    "time": "3分",
+    "technique": "ホット思考特定",
+    "domains": [
+      "work",
+      "relationship",
+      "self"
+    ]
+  },
+  {
+    "id": "A022",
+    "cat": "cognitive",
+    "icon": "💌",
+    "title": "自分への手紙",
+    "desc": "友達が同じ悩みなら何て言うか、自分宛に書く。",
+    "time": "5分",
+    "technique": "認知再構成",
+    "domains": [
+      "self",
+      "work"
+    ]
+  },
+  {
+    "id": "A023",
+    "cat": "cognitive",
+    "icon": "🔄",
+    "title": "「すべき」を「したい」に",
+    "desc": "「○○すべき」を「○○したい」に書き換える。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "work",
+      "self"
+    ]
+  },
+  {
+    "id": "A024",
+    "cat": "cognitive",
+    "icon": "🔮",
+    "title": "未来を確かめる",
+    "desc": "「絶対上手くいかない」の根拠を書き出す。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "future",
+      "self"
+    ]
+  },
+  {
+    "id": "A025",
+    "cat": "cognitive",
+    "icon": "🎨",
+    "title": "グラデーションで見る",
+    "desc": "「100%でないなら0」を50%・70%・90%で見直す。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "self",
+      "work"
+    ]
+  },
+  {
+    "id": "A026",
+    "cat": "cognitive",
+    "icon": "⚖️",
+    "title": "責任を分配する",
+    "desc": "その出来事の責任を関係者で割合分けしてみる。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A027",
+    "cat": "cognitive",
+    "icon": "🤔",
+    "title": "「嫌い」の根拠",
+    "desc": "「相手は私を嫌い」の根拠を3つ書いてみる。",
+    "time": "3分",
+    "technique": "認知再構成",
+    "domains": [
+      "relationship"
+    ]
+  },
+  {
+    "id": "A028",
+    "cat": "cognitive",
+    "icon": "🧪",
+    "title": "小さな実験",
+    "desc": "「もし○○したら○○になる」って仮説を1つ立てる。",
+    "time": "3分",
+    "technique": "行動実験",
+    "domains": [
+      "relationship",
+      "work",
+      "self"
+    ]
+  },
+  {
+    "id": "A029",
+    "cat": "cognitive",
+    "icon": "🏷",
+    "title": "感情に名前をつける",
+    "desc": "今の感情を3つの単語で表現する。",
+    "time": "1分",
+    "technique": "感情ラベリング",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A030",
+    "cat": "cognitive",
+    "icon": "💬",
+    "title": "「私は」で言い換える",
+    "desc": "「あなたが○○」を「私は○○と感じる」に。",
+    "time": "3分",
+    "technique": "アサーション準備",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A031",
+    "cat": "relax",
+    "icon": "🌬",
+    "title": "呼吸瞑想3分",
+    "desc": "呼吸に注意を向ける。雑念が湧いても戻ればOK。",
+    "time": "3分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "sleep",
+      "self"
+    ]
+  },
+  {
+    "id": "A032",
+    "cat": "relax",
+    "icon": "🫀",
+    "title": "身体スキャン",
+    "desc": "頭から足まで、順番に注意を向けていく。",
+    "time": "5分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "sleep",
+      "self"
+    ]
+  },
+  {
+    "id": "A033",
+    "cat": "relax",
+    "icon": "👀",
+    "title": "5-4-3-2-1",
+    "desc": "見える物5、音4、触れる物3、匂い2、味1。",
+    "time": "3分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self",
+      "sleep"
+    ]
+  },
+  {
+    "id": "A034",
+    "cat": "relax",
+    "icon": "👂",
+    "title": "1分聴く",
+    "desc": "1分間、聞こえる音だけに集中する。",
+    "time": "1分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A035",
+    "cat": "relax",
+    "icon": "🍵",
+    "title": "一口だけ味わう",
+    "desc": "お茶やお菓子を、1口だけ意識して味わう。",
+    "time": "1分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A036",
+    "cat": "relax",
+    "icon": "💝",
+    "title": "やさしさの言葉",
+    "desc": "「私が幸せでありますように」を3回、心の中で。",
+    "time": "1分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A037",
+    "cat": "relax",
+    "icon": "🌳",
+    "title": "自然画像を見る",
+    "desc": "自然の写真や動画を1分眺める。",
+    "time": "1分",
+    "technique": "リラクセーション",
+    "domains": [
+      "self",
+      "sleep"
+    ]
+  },
+  {
+    "id": "A038",
+    "cat": "relax",
+    "icon": "🧘",
+    "title": "体を伸ばす5分",
+    "desc": "ヨガ的な軽いストレッチ。動画見ながらでも。",
+    "time": "5分",
+    "technique": "リラクセーション",
+    "domains": [
+      "sleep",
+      "self"
+    ]
+  },
+  {
+    "id": "A039",
+    "cat": "relax",
+    "icon": "🔢",
+    "title": "呼吸を数える",
+    "desc": "吸う「1」、吐く「2」と数える。10まで。",
+    "time": "2分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "sleep",
+      "self"
+    ]
+  },
+  {
+    "id": "A040",
+    "cat": "relax",
+    "icon": "📍",
+    "title": "今、ここ",
+    "desc": "「いま私は○○している」と独り言で実況中継。",
+    "time": "1分",
+    "technique": "マインドフルネス",
+    "domains": [
+      "self"
+    ]
+  },
+  {
+    "id": "A041",
+    "cat": "assertion",
+    "icon": "🗣",
+    "title": "断りたいことを書く",
+    "desc": "今、断りたいこと1つ書いて言い換える。",
+    "time": "3分",
+    "technique": "アサーション",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A042",
+    "cat": "assertion",
+    "icon": "✋",
+    "title": "小さな要望を1つ",
+    "desc": "今日中に小さな要望を1つ伝えてみる。",
+    "time": "5分",
+    "technique": "アサーション",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A043",
+    "cat": "assertion",
+    "icon": "📝",
+    "title": "お願いのフレーズ",
+    "desc": "「お願いがあって…」のパターンを3つ用意。",
+    "time": "3分",
+    "technique": "アサーション準備",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A044",
+    "cat": "assertion",
+    "icon": "❌",
+    "title": "NOの理由を1行",
+    "desc": "「NO」と言いたい理由を1行で言葉にする。",
+    "time": "2分",
+    "technique": "アサーション準備",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A045",
+    "cat": "assertion",
+    "icon": "💬",
+    "title": "私メッセージ",
+    "desc": "「私は○○と感じる、だから○○してほしい」。",
+    "time": "3分",
+    "technique": "アサーション",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A046",
+    "cat": "assertion",
+    "icon": "🌫",
+    "title": "グレーゾーンで返す",
+    "desc": "白黒で答える前に「○○でも△△でもいい」を考える。",
+    "time": "3分",
+    "technique": "アサーション",
+    "domains": [
+      "relationship"
+    ]
+  },
+  {
+    "id": "A047",
+    "cat": "assertion",
+    "icon": "👥",
+    "title": "相手の立場を1分想像",
+    "desc": "相手の視点で、同じ状況を1分想像してみる。",
+    "time": "1分",
+    "technique": "アサーション準備",
+    "domains": [
+      "relationship"
+    ]
+  },
+  {
+    "id": "A048",
+    "cat": "assertion",
+    "icon": "🙏",
+    "title": "感謝もセットに",
+    "desc": "「断る」+「いつもありがとう」をセットで言う。",
+    "time": "3分",
+    "technique": "アサーション",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A049",
+    "cat": "assertion",
+    "icon": "⏳",
+    "title": "即答を避ける",
+    "desc": "「ちょっと考えさせて」と言うパターン。",
+    "time": "1分",
+    "technique": "アサーション",
+    "domains": [
+      "relationship",
+      "work"
+    ]
+  },
+  {
+    "id": "A050",
+    "cat": "assertion",
+    "icon": "📅",
+    "title": "明日の準備",
+    "desc": "明日「断りたい場面」を3行で書いておく。",
+    "time": "3分",
+    "technique": "アサーション計画",
+    "domains": [
+      "relationship",
+      "work"
+    ]
   }
 ]

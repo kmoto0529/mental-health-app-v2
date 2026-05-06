@@ -3,39 +3,48 @@
  *
  * 役割:
  *   Google Sheets で公開された CSV を取得して
- *   ACTION_CATALOG を上書きする。
+ *   ACTIONS（いっぽの行動カタログ）を上書きする。
  *
  * 設計方針:
  *   - キャッシュ優先（ファーストペイント高速化）
  *   - 取得・パース失敗時はバンドル既定値にfallback
  *   - 不正な行は warn してスキップ（1行壊れてても全体動かす）
- *   - mutation のみ（const ACTION_CATALOG の参照を保つ）
+ *   - mutation のみ（const ACTIONS の参照を保つ）
  *
  * 使い方 (index.html):
- *   ASIDE_CONFIG.actionCatalogUrl = 'https://docs.google.com/.../pub?output=csv';
+ *   ASIDE_CONFIG.actionCatalogUrl = 'https://docs.google.com/.../export?format=csv';
  *   MoyaCatalog.init({
- *     target: ACTION_CATALOG,
+ *     target: ACTIONS,
  *     url: ASIDE_CONFIG.actionCatalogUrl,
  *     onUpdate: () => render()
  *   });
  *
- * Sheets 列順:
- *   id / title / desc / type / difficulty / duration / category / goalKeys / states / ctaAct
- *   - goalKeys / states は パイプ区切り（例: 'calm|mixed|heavy'）
+ * Sheets 列順（ACTIONS スキーマ・2026-05-06〜）:
+ *   id / cat / icon / title / desc / time / technique / domains
+ *   - domains は パイプ区切り（例: 'work|self|sleep'）
+ *   - icon は 絵文字1〜2文字（任意）
+ *   - 履歴: v1（〜2026-05-05）は ACTION_CATALOG 用スキーマだったが
+ *           現行アプリは ACTIONS（いっぽ50項目）を使用しているため
+ *           v2 で ACTIONS スキーマにリプレース
  */
 
 (function (global) {
   'use strict';
 
-  const CACHE_KEY = 'aside_catalog_cache_v1';
-  const CACHE_FRESH_MS = 60 * 60 * 1000;        // 1h以内のキャッシュは「新鮮」（fetch成功してもネット送らない選択肢として用意）
-  const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7日超は無視
+  const CACHE_KEY = 'moyanomori_actions_cache_v2';   // v2: ACTIONS スキーマ
+  const CACHE_FRESH_MS = 60 * 60 * 1000;
+  const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
-  const VALID_TYPES        = ['app', 'daily', 'social'];
-  const VALID_DIFFICULTIES = ['easy', 'normal', 'bold'];
-  const VALID_STATES       = ['calm', 'mixed', 'heavy'];
-  const VALID_GOALS        = ['organize_feelings', 'reduce_overthinking', 'understand_my_feelings', 'have_place_to_rely', 'not_sure_yet'];
-  const VALID_CATEGORIES   = ['A','B','C','D','E','F','G','H'];
+  // 推奨値域（厳格バリデーション）
+  const VALID_CATS       = ['physical', 'cognitive', 'relax', 'assertion'];
+  const VALID_DOMAINS    = ['work', 'self', 'sleep', 'relationship', 'future'];
+  // 技法は CBT 拡張で増えうるため warning のみ・skip しない
+  const KNOWN_TECHNIQUES = [
+    '行動活性化', 'リラクセーション', 'マインドフルネス',
+    '認知の外在化', '認知再構成', '下向き矢印法', 'ホット思考特定',
+    '行動実験', '感情ラベリング',
+    'アサーション準備', 'アサーション', 'アサーション計画'
+  ];
 
   // ---- CSV parser (handles quoted fields, double-quote escaping, embedded commas/newlines) ----
   function parseCSV(text) {
@@ -61,7 +70,6 @@
       }
     }
     if (cell.length > 0 || row.length > 0) { row.push(cell); rows.push(row); }
-    // 空行を捨てる
     return rows.filter(r => r.length > 0 && !(r.length === 1 && r[0] === ''));
   }
 
@@ -81,45 +89,52 @@
 
   function normalizeAction(o, lineNo) {
     const errors = [];
+    const warnings = [];
     if (!o.id) errors.push(`L${lineNo}: id 必須`);
     if (!o.title) errors.push(`L${lineNo} (${o.id}): title 必須`);
-    if (!o.type || !VALID_TYPES.includes(o.type)) errors.push(`L${lineNo} (${o.id}): type 不正 "${o.type}"`);
-    if (!o.difficulty || !VALID_DIFFICULTIES.includes(o.difficulty)) errors.push(`L${lineNo} (${o.id}): difficulty 不正 "${o.difficulty}"`);
-    const duration = parseInt(o.duration, 10);
-    if (isNaN(duration)) errors.push(`L${lineNo} (${o.id}): duration が数値じゃない "${o.duration}"`);
-    if (!o.category || !VALID_CATEGORIES.includes(o.category)) errors.push(`L${lineNo} (${o.id}): category 不正 "${o.category}"`);
-    const goalKeys = splitPipe(o.goalKeys);
-    const invalidGoals = goalKeys.filter(g => !VALID_GOALS.includes(g));
-    if (invalidGoals.length > 0) errors.push(`L${lineNo} (${o.id}): goalKeys 不正 [${invalidGoals.join(',')}]`);
-    const states = splitPipe(o.states);
-    const invalidStates = states.filter(s => !VALID_STATES.includes(s));
-    if (invalidStates.length > 0) errors.push(`L${lineNo} (${o.id}): states 不正 [${invalidStates.join(',')}]`);
+    if (!o.desc) errors.push(`L${lineNo} (${o.id}): desc 必須`);
+    if (!o.time) errors.push(`L${lineNo} (${o.id}): time 必須`);
+    if (!o.cat || !VALID_CATS.includes(o.cat)) {
+      errors.push(`L${lineNo} (${o.id}): cat 不正 "${o.cat}" — 許可値: ${VALID_CATS.join('/')}`);
+    }
+    if (!o.technique) {
+      errors.push(`L${lineNo} (${o.id}): technique 必須`);
+    } else if (!KNOWN_TECHNIQUES.includes(o.technique)) {
+      // 既知でない技法は warn だが skip しない（CBT 技法拡張に対応）
+      warnings.push(`L${lineNo} (${o.id}): technique 既知リスト外 "${o.technique}"（受け入れます）`);
+    }
+    const domains = splitPipe(o.domains);
+    const invalidDomains = domains.filter(d => !VALID_DOMAINS.includes(d));
+    if (invalidDomains.length > 0) {
+      errors.push(`L${lineNo} (${o.id}): domains 不正 [${invalidDomains.join(',')}] — 許可値: ${VALID_DOMAINS.join('/')}`);
+    }
 
-    if (errors.length > 0) return { ok: false, errors };
+    if (errors.length > 0) return { ok: false, errors, warnings };
     return {
       ok: true,
+      warnings,
       action: {
         id: o.id,
+        cat: o.cat,
+        icon: o.icon || '',
         title: o.title,
-        desc: o.desc || '',
-        type: o.type,
-        difficulty: o.difficulty,
-        duration: duration,
-        category: o.category,
-        goalKeys: goalKeys,
-        states: states,
-        ctaAct: o.ctaAct ? o.ctaAct : null
+        desc: o.desc,
+        time: o.time,
+        technique: o.technique,
+        domains: domains
       }
     };
   }
 
   function validate(rawObjects) {
     const errors = [];
+    const warnings = [];
     const validList = [];
     const seenIds = new Set();
     rawObjects.forEach((o, i) => {
       const lineNo = i + 2; // header=L1
       const r = normalizeAction(o, lineNo);
+      (r.warnings || []).forEach(w => warnings.push(w));
       if (!r.ok) { errors.push.apply(errors, r.errors); return; }
       if (seenIds.has(r.action.id)) {
         errors.push(`L${lineNo} (${r.action.id}): id 重複`);
@@ -128,7 +143,7 @@
       seenIds.add(r.action.id);
       validList.push(r.action);
     });
-    return { errors, validList };
+    return { errors, warnings, validList };
   }
 
   function loadFromCache() {
@@ -166,9 +181,13 @@
       const text = await res.text();
       const rows = parseCSV(text);
       const objs = rowsToObjects(rows);
-      const { errors, validList } = validate(objs);
+      const { errors, warnings, validList } = validate(objs);
+      if (warnings.length > 0) {
+        console.warn('[MoyaCatalog] 警告 (' + warnings.length + '件、最初の3件):');
+        warnings.slice(0, 3).forEach(w => console.warn('  -', w));
+      }
       if (errors.length > 0) {
-        console.warn('[MoyaCatalog] バリデーションエラー (' + errors.length + '件、最初の5件表示):');
+        console.warn('[MoyaCatalog] バリデーションエラー (' + errors.length + '件、最初の5件):');
         errors.slice(0, 5).forEach(e => console.warn('  -', e));
       }
       if (validList.length === 0) {
@@ -177,9 +196,9 @@
       }
       applyToCatalog(validList, target);
       saveCache(validList);
-      console.log('[MoyaCatalog] sheets から ' + validList.length + ' 件読み込み完了 (skip: ' + errors.length + ')');
+      console.log('[MoyaCatalog] sheets から ' + validList.length + ' 件読み込み完了 (skip: ' + errors.length + ', warn: ' + warnings.length + ')');
       if (typeof onUpdate === 'function') onUpdate(validList);
-      return { ok: true, count: validList.length, skipped: errors.length };
+      return { ok: true, count: validList.length, skipped: errors.length, warnings: warnings.length };
     } catch (e) {
       console.warn('[MoyaCatalog] fetch error:', e && e.message);
       return { failed: true, error: e && e.message };
@@ -191,7 +210,7 @@
     /**
      * 起動時に1回呼ぶ。
      * @param {object} opts
-     * @param {Array}  opts.target  - 上書きされる ACTION_CATALOG の参照
+     * @param {Array}  opts.target  - 上書きされる ACTIONS の参照
      * @param {string} [opts.url]   - 公開Sheets CSVのURL。空ならバンドル既定値のまま
      * @param {Function} [opts.onUpdate] - 上書き完了時に呼ぶコールバック（再描画など）
      */
@@ -203,6 +222,11 @@
         console.warn('[MoyaCatalog] init: target 配列が必要');
         return;
       }
+      if (!url) {
+        // URL 未設定（運用前 / バンドル既定値で動作）
+        console.log('[MoyaCatalog] actionCatalogUrl 未設定 — バンドル既定値で動作');
+        return;
+      }
       // 1. キャッシュ優先で即適用（オフライン耐性）
       const cached = loadFromCache();
       if (cached && cached.actions && cached.actions.length > 0) {
@@ -211,14 +235,18 @@
         console.log('[MoyaCatalog] キャッシュから ' + cached.actions.length + ' 件適用 (' + ageMin + '分前)');
       }
       // 2. 裏で最新取得を試行
-      if (url) {
-        fetchAndApply(url, target, opts.onUpdate);
-      }
+      fetchAndApply(url, target, opts.onUpdate);
     },
 
     // 手動リロード（管理画面などから）
     refresh: function (url, target, onUpdate) {
       return fetchAndApply(url, target, onUpdate);
+    },
+
+    // キャッシュクリア（デバッグ・初期化用）
+    clearCache: function () {
+      try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
+      console.log('[MoyaCatalog] キャッシュをクリアしました');
     }
   };
 })(typeof window !== 'undefined' ? window : this);

@@ -4095,8 +4095,10 @@ window.ASIDE_CONFIG = {
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
   appVersion:      '0.2.0-beta.1',  // v2 リリース
   consentVersion:  'v0.2-beta',
-  // Google Sheets 公開CSV URL（行動カタログ）
-  actionCatalogUrl: 'https://docs.google.com/spreadsheets/d/1PugqUR07WwTrz36Mbsperuj4_ifCIUqYENoxvnIZ8C8/export?format=csv'
+  // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
+  // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
+  // 詳細: docs/catalog-update-guide.md
+  actionCatalogUrl: ''
 };
 </script>
 <script src="js/logger.js"></script>
@@ -4316,6 +4318,20 @@ const ACTIONS = [
   { id:'A049', cat:'assertion', icon:'⏳', title:'即答を避ける', desc:'「ちょっと考えさせて」と言うパターン。', time:'1分', technique:'アサーション', domains:['relationship','work'] },
   { id:'A050', cat:'assertion', icon:'📅', title:'明日の準備', desc:'明日「断りたい場面」を3行で書いておく。', time:'3分', technique:'アサーション計画', domains:['relationship','work'] },
 ];
+
+// ============================================================
+// 行動カタログ Sheets 連携（v0.9.31〜）
+//   ASIDE_CONFIG.actionCatalogUrl が設定されていれば Sheets から取得・上書き
+//   未設定時は ACTIONS（バンドル既定値・50項目）のまま動作
+//   詳細: docs/catalog-update-guide.md
+// ============================================================
+if (typeof MoyaCatalog !== 'undefined' && window.ASIDE_CONFIG) {
+  MoyaCatalog.init({
+    target: ACTIONS,
+    url: window.ASIDE_CONFIG.actionCatalogUrl || '',
+    onUpdate: () => { try { if (typeof render === 'function') render(); } catch (e) {} }
+  });
+}
 
 const ACTION_CATEGORIES = [
   { id: 'physical',  name: '物理的にできること', icon: '💪' },
@@ -9876,7 +9892,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.30-beta.1（過去きろく→レター/いっぽ閲覧）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.31-beta.1（行動カタログ Sheets 連携）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
