@@ -5847,7 +5847,7 @@ function moyamoyaScreen(stepLabel, title, body) {
   return `
     <div class="screen active">
       <div class="page-header">
-        <button class="page-back" data-act="moya-cancel">‹</button>
+        <button class="page-back" data-act="moya-back-step" aria-label="前へ">‹</button>
         <span class="page-title">もやもや整理</span>
         <span class="text-tiny text-muted">${stepLabel}</span>
       </div>
@@ -6048,7 +6048,7 @@ function renderMoyamoyaLetter(s, opts) {
   return `
     <div class="screen active letter-screen">
       <div class="letter-pageheader">
-        <button class="lph-back" data-act="${isPast ? 'back-record' : 'moya-cancel'}" aria-label="戻る">‹</button>
+        <button class="lph-back" data-act="${isPast ? 'back-record' : 'moya-back-step'}" aria-label="${isPast ? '戻る' : '前へ'}">‹</button>
         <div class="lph-center">
           <div class="lph-title">もやもや整理レター</div>
           <div class="lph-date">${dateInfo.full}</div>
@@ -6211,8 +6211,8 @@ function renderMoyamoyaLetter(s, opts) {
         </div>
       ` : `
         <div class="letter-bottombar">
-          <div class="letter-actions">
-            <button class="letter-action-btn primary" data-act="moya-save">きろくに保存して終える</button>
+          <div class="letter-actions" style="justify-content:center;">
+            <button class="letter-action-btn primary" data-act="moya-save" style="min-width: 220px;">保存して終える</button>
           </div>
         </div>
       `}
@@ -9896,7 +9896,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.32-beta.1（もやもや整理 step2/step4・レター画面整理）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.33-beta.1（もやもや整理 戻るボタンを前stepへ / 保存ボタン中央化）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -10243,6 +10243,15 @@ function handleAction(act, el, ev) {
   // もやもや整理
   if (act === 'moyamoya-start') { moyamoya = { step: 1 }; go('moyamoya'); return; }
   if (act === 'moya-cancel')    { moyamoya = null; go('home'); return; }
+  if (act === 'moya-back-step') {
+    // step1 では前のstepがないのでホームへ。それ以外は1つ前のstepへ。
+    // step6 (レター) → step5 に戻ると「いま、気持ちの強さ」を選び直せる。
+    // step4 (別の見方候補) に戻ると候補が再表示される（生成済みなら再生成しない）。
+    if (!moyamoya || (moyamoya.step || 1) <= 1) { moyamoya = null; go('home'); return; }
+    moyamoya.step = (moyamoya.step || 1) - 1;
+    render();
+    return;
+  }
   if (act === 'moya-step1-next') {
     const v = (document.getElementById('moyaInput')||{}).value || '';
     if (!v.trim()) { toast('短くてOK。何があったか書いてみて'); return; }
