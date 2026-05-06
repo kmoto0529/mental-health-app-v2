@@ -5712,15 +5712,26 @@ function viewMoyamoya() {
     `);
   }
   if (s.step === 2) {
+    // 主要 8 個を初期表示。「もっと見る」で全件展開。
+    // ただし「その他」を選んでいる場合や、選択中の感情が初期8個に含まれない場合は全件表示を強制。
+    const PRIMARY_COUNT = 8;
+    const showAll = !!s.showAllEmotions;
+    const primaryNames = new Set(EMOTIONS.slice(0, PRIMARY_COUNT).map(e => e.name));
+    const selectedOutsidePrimary = s.emotion && !primaryNames.has(s.emotion);
+    const visibleEmotions = (showAll || selectedOutsidePrimary) ? EMOTIONS : EMOTIONS.slice(0, PRIMARY_COUNT);
+    const hasMore = visibleEmotions.length < EMOTIONS.length;
     return moyamoyaScreen(stepLabel, 'どんな気持ちが一番近かった？', `
       <div class="moya-emo-grid">
-        ${EMOTIONS.map(e => `
+        ${visibleEmotions.map(e => `
           <button class="moya-emo-item ${s.emotion === e.name ? 'selected' : ''}" data-act="moya-step2-pick" data-emotion="${e.name}">
             <span class="moya-emo-emoji">${e.emoji}</span>
             <span class="moya-emo-name">${e.name}</span>
           </button>
         `).join('')}
       </div>
+      ${hasMore ? `
+        <button class="btn-ghost" data-act="moya-step2-show-all" style="margin-top:12px; width:100%; font-size:13px; padding:10px 12px;">他の気持ちも見る（あと ${EMOTIONS.length - visibleEmotions.length} 個）</button>
+      ` : ''}
       <div style="margin-top:16px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="moya-step2-next" ${!s.emotion ? 'disabled' : ''}>つづける</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
@@ -5798,7 +5809,7 @@ function viewMoyamoya() {
         <button class="btn btn-secondary" data-act="moya-step4-more" style="margin-top:14px; width:100%;">他の見方も見てみる</button>
       ` : ''}
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="moya-step4-next" ${!hasSelection ? 'disabled' : ''}>この見方を踏まえて続ける</button>
+        <button class="btn btn-primary" data-act="moya-step4-next" ${!hasSelection ? 'disabled' : ''}>この見方で進む</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
       </div>
     `);
@@ -6042,9 +6053,7 @@ function renderMoyamoyaLetter(s, opts) {
           <div class="lph-title">もやもや整理レター</div>
           <div class="lph-date">${dateInfo.full}</div>
         </div>
-        ${isPast
-          ? `<span class="lph-share" style="visibility:hidden;" aria-hidden="true">↑</span>`
-          : `<button class="lph-share" data-act="letter-share" aria-label="共有">↑</button>`}
+        <span class="lph-share" style="visibility:hidden;" aria-hidden="true">↑</span>
       </div>
 
       <div class="letter-grid">
@@ -6203,12 +6212,7 @@ function renderMoyamoyaLetter(s, opts) {
       ` : `
         <div class="letter-bottombar">
           <div class="letter-actions">
-            <button class="letter-action-btn" data-act="letter-save-image">📥 画像で保存</button>
-            <button class="letter-action-btn primary" data-act="letter-send">✉ レターを送る</button>
-            <button class="letter-action-btn" data-act="moya-save">📝 メモに残す</button>
-          </div>
-          <div class="letter-restart">
-            <button data-act="letter-restart">最初からやり直す</button>
+            <button class="letter-action-btn primary" data-act="moya-save">きろくに保存して終える</button>
           </div>
         </div>
       `}
@@ -9892,7 +9896,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.31-beta.1（行動カタログ Sheets 連携）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.32-beta.1（もやもや整理 step2/step4・レター画面整理）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -10250,6 +10254,7 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'moya-step2-pick') { moyamoya.emotion = el.dataset.emotion; render(); return; }
+  if (act === 'moya-step2-show-all') { moyamoya.showAllEmotions = true; render(); return; }
   if (act === 'moya-step2-next') { if (moyamoya.emotion) { moyamoya.step = 3; render(); } return; }
   if (act === 'moya-set-score') {
     moyamoya.emotionScoreBefore = parseInt(el.dataset.score, 10);
