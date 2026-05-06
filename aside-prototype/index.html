@@ -4909,6 +4909,8 @@ function render() {
     case 'record':          html = viewRecord(); break;
     case 'day-detail':      html = viewDayDetail(); break;
     case 'kiroku-detail':       html = viewKirokuDetail(); break;
+    case 'kiroku-letter':       html = viewKirokuLetter(); break;
+    case 'kiroku-ippo':         html = viewKirokuIppo(); break;
     case 'kiroku-distortions':  html = viewKirokuDistortions(); break;
     case 'kiroku-trend':        html = viewKirokuTrend(); break;
     case 'kiroku-radar':        html = viewKirokuRadar(); break;
@@ -5992,8 +5994,12 @@ function letterLeafSVG() {
 }
 
 // もやもや整理レター（v0.7.5 添付画像準拠）
-function renderMoyamoyaLetter(s) {
-  const date = new Date();
+//   opts.viewMode: 'live'（既定、整理セッション直後）| 'past'（過去きろくからの閲覧）
+//   opts.dateOverride: ISO文字列。record.createdAt を渡すと当時の日付で表示する
+function renderMoyamoyaLetter(s, opts) {
+  opts = opts || {};
+  const isPast = opts.viewMode === 'past';
+  const date = opts.dateOverride ? new Date(opts.dateOverride) : new Date();
   const dateInfo = formatLetterDate(date);
   const before = s.emotionScoreBefore == null ? 5 : s.emotionScoreBefore;
   const after = s.emotionScoreAfter == null ? before : s.emotionScoreAfter;
@@ -6015,12 +6021,14 @@ function renderMoyamoyaLetter(s) {
   return `
     <div class="screen active letter-screen">
       <div class="letter-pageheader">
-        <button class="lph-back" data-act="moya-cancel" aria-label="戻る">‹</button>
+        <button class="lph-back" data-act="${isPast ? 'back-record' : 'moya-cancel'}" aria-label="戻る">‹</button>
         <div class="lph-center">
           <div class="lph-title">もやもや整理レター</div>
           <div class="lph-date">${dateInfo.full}</div>
         </div>
-        <button class="lph-share" data-act="letter-share" aria-label="共有">↑</button>
+        ${isPast
+          ? `<span class="lph-share" style="visibility:hidden;" aria-hidden="true">↑</span>`
+          : `<button class="lph-share" data-act="letter-share" aria-label="共有">↑</button>`}
       </div>
 
       <div class="letter-grid">
@@ -6170,16 +6178,24 @@ function renderMoyamoyaLetter(s) {
       </div>
 
       <!-- アクションバー -->
-      <div class="letter-bottombar">
-        <div class="letter-actions">
-          <button class="letter-action-btn" data-act="letter-save-image">📥 画像で保存</button>
-          <button class="letter-action-btn primary" data-act="letter-send">✉ レターを送る</button>
-          <button class="letter-action-btn" data-act="moya-save">📝 メモに残す</button>
+      ${isPast ? `
+        <div class="letter-bottombar">
+          <div class="letter-actions">
+            <button class="letter-action-btn primary" data-act="back-record">‹ 過去きろくに戻る</button>
+          </div>
         </div>
-        <div class="letter-restart">
-          <button data-act="letter-restart">最初からやり直す</button>
+      ` : `
+        <div class="letter-bottombar">
+          <div class="letter-actions">
+            <button class="letter-action-btn" data-act="letter-save-image">📥 画像で保存</button>
+            <button class="letter-action-btn primary" data-act="letter-send">✉ レターを送る</button>
+            <button class="letter-action-btn" data-act="moya-save">📝 メモに残す</button>
+          </div>
+          <div class="letter-restart">
+            <button data-act="letter-restart">最初からやり直す</button>
+          </div>
         </div>
-      </div>
+      `}
     </div>
   `;
 }
@@ -8627,12 +8643,12 @@ function viewCalendarSection() {
         const moodLine = `${s.moodLabel || ''}（${s.beforeIntensity ?? '-'}/10 → ${s.afterIntensity ?? '-'}/10）`;
         const memo = change > 0 ? `🌱 ${change}ポイント軽くなった` : change === 0 ? '🌱 落ち着いた状態をキープ' : '🌱 まずは行動できたのが大事だよ';
         html += `
-          <div class="kr-rec-card" style="cursor:default;">
+          <button class="kr-rec-card" data-act="kiroku-ippo" data-ippo-id="${s.id}">
             <div class="kr-rec-meta">${formatDate(s.completedAt)} ・ きょうのいっぽ</div>
             <div class="kr-rec-title">${escapeHtml(actionTitle)}</div>
             <div class="kr-rec-emo">${escapeHtml(moodLine)}</div>
             <div class="kr-rec-memo">${escapeHtml(memo)}</div>
-          </div>
+          </button>
         `;
       }
     });
@@ -8695,7 +8711,111 @@ function viewKirokuDetail() {
           ` : ''}
         </div>
 
-        <button class="btn btn-primary" data-act="open-distortions" style="margin-top: 18px; width:100%;">この記録をもとに振り返る</button>
+        ${r.letterTitle || r.alternativeView ? `
+          <button class="btn btn-secondary" data-act="view-kiroku-letter" data-record-id="${r.id}" style="margin-top: 14px; width:100%;">📨 このきもちのレターを見る</button>
+        ` : ''}
+        <button class="btn btn-primary" data-act="open-distortions" style="margin-top: 10px; width:100%;">この記録をもとに振り返る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// 過去レター閲覧画面（v0.9.30 #3-A）
+//   moyamoyaRecords[].id を viewParams.recordId で受け取り、
+//   既存 renderMoyamoyaLetter を viewMode='past' で再利用する。
+// ============================================================
+function viewKirokuLetter() {
+  const recordId = viewParams.recordId;
+  const r = (state.moyamoyaRecords || []).find(x => x.id === recordId);
+  if (!r) { setTimeout(() => go('record'), 0); return ''; }
+  return renderMoyamoyaLetter(r, { viewMode: 'past', dateOverride: r.createdAt });
+}
+
+// ============================================================
+// 過去いっぽ詳細画面（v0.9.30 #3-B）
+//   ippoSessions[].id を viewParams.ippoId で受け取って表示。
+//   行動内容・気持ちの変化（before/after）・リアクション・メモを再表示。
+// ============================================================
+function viewKirokuIppo() {
+  const ippoId = viewParams.ippoId;
+  const s = (state.ippoSessions || []).find(x => x.id === ippoId);
+  if (!s) { setTimeout(() => go('record'), 0); return ''; }
+  const action = (typeof ACTIONS !== 'undefined') ? ACTIONS.find(a => a.id === s.actionId) : null;
+  const actionTitle = action ? `${action.icon || ''} ${action.title}` : (s.actionId || '一歩');
+  const before = s.beforeIntensity == null ? null : s.beforeIntensity;
+  const after  = s.afterIntensity  == null ? null : s.afterIntensity;
+  const change = (typeof s.changeValue === 'number')
+    ? s.changeValue
+    : (before != null && after != null ? (before - after) : 0);
+  const reactionLabel = ({
+    better: 'すこし楽になった',
+    same:   '変わらなかった',
+    hard:   'むずかしかった'
+  })[s.reaction] || (s.reaction ? String(s.reaction) : '記録なし');
+  const memo = change > 0 ? `🌱 ${change}ポイント軽くなった`
+              : change === 0 ? '🌱 落ち着いた状態をキープ'
+              : '🌱 まずは行動できたのが大事だよ';
+  const beforePos = before == null ? null : Math.max(0, Math.min(100, before * 10));
+  const afterPos  = after  == null ? null : Math.max(0, Math.min(100, after  * 10));
+
+  return `
+    <div class="screen active" style="padding-bottom:40px;">
+      <div class="kr-det-page-h">
+        <button class="kr-det-back" data-act="back-record">‹</button>
+        <span style="font-size:14px; font-weight:500;">いっぽの記録</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div style="padding: 0 16px;">
+        <div class="text-tiny text-muted">${formatDate(s.completedAt || s.startedAt || s.createdAt)} ・ きょうのいっぽ</div>
+        <h2 style="margin: 6px 0 4px; font-family:'Noto Serif JP', serif;">${escapeHtml(actionTitle)}</h2>
+        <div class="text-small text-soft" style="margin-bottom: 14px;">
+          ${escapeHtml(s.moodLabel || '')}${before != null ? `（${before}/10 → ${after != null ? after + '/10' : '-'}）` : ''}
+        </div>
+
+        <div class="kr-det-card">
+          ${action && action.desc ? `
+            <div class="kr-det-section">
+              <div class="kr-det-section-h fact">🌱 取り組んだこと</div>
+              <p>${escapeHtml(action.desc)}</p>
+              ${action.technique ? `<p class="text-tiny text-muted" style="margin-top:6px;">技法: ${escapeHtml(action.technique)}${action.time ? ' / ' + escapeHtml(action.time) : ''}</p>` : ''}
+            </div>
+          ` : ''}
+
+          ${before != null || after != null ? `
+            <div class="kr-det-section">
+              <div class="kr-det-section-h emotion">💗 気持ちの強さの変化</div>
+              <p>${escapeHtml(s.moodLabel || '気持ち')}（${before != null ? before + '/10' : '-'}${after != null ? ' → ' + after + '/10' : ''}）</p>
+              ${beforePos != null ? `
+                <div class="kr-det-emo-bar" style="margin-top:8px;">
+                  <span class="text-tiny text-muted">楽</span>
+                  <div class="kr-det-emo-bar-track" style="position:relative;">
+                    <div class="kr-det-emo-bar-thumb" style="left: ${beforePos}%; opacity:0.5;"></div>
+                    ${afterPos != null ? `<div class="kr-det-emo-bar-thumb" style="left: ${afterPos}%; background:#5C7E60;"></div>` : ''}
+                  </div>
+                  <span class="text-tiny text-muted">つらい</span>
+                </div>
+                <p class="text-tiny text-muted" style="margin-top:6px;">うすい印 = 行動前 / 濃い印 = 行動後</p>
+              ` : ''}
+            </div>
+          ` : ''}
+
+          <div class="kr-det-section">
+            <div class="kr-det-section-h action">🌿 行動後の手応え</div>
+            <p>${escapeHtml(reactionLabel)}</p>
+          </div>
+
+          ${s.memoText ? `
+            <div class="kr-det-section">
+              <div class="kr-det-section-h interp">💭 メモ</div>
+              <p>${escapeHtml(s.memoText)}</p>
+            </div>
+          ` : ''}
+
+          <div class="kr-rec-memo" style="margin-top: 14px;">${escapeHtml(memo)}</div>
+        </div>
+
+        <button class="btn btn-primary" data-act="back-record" style="margin-top: 18px; width:100%;">‹ 過去きろくに戻る</button>
       </div>
     </div>
   `;
@@ -9756,7 +9876,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.29-beta.1（要望フォーム追加）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.30-beta.1（過去きろく→レター/いっぽ閲覧）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -10243,6 +10363,8 @@ function handleAction(act, el, ev) {
   if (act === 'day-detail') { viewParams.dateKey = el.dataset.date; go('day-detail'); return; }
   if (act === 'kiroku-detail') { viewParams.recordId = el.dataset.recordId; go('kiroku-detail'); return; }
   if (act === 'kiroku-chat')   { viewParams.chatId = el.dataset.chatId;     go('kiroku-chat');   return; }
+  if (act === 'view-kiroku-letter') { viewParams.recordId = el.dataset.recordId; go('kiroku-letter'); return; }
+  if (act === 'kiroku-ippo')   { viewParams.ippoId  = el.dataset.ippoId;   go('kiroku-ippo');   return; }
   if (act === 'open-distortions') { go('kiroku-distortions'); return; }
   if (act === 'open-trend') { go('kiroku-trend'); return; }
   if (act === 'open-radar') { go('kiroku-radar'); return; }
