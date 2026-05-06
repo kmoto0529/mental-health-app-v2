@@ -5375,18 +5375,28 @@ function viewHome() {
         </div>
       </div>
 
-      ${state.moodLogs.length > 0 ? `
-        <div class="recent-header">
-          <div class="recent-title">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7A8580" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            <span>最近のきもち</span>
+      ${(() => {
+        // ホーム最近のきろく：気分ともやもやを統合した直近3件（いっぽは含めない）
+        // きろくタブの kr-rec-card と同一見た目・同一遷移で統一
+        const items = [];
+        (state.moodLogs || []).forEach(m => items.push({ kind: 'mood', t: m.createdAt, data: m }));
+        (state.moyamoyaRecords || []).forEach(r => items.push({ kind: 'moyamoya', t: r.createdAt, data: r }));
+        items.sort((a, b) => new Date(b.t) - new Date(a.t));
+        const top3 = items.slice(0, 3);
+        if (top3.length === 0) return '';
+        return `
+          <div class="recent-header">
+            <div class="recent-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7A8580" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <span>最近のきろく</span>
+            </div>
+            <button class="recent-all" data-act="see-all-records">すべて見る ›</button>
           </div>
-          <button class="recent-all" data-act="see-all-records">すべて見る ›</button>
-        </div>
-        <div class="recent-list">
-          ${state.moodLogs.slice().reverse().slice(0, 3).map(m => renderRecentRow(m)).join('')}
-        </div>
-      ` : ''}
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            ${top3.map(renderKirokuRowItem).join('')}
+          </div>
+        `;
+      })()}
 
     </div>
   `;
@@ -8596,6 +8606,63 @@ function showCrisisModal(severity) {
 // ============================================================
 let viewParams = {};
 
+// ============================================================
+// 「最近のきろく」カード生成（ホームと きろくタブで共通利用 / v0.9.35〜）
+//   it: { kind: 'mood' | 'moyamoya' | 'ippo', t: ISO, data: {...} }
+//   遷移先:
+//     mood (会話あり): kiroku-chat / mood (会話なし): クリック不可
+//     moyamoya: kiroku-detail（中で「レターを見る」遷移可）
+//     ippo: kiroku-ippo
+// ============================================================
+function renderKirokuRowItem(it) {
+  if (!it || !it.data) return '';
+  if (it.kind === 'moyamoya') {
+    const r = it.data;
+    const memo = generateRecordMemo(r);
+    const titleText = r.letterTitle || (r.eventText || '').slice(0, 30);
+    const emoLine = `${r.emotion || ''}（${r.emotionScoreBefore}→${r.emotionScoreAfter}）`;
+    return `
+      <button class="kr-rec-card" data-act="kiroku-detail" data-record-id="${r.id}">
+        <div class="kr-rec-meta">${formatDate(r.createdAt)} ・ もやもや整理</div>
+        <div class="kr-rec-title">${escapeHtml(titleText)}</div>
+        <div class="kr-rec-emo">${escapeHtml(emoLine)}</div>
+        ${memo ? `<div class="kr-rec-memo">🌱 すぷらんメモ: ${escapeHtml(memo)}</div>` : ''}
+      </button>
+    `;
+  }
+  if (it.kind === 'mood') {
+    const m = it.data;
+    const moodObj = MOODS.find(x => x.id === m.moodScore);
+    const chat = (state.aiChats || []).find(c => c.sourceType === 'mood_log' && c.sourceId === m.id);
+    const hasChat = chat && (chat.messages || []).length > 1;
+    return `
+      <button class="kr-rec-card" ${hasChat ? `data-act="kiroku-chat" data-chat-id="${chat.id}"` : 'style="cursor:default;"'}>
+        <div class="kr-rec-meta">${formatDate(m.createdAt)} ・ 気分の記録${hasChat ? ' ・ AI会話あり' : ''}</div>
+        <div class="kr-rec-title">${moodObj ? moodObj.emoji + ' ' + moodObj.label : ''}</div>
+        ${m.comment ? `<div class="kr-rec-emo">${escapeHtml(m.comment)}</div>` : ''}
+        ${hasChat ? `<div class="kr-rec-memo">💬 タップで会話履歴を見る（${(chat.messages || []).length}件）</div>` : ''}
+      </button>
+    `;
+  }
+  if (it.kind === 'ippo') {
+    const s = it.data;
+    const action = (typeof ACTIONS !== 'undefined') ? ACTIONS.find(a => a.id === s.actionId) : null;
+    const actionTitle = action ? `${action.icon || ''} ${action.title}` : (s.actionId || '一歩');
+    const change = (typeof s.changeValue === 'number') ? s.changeValue : ((s.beforeIntensity || 0) - (s.afterIntensity || 0));
+    const moodLine = `${s.moodLabel || ''}（${s.beforeIntensity ?? '-'}/10 → ${s.afterIntensity ?? '-'}/10）`;
+    const memo = change > 0 ? `🌱 ${change}ポイント軽くなった` : change === 0 ? '🌱 落ち着いた状態をキープ' : '🌱 まずは行動できたのが大事だよ';
+    return `
+      <button class="kr-rec-card" data-act="kiroku-ippo" data-ippo-id="${s.id}">
+        <div class="kr-rec-meta">${formatDate(s.completedAt)} ・ きょうのいっぽ</div>
+        <div class="kr-rec-title">${escapeHtml(actionTitle)}</div>
+        <div class="kr-rec-emo">${escapeHtml(moodLine)}</div>
+        <div class="kr-rec-memo">${escapeHtml(memo)}</div>
+      </button>
+    `;
+  }
+  return '';
+}
+
 function viewRecord() {
   const sub = state.ui.recordSubtab || 'calendar';
   return `
@@ -8705,50 +8772,7 @@ function viewCalendarSection() {
       まだ記録がありません。<br>ホームから「きもち」を残してみよう。
     </div>`;
   } else {
-    items.forEach(it => {
-      if (it.kind === 'moyamoya') {
-        const r = it.data;
-        const memo = generateRecordMemo(r);
-        const titleText = r.letterTitle || (r.eventText || '').slice(0, 30);
-        const emoLine = `${r.emotion || ''}（${r.emotionScoreBefore}→${r.emotionScoreAfter}）`;
-        html += `
-          <button class="kr-rec-card" data-act="kiroku-detail" data-record-id="${r.id}">
-            <div class="kr-rec-meta">${formatDate(r.createdAt)} ・ もやもや整理</div>
-            <div class="kr-rec-title">${escapeHtml(titleText)}</div>
-            <div class="kr-rec-emo">${escapeHtml(emoLine)}</div>
-            ${memo ? `<div class="kr-rec-memo">🌱 すぷらんメモ: ${escapeHtml(memo)}</div>` : ''}
-          </button>
-        `;
-      } else if (it.kind === 'mood') {
-        const m = it.data;
-        const moodObj = MOODS.find(x => x.id === m.moodScore);
-        const chat = (state.aiChats || []).find(c => c.sourceType === 'mood_log' && c.sourceId === m.id);
-        const hasChat = chat && (chat.messages || []).length > 1;
-        html += `
-          <button class="kr-rec-card" ${hasChat ? `data-act="kiroku-chat" data-chat-id="${chat.id}"` : 'style="cursor:default;"'}>
-            <div class="kr-rec-meta">${formatDate(m.createdAt)} ・ 気分の記録${hasChat ? ' ・ AI会話あり' : ''}</div>
-            <div class="kr-rec-title">${moodObj ? moodObj.emoji + ' ' + moodObj.label : ''}</div>
-            ${m.comment ? `<div class="kr-rec-emo">${escapeHtml(m.comment)}</div>` : ''}
-            ${hasChat ? `<div class="kr-rec-memo">💬 タップで会話履歴を見る（${(chat.messages || []).length}件）</div>` : ''}
-          </button>
-        `;
-      } else if (it.kind === 'ippo') {
-        const s = it.data;
-        const action = (typeof ACTIONS !== 'undefined') ? ACTIONS.find(a => a.id === s.actionId) : null;
-        const actionTitle = action ? `${action.icon || ''} ${action.title}` : (s.actionId || '一歩');
-        const change = (typeof s.changeValue === 'number') ? s.changeValue : ((s.beforeIntensity || 0) - (s.afterIntensity || 0));
-        const moodLine = `${s.moodLabel || ''}（${s.beforeIntensity ?? '-'}/10 → ${s.afterIntensity ?? '-'}/10）`;
-        const memo = change > 0 ? `🌱 ${change}ポイント軽くなった` : change === 0 ? '🌱 落ち着いた状態をキープ' : '🌱 まずは行動できたのが大事だよ';
-        html += `
-          <button class="kr-rec-card" data-act="kiroku-ippo" data-ippo-id="${s.id}">
-            <div class="kr-rec-meta">${formatDate(s.completedAt)} ・ きょうのいっぽ</div>
-            <div class="kr-rec-title">${escapeHtml(actionTitle)}</div>
-            <div class="kr-rec-emo">${escapeHtml(moodLine)}</div>
-            <div class="kr-rec-memo">${escapeHtml(memo)}</div>
-          </button>
-        `;
-      }
-    });
+    html += items.map(renderKirokuRowItem).join('');
   }
 
   return html;
@@ -9973,7 +9997,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.34-beta.1（保存ボタン中央配置 / 別の見方にCBT技法ラベル）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.35-beta.1（ホーム最近のきろくをきろくタブと統一）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -10272,8 +10296,17 @@ function handleAction(act, el, ev) {
   }
   // 気持ち入力フル
   if (act === 'open-mood-full') { moodDraft = null; go('mood-full'); return; }
-  // すべての記録を見る
-  if (act === 'see-all-records') { go('record'); return; }
+  // すべての記録を見る → きろくタブのカレンダー > 「最近のきろく」位置へスクロール
+  if (act === 'see-all-records') {
+    state.ui.recordSubtab = 'calendar';
+    go('record');
+    setTimeout(() => {
+      const headers = document.querySelectorAll('h3.section-title');
+      const target = Array.from(headers).find(h => h.textContent.includes('最近のきろく'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+    return;
+  }
   // 記録詳細
   if (act === 'open-record-detail') {
     const m = state.moodLogs.find(x => x.id === el.dataset.id);
