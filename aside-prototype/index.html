@@ -534,6 +534,33 @@
 .moya-altview-card.selected .moya-altview-num { color: #5C7E60; }
 [data-theme="dark"] .moya-altview-card.selected .moya-altview-num { color: #C0D8B7; }
 
+/* 別の見方カード ラベルバッジ（v0.9.34〜CBT技法ラベル） */
+.moya-altview-body { flex: 1; min-width: 0; }
+.moya-altview-label {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(123, 168, 118, 0.18);
+  color: #5C7E60;
+  border-radius: 999px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+[data-theme="dark"] .moya-altview-label {
+  background: rgba(167, 196, 160, 0.22);
+  color: #C0D8B7;
+}
+.moya-altview-card.selected .moya-altview-label {
+  background: rgba(92, 126, 96, 0.25);
+}
+.moya-altview-text {
+  margin: 8px 0 0;
+  line-height: 1.85;
+  font-size: 14px;
+}
+
 /* AIで別の見方を生成中のローディング */
 .moya-loading {
   text-align: center;
@@ -911,10 +938,12 @@
   margin: 0 auto;
 }
 .letter-actions {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
+  display: flex;
+  justify-content: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
+.letter-actions > .letter-action-btn { flex: 0 1 auto; }
 .letter-action-btn {
   background: var(--bg-card);
   border: 1px solid var(--divider);
@@ -5798,12 +5827,17 @@ function viewMoyamoya() {
     return moyamoyaScreen(stepLabel, '別の見方を考えてみました', `
       <p class="text-tiny text-muted mb-3">⚠️ AIが推定した参考情報です。納得できるものを1つ選んでください。</p>
       <div style="display:flex; flex-direction:column; gap:10px;">
-        ${visible.map((v, i) => `
+        ${visible.map((rawV, i) => {
+          const v = normalizeAltView(rawV);
+          return `
           <button class="moya-altview-card ${selectedIdx === i ? 'selected' : ''}" data-act="moya-step4-pick" data-index="${i}">
             <span class="moya-altview-num">${i+1}</span>
-            <p style="margin:0;">${escapeHtml(v).replace(/\n/g, '<br>')}</p>
-          </button>
-        `).join('')}
+            <div class="moya-altview-body">
+              ${v.label ? `<span class="moya-altview-label">${escapeHtml(v.label)}</span>` : ''}
+              <p class="moya-altview-text">${escapeHtml(v.text).replace(/\n/g, '<br>')}</p>
+            </div>
+          </button>`;
+        }).join('')}
       </div>
       ${canMore ? `
         <button class="btn btn-secondary" data-act="moya-step4-more" style="margin-top:14px; width:100%;">他の見方も見てみる</button>
@@ -5871,16 +5905,39 @@ window.moyaSetScoreAfter = function(v) {
 };
 
 // v3.8 テンプレ版（フォールバック用）
+// CBT 認知再構成のラベル候補（v0.9.34〜固定8種）
+//   生成時はこの中から1つ選んで各見方に付与する。
+//   ラベル名は「パッと見て選びやすい」短さを優先し、説明はプロンプト側に持たせる。
+const MOYA_ALTVIEW_LABELS = [
+  { id: 'third_person',   name: '第三者視点',     hint: '友人や他者ならどう見るか' },
+  { id: 'time_axis',      name: '時間軸',         hint: '1ヶ月後・1年後の自分はどう見るか' },
+  { id: 'fact_vs_interp', name: '事実と解釈',     hint: '起きた事実と自分の解釈を切り分ける' },
+  { id: 'counter',        name: '反証',           hint: 'その思考の反対の証拠を探す' },
+  { id: 'scope',          name: '状況の幅',       hint: '「全部」「いつも」を「一部」「今回は」に' },
+  { id: 'self_compass',   name: '自分への声かけ', hint: '同じ状況の友達に何と言うか' },
+  { id: 'small_facts',    name: '小さな事実',     hint: '見落としていた良い兆し・ポジ要素' },
+  { id: 'uncertainty',    name: '不確実性の確認', hint: '最悪のシナリオは本当に確実か' }
+];
+
+// 後方互換ヘルパー：旧形式 string も受け取って {label, text} に正規化
+function normalizeAltView(v, fallbackLabel) {
+  if (v && typeof v === 'object' && typeof v.text === 'string') {
+    return { label: typeof v.label === 'string' ? v.label : (fallbackLabel || ''), text: v.text };
+  }
+  if (typeof v === 'string') return { label: fallbackLabel || '', text: v };
+  return { label: fallbackLabel || '', text: '' };
+}
+
 function generateAlternativeViewsTemplate(eventText, emotion) {
   const short = (eventText || '').slice(0, 28) + ((eventText || '').length > 28 ? '…' : '');
   const emo = emotion || 'つらさ';
   return [
-    `「${short}」というできごと、${emo}を強く感じたんですね。感情はあなたを守るために働いているサイン。否定する必要はありません。`,
-    `「自分が全部悪い」と感じている部分があるかもしれません。でも別の見方をすると、「今回はうまくいかなかったけれど、あなたの全部が否定されたわけではない」とも考えられそうです。`,
-    `今回のできごとは、永遠に続くものではなく、一時的なもの。明日になれば、感じ方が少し変わっているかもしれません。`,
-    `「絶対こうあるべき」と自分にプレッシャーをかけている部分はありませんか？「できる範囲でいい」と自分に言ってあげるのも、ひとつの選択肢です。`,
-    `周りの人にも、よく似た経験は意外とよくあります。あなただけが特別に「ダメ」というわけではなく、誰もが感じる自然な感情です。`,
-    `「もし友達が同じ状況にいたら、何て言ってあげる？」その言葉を、今のあなた自身にも、優しくかけてみてもいいかもしれません。`,
+    { label: '自分への声かけ', text: `「${short}」というできごと、${emo}を強く感じたんですね。感情はあなたを守るために働いているサイン。否定する必要はありません。` },
+    { label: '状況の幅',       text: `「自分が全部悪い」と感じている部分があるかもしれません。でも別の見方をすると、「今回はうまくいかなかったけれど、あなたの全部が否定されたわけではない」とも考えられそうです。` },
+    { label: '時間軸',         text: `今回のできごとは、永遠に続くものではなく、一時的なもの。明日になれば、感じ方が少し変わっているかもしれません。` },
+    { label: '事実と解釈',     text: `「絶対こうあるべき」と自分にプレッシャーをかけている部分はありませんか？「できる範囲でいい」と自分に言ってあげるのも、ひとつの選択肢です。` },
+    { label: '小さな事実',     text: `周りの人にも、よく似た経験は意外とよくあります。あなただけが特別に「ダメ」というわけではなく、誰もが感じる自然な感情です。` },
+    { label: '第三者視点',     text: `「もし友達が同じ状況にいたら、何て言ってあげる？」その言葉を、今のあなた自身にも、優しくかけてみてもいいかもしれません。` },
   ];
 }
 
@@ -5908,7 +5965,14 @@ async function generateAlternativeViewsAI(eventText, emotion, score) {
     if (start < 0 || end < 0 || end <= start) return null;
     const arr = JSON.parse(cleaned.slice(start, end + 1));
     if (!Array.isArray(arr)) return null;
-    const views = arr.filter(v => typeof v === 'string' && v.trim().length > 0).map(v => v.trim());
+    // 新形式 [{label, text}, ...] / 旧形式 [string, ...] の両方を受け入れる
+    const validLabels = new Set(MOYA_ALTVIEW_LABELS.map(l => l.name));
+    const views = arr.map(v => normalizeAltView(v))
+      .filter(v => v.text && v.text.length > 0)
+      .map(v => ({
+        label: validLabels.has(v.label) ? v.label : '',
+        text: v.text.trim()
+      }));
     if (views.length < 3) return null;
     // 6個に揃える（不足分はテンプレ補填）
     const fb = generateAlternativeViewsTemplate(eventText, emotion);
@@ -5941,7 +6005,7 @@ function generateLetter(s) {
     ? '気持ちは少しずつほぐれていきます。今日は書けただけでも一歩。'
     : '今日はまだ重く感じるかもしれない。それでも書いてくれたこと、覚えておこう。';
   // alternativeView は step4 で1つ選択された見方
-  const altText = s.alternativeView || (Array.isArray(s.alternativeViews) ? s.alternativeViews.slice(0, s.alternativeViewsRevealed || 3).map((v, i) => `${i+1}. ${v}`).join('\n\n') : '');
+  const altText = s.alternativeView || (Array.isArray(s.alternativeViews) ? s.alternativeViews.slice(0, s.alternativeViewsRevealed || 3).map((v, i) => `${i+1}. ${normalizeAltView(v).text}`).join('\n\n') : '');
   const body = `今日起きたこと\n${s.eventText}\n\n感じていたこと\n${s.emotion}（強さ ${s.emotionScoreBefore} / 10）\n\n別の見方\n${altText}\n\n少し楽になるための一言\n${closing}`;
   return { title, body };
 }
@@ -8097,17 +8161,19 @@ const AI_PROMPTS = {
     model: 'gemini-2.5-flash',
     temperature: 0.95,
     maxTokens: 1800,
-    outputFormat: 'JSON 配列（6つの文字列。各 80-130 字）',
+    outputFormat: 'JSON 配列（6つの {label, text}。label は固定8種から、text は 80-130 字）',
     fallbackBehavior: 'API未設定 / 失敗 / JSONパース失敗時はテンプレ6個（generateAlternativeViewsTemplate）',
     safetyChecks: [
       'detectCrisis（Step 1 で検知済み）',
       'JSON 抽出 / パース失敗時は静かにテンプレへフォールバック',
       '生成失敗時もユーザーには loading 解除後にテンプレで表示',
+      'label が固定8種以外なら空文字に正規化（誤ラベル防止）',
     ],
     systemPrompt: `あなたは認知行動療法（CBT）に基づいてサポートする経験豊富なセラピストです。
 22-28歳の若者の相談に対し、認知再構成（cognitive restructuring）の観点から「別の見方」を6つ提示してください。
+各見方には、その見方が属するCBT技法ラベル（下記候補から1つ）を付けます。
 
-# CBTの認知の歪み（代表例）
+# CBTの認知の歪み（相談者の思考に隠れがちな代表例）
 - 全か無か思考（白黒で決めつける）
 - 過度の一般化（いつも・絶対・どうせ）
 - 心の読みすぎ（相手の気持ちを断定）
@@ -8117,23 +8183,34 @@ const AI_PROMPTS = {
 - マイナス思考（良いことを打ち消す）
 - レッテル貼り（自分はダメ・無価値）
 
+# ラベル候補（必ずこの中から1つ選ぶ・固定8種）
+- 第三者視点（友人や他者ならどう見るか）
+- 時間軸（1ヶ月後・1年後の自分はどう見るか）
+- 事実と解釈（起きた事実と自分の解釈を切り分ける）
+- 反証（その思考の反対の証拠を探す）
+- 状況の幅（「全部」「いつも」を「一部」「今回は」に）
+- 自分への声かけ（同じ状況の友達に何と言うか）
+- 小さな事実（見落としていた良い兆し・ポジ要素）
+- 不確実性の確認（最悪のシナリオは本当に確実か）
+
 # 出力ルール
-- 6つはそれぞれ違う角度の視点（共感・別解釈・時間軸・他者視点・自己への優しさ・小さな事実 など）
+- 6つはそれぞれ違うラベルにする（同じラベルが2つ以上にならない）
 - 否定せず共感ベース。「〜かもしれない」「〜と考えてみてもいいかも」など断定を避ける
-- 各見方は2-3文・80-130字
+- text は 2-3文・80-130字
 - 22-28歳の若者に話しかける温かい口語トーン
 - 必ず JSON 配列のみで出力（説明・コードブロック・前置き不要）
+- label の文字列は上記ラベル候補の名称（例: "第三者視点"）と完全一致させる
 
 # 出力フォーマット
-["見方1のテキスト","見方2のテキスト","見方3のテキスト","見方4のテキスト","見方5のテキスト","見方6のテキスト"]`,
+[{"label":"第三者視点","text":"見方1のテキスト"},{"label":"時間軸","text":"見方2のテキスト"},{"label":"事実と解釈","text":"見方3のテキスト"},{"label":"自分への声かけ","text":"見方4のテキスト"},{"label":"状況の幅","text":"見方5のテキスト"},{"label":"小さな事実","text":"見方6のテキスト"}]`,
     userTemplate: `# 相談内容
 - できごと: {eventText}
 - 主な感情: {emotion}
 - 強さ: {score}/10
 
-上記について、別の見方を6つ JSON 配列で出力してください。`,
-    lastUpdated: '2026-05-02',
-    changeNote: 'v0.7.5 で初版（CBT 8種の認知の歪みを踏まえて生成）',
+上記について、別の見方を6つ {label, text} 形式の JSON 配列で出力してください。`,
+    lastUpdated: '2026-05-06',
+    changeNote: 'v0.9.34 で出力を {label, text} 形式に変更。CBT技法ラベル8種を導入し選択時の判断材料を増やす。',
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
@@ -9896,7 +9973,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.33-beta.1（もやもや整理 戻るボタンを前stepへ / 保存ボタン中央化）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.34-beta.1（保存ボタン中央配置 / 別の見方にCBT技法ラベル）</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -10290,13 +10367,15 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'moya-step4-next') {
-    // 選択された1つの見方をレター用に保存
+    // 選択された1つの見方をレター用に保存（新形式 {label,text} / 旧形式 string 両対応）
     const idx = moyamoya.alternativeViewSelectedIndex;
     if (!Array.isArray(moyamoya.alternativeViews) || typeof idx !== 'number' || idx < 0 || idx >= (moyamoya.alternativeViewsRevealed || 0)) {
       toast('しっくりくる見方を1つ選んでね');
       return;
     }
-    moyamoya.alternativeView = moyamoya.alternativeViews[idx];
+    const picked = normalizeAltView(moyamoya.alternativeViews[idx]);
+    moyamoya.alternativeView = picked.text;
+    moyamoya.alternativeViewLabel = picked.label || '';
     moyamoya.step = 5;
     render();
     return;
