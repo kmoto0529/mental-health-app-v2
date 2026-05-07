@@ -4745,7 +4745,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.42-beta.1',  // P6: 5択評価＋やったね完了画面＋ベース画面
+  appVersion:      '0.9.43-beta.1',  // P6.1: 5択評価ラベル更新 (悪くなった/変わらない/少し良く/良く/とても良く)
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -7001,11 +7001,11 @@ const IPPO_MOODS = [
 // 行動後の評価（v0.9.42 〜・5択定性評価）
 // value は推薦エンジンの changeValue として使用 (-2 〜 +3 の範囲)
 const IPPO_EVALUATIONS = [
-  { id: 'worse',         value: -2, label: '黒くなった',     emoji: '😞' },
-  { id: 'no-change',     value:  0, label: '変わらない',     emoji: '😐' },
-  { id: 'slight-change', value:  1, label: 'やや変わった',   emoji: '🙂' },
-  { id: 'better',        value:  2, label: '少し良くなった', emoji: '😊' },
-  { id: 'much-better',   value:  3, label: '良くなった',     emoji: '😄' },
+  { id: 'worse',         value: -2, label: '悪くなった',       emoji: '😞' },
+  { id: 'no-change',     value:  0, label: '変わらない',       emoji: '😐' },
+  { id: 'slight-better', value:  1, label: '少し良くなった',   emoji: '🙂' },
+  { id: 'better',        value:  2, label: '良くなった',       emoji: '😊' },
+  { id: 'much-better',   value:  3, label: 'とても良くなった', emoji: '😄' },
 ];
 
 function ippoCompletedToday() {
@@ -7807,10 +7807,11 @@ function viewIppoTodayDone(session) {
     const evDef = IPPO_EVALUATIONS.find(e => e.id === session.evaluation.id);
     if (evDef) todayMoodEmoji = evDef.emoji;
   } else if (typeof session.changeValue === 'number') {
-    if (session.changeValue >= 3) { todayMoodLabel = '良くなった'; todayMoodEmoji = '😄'; }
-    else if (session.changeValue >= 1) { todayMoodLabel = '少し良くなった'; todayMoodEmoji = '😊'; }
-    else if (session.changeValue === 0) { todayMoodLabel = '変わらない'; todayMoodEmoji = '😐'; }
-    else { todayMoodLabel = '黒くなった'; todayMoodEmoji = '😞'; }
+    if (session.changeValue >= 3)      { todayMoodLabel = 'とても良くなった'; todayMoodEmoji = '😄'; }
+    else if (session.changeValue >= 2) { todayMoodLabel = '良くなった';       todayMoodEmoji = '😊'; }
+    else if (session.changeValue >= 1) { todayMoodLabel = '少し良くなった';   todayMoodEmoji = '🙂'; }
+    else if (session.changeValue === 0){ todayMoodLabel = '変わらない';       todayMoodEmoji = '😐'; }
+    else                                { todayMoodLabel = '悪くなった';       todayMoodEmoji = '😞'; }
   }
 
   // 今日のおすすめの一歩 (履歴・方向ベース・既に実施したのは除外)
