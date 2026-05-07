@@ -4263,53 +4263,6 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 
 /* ============================================================
-   いっぽ Step 45 — やったね完了画面 (v0.9.42 〜)
-   ============================================================ */
-.ippo-done-screen { padding-top: 16px; }
-.ippo-done-hero {
-  text-align: center;
-  padding: 28px 16px 24px;
-  background: linear-gradient(135deg, #EAF1E6 0%, #DDE9DC 100%);
-  border-radius: 18px;
-  margin-bottom: 16px;
-}
-[data-theme="dark"] .ippo-done-hero {
-  background: linear-gradient(135deg, rgba(167,196,160,0.18) 0%, rgba(167,196,160,0.10) 100%);
-}
-.ippo-done-mascot { margin-bottom: 12px; }
-.ippo-done-h1 {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 24px; font-weight: 600;
-  color: var(--text-strong);
-  margin: 0 0 6px;
-}
-.ippo-done-msg {
-  font-size: 13px; color: var(--text-soft);
-  margin: 0;
-}
-.ippo-done-action-card {
-  background: var(--bg-card);
-  border-radius: 14px;
-  padding: 14px 16px;
-}
-[data-theme="dark"] .ippo-done-action-card { background: rgba(47, 62, 62, 0.55); }
-.ippo-done-action-label {
-  font-size: 11px; color: var(--text-muted);
-  margin-bottom: 6px;
-}
-.ippo-done-action-body {
-  display: flex; align-items: center; gap: 12px;
-}
-.ippo-done-action-icon {
-  font-size: 32px; line-height: 1; flex-shrink: 0;
-}
-.ippo-done-action-title {
-  font-size: 15px; font-weight: 600;
-  color: var(--text-strong);
-}
-.ippo-done-action-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-/* ============================================================
    いっぽ ベース画面 — 今日のサマリ (v0.9.42 〜)
    ============================================================ */
 .ippo-base-screen { padding-bottom: 90px; }
@@ -4745,7 +4698,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.43-beta.1',  // P6.1: 5択評価ラベル更新 (悪くなった/変わらない/少し良く/良く/とても良く)
+  appVersion:      '0.9.44-beta.1',  // P6.2: やったね画面廃止・Step4 直後にベース画面へ
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -7028,15 +6981,14 @@ function viewAction() {
   if (!ippoToday) {
     ippoToday = { step: 0, startedAt: new Date().toISOString() };
   }
-  // v0.9.42 〜 構成: 0:方向(6択複数) / 2:推薦 / 3:いまやる-あとで / 35:タイマー / 4:5択評価 / 45:やったね
-  // (旧 Step 1 気分+強さ・Step 5 サマリ は廃止)
+  // v0.9.44 〜 構成: 0:方向(6択複数) / 2:推薦 / 3:いまやる-あとで / 35:タイマー / 4:5択評価 → 完了後ベース画面へ
+  // (旧 Step 1 気分+強さ・Step 5 サマリ・Step 45 やったね は廃止)
   switch (ippoToday.step) {
     case 0:  return viewIppoStep0(ippoToday);
     case 2:  return viewIppoStep2(ippoToday);
     case 3:  return viewIppoStep3(ippoToday);
     case 35: return viewIppoTimer(ippoToday);
     case 4:  return viewIppoStep4(ippoToday);
-    case 45: return viewIppoStep45(ippoToday);
     default: ippoToday = null; return viewAction();
   }
 }
@@ -7609,42 +7561,9 @@ function calcRecentTrendInsight() {
   return '少しずつ、自分に合うパターンが見えてきています';
 }
 
-// Step 45（v0.9.42 〜）: やったね完了画面 — Step 4 評価記録直後に表示。
-// 「ホームに戻る」「あとでやる」で離脱、または再度いっぽタブを開くとベース画面 (viewIppoTodayDone) が表示される。
-function viewIppoStep45(s) {
-  const c = s.candidates && s.candidates.find(x => x.action.id === s.selectedActionId);
-  const action = c ? c.action : null;
-  return `
-    <div class="screen active ippo-screen ippo-done-screen">
-      <div class="ippo-done-hero">
-        <div class="ippo-done-mascot">${suplan({ stage: 'futaba', expression: 'happy', size: 96 })}</div>
-        <h1 class="ippo-done-h1">やったね！</h1>
-        <p class="ippo-done-msg">一歩をやりきりました！</p>
-      </div>
-
-      ${action ? `
-        <div class="ippo-done-action-card">
-          <div class="ippo-done-action-label">今日の一歩</div>
-          <div class="ippo-done-action-body">
-            <span class="ippo-done-action-icon">${action.icon}</span>
-            <div>
-              <div class="ippo-done-action-title">${escapeHtml(action.title)}</div>
-              <div class="ippo-done-action-time">⏱ ${action.time}</div>
-            </div>
-          </div>
-        </div>
-      ` : ''}
-
-      <div style="display:grid; gap:10px; margin-top:22px;">
-        <button class="btn btn-primary" data-act="ippo-step45-home">ホームに戻る</button>
-        <button class="btn-ghost" data-act="ippo-step45-later">あとでやる</button>
-      </div>
-    </div>
-  `;
-}
-
 // Step 5 (旧サマリ画面・v0.9.42 〜 廃止) — case 5 は switch から外した。
-// コードは互換のため残置。新フローでは Step 45 (やったね) → home → ベース画面 (viewIppoTodayDone) で代替。
+// Step 45 (やったね完了画面・v0.9.42〜v0.9.43) も廃止 (v0.9.44〜): Step 4 → ベース画面に直接遷移。
+// コードは互換のため残置。
 function viewIppoStep5(s) {
   const c = s.candidates.find(x => x.action.id === s.selectedActionId);
   const before = s.beforeIntensity;
@@ -11727,19 +11646,9 @@ function handleAction(act, el, ev) {
       });
       ippoToday.savedAtSummary = true;
     }
-    ippoToday.step = 45;  // やったね完了画面へ
-    render();
-    return;
-  }
-  // Step 45: やったね完了画面のアクション
-  if (act === 'ippo-step45-home') {
+    // セッション保存後はベース画面 (viewIppoTodayDone) を直接表示
     ippoToday = null;
-    go('home');
-    return;
-  }
-  if (act === 'ippo-step45-later') {
-    // セッションは既に保存済み・ベース画面 (viewIppoTodayDone) に留まる
-    ippoToday = null;
+    toast('一歩を記録しました');
     render();
     return;
   }
