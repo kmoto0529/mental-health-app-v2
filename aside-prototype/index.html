@@ -4203,6 +4203,55 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 
 /* ============================================================
+   いっぽ Timer 画面 (準備中プレースホルダ) — v0.9.41 〜
+   ============================================================ */
+.ippo-timer-screen { padding-top: 12px; }
+.ippo-timer-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 22px 18px;
+  text-align: center;
+}
+[data-theme="dark"] .ippo-timer-card { background: rgba(47, 62, 62, 0.55); }
+.ippo-timer-action-head {
+  display: flex; align-items: center; gap: 12px; justify-content: center;
+  margin-bottom: 8px;
+}
+.ippo-timer-icon { font-size: 32px; line-height: 1; flex-shrink: 0; }
+.ippo-timer-action-body { text-align: left; min-width: 0; }
+.ippo-timer-title {
+  font-size: 16px; font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.4;
+}
+.ippo-timer-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.ippo-timer-circle-wrap { margin: 16px 0 12px; }
+.ippo-timer-circle {
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  border: 6px solid #DDE9DC;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto;
+  background: var(--bg-soft);
+}
+[data-theme="dark"] .ippo-timer-circle {
+  border-color: rgba(167,196,160,0.25);
+}
+.ippo-timer-soon-label {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 11px; color: var(--text-muted);
+  background: var(--bg-soft);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+.ippo-timer-desc {
+  font-size: 13px; color: var(--text-soft);
+  line-height: 1.7;
+  margin: 12px 0 0;
+}
+
+/* ============================================================
    きづき (Kizuki) タブ — v0.9.38 〜
    ============================================================ */
 .kizuki-top-screen, .kizuki-list-screen { padding-bottom: 80px; }
@@ -4449,7 +4498,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.40-beta.1',  // P4: いっぽStep0 6択複数選択 (Step1廃止)
+  appVersion:      '0.9.41-beta.1',  // P5: いっぽタイマー画面 (準備中プレースホルダ)
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -6722,14 +6771,15 @@ function viewAction() {
   if (!ippoToday) {
     ippoToday = { step: 0, startedAt: new Date().toISOString() };
   }
-  // v0.9.40 〜 構成: 0: 方向(6択複数) / 2: 推薦 / 3: いまやる-あとでやる / 4: 変化記録 / 5: サマリ
+  // v0.9.40 〜 構成: 0: 方向(6択複数) / 2: 推薦 / 3: いまやる-あとでやる / 35: タイマー / 4: 変化記録 / 5: サマリ
   // (旧 Step 1 気分+強さ は廃止)
   switch (ippoToday.step) {
-    case 0: return viewIppoStep0(ippoToday);
-    case 2: return viewIppoStep2(ippoToday);
-    case 3: return viewIppoStep3(ippoToday);
-    case 4: return viewIppoStep4(ippoToday);
-    case 5: return viewIppoStep5(ippoToday);
+    case 0:  return viewIppoStep0(ippoToday);
+    case 2:  return viewIppoStep2(ippoToday);
+    case 3:  return viewIppoStep3(ippoToday);
+    case 35: return viewIppoTimer(ippoToday);
+    case 4:  return viewIppoStep4(ippoToday);
+    case 5:  return viewIppoStep5(ippoToday);
     default: ippoToday = null; return viewAction();
   }
 }
@@ -7148,6 +7198,44 @@ function viewIppoStep3(s) {
       <p class="text-tiny text-muted text-center" style="margin-top:10px;">
         「あとでやる」と、サマリ画面の「もう一歩」に保留されます
       </p>
+    </div>
+  `;
+}
+
+// Step 35 (タイマー画面・v0.9.41 〜) — 「いまやる」と「変化記録」の間。
+// 行動別の本格タイマー (深呼吸4-7-8 のセット表示等) は別途実装予定のため、
+// 現状は「準備中」プレースホルダ。「終わったよ」で Step 4 へ進む。
+function viewIppoTimer(s) {
+  const c = s.candidates && s.candidates.find(x => x.action.id === s.selectedActionId);
+  if (!c) { s.step = 2; return viewIppoStep2(s); }
+  return `
+    <div class="screen active ippo-screen ippo-timer-screen">
+      <h1 class="ippo-h1">きょうのいっぽ</h1>
+      <div class="ippo-step">実施中</div>
+
+      <div class="ippo-timer-card">
+        <div class="ippo-timer-action-head">
+          <span class="ippo-timer-icon" aria-hidden="true">${c.action.icon}</span>
+          <div class="ippo-timer-action-body">
+            <div class="ippo-timer-title">${escapeHtml(c.action.title)}</div>
+            <div class="ippo-timer-time">⏱ 目安 ${c.action.time}</div>
+          </div>
+        </div>
+
+        <div class="ippo-timer-circle-wrap">
+          <div class="ippo-timer-circle">
+            ${suplan({ stage: 'tane', expression: 'happy', size: 80 })}
+          </div>
+          <div class="ippo-timer-soon-label">タイマー機能 準備中</div>
+        </div>
+
+        <p class="ippo-timer-desc">${escapeHtml(c.action.desc)}</p>
+      </div>
+
+      <div style="display:grid; gap:10px; margin-top:18px;">
+        <button class="btn btn-primary" data-act="ippo-timer-done">終わったよ →</button>
+        <button class="btn-ghost" data-act="ippo-back" data-to="3">‹ 戻る</button>
+      </div>
     </div>
   `;
 }
@@ -11231,6 +11319,15 @@ function handleAction(act, el, ev) {
   if (act === 'ippo-step3-now') {
     if (!ippoToday || !ippoToday.selectedActionId) return;
     ippoToday.beforeIntensity = ippoToday.moodIntensity;
+    ippoToday.timerStartedAt = new Date().toISOString();
+    ippoToday.step = 35;  // v0.9.41 〜 タイマー画面 (準備中) を経由
+    render();
+    return;
+  }
+  // タイマー画面: 終わったよ → Step 4 (変化記録)
+  if (act === 'ippo-timer-done') {
+    if (!ippoToday) return;
+    ippoToday.timerEndedAt = new Date().toISOString();
     ippoToday.step = 4;
     render();
     return;
