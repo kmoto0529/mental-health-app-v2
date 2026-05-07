@@ -177,7 +177,9 @@
 }
 .home-mascot:hover { transform: scale(1.04); }
 .home-mascot:active { transform: scale(0.97); }
-.home-mascot svg, .home-mascot img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; pointer-events: none; }
+.home-mascot svg, .home-mascot img { width: 100%; height: 100%; border-radius: 50%; display: block; pointer-events: none; }
+.home-mascot img { object-fit: cover !important; object-position: center 30%; transform: scale(1.18); }
+.home-mascot svg { object-fit: contain; }
 [data-theme="dark"] .home-mascot {
   background: #243030;
   box-shadow: 0 0 0 1.5px rgba(167, 196, 160, 0.45),
@@ -5333,7 +5335,7 @@ function viewHome() {
           <p class="home-subtitle">${getHomeSubtitle()}</p>
         </div>
         <button class="home-mascot" data-act="open-suplan-info" aria-label="すぷらんについて">
-          ${suplan({ size: 56 })}
+          ${suplan({ size: 56, expression: suplanHomeExpression() })}
         </button>
       </header>
 
@@ -7830,6 +7832,12 @@ function suplanExpression() {
   if (last.moodScore <= 2) return 'sad';
   if (last.moodScore >= 4) return 'happy';
   return 'calm';
+}
+
+// ホーム右上のすぷらんアイコン用：毎回見るためネガティブ表情は出さない
+function suplanHomeExpression() {
+  const e = suplanExpression();
+  return e === 'sad' ? 'calm' : e;
 }
 
 // ============================================================
