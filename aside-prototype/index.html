@@ -4113,6 +4113,96 @@ body.keyboard-open .mood-chat-bottom .input-row {
 .mb-4 { margin-bottom: 16px; }
 
 /* ============================================================
+   いっぽ Step 0 — 今日はどうなりたい？ (v0.9.40 〜・複数選択)
+   ============================================================ */
+.ippo-dir-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 380px) {
+  .ippo-dir-grid { grid-template-columns: 1fr 1fr; }
+}
+.ippo-dir-card {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 14px 14px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--divider);
+  border-radius: 14px;
+  font: inherit; color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .ippo-dir-card {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167,196,160,0.15);
+}
+.ippo-dir-card:active { transform: scale(0.98); }
+.ippo-dir-card.selected {
+  background: #EAF1E6;
+  border-color: #7BA876;
+  box-shadow: 0 0 0 2px rgba(123,168,118,0.18);
+}
+[data-theme="dark"] .ippo-dir-card.selected {
+  background: rgba(123,168,118,0.18);
+  border-color: #A7C4A0;
+}
+.ippo-dir-check {
+  position: absolute;
+  top: 8px; right: 10px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid var(--divider);
+  display: flex; align-items: center; justify-content: center;
+  color: #FFFFFF;
+  font-size: 11px; font-weight: 700;
+  line-height: 1;
+}
+.ippo-dir-card.selected .ippo-dir-check {
+  background: #7BA876;
+  border-color: #7BA876;
+}
+.ippo-dir-icon { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.ippo-dir-body { flex: 1; min-width: 0; }
+.ippo-dir-name {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 2px;
+}
+.ippo-dir-desc {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* 方向表示行 (Step 2-4) */
+.ippo-dir-line {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.ippo-dir-line-label { font-size: 11px; color: var(--text-muted); }
+.ippo-dir-line-chips { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.ippo-dir-line-chip {
+  font-size: 11px;
+  background: #EAF1E6;
+  color: #4A6B4F;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+[data-theme="dark"] .ippo-dir-line-chip {
+  background: rgba(123,168,118,0.18);
+  color: #A7C4A0;
+}
+.ippo-dir-line-change {
+  font-size: 11px; padding: 2px 8px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
    きづき (Kizuki) タブ — v0.9.38 〜
    ============================================================ */
 .kizuki-top-screen, .kizuki-list-screen { padding-bottom: 80px; }
@@ -4359,7 +4449,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.39-beta.1',  // P2: きづきタブ トップ＆ワーク一覧UI
+  appVersion:      '0.9.40-beta.1',  // P4: いっぽStep0 6択複数選択 (Step1廃止)
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -4638,14 +4728,21 @@ const MOOD_PURPOSE_PRIORITY = {
 };
 
 // なりたい方向 → 重視する目的タグ（Step 0 で選択）
+// v0.9.40 〜: 6択・複数選択UIに刷新（旧5択 lighter/calm/clear/energize/kindself は廃止）
 const IPPO_DIRECTIONS = [
-  { id: 'lighter',   icon: '😣', name: '少し楽になりたい',     desc: '今のつらさを軽くしたい',         purposes: ['不安軽減', 'リラックス'] },
-  { id: 'calm',      icon: '🌿', name: '落ち着きたい',         desc: '気持ちを整えたい',               purposes: ['リラックス', '思考整理'] },
-  { id: 'clear',     icon: '💭', name: 'モヤモヤを整理したい', desc: '頭の中をスッキリさせたい',       purposes: ['思考整理', '気分転換'] },
-  { id: 'energize',  icon: '☀️', name: '少し元気を出したい',   desc: 'やる気を取り戻したい',           purposes: ['行動を起こす', '気分転換'] },
-  { id: 'kindself',  icon: '💗', name: '自分を大切にしたい',   desc: '自分にやさしくしたい',           purposes: ['自己否定を和らげる', 'リラックス'] },
+  { id: 'relax',      icon: '🌿', name: 'リラックスしたい',     desc: '不安・緊張をほぐしたい',           purposes: ['リラックス', '不安軽減'] },
+  { id: 'mood-up',    icon: '☀️', name: '気分を上げたい',       desc: '落ち込んだ気分を上向きに',         purposes: ['気分転換', '行動を起こす'] },
+  { id: 'motivate',   icon: '💪', name: 'やる気を出したい',     desc: '動き出すきっかけがほしい',         purposes: ['行動を起こす', '気分転換'] },
+  { id: 'confidence', icon: '🌱', name: '自信をつけたい',       desc: '自分を信じられるようになりたい',   purposes: ['自己否定を和らげる', '行動を起こす'] },
+  { id: 'connect',    icon: '💗', name: 'つながりを感じたい',   desc: '人とのつながりを実感したい',       purposes: ['気分転換', '自己否定を和らげる'] },
+  { id: 'clarify',    icon: '💭', name: '考えを整理したい',     desc: '頭の中をスッキリさせたい',         purposes: ['思考整理', '気分転換'] },
 ];
 function getDirection(id) { return IPPO_DIRECTIONS.find(d => d.id === id) || null; }
+// 複数選択された direction を返す（v0.9.40 〜・新6択用）
+function getDirectionIds() {
+  const ids = (state.user && state.user.directionIds) || [];
+  return Array.isArray(ids) ? ids.filter(id => getDirection(id)) : [];
+}
 
 // 行動タグの導出（既存フィールドからルールで推定）
 function deriveActionTags(action) {
@@ -4696,7 +4793,12 @@ function deriveActionTags(action) {
 function scoreAction(action, ctx) {
   const tags = deriveActionTags(action);
   const history = ctx.history || [];
-  const direction = getDirection(ctx.directionId || (state.user && state.user.direction));
+  // v0.9.40 〜: directionIds (配列) を優先・既存 directionId は1要素配列として後方互換
+  const ctxIds = Array.isArray(ctx.directionIds) ? ctx.directionIds
+                : ctx.directionId ? [ctx.directionId]
+                : getDirectionIds();
+  const directions = ctxIds.map(getDirection).filter(Boolean);
+  const direction = directions[0] || null;  // 既存の表示・reasons用
 
   // ① 感情との相性（最大30）+ 方向ボーナス
   const wantPriority = MOOD_PURPOSE_PRIORITY[ctx.moodLabel] || ['気分転換', '行動を起こす', 'リラックス'];
@@ -4708,8 +4810,8 @@ function scoreAction(action, ctx) {
     }
   }
   if (emotionAffinity === 0) emotionAffinity = 8;
-  // 方向の希望purposesと一致 → +6（上限30）
-  if (direction && direction.purposes.some(p => tags.purpose.includes(p))) {
+  // 方向の希望purposesといずれかが一致 → +6（上限30）
+  if (directions.some(d => d.purposes.some(p => tags.purpose.includes(p)))) {
     emotionAffinity = Math.min(30, emotionAffinity + 6);
   }
 
@@ -4801,10 +4903,10 @@ function getNextStepRecommendations(ippoState, n = 3) {
   const usedAction = ACTIONS.find(a => a.id === ippoState.selectedActionId);
   const usedTags = usedAction ? deriveActionTags(usedAction) : null;
   const ctx = {
-    moodLabel: ippoState.moodLabel,
+    moodLabel: ippoState.moodLabel || 'なんとなく',
     intensity: ippoState.afterIntensity,
     history: state.ippoSessions || [],
-    directionId: state.user.direction,
+    directionIds: ippoState.directionIds || getDirectionIds(),
     // 短い行動を済ませたなら、次は少し長めの行動を勧める
     durationPref: usedTags && usedTags.means.includes('1分以内') ? '3min'
                 : usedTags && usedTags.means.includes('3〜5分') ? '5min'
@@ -4838,7 +4940,10 @@ const TECHNIQUE_EXPLANATIONS = {
 
 function generateAIFeedback(ippoState) {
   const action = ACTIONS.find(a => a.id === ippoState.selectedActionId);
-  const direction = getDirection(state.user.direction);
+  // v0.9.40 〜: 複数選択された方向の最初の1つを表示用に使う (旧 state.user.direction は廃止)
+  const directionIds = (ippoState && Array.isArray(ippoState.directionIds))
+    ? ippoState.directionIds : getDirectionIds();
+  const direction = getDirection(directionIds[0]);
   const change = (ippoState.beforeIntensity || 0) - (ippoState.afterIntensity || 0);
   const explain = action && TECHNIQUE_EXPLANATIONS[action.technique]
     ? TECHNIQUE_EXPLANATIONS[action.technique]
@@ -6613,16 +6718,14 @@ function viewAction() {
   if (!ippoToday && (state.ippoSessions || []).length > 0) {
     return viewIppoNewDay();
   }
-  // 新規開始: 方向未設定なら Step 0 から、設定済みなら Step 1 から
+  // 新規開始: 必ず Step 0 (今日はどうなりたい？) から
   if (!ippoToday) {
-    const startStep = (state.user && state.user.direction) ? 1 : 0;
-    ippoToday = { step: startStep, startedAt: new Date().toISOString() };
+    ippoToday = { step: 0, startedAt: new Date().toISOString() };
   }
-  // 新5ステップ構成（v0.9.13）
-  // 0: 方向 / 1: 気分+強さ / 2: 推薦 / 3: いまやる-あとでやる / 4: 変化記録 / 5: サマリ
+  // v0.9.40 〜 構成: 0: 方向(6択複数) / 2: 推薦 / 3: いまやる-あとでやる / 4: 変化記録 / 5: サマリ
+  // (旧 Step 1 気分+強さ は廃止)
   switch (ippoToday.step) {
     case 0: return viewIppoStep0(ippoToday);
-    case 1: return viewIppoStep1(ippoToday);
     case 2: return viewIppoStep2(ippoToday);
     case 3: return viewIppoStep3(ippoToday);
     case 4: return viewIppoStep4(ippoToday);
@@ -6632,21 +6735,31 @@ function viewAction() {
 }
 
 function ippoHeader(stepNo) {
+  // v0.9.40 〜: 新4ステップ表記 (Step 0 を 1/4 とする)
+  // 0:方向(1/4) → 2:推薦(2/4) → 3:いまやる(3/4) → 4:変化記録(4/4) → 5:サマリ(別画面)
+  const dispMap = { 0: '1 / 4', 2: '2 / 4', 3: '3 / 4', 4: '4 / 4' };
+  const disp = dispMap[stepNo];
   return `
     <h1 class="ippo-h1">きょうのいっぽ</h1>
-    <div class="ippo-step">Step ${stepNo}${stepNo === 0 ? ' — 方向設定' : ' / 4'}</div>
+    ${disp ? `<div class="ippo-step">Step ${disp}</div>` : ''}
   `;
 }
 
-// 現在の方向の表示行（Step 1〜5 で表示）
+// 現在の方向の表示行（Step 2〜4 で表示）— v0.9.40 〜 複数選択対応
 function ippoDirectionLine() {
-  const d = getDirection(state.user.direction);
-  if (!d) return '';
+  // ippoToday.directionIds 優先・無ければ state から
+  const ids = (ippoToday && Array.isArray(ippoToday.directionIds))
+    ? ippoToday.directionIds
+    : getDirectionIds();
+  const dirs = ids.map(getDirection).filter(Boolean);
+  if (dirs.length === 0) return '';
   return `
-    <div class="text-tiny text-muted" style="display:flex; align-items:center; gap:6px; margin-bottom:14px;">
-      <span>今日の方向性：</span>
-      <span style="color:#7BA876; font-weight:600;">${escapeHtml(d.name)}</span>
-      <button class="btn-ghost" data-act="ippo-change-direction" style="font-size:11px; padding:2px 8px; margin-left:4px;">変更</button>
+    <div class="ippo-dir-line">
+      <span class="ippo-dir-line-label">今日の方向：</span>
+      <div class="ippo-dir-line-chips">
+        ${dirs.map(d => `<span class="ippo-dir-line-chip">${d.icon} ${escapeHtml(d.name)}</span>`).join('')}
+      </div>
+      <button class="btn-ghost ippo-dir-line-change" data-act="ippo-change-direction">変更</button>
     </div>
   `;
 }
@@ -6669,11 +6782,11 @@ function viewIppoNewDay() {
   const totalCount = sessions.length;
   const bestAction = calcMostEffectiveAction();
 
-  // きょうのおすすめ（直近の気分・方向をベースに3件）
+  // きょうのおすすめ（前日方向＋平均的な気分でフォールバック）
   const recs = last ? getTopRecommendations({
     moodLabel: last.moodLabel || 'なんとなく',
     intensity: last.afterIntensity || 5,
-    directionId: state.user.direction,
+    directionIds: getDirectionIds(),
     durationPref: '1min',
     history: sessions,
   }, 3) : [];
@@ -6850,34 +6963,44 @@ function viewIppoOnboarding() {
   `;
 }
 
-// Step 0: なりたい方向を選ぶ（初回のみ。state.user.direction に保存して以降スキップ）
+// Step 0: 今日はどうなりたい？(v0.9.40 〜・複数選択UI)
+// 旧 Step 1 (気分10種＋強さ) は廃止し、Step 0 → Step 2 に直接遷移。
+// 行動後の評価は P6 で 5択定性評価に変更予定 (黒くなった/変わらない/...)。
 function viewIppoStep0(s) {
-  const selected = s.directionId || (state.user && state.user.direction);
+  // ippoToday.directionIds が無ければ既存ユーザーの保存値で初期化
+  if (!Array.isArray(s.directionIds)) {
+    s.directionIds = getDirectionIds().slice();
+  }
+  const selected = new Set(s.directionIds);
   return `
     <div class="screen active ippo-screen">
       ${ippoHeader(0)}
-      <div class="ippo-q">今日はどうなりたいですか？</div>
-      <p class="text-tiny text-muted mb-3">あなたの方向性を選んでください</p>
-      <div class="dd-theme-grid" style="margin-bottom:18px;">
+      <div class="ippo-q">今日は、どうなりたい？</div>
+      <p class="text-tiny text-muted mb-3">いっぽに合いそうなものを選んでください（複数選択OK）</p>
+      <div class="ippo-dir-grid">
         ${IPPO_DIRECTIONS.map(d => `
-          <button class="dd-theme-card ${selected === d.id ? 'selected' : ''}" data-act="ippo-step0-pick" data-direction="${d.id}">
-            <span class="dd-theme-icon">${d.icon}</span>
-            <div>
-              <div class="dd-theme-name">${escapeHtml(d.name)}</div>
-              <div class="text-tiny text-muted" style="margin-top:2px;">${escapeHtml(d.desc)}</div>
+          <button class="ippo-dir-card ${selected.has(d.id) ? 'selected' : ''}"
+                  data-act="ippo-step0-toggle" data-direction="${d.id}">
+            <span class="ippo-dir-check" aria-hidden="true">${selected.has(d.id) ? '✓' : ''}</span>
+            <span class="ippo-dir-icon">${d.icon}</span>
+            <div class="ippo-dir-body">
+              <div class="ippo-dir-name">${escapeHtml(d.name)}</div>
+              <div class="ippo-dir-desc">${escapeHtml(d.desc)}</div>
             </div>
           </button>
         `).join('')}
       </div>
-      <div style="display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step0-next" ${!selected ? 'disabled' : ''}>次へ</button>
+      <div style="display:grid; gap:10px; margin-top:18px;">
+        <button class="btn btn-primary" data-act="ippo-step0-next" ${selected.size === 0 ? 'disabled' : ''}>次へ</button>
         <button class="btn-ghost" data-act="ippo-cancel">キャンセル</button>
       </div>
     </div>
   `;
 }
 
-// Step 1（v0.9.13 新設）: 気分 + 強さを統合（旧Step1+Step2をマージ）
+// Step 1 (旧 v0.9.13 仕様・気分10種+強さ) — v0.9.40 で廃止。
+// コードは互換のため残すが viewAction.switch から呼ばれない。
+// 行動後評価は P6 で 5択定性評価に置き換える予定。
 function viewIppoStep1(s) {
   const mainMoods = IPPO_MOODS.filter(m => m.label !== 'なんとなく');
   const nantonaku = IPPO_MOODS.find(m => m.label === 'なんとなく');
@@ -6930,13 +7053,13 @@ function viewIppoStep1(s) {
   `;
 }
 
-// Step 2（v0.9.13）: 推薦カード（旧Step3）
+// Step 2（v0.9.13・v0.9.40 〜は Step 0 直後）: 推薦カード
 function viewIppoStep2(s) {
   if (!s.candidates) {
     s.candidates = getTopRecommendations({
-      moodLabel: s.moodLabel,
-      intensity: s.moodIntensity,
-      directionId: state.user.direction,
+      moodLabel: s.moodLabel || 'なんとなく',
+      intensity: s.moodIntensity == null ? 5 : s.moodIntensity,
+      directionIds: s.directionIds || getDirectionIds(),
       durationPref: s.durationPref || '1min',
       history: state.ippoSessions || [],
     }, 5);
@@ -6995,7 +7118,7 @@ function viewIppoStep2(s) {
 
       <div style="margin-top:18px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="ippo-step2-next" ${!selectedId ? 'disabled' : ''}>この一歩を選ぶ</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="1">‹ 戻る</button>
+        <button class="btn-ghost" data-act="ippo-back" data-to="0">‹ 戻る</button>
       </div>
     </div>
   `;
@@ -10980,29 +11103,25 @@ function handleAction(act, el, ev) {
   // きょうのいっぽ（v0.9.2 仕様書準拠 Steps 0-6）
   if (act === 'ippo-cancel') { ippoToday = null; go('home'); return; }
   if (act === 'ippo-onboarding-start') {
-    const startStep = (state.user && state.user.direction) ? 1 : 0;
-    ippoToday = { step: startStep, startedAt: new Date().toISOString() };
+    ippoToday = { step: 0, startedAt: new Date().toISOString() };
     render();
     return;
   }
-  // 新しい1日画面 → 通常フロー開始
+  // 新しい1日画面 → 通常フロー開始 (v0.9.40 〜 必ず Step 0)
   if (act === 'ippo-newday-start') {
-    const startStep = (state.user && state.user.direction) ? 1 : 0;
-    ippoToday = { step: startStep, startedAt: new Date().toISOString() };
+    ippoToday = { step: 0, startedAt: new Date().toISOString() };
     render();
     return;
   }
-  // 新しい1日画面のおすすめカード直接タップ → Step 1 から（気分は確認したい）
+  // 新しい1日画面のおすすめカード直接タップ (v0.9.40 〜 Step 0 から方向選択)
   if (act === 'ippo-newday-pick-rec') {
-    ippoToday = { step: 1, startedAt: new Date().toISOString(), preselectedActionId: el.dataset.actionId };
+    ippoToday = { step: 0, startedAt: new Date().toISOString(), preselectedActionId: el.dataset.actionId };
     render();
     return;
   }
-  // 完了済日からの「もう一歩やる」: 直近セッションをベースに Step 3（複数選択）へ
-  // 「もう一歩やる」: 仕様変更（v0.9.13）— 必ず Step 1 から開始
-  // Step 0 (方向) はいつでも変えられる、ただし2回目以降は Step 1 直行
+  // 「もう一歩やる」 (v0.9.40 〜 必ず Step 0 から)
   if (act === 'ippo-do-another') {
-    ippoToday = { step: 1, startedAt: new Date().toISOString() };
+    ippoToday = { step: 0, startedAt: new Date().toISOString() };
     render();
     return;
   }
@@ -11021,27 +11140,44 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'ippo-restart') {
-    const startStep = (state.user && state.user.direction) ? 1 : 0;
-    ippoToday = { step: startStep, startedAt: new Date().toISOString() };
+    ippoToday = { step: 0, startedAt: new Date().toISOString() };
     render();
     return;
   }
   if (act === 'ippo-change-direction') {
-    if (ippoToday) { ippoToday.step = 0; ippoToday.directionId = state.user.direction; }
+    if (ippoToday) {
+      ippoToday.step = 0;
+      // 既存選択を引き継いで再編集できるよう directionIds はそのまま残す
+      ippoToday.candidates = null;  // 推薦再計算
+    }
     render();
     return;
   }
-  // Step 0: 方向選択
-  if (act === 'ippo-step0-pick') {
-    if (ippoToday) ippoToday.directionId = el.dataset.direction;
+  // Step 0: 方向選択 (v0.9.40 〜 複数選択トグル)
+  if (act === 'ippo-step0-toggle') {
+    if (!ippoToday) return;
+    if (!Array.isArray(ippoToday.directionIds)) ippoToday.directionIds = [];
+    const id = el.dataset.direction;
+    const idx = ippoToday.directionIds.indexOf(id);
+    if (idx >= 0) ippoToday.directionIds.splice(idx, 1);
+    else ippoToday.directionIds.push(id);
     render();
     return;
   }
   if (act === 'ippo-step0-next') {
-    if (!ippoToday || !ippoToday.directionId) { toast('方向を選んでね'); return; }
-    state.user.direction = ippoToday.directionId;
+    if (!ippoToday || !Array.isArray(ippoToday.directionIds) || ippoToday.directionIds.length === 0) {
+      toast('1つ以上選んでね');
+      return;
+    }
+    // 永続化 (今後の NewDay 等で前回値として参照)
+    state.user.directionIds = ippoToday.directionIds.slice();
+    delete state.user.direction;  // 旧5択は廃止
     saveState();
-    ippoToday.step = 1;
+    // moodLabel/Intensity は既存推薦エンジン互換のためデフォルト値で埋める
+    if (!ippoToday.moodLabel) ippoToday.moodLabel = 'なんとなく';
+    if (ippoToday.moodIntensity == null) ippoToday.moodIntensity = 5;
+    ippoToday.candidates = null;  // 推薦再計算
+    ippoToday.step = 2;
     render();
     return;
   }
@@ -11108,7 +11244,7 @@ function handleAction(act, el, ev) {
       actionId: ippoToday.selectedActionId,
       moodLabel: ippoToday.moodLabel,
       moodIntensity: ippoToday.moodIntensity,
-      directionId: state.user.direction,
+      directionIds: (ippoToday.directionIds || []).slice(),
       savedAt: new Date().toISOString(),
     });
     saveState();
@@ -11131,11 +11267,13 @@ function handleAction(act, el, ev) {
     // Step 5 (サマリ) 遷移時に自動保存
     if (!ippoToday.savedAtSummary) {
       const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
+      const sessionDirIds = (ippoToday.directionIds || getDirectionIds()).slice();
       state.ippoSessions.push({
         id: uid(),
         moodLabel: ippoToday.moodLabel,
         moodIntensity: ippoToday.moodIntensity,
-        directionId: state.user.direction,
+        directionIds: sessionDirIds,
+        directionId: sessionDirIds[0] || null,  // 後方互換
         actionId: ippoToday.selectedActionId,
         score: c?.score.total || null,
         reasons: c?.reasons || [],
@@ -11154,7 +11292,7 @@ function handleAction(act, el, ev) {
         moodLabel: ippoToday.moodLabel,
         changeValue: ippoToday.beforeIntensity - ippoToday.afterIntensity,
         actionId: ippoToday.selectedActionId,
-        directionId: state.user.direction,
+        directionIds: sessionDirIds,
       });
       ippoToday.savedAtSummary = true;
     }
@@ -11170,22 +11308,24 @@ function handleAction(act, el, ev) {
     // 保留時の文脈を再構築。candidates にはこの行動だけ入れて Step 3 から
     const action = ACTIONS.find(a => a.id === p.actionId);
     if (!action) return;
+    const pDirIds = (Array.isArray(p.directionIds) && p.directionIds.length > 0)
+      ? p.directionIds : (p.directionId ? [p.directionId] : []);
     const score = scoreAction(action, {
-      moodLabel: p.moodLabel,
-      intensity: p.moodIntensity,
-      directionId: p.directionId,
+      moodLabel: p.moodLabel || 'なんとなく',
+      intensity: p.moodIntensity == null ? 5 : p.moodIntensity,
+      directionIds: pDirIds,
       durationPref: '1min',
       history: state.ippoSessions || [],
     });
     const reasons = generateActionReasons(action, score, {
-      moodLabel: p.moodLabel,
+      moodLabel: p.moodLabel || 'なんとなく',
       history: state.ippoSessions || [],
     });
     ippoToday = {
       step: 3,
-      moodLabel: p.moodLabel,
-      moodIntensity: p.moodIntensity,
-      directionId: p.directionId,
+      moodLabel: p.moodLabel || 'なんとなく',
+      moodIntensity: p.moodIntensity == null ? 5 : p.moodIntensity,
+      directionIds: pDirIds,
       candidates: [{ action, score, reasons }],
       selectedActionId: p.actionId,
       resumedPendingId: p.id,
@@ -11371,10 +11511,13 @@ function handleAction(act, el, ev) {
     // 先に ippo を保存してから深掘りへ
     if (ippoToday) {
       const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
+      const sessionDirIds = (ippoToday.directionIds || getDirectionIds()).slice();
       state.ippoSessions.push({
         id: uid(),
         moodLabel: ippoToday.moodLabel,
         moodIntensity: ippoToday.moodIntensity,
+        directionIds: sessionDirIds,
+        directionId: sessionDirIds[0] || null,
         actionId: ippoToday.selectedActionId,
         score: c?.score.total || null,
         reasons: c?.reasons || [],
@@ -11395,11 +11538,13 @@ function handleAction(act, el, ev) {
   if (act === 'ippo-save') {
     if (!ippoToday) return;
     const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
+    const sessionDirIds = (ippoToday.directionIds || getDirectionIds()).slice();
     state.ippoSessions.push({
       id: uid(),
       moodLabel: ippoToday.moodLabel,
       moodIntensity: ippoToday.moodIntensity,
-      directionId: state.user.direction,
+      directionIds: sessionDirIds,
+      directionId: sessionDirIds[0] || null,
       actionId: ippoToday.selectedActionId,
       score: c?.score.total || null,
       reasons: c?.reasons || [],
@@ -11414,7 +11559,7 @@ function handleAction(act, el, ev) {
       moodLabel: ippoToday.moodLabel,
       changeValue: ippoToday.beforeIntensity - ippoToday.afterIntensity,
       actionId: ippoToday.selectedActionId,
-      directionId: state.user.direction,
+      directionIds: sessionDirIds,
     });
     ippoToday = null;
     toast('一歩を記録しました');
