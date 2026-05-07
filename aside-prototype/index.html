@@ -4203,6 +4203,253 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 
 /* ============================================================
+   いっぽ Step 4 — 5択定性評価 (v0.9.42 〜)
+   ============================================================ */
+.ippo-eval5-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 4px 0 16px;
+}
+.ippo-eval5-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 4px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--divider);
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit; color: inherit;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .ippo-eval5-btn {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167,196,160,0.15);
+}
+.ippo-eval5-btn:active { transform: scale(0.96); }
+.ippo-eval5-btn.selected {
+  background: #EAF1E6;
+  border-color: #7BA876;
+  box-shadow: 0 0 0 2px rgba(123,168,118,0.18);
+}
+[data-theme="dark"] .ippo-eval5-btn.selected {
+  background: rgba(123,168,118,0.18);
+  border-color: #A7C4A0;
+}
+.ippo-eval5-emoji { font-size: 24px; line-height: 1; }
+.ippo-eval5-label {
+  font-size: 10px; line-height: 1.3;
+  color: var(--text-soft);
+  text-align: center;
+  word-break: keep-all;
+}
+.ippo-eval5-btn.selected .ippo-eval5-label {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.ippo-eval5-thanks {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+  margin-top: 4px;
+}
+.ippo-eval5-thanks-icon { font-size: 22px; flex-shrink: 0; }
+.ippo-eval5-thanks-text {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   いっぽ Step 45 — やったね完了画面 (v0.9.42 〜)
+   ============================================================ */
+.ippo-done-screen { padding-top: 16px; }
+.ippo-done-hero {
+  text-align: center;
+  padding: 28px 16px 24px;
+  background: linear-gradient(135deg, #EAF1E6 0%, #DDE9DC 100%);
+  border-radius: 18px;
+  margin-bottom: 16px;
+}
+[data-theme="dark"] .ippo-done-hero {
+  background: linear-gradient(135deg, rgba(167,196,160,0.18) 0%, rgba(167,196,160,0.10) 100%);
+}
+.ippo-done-mascot { margin-bottom: 12px; }
+.ippo-done-h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 24px; font-weight: 600;
+  color: var(--text-strong);
+  margin: 0 0 6px;
+}
+.ippo-done-msg {
+  font-size: 13px; color: var(--text-soft);
+  margin: 0;
+}
+.ippo-done-action-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+[data-theme="dark"] .ippo-done-action-card { background: rgba(47, 62, 62, 0.55); }
+.ippo-done-action-label {
+  font-size: 11px; color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.ippo-done-action-body {
+  display: flex; align-items: center; gap: 12px;
+}
+.ippo-done-action-icon {
+  font-size: 32px; line-height: 1; flex-shrink: 0;
+}
+.ippo-done-action-title {
+  font-size: 15px; font-weight: 600;
+  color: var(--text-strong);
+}
+.ippo-done-action-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ============================================================
+   いっぽ ベース画面 — 今日のサマリ (v0.9.42 〜)
+   ============================================================ */
+.ippo-base-screen { padding-bottom: 90px; }
+.ippo-base-hero {
+  text-align: center;
+  padding: 22px 16px 18px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  margin-bottom: 14px;
+}
+[data-theme="dark"] .ippo-base-hero { background: rgba(47, 62, 62, 0.55); }
+.ippo-base-hero-mascot { margin-bottom: 8px; }
+.ippo-base-hero-h {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--text-strong);
+  margin: 0 0 14px;
+}
+.ippo-base-hero-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.ippo-base-stat-cell { text-align: center; }
+.ippo-base-stat-num {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px; font-weight: 700;
+  color: #6B8F71;
+  line-height: 1.1;
+}
+.ippo-base-stat-suf { font-size: 11px; font-weight: 400; margin-left: 2px; color: var(--text-muted); }
+.ippo-base-stat-emoji { font-size: 26px; line-height: 1.1; }
+.ippo-base-stat-label {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.ippo-base-section-h {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  margin: 16px 4px 8px;
+}
+
+.ippo-base-rec-card {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: inherit;
+  transition: transform 0.15s ease;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .ippo-base-rec-card {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167,196,160,0.15);
+}
+.ippo-base-rec-card:active { transform: scale(0.98); }
+.ippo-base-rec-icon {
+  font-size: 24px; line-height: 1;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-soft);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.ippo-base-rec-body { flex: 1; min-width: 0; }
+.ippo-base-rec-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+}
+.ippo-base-rec-time { font-size: 11px; font-weight: 400; color: var(--text-muted); }
+.ippo-base-rec-meta {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 2px;
+}
+.ippo-base-rec-cta {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 600;
+  color: #FFFFFF;
+  background: #6B8F71;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
+.ippo-base-soon-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+.ippo-base-soon-icon { font-size: 22px; flex-shrink: 0; }
+.ippo-base-soon-h {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-strong);
+}
+.ippo-base-soon-d {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.ippo-base-kizuki-card {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #EAF1E6 0%, #DDE9DC 100%);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: inherit;
+  margin-top: 12px;
+  transition: transform 0.15s ease;
+}
+[data-theme="dark"] .ippo-base-kizuki-card {
+  background: linear-gradient(135deg, rgba(167,196,160,0.18) 0%, rgba(167,196,160,0.10) 100%);
+}
+.ippo-base-kizuki-card:active { transform: scale(0.98); }
+.ippo-base-kizuki-icon { font-size: 24px; flex-shrink: 0; }
+.ippo-base-kizuki-body { flex: 1; min-width: 0; }
+.ippo-base-kizuki-h {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+}
+.ippo-base-kizuki-d {
+  font-size: 11px; color: var(--text-soft);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.ippo-base-kizuki-arrow {
+  font-size: 18px; color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ============================================================
    いっぽ Timer 画面 (準備中プレースホルダ) — v0.9.41 〜
    ============================================================ */
 .ippo-timer-screen { padding-top: 12px; }
@@ -4498,7 +4745,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.41-beta.1',  // P5: いっぽタイマー画面 (準備中プレースホルダ)
+  appVersion:      '0.9.42-beta.1',  // P6: 5択評価＋やったね完了画面＋ベース画面
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -6751,6 +6998,16 @@ const IPPO_MOODS = [
   { label: 'なんとなく', emoji: '💭' },  // 特殊: 主感情が定まらない時
 ];
 
+// 行動後の評価（v0.9.42 〜・5択定性評価）
+// value は推薦エンジンの changeValue として使用 (-2 〜 +3 の範囲)
+const IPPO_EVALUATIONS = [
+  { id: 'worse',         value: -2, label: '黒くなった',     emoji: '😞' },
+  { id: 'no-change',     value:  0, label: '変わらない',     emoji: '😐' },
+  { id: 'slight-change', value:  1, label: 'やや変わった',   emoji: '🙂' },
+  { id: 'better',        value:  2, label: '少し良くなった', emoji: '😊' },
+  { id: 'much-better',   value:  3, label: '良くなった',     emoji: '😄' },
+];
+
 function ippoCompletedToday() {
   return state.ippoSessions.find(s => s.completedAt && sameDay(new Date(s.completedAt), new Date()));
 }
@@ -6771,15 +7028,15 @@ function viewAction() {
   if (!ippoToday) {
     ippoToday = { step: 0, startedAt: new Date().toISOString() };
   }
-  // v0.9.40 〜 構成: 0: 方向(6択複数) / 2: 推薦 / 3: いまやる-あとでやる / 35: タイマー / 4: 変化記録 / 5: サマリ
-  // (旧 Step 1 気分+強さ は廃止)
+  // v0.9.42 〜 構成: 0:方向(6択複数) / 2:推薦 / 3:いまやる-あとで / 35:タイマー / 4:5択評価 / 45:やったね
+  // (旧 Step 1 気分+強さ・Step 5 サマリ は廃止)
   switch (ippoToday.step) {
     case 0:  return viewIppoStep0(ippoToday);
     case 2:  return viewIppoStep2(ippoToday);
     case 3:  return viewIppoStep3(ippoToday);
     case 35: return viewIppoTimer(ippoToday);
     case 4:  return viewIppoStep4(ippoToday);
-    case 5:  return viewIppoStep5(ippoToday);
+    case 45: return viewIppoStep45(ippoToday);
     default: ippoToday = null; return viewAction();
   }
 }
@@ -7240,43 +7497,38 @@ function viewIppoTimer(s) {
   `;
 }
 
-// Step 4（v0.9.13）: 気分の変化記録（旧Step5）
+// Step 4（v0.9.42 〜・5択定性評価）— 旧 0-10 スケールを廃止
+// 行動の効果を5段階で評価。session.evaluation に保存し、changeValue は後方互換用に value を入れる。
 function viewIppoStep4(s) {
-  const before = s.beforeIntensity == null ? s.moodIntensity : s.beforeIntensity;
-  const after = s.afterIntensity == null ? Math.max(0, before - 2) : s.afterIntensity;
-  const moodObj = IPPO_MOODS.find(m => m.label === s.moodLabel);
+  const selected = s.evaluation && s.evaluation.id;
   return `
     <div class="screen active ippo-screen">
       ${ippoHeader(4)}
-      <div class="ippo-q">どのくらい楽になりましたか？</div>
-      <p class="text-tiny text-muted mb-3">変化した度合いを教えてください</p>
-      <div class="ippo-eval-row">
-        <div class="ippo-eval-col">
-          <div class="ippo-eval-label">やる前</div>
-          <div style="font-size:30px;">${moodObj ? moodObj.emoji : '😟'}</div>
-          <div class="ippo-eval-num">${before}<span class="ippo-eval-suf">/10</span></div>
-        </div>
-        <div class="ippo-eval-arrow">→</div>
-        <div class="ippo-eval-col">
-          <div class="ippo-eval-label">今の気分</div>
-          <div style="font-size:30px;">${after <= 3 ? '😌' : after <= 6 ? '😐' : '😟'}</div>
-          <div class="ippo-eval-num" id="ippoAfterNum">${after}<span class="ippo-eval-suf">/10</span></div>
-        </div>
-      </div>
-      <div class="moya-scale-row">
-        ${Array.from({length: 11}, (_, n) => `
-          <button class="moya-scale-btn ${after === n ? 'selected' : ''}" data-act="ippo-step4-after" data-score="${n}">${n}</button>
+      <div class="ippo-q">気分はどう変わりましたか？</div>
+      <p class="text-tiny text-muted mb-3">感情の変化を選んでください</p>
+
+      <div class="ippo-eval5-row">
+        ${IPPO_EVALUATIONS.map(ev => `
+          <button class="ippo-eval5-btn ${selected === ev.id ? 'selected' : ''}"
+                  data-act="ippo-step4-eval" data-eval="${ev.id}"
+                  aria-label="${escapeHtml(ev.label)}">
+            <span class="ippo-eval5-emoji">${ev.emoji}</span>
+            <span class="ippo-eval5-label">${escapeHtml(ev.label)}</span>
+          </button>
         `).join('')}
       </div>
-      <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); margin-top:6px; padding: 0 4px;">
-        <span>変わらない</span><span>すごく楽になった</span>
+
+      <div class="ippo-eval5-thanks">
+        <span class="ippo-eval5-thanks-icon">💗</span>
+        <p class="ippo-eval5-thanks-text">
+          記録してくれてありがとう！<br>
+          小さな一歩が、大きな変化につながります 🌱
+        </p>
       </div>
-      <div style="margin-top:14px; padding:10px 14px; background: var(--bg-soft); border-radius:10px; text-align:center;">
-        <span style="font-size:13px;">💗 記録してくれてありがとう。<br>小さな変化も、とても大切です ✨</span>
-      </div>
+
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step4-next">記録する</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="3">‹ 戻る</button>
+        <button class="btn btn-primary" data-act="ippo-step4-next" ${!selected ? 'disabled' : ''}>記録する</button>
+        <button class="btn-ghost" data-act="ippo-back" data-to="35">‹ 戻る</button>
       </div>
     </div>
   `;
@@ -7357,7 +7609,42 @@ function calcRecentTrendInsight() {
   return '少しずつ、自分に合うパターンが見えてきています';
 }
 
-// Step 5（v0.9.13）: 行動後サマリ画面（旧Step6を改名・「もう一歩」ロジック更新）
+// Step 45（v0.9.42 〜）: やったね完了画面 — Step 4 評価記録直後に表示。
+// 「ホームに戻る」「あとでやる」で離脱、または再度いっぽタブを開くとベース画面 (viewIppoTodayDone) が表示される。
+function viewIppoStep45(s) {
+  const c = s.candidates && s.candidates.find(x => x.action.id === s.selectedActionId);
+  const action = c ? c.action : null;
+  return `
+    <div class="screen active ippo-screen ippo-done-screen">
+      <div class="ippo-done-hero">
+        <div class="ippo-done-mascot">${suplan({ stage: 'futaba', expression: 'happy', size: 96 })}</div>
+        <h1 class="ippo-done-h1">やったね！</h1>
+        <p class="ippo-done-msg">一歩をやりきりました！</p>
+      </div>
+
+      ${action ? `
+        <div class="ippo-done-action-card">
+          <div class="ippo-done-action-label">今日の一歩</div>
+          <div class="ippo-done-action-body">
+            <span class="ippo-done-action-icon">${action.icon}</span>
+            <div>
+              <div class="ippo-done-action-title">${escapeHtml(action.title)}</div>
+              <div class="ippo-done-action-time">⏱ ${action.time}</div>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+
+      <div style="display:grid; gap:10px; margin-top:22px;">
+        <button class="btn btn-primary" data-act="ippo-step45-home">ホームに戻る</button>
+        <button class="btn-ghost" data-act="ippo-step45-later">あとでやる</button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 5 (旧サマリ画面・v0.9.42 〜 廃止) — case 5 は switch から外した。
+// コードは互換のため残置。新フローでは Step 45 (やったね) → home → ベース画面 (viewIppoTodayDone) で代替。
 function viewIppoStep5(s) {
   const c = s.candidates.find(x => x.action.id === s.selectedActionId);
   const before = s.beforeIntensity;
@@ -7503,88 +7790,122 @@ function shouldSuggestDeepDive() {
 
 // 完了済みの日（再来時の表示）
 // 完了済みの日（再来時の表示）— Step 6 と同じ「改善の可視化」デザインを使用
+// ベース画面 (今日のサマリ) — v0.9.42 〜
+// 完了済日にいっぽタブを開いた時に表示される。画像 (2回目以降フロー) のレイアウトに準拠。
+//   ヘッダー / 「いっぽもよくやったね！」+ 連続日数・実施回数・今日の気分
+//   今日のおすすめの一歩 / 続けて2回目やった一歩 / 習慣 (P8 で実装) / きづき導線
 function viewIppoTodayDone(session) {
-  const before = session.beforeIntensity;
-  const after = session.afterIntensity;
-  const change = session.changeValue;
-
-  // 統計指標
+  const sessions = state.ippoSessions || [];
   const streak = calcIppoStreakDays();
-  const totalCount = (state.ippoSessions || []).length;
-  const avgMatch = calcAvgMatchScore();
-  const bestAction = calcMostEffectiveAction();
-  const insight = calcRecentTrendInsight();
+  const totalCount = sessions.length;
 
-  // 気分絵文字
-  const moodObj = IPPO_MOODS.find(m => m.label === session.moodLabel);
-  const beforeEmoji = moodObj ? moodObj.emoji : '😟';
-  const afterEmoji = after <= 3 ? '😊' : after <= 5 ? '😌' : after <= 7 ? '😐' : '😟';
+  // 今日の気分 (5択評価ラベル → なければ legacy の changeValue から推定)
+  let todayMoodLabel = 'まあまあ';
+  let todayMoodEmoji = '🙂';
+  if (session.evaluation && session.evaluation.label) {
+    todayMoodLabel = session.evaluation.label;
+    const evDef = IPPO_EVALUATIONS.find(e => e.id === session.evaluation.id);
+    if (evDef) todayMoodEmoji = evDef.emoji;
+  } else if (typeof session.changeValue === 'number') {
+    if (session.changeValue >= 3) { todayMoodLabel = '良くなった'; todayMoodEmoji = '😄'; }
+    else if (session.changeValue >= 1) { todayMoodLabel = '少し良くなった'; todayMoodEmoji = '😊'; }
+    else if (session.changeValue === 0) { todayMoodLabel = '変わらない'; todayMoodEmoji = '😐'; }
+    else { todayMoodLabel = '黒くなった'; todayMoodEmoji = '😞'; }
+  }
+
+  // 今日のおすすめの一歩 (履歴・方向ベース・既に実施したのは除外)
+  const usedActionIds = new Set(sessions.filter(s => sameDay(new Date(s.completedAt), new Date())).map(s => s.actionId));
+  const allRecs = getTopRecommendations({
+    moodLabel: 'なんとなく',
+    intensity: 5,
+    directionIds: getDirectionIds(),
+    durationPref: '1min',
+    history: sessions,
+  }, 5);
+  const todayRec = allRecs.find(r => !usedActionIds.has(r.action.id));
+
+  // 続けて2回目やった一歩: 直近で2回以上同じ行動 → 最後にやった日付を表示
+  const actionFreq = {};
+  sessions.forEach(s => {
+    actionFreq[s.actionId] = (actionFreq[s.actionId] || 0) + 1;
+  });
+  const repeatId = Object.keys(actionFreq).find(id => actionFreq[id] >= 2 && id !== session.actionId);
+  const repeatAction = repeatId ? ACTIONS.find(a => a.id === repeatId) : null;
+  const repeatLastSession = repeatId ? [...sessions].reverse().find(s => s.actionId === repeatId) : null;
 
   return `
-    <div class="screen active ippo-screen">
+    <div class="screen active ippo-screen ippo-base-screen">
       <div class="page-header">
         <span style="width:36px;"></span>
-        <h1 class="ippo-h1" style="margin:0; flex:1; text-align:center; font-size:18px;">きょうのいっぽ</h1>
+        <h1 class="page-title">いっぽ</h1>
         <span style="width:36px;"></span>
       </div>
-      <p class="text-tiny text-muted text-center" style="margin: 0 0 10px;">今日のいっぽは記録済みです</p>
 
-      <!-- ヒーロー -->
-      <div class="ippo-hero-card">
-        <div style="text-align:center; margin-bottom:8px;">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
-        <div class="ippo-hero-title">今日もよくやったね！</div>
-        <div class="ippo-hero-row">
-          <div class="ippo-hero-col">
-            <div class="ippo-hero-emoji">${beforeEmoji}</div>
-            <div class="ippo-hero-num">${before}<span class="ippo-hero-suf">/10</span></div>
+      <!-- ヒーロー: いっぽもよくやったね -->
+      <div class="ippo-base-hero">
+        <div class="ippo-base-hero-mascot">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
+        <h2 class="ippo-base-hero-h">いっぽもよくやったね！</h2>
+        <div class="ippo-base-hero-stats">
+          <div class="ippo-base-stat-cell">
+            <div class="ippo-base-stat-num">${streak}<span class="ippo-base-stat-suf">日</span></div>
+            <div class="ippo-base-stat-label">連続日数</div>
           </div>
-          <div class="ippo-hero-arrow">→</div>
-          <div class="ippo-hero-col">
-            <div class="ippo-hero-emoji">${afterEmoji}</div>
-            <div class="ippo-hero-num green">${after}<span class="ippo-hero-suf">/10</span></div>
+          <div class="ippo-base-stat-cell">
+            <div class="ippo-base-stat-num">${totalCount}<span class="ippo-base-stat-suf">回</span></div>
+            <div class="ippo-base-stat-label">実施した回数</div>
           </div>
-        </div>
-        ${change > 0 ? `<div class="ippo-hero-delta">+${change} 改善</div>`
-          : change === 0 ? `<div class="ippo-hero-delta" style="color:var(--text-muted);">±0</div>`
-          : `<div class="ippo-hero-delta" style="color:#D77B5B;">${change}</div>`}
-      </div>
-
-      <!-- あなたの積み重ね -->
-      <div class="ippo-stat-card">
-        <div class="ippo-stat-h">📊 あなたの積み重ね</div>
-        <div class="ippo-stat-row">
-          <div class="ippo-stat-cell">
-            <div class="ippo-stat-num">${streak}<span class="ippo-stat-suf">日目</span></div>
-            <div class="ippo-stat-label">連続日数</div>
-          </div>
-          <div class="ippo-stat-cell">
-            <div class="ippo-stat-num">${totalCount}<span class="ippo-stat-suf">回</span></div>
-            <div class="ippo-stat-label">これまでのいっぽ</div>
-          </div>
-          <div class="ippo-stat-cell">
-            <div class="ippo-stat-num">${avgMatch == null ? '—' : avgMatch + '%'}</div>
-            <div class="ippo-stat-label">マッチ度平均</div>
+          <div class="ippo-base-stat-cell">
+            <div class="ippo-base-stat-emoji">${todayMoodEmoji}</div>
+            <div class="ippo-base-stat-label">${escapeHtml(todayMoodLabel)}</div>
           </div>
         </div>
       </div>
 
-      ${bestAction ? `
-        <div class="ippo-stat-card">
-          <div class="ippo-stat-h">💗 よく効くいっぽ</div>
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
-            <span class="ippo-best-tag">${escapeHtml(bestAction.action?.title || '-')}</span>
-            <span style="font-size:13px; color:var(--text-soft);">平均 <strong style="color:#6B8F71; font-size:15px;">${bestAction.avg >= 0 ? '-' : '+'}${Math.abs(bestAction.avg).toFixed(1)}</strong></span>
+      <!-- 今日のおすすめの一歩 -->
+      ${todayRec ? `
+        <div class="ippo-base-section-h">今日のおすすめの一歩</div>
+        <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${todayRec.action.id}">
+          <span class="ippo-base-rec-icon">${todayRec.action.icon}</span>
+          <div class="ippo-base-rec-body">
+            <div class="ippo-base-rec-title">${escapeHtml(todayRec.action.title)}<span class="ippo-base-rec-time">（${todayRec.action.time}）</span></div>
+            <div class="ippo-base-rec-meta">おすすめ度 ${todayRec.score.total}%</div>
           </div>
-        </div>
+          <span class="ippo-base-rec-cta">やってみる</span>
+        </button>
       ` : ''}
 
-      <div class="ippo-stat-card">
-        <div class="ippo-stat-h">🌱 最近の傾向</div>
-        <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
-          <p style="flex:1; margin:0; font-size:12px; line-height:1.7; color:var(--text-soft);">${escapeHtml(insight)}</p>
-          <div style="flex-shrink:0;">${suplan({ stage: 'futaba', expression: 'calm', size: 44 })}</div>
+      <!-- 続けて2回目やった一歩 -->
+      ${repeatAction && repeatLastSession ? `
+        <div class="ippo-base-section-h">続けて2回目やった一歩</div>
+        <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${repeatAction.id}">
+          <span class="ippo-base-rec-icon">${repeatAction.icon}</span>
+          <div class="ippo-base-rec-body">
+            <div class="ippo-base-rec-title">${escapeHtml(repeatAction.title)}<span class="ippo-base-rec-time">（${repeatAction.time}）</span></div>
+            <div class="ippo-base-rec-meta">前回：${formatDate(repeatLastSession.completedAt)}</div>
+          </div>
+          <span class="ippo-base-rec-cta">もう一度やる</span>
+        </button>
+      ` : ''}
+
+      <!-- 習慣にしていること (P8 で実装) -->
+      <div class="ippo-base-section-h">習慣にしていること</div>
+      <div class="ippo-base-soon-card">
+        <span class="ippo-base-soon-icon">🌱</span>
+        <div>
+          <div class="ippo-base-soon-h">習慣化機能 準備中</div>
+          <div class="ippo-base-soon-d">小さな行動を続ける記録機能をまもなく追加します</div>
         </div>
       </div>
+
+      <!-- きづきタブ導線 -->
+      <button class="ippo-base-kizuki-card" data-act="ippo-base-go-kizuki">
+        <span class="ippo-base-kizuki-icon">💡</span>
+        <div class="ippo-base-kizuki-body">
+          <div class="ippo-base-kizuki-h">深く自分を知るワーク</div>
+          <div class="ippo-base-kizuki-d">思考のクセや価値観を理解して、行動の効果を高めましょう</div>
+        </div>
+        <span class="ippo-base-kizuki-arrow">›</span>
+      </button>
 
       ${renderPendingOrMoreCta()}
     </div>
@@ -11352,19 +11673,28 @@ function handleAction(act, el, ev) {
     else go('home');
     return;
   }
-  // Step 4: 変化記録
-  if (act === 'ippo-step4-after') {
-    if (ippoToday) ippoToday.afterIntensity = parseInt(el.dataset.score, 10);
+  // Step 4: 5択定性評価 (v0.9.42 〜)
+  if (act === 'ippo-step4-eval') {
+    if (!ippoToday) return;
+    const ev = IPPO_EVALUATIONS.find(x => x.id === el.dataset.eval);
+    if (!ev) return;
+    ippoToday.evaluation = { id: ev.id, value: ev.value, label: ev.label };
     render();
     return;
   }
   if (act === 'ippo-step4-next') {
     if (!ippoToday) return;
-    if (ippoToday.afterIntensity == null) ippoToday.afterIntensity = Math.max(0, ippoToday.beforeIntensity - 2);
-    // Step 5 (サマリ) 遷移時に自動保存
+    if (!ippoToday.evaluation) { toast('感情の変化を選んでね'); return; }
+    // session 保存 (Step 45 やったね 遷移時)
     if (!ippoToday.savedAtSummary) {
       const c = ippoToday.candidates?.find(x => x.action.id === ippoToday.selectedActionId);
       const sessionDirIds = (ippoToday.directionIds || getDirectionIds()).slice();
+      const ev = ippoToday.evaluation;
+      // 後方互換: changeValue を value にマッピング (推薦エンジン pastEffect 互換)
+      // before=5 固定・after = 5 - value (clamp 0..10) で旧 0-10 スケールも埋める
+      const cv = ev.value;
+      const beforeI = 5;
+      const afterI = Math.max(0, Math.min(10, 5 - cv));
       state.ippoSessions.push({
         id: uid(),
         moodLabel: ippoToday.moodLabel,
@@ -11374,10 +11704,13 @@ function handleAction(act, el, ev) {
         actionId: ippoToday.selectedActionId,
         score: c?.score.total || null,
         reasons: c?.reasons || [],
-        beforeIntensity: ippoToday.beforeIntensity,
-        afterIntensity: ippoToday.afterIntensity,
-        changeValue: ippoToday.beforeIntensity - ippoToday.afterIntensity,
+        evaluation: ev,            // 新フィールド (v0.9.42 〜)
+        changeValue: cv,           // 後方互換: 推薦エンジン pastEffect で使用
+        beforeIntensity: beforeI,  // 後方互換 (旧 0-10 スケール)
+        afterIntensity: afterI,    // 後方互換
         startedAt: ippoToday.startedAt,
+        timerStartedAt: ippoToday.timerStartedAt,
+        timerEndedAt: ippoToday.timerEndedAt,
         completedAt: new Date().toISOString(),
       });
       // 保留から消す（再開していた場合）
@@ -11386,17 +11719,38 @@ function handleAction(act, el, ev) {
       }
       saveState();
       if (window.MoyaLogger) MoyaLogger.event('ippo_completed', {
-        moodLabel: ippoToday.moodLabel,
-        changeValue: ippoToday.beforeIntensity - ippoToday.afterIntensity,
+        evaluation: ev,
+        changeValue: cv,
         actionId: ippoToday.selectedActionId,
         directionIds: sessionDirIds,
       });
       ippoToday.savedAtSummary = true;
     }
-    ippoToday.step = 5;
+    ippoToday.step = 45;  // やったね完了画面へ
     render();
     return;
   }
+  // Step 45: やったね完了画面のアクション
+  if (act === 'ippo-step45-home') {
+    ippoToday = null;
+    go('home');
+    return;
+  }
+  if (act === 'ippo-step45-later') {
+    // セッションは既に保存済み・ベース画面 (viewIppoTodayDone) に留まる
+    ippoToday = null;
+    render();
+    return;
+  }
+  // ベース画面: おすすめの一歩を直接やる → Step 0 から開始 (action 事前選択)
+  if (act === 'ippo-base-do-rec') {
+    const actionId = el.dataset.actionId;
+    ippoToday = { step: 0, startedAt: new Date().toISOString(), preselectedActionId: actionId };
+    render();
+    return;
+  }
+  // ベース画面: きづきタブへ
+  if (act === 'ippo-base-go-kizuki') { go('kizuki'); return; }
   // 保留からの再開: Step 3 から
   if (act === 'ippo-resume-pending') {
     const pid = el.dataset.pendingId;
