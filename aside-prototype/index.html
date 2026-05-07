@@ -4112,6 +4112,241 @@ body.keyboard-open .mood-chat-bottom .input-row {
 .mb-3 { margin-bottom: 12px; }
 .mb-4 { margin-bottom: 16px; }
 
+/* ============================================================
+   きづき (Kizuki) タブ — v0.9.38 〜
+   ============================================================ */
+.kizuki-top-screen, .kizuki-list-screen { padding-bottom: 80px; }
+
+/* ヒーロー */
+.kizuki-hero-card {
+  background: linear-gradient(135deg, #EAF1E6 0%, #DDE9DC 100%);
+  border-radius: 16px;
+  padding: 22px 18px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+[data-theme="dark"] .kizuki-hero-card {
+  background: linear-gradient(135deg, rgba(167,196,160,0.15) 0%, rgba(167,196,160,0.08) 100%);
+}
+.kizuki-hero-icon { font-size: 36px; line-height: 1; margin-bottom: 8px; }
+.kizuki-hero-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 17px; font-weight: 600;
+  margin: 0;
+  color: var(--text-strong);
+  line-height: 1.55;
+}
+
+/* 3つのメリット */
+.kizuki-benefit-list {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+[data-theme="dark"] .kizuki-benefit-list { background: rgba(47, 62, 62, 0.55); }
+.kizuki-benefit-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 6px 2px;
+}
+.kizuki-benefit-icon {
+  font-size: 22px; line-height: 1;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-soft);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.kizuki-benefit-h {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 2px;
+}
+.kizuki-benefit-d {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* セクション見出し */
+.kizuki-section-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  margin: 18px 4px 8px;
+}
+.kizuki-section-h {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-soft);
+  margin: 16px 4px 8px;
+  letter-spacing: 0.04em;
+}
+
+/* はじめての方おすすめ (Featured) */
+.kizuki-feature-card {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1.5px solid #C8DCC0;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: inherit;
+  margin-bottom: 6px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+[data-theme="dark"] .kizuki-feature-card {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167,196,160,0.3);
+}
+.kizuki-feature-card:active { transform: scale(0.98); }
+.kizuki-feature-icon {
+  font-size: 28px; line-height: 1;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: #EAF1E6;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .kizuki-feature-icon { background: rgba(167,196,160,0.15); }
+.kizuki-feature-body { flex: 1; min-width: 0; }
+.kizuki-feature-h {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 2px;
+}
+.kizuki-feature-time { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+.kizuki-feature-d {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.5;
+}
+.kizuki-feature-cta {
+  flex-shrink: 0;
+  font-size: 12px; font-weight: 600;
+  color: #FFFFFF;
+  background: #6B8F71;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+/* ワークカードリスト */
+.kizuki-work-list {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.kizuki-work-card {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: inherit;
+  transition: transform 0.15s ease;
+}
+[data-theme="dark"] .kizuki-work-card {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167,196,160,0.15);
+}
+.kizuki-work-card:active { transform: scale(0.98); }
+.kizuki-work-card.is-pending { opacity: 0.65; }
+.kizuki-work-icon {
+  font-size: 22px; line-height: 1;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-soft);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.kizuki-work-body { flex: 1; min-width: 0; }
+.kizuki-work-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 2px;
+}
+.kizuki-work-time { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+.kizuki-work-desc {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.5;
+}
+.kizuki-arrow {
+  font-size: 18px; color: var(--text-muted);
+  flex-shrink: 0;
+}
+.kizuki-soon-badge {
+  flex-shrink: 0;
+  font-size: 10px; color: var(--text-muted);
+  background: var(--bg-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* すべてのワークを見る */
+.kizuki-see-all {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 13px;
+}
+
+/* いつやるのがおすすめ Tip */
+.kizuki-tip-card {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+}
+.kizuki-tip-h {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 6px;
+}
+.kizuki-tip-d {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ワーク一覧 フィルタタブ */
+.kizuki-filter-row {
+  display: flex; gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.kizuki-filter-row::-webkit-scrollbar { display: none; }
+.kizuki-filter-btn {
+  flex-shrink: 0;
+  font-size: 12px; font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .kizuki-filter-btn {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167,196,160,0.15);
+}
+.kizuki-filter-btn.selected {
+  background: #6B8F71;
+  border-color: #6B8F71;
+  color: #FFFFFF;
+}
+
+.kizuki-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+.kizuki-empty p { margin-top: 10px; }
+
 /* レスポンシブ */
 @media (min-width: 480px) {
   #app { box-shadow: var(--shadow-card); }
@@ -4124,7 +4359,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.38-beta.1',  // P1: きづきタブ追加（4タブ化）
+  appVersion:      '0.9.39-beta.1',  // P2: きづきタブ トップ＆ワーク一覧UI
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -4931,15 +5166,16 @@ function go(screen, opts = {}) {
 
 function render() {
   // タブバー＆FAB の表示制御（v3.5 仕様: ホームには独自CTAがあるためFABは非表示）
-  const showTabbar = ['home', 'action', 'kizuki', 'record'].includes(currentScreen);
+  const showTabbar = ['home', 'action', 'kizuki', 'kizuki-list', 'record'].includes(currentScreen);
   const showFab = false;        // FAB全廃（ホームのきもち/もやもやCTAで代替）
   document.getElementById('tabbar').style.display = showTabbar ? 'flex' : 'none';
   document.getElementById('fab').classList.toggle('hidden', !showFab);
 
-  // タブバー active 状態
+  // タブバー active 状態 (サブ画面でも親タブをハイライト)
+  const activeTab = currentScreen === 'kizuki-list' ? 'kizuki' : currentScreen;
   document.querySelectorAll('.navbtn').forEach(el => {
     const tab = el.dataset.tab;
-    el.classList.toggle('active', tab === currentScreen);
+    el.classList.toggle('active', tab === activeTab);
   });
 
   let html = '';
@@ -4956,6 +5192,7 @@ function render() {
     case 'deepdive':        html = viewDeepDive(); break;
     case 'action':          html = viewAction(); break;
     case 'kizuki':          html = viewKizuki(); break;
+    case 'kizuki-list':     html = viewKizukiList(); break;
     case 'goal-chat':       html = viewGoalChat(); break;
     case 'policy-select':   html = viewPolicySelect(); break;
     case 'action-select':   html = viewActionSelect(); break;
@@ -7147,40 +7384,184 @@ function viewIppoTodayDone(session) {
 // ============================================================
 // きづき（深く知るワーク）タブ — v0.9.38 〜
 // 思考のクセや価値観を理解し、行動の効果を高めるワーク群。
-// 既存の deepDive（下向き矢印法）はワーク詳細としてここから入る導線に統合予定。
-// Phase 1 ではタブ枠だけ用意し、Phase 2 で中身（トップ＆ワーク一覧）を実装する。
+// 既存の deepDive（下向き矢印法）はワーク詳細としてここから入る導線に統合。
+// Phase 2: トップ＆ワーク一覧UI + 既存 deepDive を「下向き矢印法」ワークとして接続
+// Phase 3 で他のワーク本体（思考のクセチェック、認知のゆがみ、価値観整理等）を実装予定。
 // ============================================================
-function viewKizuki() {
+
+// ワークカタログ（Phase 2: 構造定義 + 下向き矢印法のみ available。他は P3 で実装）
+const KIZUKI_WORKS = [
+  // 思考のクセ
+  { id:'thought-check',     cat:'thought',      icon:'🔍', title:'思考のクセをチェック',     desc:'あなたの自動思考の傾向を確認',                 time:'5分',  status:'pending', section:'思考のクセを知る' },
+  { id:'auto-thought',      cat:'thought',      icon:'💭', title:'自動思考になりやすい？',   desc:'自動的に考える傾向をチェック',                 time:'3分',  status:'pending', section:'思考のクセを知る' },
+  // 深掘り
+  { id:'downward-arrow',    cat:'deepdive',     icon:'🔽', title:'下向き矢印法',             desc:'根っこにある思い込みを探るワーク',             time:'10分', status:'available', action:'kizuki-open-deepdive', section:'深く掘り下げる' },
+  { id:'distortion',        cat:'deepdive',     icon:'🌀', title:'認知のゆがみを理解する',   desc:'代表的な認知のゆがみをチェック',               time:'7分',  status:'pending', section:'深く掘り下げる' },
+  { id:'behavior-experiment', cat:'deepdive',   icon:'🧪', title:'行動実験を計画する',       desc:'思い込みを検証する計画を立てる',               time:'5分',  status:'pending', section:'深く掘り下げる' },
+  // 価値観・方向性
+  { id:'values',            cat:'value',        icon:'💎', title:'価値観を整理する',         desc:'あなたにとって大切なことを整理する',           time:'10分', status:'pending', section:'価値観・方向性' },
+  { id:'ideal-self',        cat:'value',        icon:'🌟', title:'理想の自分をイメージする', desc:'理想の未来をイメージしてみる',                 time:'7分',  status:'pending', section:'価値観・方向性' },
+];
+
+const KIZUKI_FILTERS = [
+  { id:'all',          label:'すべて' },
+  { id:'thought',      label:'思考のクセ' },
+  { id:'value',        label:'価値観・方向性' },
+  { id:'relationship', label:'人間関係' },
+];
+
+// セクション順（ワーク一覧画面のグループ化用）
+const KIZUKI_SECTIONS = ['思考のクセを知る', '深く掘り下げる', '価値観・方向性'];
+
+let kizukiFilter = 'all';  // ワーク一覧フィルタ状態（モジュールローカル）
+
+// カードHTML共通レンダラ
+function renderKizukiWorkCard(w, opts = {}) {
+  const isPending = w.status === 'pending';
+  const action = isPending ? 'kizuki-coming-soon' : (w.action || 'kizuki-coming-soon');
   return `
-    <div class="screen active">
+    <button class="kizuki-work-card ${isPending ? 'is-pending' : ''}"
+            data-act="${action}" data-work="${w.id}">
+      <span class="kizuki-work-icon">${w.icon}</span>
+      <div class="kizuki-work-body">
+        <div class="kizuki-work-title">${escapeHtml(w.title)}<span class="kizuki-work-time">（${w.time}）</span></div>
+        <div class="kizuki-work-desc">${escapeHtml(w.desc)}</div>
+      </div>
+      ${isPending ? '<span class="kizuki-soon-badge">準備中</span>' : '<span class="kizuki-arrow">›</span>'}
+    </button>
+  `;
+}
+
+// === きづきタブ トップ画面 ===
+function viewKizuki() {
+  // はじめての方おすすめ（思考のクセを知る）
+  const featured = KIZUKI_WORKS.find(w => w.id === 'thought-check');
+  // おすすめ3件（available 優先 → pending）
+  const recommended = [
+    KIZUKI_WORKS.find(w => w.id === 'downward-arrow'),
+    KIZUKI_WORKS.find(w => w.id === 'behavior-experiment'),
+    KIZUKI_WORKS.find(w => w.id === 'values'),
+  ].filter(Boolean);
+
+  return `
+    <div class="screen active kizuki-top-screen">
       <div class="page-header">
         <span style="width:36px;"></span>
         <h1 class="page-title">きづき</h1>
         <span style="width:36px;"></span>
       </div>
-      <div style="padding:24px 8px; text-align:center;">
-        <div style="font-size:48px; line-height:1; margin-bottom:16px;">💡</div>
-        <h2 style="font-size:18px; font-weight:600; margin:0 0 10px; color:var(--text-strong);">
-          自分を知ると、<br>「効く一歩」がさらに見つかる
-        </h2>
-        <p class="text-tiny text-muted" style="line-height:1.7;">
-          思考のクセや価値観を理解するワークが<br>
-          まもなくここに並びます 🌱
-        </p>
-        <div style="margin-top:24px; padding:14px 16px; background:var(--bg-soft); border-radius:12px; text-align:left;">
-          <div class="text-tiny text-muted" style="margin-bottom:6px;">準備中の機能</div>
-          <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.9; color:var(--text-soft);">
-            <li>思考のクセをチェック</li>
-            <li>下向き矢印法（深掘り）</li>
-            <li>認知のゆがみを理解する</li>
-            <li>行動実験を計画する</li>
-            <li>価値観を整理する</li>
-          </ul>
-        </div>
-        <button class="btn-ghost" data-act="kizuki-open-deepdive" style="margin-top:18px;">
-          いまは下向き矢印法を試す →
-        </button>
+
+      <!-- ヒーロー: 価値訴求 -->
+      <div class="kizuki-hero-card">
+        <div class="kizuki-hero-icon">💡</div>
+        <h2 class="kizuki-hero-title">自分を知ると、<br>「効く一歩」がさらに見つかる</h2>
       </div>
+
+      <!-- 3つのメリット -->
+      <div class="kizuki-benefit-list">
+        <div class="kizuki-benefit-item">
+          <span class="kizuki-benefit-icon">🧠</span>
+          <div>
+            <div class="kizuki-benefit-h">思考のクセやパターンがわかる</div>
+            <div class="kizuki-benefit-d">なぜつらくなるのかの背景が見える</div>
+          </div>
+        </div>
+        <div class="kizuki-benefit-item">
+          <span class="kizuki-benefit-icon">🎯</span>
+          <div>
+            <div class="kizuki-benefit-h">自分に合う行動提案の精度がUP</div>
+            <div class="kizuki-benefit-d">効果の高い一歩が提案されやすくなる</div>
+          </div>
+        </div>
+        <div class="kizuki-benefit-item">
+          <span class="kizuki-benefit-icon">✨</span>
+          <div>
+            <div class="kizuki-benefit-h">根本原因にアプローチできる</div>
+            <div class="kizuki-benefit-d">再発しにくく、長期的に楽になりやすい</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- はじめての方おすすめ -->
+      ${featured ? `
+        <div class="kizuki-section-title">はじめての方におすすめ</div>
+        <button class="kizuki-feature-card" data-act="kizuki-coming-soon" data-work="${featured.id}">
+          <span class="kizuki-feature-icon">${featured.icon}</span>
+          <div class="kizuki-feature-body">
+            <div class="kizuki-feature-h">${escapeHtml(featured.title)}<span class="kizuki-feature-time">（${featured.time}）</span></div>
+            <div class="kizuki-feature-d">あなたの思考パターンをチェックできます</div>
+          </div>
+          <span class="kizuki-feature-cta">はじめる</span>
+        </button>
+      ` : ''}
+
+      <!-- おすすめのワーク -->
+      <div class="kizuki-section-title">おすすめのワーク</div>
+      <div class="kizuki-work-list">
+        ${recommended.map(w => renderKizukiWorkCard(w)).join('')}
+      </div>
+
+      <button class="btn-ghost kizuki-see-all" data-act="kizuki-see-all">
+        すべてのワークを見る →
+      </button>
+
+      <!-- いつやるのがおすすめ -->
+      <div class="kizuki-tip-card">
+        <div class="kizuki-tip-h">いつやるのがおすすめ？</div>
+        <p class="kizuki-tip-d">
+          気分が安定しているときや、時間に余裕があるときに使うのがおすすめ。<br>
+          1日1つ、少しずつ進めていきましょう 🌱
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+// === ワーク一覧画面 ===
+function viewKizukiList() {
+  const filter = kizukiFilter || 'all';
+  const filtered = filter === 'all'
+    ? KIZUKI_WORKS
+    : KIZUKI_WORKS.filter(w => w.cat === filter);
+
+  // セクション別グルーピング
+  const grouped = {};
+  filtered.forEach(w => {
+    const sec = w.section || 'その他';
+    if (!grouped[sec]) grouped[sec] = [];
+    grouped[sec].push(w);
+  });
+  const sectionOrder = KIZUKI_SECTIONS.filter(s => grouped[s]);
+
+  const empty = filtered.length === 0;
+
+  return `
+    <div class="screen active kizuki-list-screen">
+      <div class="page-header">
+        <button class="page-back" data-act="kizuki-list-back">‹</button>
+        <h1 class="page-title">ワーク一覧</h1>
+        <span style="width:36px;"></span>
+      </div>
+
+      <!-- フィルタタブ -->
+      <div class="kizuki-filter-row">
+        ${KIZUKI_FILTERS.map(f => `
+          <button class="kizuki-filter-btn ${filter === f.id ? 'selected' : ''}"
+                  data-act="kizuki-filter" data-filter="${f.id}">${f.label}</button>
+        `).join('')}
+      </div>
+
+      ${empty ? `
+        <div class="kizuki-empty">
+          <div style="font-size:32px;">🌱</div>
+          <p class="text-tiny text-muted">このカテゴリのワークはまだ準備中です</p>
+        </div>
+      ` : sectionOrder.map(sec => `
+        <div class="kizuki-section-h">${escapeHtml(sec)}</div>
+        <div class="kizuki-work-list">
+          ${grouped[sec].map(w => renderKizukiWorkCard(w)).join('')}
+        </div>
+      `).join('')}
     </div>
   `;
 }
@@ -10819,10 +11200,25 @@ function handleAction(act, el, ev) {
     go('deepdive');
     return;
   }
-  // きづきタブから下向き矢印法を起動（v0.9.38 暫定動線・Phase 2 でワーク一覧経由に変更予定）
+  // きづきタブから下向き矢印法を起動
   if (act === 'kizuki-open-deepdive') {
     deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString(), from: 'kizuki' };
     go('deepdive');
+    return;
+  }
+  // きづきタブ: ワーク一覧へ
+  if (act === 'kizuki-see-all') { go('kizuki-list'); return; }
+  // きづきタブ: 一覧→トップへ戻る
+  if (act === 'kizuki-list-back') { go('kizuki'); return; }
+  // きづきタブ: フィルタ切替
+  if (act === 'kizuki-filter') {
+    kizukiFilter = el.dataset.filter || 'all';
+    render();
+    return;
+  }
+  // きづきタブ: 未実装ワーク (Phase 3 で実装予定)
+  if (act === 'kizuki-coming-soon') {
+    toast('このワークはまもなく実装予定です 🌱');
     return;
   }
   if (act === 'dd-cancel') {
@@ -10965,9 +11361,10 @@ function handleAction(act, el, ev) {
     });
     saveState();
     if (window.MoyaLogger) MoyaLogger.event('deepdive_saved', { tags: deepDive.tags || [], theme: deepDive.themeType });
+    const backTo = deepDive.from || 'record';
     deepDive = null;
     toast('深掘りを保存しました');
-    go('record');
+    go(backTo);
     return;
   }
   if (act === 'ippo-save-then-dd') {
