@@ -4402,6 +4402,98 @@ body.keyboard-open .mood-chat-bottom .input-row {
   flex-shrink: 0;
 }
 
+/* ベース画面 「他の行動を見る」リンク (P7・v0.9.45 〜) */
+.ippo-base-other-link {
+  display: block; text-align: center;
+  margin: 16px auto 0; padding: 10px 16px;
+  background: transparent; border: none;
+  color: var(--accent); font-size: 13px; font-weight: 500;
+  cursor: pointer; text-decoration: none;
+  width: 100%;
+}
+.ippo-base-other-link:active { opacity: 0.7; }
+
+/* ============================================================
+   いっぽ 行動を選ぶ画面 — v0.9.45 〜 (P7)
+   3サブタブ: おすすめ / カテゴリから選ぶ / 履歴
+   ============================================================ */
+.ippo-picker-screen { padding: 18px 16px 100px; }
+.ippo-picker-tabs {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin: 0 -16px 16px;
+  padding: 0 16px;
+  position: sticky; top: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+.ippo-picker-tab {
+  flex: 1;
+  padding: 12px 4px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.ippo-picker-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+.ippo-picker-body { display: flex; flex-direction: column; gap: 8px; }
+.ippo-picker-cat-h {
+  font-size: 13px; font-weight: 600;
+  margin: 12px 0 8px;
+  color: var(--text-strong);
+  display: flex; align-items: center; gap: 8px;
+}
+.ippo-picker-cat-h:first-child { margin-top: 0; }
+.ippo-picker-cat-list {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 4px;
+}
+.ippo-picker-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+[data-theme="dark"] .ippo-picker-card {
+  background: rgba(47, 62, 62, 0.55);
+}
+.ippo-picker-card:active { transform: scale(0.99); }
+.ippo-picker-icon { font-size: 24px; flex-shrink: 0; line-height: 1; }
+.ippo-picker-card-body { flex: 1; min-width: 0; }
+.ippo-picker-title {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.4;
+}
+.ippo-picker-time {
+  font-size: 11px; color: var(--text-muted);
+  font-weight: 400; margin-left: 4px;
+}
+.ippo-picker-meta {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 3px; line-height: 1.4;
+}
+.ippo-picker-cta { color: var(--text-muted); font-size: 18px; flex-shrink: 0; }
+.ippo-picker-empty {
+  text-align: center; color: var(--text-muted);
+  padding: 40px 16px; font-size: 13px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+}
+
 /* ============================================================
    いっぽ Timer 画面 (準備中プレースホルダ) — v0.9.41 〜
    ============================================================ */
@@ -6983,12 +7075,14 @@ function viewAction() {
   }
   // v0.9.44 〜 構成: 0:方向(6択複数) / 2:推薦 / 3:いまやる-あとで / 35:タイマー / 4:5択評価 → 完了後ベース画面へ
   // (旧 Step 1 気分+強さ・Step 5 サマリ・Step 45 やったね は廃止)
+  // v0.9.45 〜 step 99: 行動を選ぶ画面 (P7・3サブタブ)
   switch (ippoToday.step) {
     case 0:  return viewIppoStep0(ippoToday);
     case 2:  return viewIppoStep2(ippoToday);
     case 3:  return viewIppoStep3(ippoToday);
     case 35: return viewIppoTimer(ippoToday);
     case 4:  return viewIppoStep4(ippoToday);
+    case 99: return viewIppoActionPicker(ippoToday);
     default: ippoToday = null; return viewAction();
   }
 }
@@ -7313,6 +7407,7 @@ function viewIppoStep1(s) {
 }
 
 // Step 2（v0.9.13・v0.9.40 〜は Step 0 直後）: 推薦カード
+// v0.9.45 〜: preselectedActionId があれば最上位に挿入＆自動選択 (P7・ピッカー/おすすめ直タップ経由)
 function viewIppoStep2(s) {
   if (!s.candidates) {
     s.candidates = getTopRecommendations({
@@ -7322,6 +7417,19 @@ function viewIppoStep2(s) {
       durationPref: s.durationPref || '1min',
       history: state.ippoSessions || [],
     }, 5);
+    // preselectedActionId 対応: 候補に含まれていなければ先頭に追加・既存なら最上位へ繰り上げ
+    if (s.preselectedActionId) {
+      const idx = s.candidates.findIndex(c => c.action.id === s.preselectedActionId);
+      if (idx === -1) {
+        const preAction = ACTIONS.find(a => a.id === s.preselectedActionId);
+        if (preAction) {
+          s.candidates.unshift({ action: preAction, score: { total: 100, tags: { purpose: [], means: [] } }, userPicked: true });
+        }
+      } else if (idx > 0) {
+        s.candidates.unshift(s.candidates.splice(idx, 1)[0]);
+      }
+      if (!s.selectedActionId) s.selectedActionId = s.preselectedActionId;
+    }
   }
   const visibleCount = s.candidatesShown || 3;
   const visible = s.candidates.slice(0, visibleCount);
@@ -7345,7 +7453,7 @@ function viewIppoStep2(s) {
               <div class="ippo-rec-head">
                 <span class="ippo-rec-icon">${c.action.icon}</span>
                 <span class="ippo-rec-title">${escapeHtml(c.action.title)}（${c.action.time}）</span>
-                <span class="ippo-rec-pct">マッチ度 ${c.score.total}%</span>
+                <span class="ippo-rec-pct">${c.userPicked ? '✓ あなたの選択' : `マッチ度 ${c.score.total}%`}</span>
               </div>
               <p class="text-tiny text-soft" style="margin:6px 0 8px;">${escapeHtml(c.action.desc)}</p>
               <div class="ippo-rec-bar-wrap">
@@ -7682,7 +7790,7 @@ function renderPendingOrMoreCta() {
             `;
           }).join('')}
         </div>
-        <button class="btn-ghost" data-act="ippo-do-another" style="margin-top:8px; width:100%; font-size:12px;">別の一歩を見る</button>
+        <button class="btn-ghost" data-act="ippo-open-picker" style="margin-top:8px; width:100%; font-size:12px;">別の一歩を見る</button>
       </div>
     `;
   }
@@ -7828,8 +7936,121 @@ function viewIppoTodayDone(session) {
       </button>
 
       ${renderPendingOrMoreCta()}
+
+      <button class="ippo-base-other-link" data-act="ippo-open-picker">他の行動を見る →</button>
     </div>
   `;
+}
+
+// ============================================================
+// いっぽ 行動を選ぶ画面 (P7・v0.9.45 〜)
+// 3サブタブ: おすすめ / カテゴリから選ぶ / 履歴
+// 進入: ベース画面「他の行動を見る →」 / pendingモードの「別の一歩を見る」
+// 行動選択 → preselectedActionId を持って Step 0 (方向選択) から開始
+// ============================================================
+function viewIppoActionPicker(s) {
+  const tab = s.pickerTab || 'recommend';
+  const sessions = state.ippoSessions || [];
+
+  let body = '';
+  if (tab === 'recommend') {
+    const recs = getTopRecommendations({
+      moodLabel: 'なんとなく',
+      intensity: 5,
+      directionIds: getDirectionIds(),
+      durationPref: '1min',
+      history: sessions,
+    }, 8);
+    body = recs.length === 0
+      ? `<div class="ippo-picker-empty">おすすめが見つかりませんでした<br>カテゴリから選ぶをお試しください</div>`
+      : recs.map(r => renderActionPickerCard(r.action, { meta: `おすすめ度 ${r.score.total}%・${r.action.technique}` })).join('');
+  } else if (tab === 'category') {
+    body = ACTION_CATEGORIES.map(cat => {
+      const items = ACTIONS.filter(a => a.cat === cat.id);
+      if (items.length === 0) return '';
+      return `
+        <div class="ippo-picker-cat-h"><span>${cat.icon}</span><span>${escapeHtml(cat.name)}</span><span style="color:var(--text-muted); font-weight:400; font-size:11px; margin-left:auto;">${items.length}件</span></div>
+        <div class="ippo-picker-cat-list">
+          ${items.map(a => renderActionPickerCard(a, { meta: a.technique })).join('')}
+        </div>
+      `;
+    }).join('');
+  } else if (tab === 'history') {
+    const hist = getIppoActionHistory();
+    body = hist.length === 0
+      ? `<div class="ippo-picker-empty">まだ実施した記録がありません<br>「おすすめ」または「カテゴリから選ぶ」から始めましょう</div>`
+      : hist.map(h => {
+          const a = ACTIONS.find(x => x.id === h.actionId);
+          if (!a) return '';
+          const avg = h.evalCount > 0 ? (h.evalSum / h.evalCount) : null;
+          const metaParts = [`最後: ${formatDate(h.lastDate)}`, `${h.count}回`];
+          if (avg !== null) metaParts.push(`平均 ${ippoEvalAvgEmoji(avg)}`);
+          return renderActionPickerCard(a, { meta: metaParts.join(' ・ ') });
+        }).join('');
+  }
+
+  return `
+    <div class="screen active ippo-screen ippo-picker-screen">
+      <div class="page-header">
+        <button class="back-btn" data-act="ippo-picker-back" aria-label="戻る">‹</button>
+        <h1 class="page-title">行動を選ぶ</h1>
+        <span style="width:36px;"></span>
+      </div>
+
+      <div class="ippo-picker-tabs" role="tablist">
+        <button class="ippo-picker-tab ${tab === 'recommend' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="recommend" role="tab" aria-selected="${tab === 'recommend'}">おすすめ</button>
+        <button class="ippo-picker-tab ${tab === 'category' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="category" role="tab" aria-selected="${tab === 'category'}">カテゴリから選ぶ</button>
+        <button class="ippo-picker-tab ${tab === 'history' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="history" role="tab" aria-selected="${tab === 'history'}">履歴</button>
+      </div>
+
+      <div class="ippo-picker-body">
+        ${body}
+      </div>
+    </div>
+  `;
+}
+
+function renderActionPickerCard(action, opts = {}) {
+  const meta = opts.meta || action.technique || '';
+  return `
+    <button class="ippo-picker-card" data-act="ippo-picker-pick" data-action-id="${action.id}">
+      <span class="ippo-picker-icon">${action.icon}</span>
+      <div class="ippo-picker-card-body">
+        <div class="ippo-picker-title">${escapeHtml(action.title)}<span class="ippo-picker-time">（${action.time}）</span></div>
+        <div class="ippo-picker-meta">${escapeHtml(meta)}</div>
+      </div>
+      <span class="ippo-picker-cta">›</span>
+    </button>
+  `;
+}
+
+// 行動別の履歴集計 (履歴サブタブ用)
+function getIppoActionHistory() {
+  const sessions = (state.ippoSessions || []).filter(s => s.actionId && s.completedAt);
+  const map = {};
+  sessions.forEach(s => {
+    if (!map[s.actionId]) {
+      map[s.actionId] = { actionId: s.actionId, count: 0, lastDate: null, evalSum: 0, evalCount: 0 };
+    }
+    const m = map[s.actionId];
+    m.count++;
+    const dt = new Date(s.completedAt);
+    if (!m.lastDate || dt > m.lastDate) m.lastDate = dt;
+    let v = null;
+    if (s.evaluation && typeof s.evaluation.value === 'number') v = s.evaluation.value;
+    else if (typeof s.changeValue === 'number') v = s.changeValue;
+    if (v !== null) { m.evalSum += v; m.evalCount++; }
+  });
+  return Object.values(map).sort((a, b) => (b.lastDate || 0) - (a.lastDate || 0));
+}
+
+// 平均評価 (-2 〜 +3) を 5択絵文字に丸める
+function ippoEvalAvgEmoji(avg) {
+  if (avg >= 2.5) return '😄';
+  if (avg >= 1.5) return '😊';
+  if (avg >= 0.5) return '🙂';
+  if (avg >= -0.5) return '😐';
+  return '😞';
 }
 
 // 旧UI（goal/policy/action）— 当面は viewAction から呼ばれないが互換のため残す
@@ -11451,6 +11672,34 @@ function handleAction(act, el, ev) {
   // 「もう一歩やる」 (v0.9.40 〜 必ず Step 0 から)
   if (act === 'ippo-do-another') {
     ippoToday = { step: 0, startedAt: new Date().toISOString() };
+    render();
+    return;
+  }
+  // 「行動を選ぶ」画面を開く (P7・v0.9.45 〜)
+  if (act === 'ippo-open-picker') {
+    ippoToday = { step: 99, pickerTab: 'recommend', startedAt: new Date().toISOString() };
+    render();
+    return;
+  }
+  // ピッカーのサブタブ切替 (P7)
+  if (act === 'ippo-picker-tab') {
+    if (ippoToday) {
+      ippoToday.pickerTab = el.dataset.tab || 'recommend';
+      render();
+    }
+    return;
+  }
+  // ピッカーで行動選択 → preselectedActionId を持って Step 0 から開始 (P7)
+  if (act === 'ippo-picker-pick') {
+    const actionId = el.dataset.actionId;
+    if (!actionId) return;
+    ippoToday = { step: 0, preselectedActionId: actionId, startedAt: new Date().toISOString() };
+    render();
+    return;
+  }
+  // ピッカーから戻る → ベース画面 / NewDay へ (P7)
+  if (act === 'ippo-picker-back') {
+    ippoToday = null;
     render();
     return;
   }
