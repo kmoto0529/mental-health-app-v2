@@ -4414,6 +4414,176 @@ body.keyboard-open .mood-chat-bottom .input-row {
 .ippo-base-other-link:active { opacity: 0.7; }
 
 /* ============================================================
+   ベース画面 P8 拡張 (v0.9.46 〜)
+   ============================================================ */
+.ippo-base-screen { padding: 14px 16px 90px; }
+.ippo-base-hero-msg {
+  font-size: 12px; line-height: 1.6;
+  color: var(--text-soft);
+  margin: -6px 0 14px;
+}
+.ippo-base-stat-icon-line { font-size: 16px; line-height: 1; margin-bottom: 4px; opacity: 0.85; }
+.ippo-base-stat-icon-line.todo { opacity: 0.4; }
+.ippo-base-stat-num-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px; font-weight: 600;
+  color: #6B8F71;
+  line-height: 1.2;
+}
+.ippo-base-stat-num-text.todo { color: var(--text-muted); font-weight: 500; }
+
+/* セクションヘッダー (番号付き + 右リンク) */
+.ippo-base-section-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 16px 4px 8px;
+}
+.ippo-base-section-h-num {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0;
+}
+.ippo-base-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  background: #E8EFE5;
+  color: #6B8F71;
+  border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .ippo-base-num { background: rgba(167,196,160,0.18); color: #A7C4A0; }
+.ippo-base-section-link {
+  background: transparent; border: none;
+  color: var(--accent);
+  font-size: 11px; font-weight: 500;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.ippo-base-section-link:active { opacity: 0.6; }
+
+/* レコメンド進捗バー (今日のおすすめ) */
+.ippo-base-rec-desc {
+  font-size: 11px; color: var(--text-muted);
+  margin: 2px 0 6px;
+  line-height: 1.45;
+}
+.ippo-base-rec-bar-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.ippo-base-rec-bar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--bg-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ippo-base-rec-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #A7C4A0 0%, #6B8F71 100%);
+  border-radius: 999px;
+}
+.ippo-base-rec-bar-label {
+  font-size: 10px; font-weight: 600;
+  color: #6B8F71;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .ippo-base-rec-bar-label { color: #A7C4A0; }
+
+/* 「最近よくやっている」アイコン色違い + ソフトCTA */
+.ippo-base-rec-icon-blue { background: #E5EFF5; }
+[data-theme="dark"] .ippo-base-rec-icon-blue { background: rgba(120,160,200,0.18); }
+.ippo-base-rec-cta-soft {
+  background: var(--bg-soft);
+  color: #6B8F71;
+}
+[data-theme="dark"] .ippo-base-rec-cta-soft { background: rgba(167,196,160,0.18); color: #A7C4A0; }
+
+/* 習慣リスト */
+.ippo-base-habit-list { display: flex; flex-direction: column; gap: 8px; }
+.ippo-base-habit-row {
+  display: flex; align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  overflow: hidden;
+}
+[data-theme="dark"] .ippo-base-habit-row { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.ippo-base-habit-tap {
+  display: flex; align-items: center; gap: 12px;
+  flex: 1;
+  padding: 10px 14px;
+  background: transparent; border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: inherit;
+}
+.ippo-base-habit-tap:active { background: var(--bg-soft); }
+.ippo-base-habit-icon {
+  font-size: 22px; line-height: 1;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-soft);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.ippo-base-habit-body { flex: 1; min-width: 0; }
+.ippo-base-habit-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+}
+.ippo-base-habit-meta {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 2px;
+}
+.ippo-base-habit-remove {
+  background: transparent; border: none;
+  color: var(--text-muted);
+  font-size: 18px; line-height: 1;
+  width: 36px; height: 36px;
+  margin-right: 6px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.ippo-base-habit-remove:active { background: var(--bg-soft); }
+
+/* ピッカー: 習慣モード */
+.ippo-picker-habit-hint {
+  font-size: 12px; color: var(--text-soft);
+  background: var(--bg-soft);
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin: 4px 0 12px;
+  line-height: 1.5;
+}
+.ippo-picker-card-habit {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .ippo-picker-card-habit { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.ippo-picker-habit-btn {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 600;
+  background: var(--bg-soft);
+  color: #6B8F71;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ippo-picker-habit-btn.on {
+  background: #6B8F71;
+  color: #FFFFFF;
+}
+[data-theme="dark"] .ippo-picker-habit-btn { background: rgba(167,196,160,0.18); color: #A7C4A0; }
+[data-theme="dark"] .ippo-picker-habit-btn.on { background: #6B8F71; color: #FFFFFF; }
+.ippo-picker-habit-btn:active { transform: scale(0.96); }
+
+/* ============================================================
    いっぽ 行動を選ぶ画面 — v0.9.45 〜 (P7)
    3サブタブ: おすすめ / カテゴリから選ぶ / 履歴
    ============================================================ */
@@ -4790,7 +4960,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.44-beta.1',  // P6.2: やったね画面廃止・Step4 直後にベース画面へ
+  appVersion:      '0.9.46-beta.1',  // P8: ベース画面刷新 + 習慣化機能 + キャンセル/戻る統一
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -5343,6 +5513,8 @@ const defaultState = () => ({
     gender: '',         // 'female' | 'male' | 'other' | 'no_answer'
     interests: [],      // ['work','relationship','romance','future','money','health','other']
     profileDone: false, // プロフィール画面完了
+    // v0.9.46 P8: 習慣化機能 — 習慣としてマークした行動IDの配列
+    habitActionIds: [],
   },
   initialDone: false,   // 旧 mood-input フラグ (互換のため残すが新導線では使わない)
   guidedShown: false,   // 使い方ガイド表示済み
@@ -7058,24 +7230,15 @@ function ippoCompletedToday() {
 }
 
 function viewAction() {
-  // 今日すでに完了 + 進行中セッションなし → 完了サマリー表示
-  const done = ippoCompletedToday();
-  if (done && !ippoToday) return viewIppoTodayDone(done);
-  // 一度も使っていない & 進行中なし → オンボーディング画面
-  if (!ippoToday && (state.ippoSessions || []).length === 0) {
-    return viewIppoOnboarding();
-  }
-  // 過去の利用あり & 今日未完了 & 進行中なし → 新しい1日画面
-  if (!ippoToday && (state.ippoSessions || []).length > 0) {
-    return viewIppoNewDay();
-  }
-  // 新規開始: 必ず Step 0 (今日はどうなりたい？) から
+  // P8 〜: 進行中セッションなし → ベース画面 (今日完了/未完了で文言を可変)
+  //         初回利用 (履歴0) のときのみオンボーディング
   if (!ippoToday) {
-    ippoToday = { step: 0, startedAt: new Date().toISOString() };
+    if ((state.ippoSessions || []).length === 0) return viewIppoOnboarding();
+    return viewIppoBase(ippoCompletedToday() || null);
   }
-  // v0.9.44 〜 構成: 0:方向(6択複数) / 2:推薦 / 3:いまやる-あとで / 35:タイマー / 4:5択評価 → 完了後ベース画面へ
+  // 進行中: ステップ別画面 (Step 0 → 2 → 3 → 35 → 4 → 完了 → ベース)
   // (旧 Step 1 気分+強さ・Step 5 サマリ・Step 45 やったね は廃止)
-  // v0.9.45 〜 step 99: 行動を選ぶ画面 (P7・3サブタブ)
+  // step 99: 行動を選ぶ画面 (P7・3サブタブ)
   switch (ippoToday.step) {
     case 0:  return viewIppoStep0(ippoToday);
     case 2:  return viewIppoStep2(ippoToday);
@@ -7817,113 +7980,144 @@ function shouldSuggestDeepDive() {
 
 // 完了済みの日（再来時の表示）
 // 完了済みの日（再来時の表示）— Step 6 と同じ「改善の可視化」デザインを使用
-// ベース画面 (今日のサマリ) — v0.9.42 〜
-// 完了済日にいっぽタブを開いた時に表示される。画像 (2回目以降フロー) のレイアウトに準拠。
-//   ヘッダー / 「いっぽもよくやったね！」+ 連続日数・実施回数・今日の気分
-//   今日のおすすめの一歩 / 続けて2回目やった一歩 / 習慣 (P8 で実装) / きづき導線
-function viewIppoTodayDone(session) {
+// ベース画面 (P8 〜) — いっぽタブの正面玄関
+//   実施済 / 未実施 で文言を可変
+//   ヒーロー / 今日のおすすめ / 最近よくやっているいっぽ / 習慣にしていること / きづき導線
+function viewIppoBase(session) {
   const sessions = state.ippoSessions || [];
   const streak = calcIppoStreakDays();
   const totalCount = sessions.length;
+  const isDone = !!session;
 
-  // 今日の気分 (5択評価ラベル → なければ legacy の changeValue から推定)
-  let todayMoodLabel = 'まあまあ';
-  let todayMoodEmoji = '🙂';
-  if (session.evaluation && session.evaluation.label) {
-    todayMoodLabel = session.evaluation.label;
-    const evDef = IPPO_EVALUATIONS.find(e => e.id === session.evaluation.id);
-    if (evDef) todayMoodEmoji = evDef.emoji;
-  } else if (typeof session.changeValue === 'number') {
-    if (session.changeValue >= 3)      { todayMoodLabel = 'とても良くなった'; todayMoodEmoji = '😄'; }
-    else if (session.changeValue >= 2) { todayMoodLabel = '良くなった';       todayMoodEmoji = '😊'; }
-    else if (session.changeValue >= 1) { todayMoodLabel = '少し良くなった';   todayMoodEmoji = '🙂'; }
-    else if (session.changeValue === 0){ todayMoodLabel = '変わらない';       todayMoodEmoji = '😐'; }
-    else                                { todayMoodLabel = '悪くなった';       todayMoodEmoji = '😞'; }
-  }
-
-  // 今日のおすすめの一歩 (履歴・方向ベース・既に実施したのは除外)
-  const usedActionIds = new Set(sessions.filter(s => sameDay(new Date(s.completedAt), new Date())).map(s => s.actionId));
+  // 今日のおすすめの一歩 (履歴・方向ベース・本日実施済の actionId は除外)
+  const usedActionIds = new Set(
+    sessions.filter(s => sameDay(new Date(s.completedAt), new Date())).map(s => s.actionId)
+  );
   const allRecs = getTopRecommendations({
     moodLabel: 'なんとなく',
     intensity: 5,
     directionIds: getDirectionIds(),
     durationPref: '1min',
     history: sessions,
-  }, 5);
-  const todayRec = allRecs.find(r => !usedActionIds.has(r.action.id));
+  }, 8);
+  const topRec = allRecs.find(r => !usedActionIds.has(r.action.id)) || allRecs[0];
 
-  // 続けて2回目やった一歩: 直近で2回以上同じ行動 → 最後にやった日付を表示
-  const actionFreq = {};
+  // 最近よくやっているいっぽ (過去7日間で最頻実施 / 既に今日やった行動は除外)
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentFreq = {};
+  const recentLast = {};
   sessions.forEach(s => {
-    actionFreq[s.actionId] = (actionFreq[s.actionId] || 0) + 1;
+    if (!s.completedAt || !s.actionId) return;
+    const dt = new Date(s.completedAt);
+    if (dt < sevenDaysAgo) return;
+    recentFreq[s.actionId] = (recentFreq[s.actionId] || 0) + 1;
+    if (!recentLast[s.actionId] || dt > recentLast[s.actionId]) recentLast[s.actionId] = dt;
   });
-  const repeatId = Object.keys(actionFreq).find(id => actionFreq[id] >= 2 && id !== session.actionId);
-  const repeatAction = repeatId ? ACTIONS.find(a => a.id === repeatId) : null;
-  const repeatLastSession = repeatId ? [...sessions].reverse().find(s => s.actionId === repeatId) : null;
+  const sortedRecent = Object.keys(recentFreq)
+    .filter(id => !usedActionIds.has(id))
+    .sort((a, b) => (recentFreq[b] - recentFreq[a]) || (recentLast[b] - recentLast[a]));
+  const recentId = sortedRecent[0] || null;
+  const recentAction = recentId ? ACTIONS.find(a => a.id === recentId) : null;
+  const recentLastDt = recentId ? recentLast[recentId] : null;
+
+  // 習慣にしている行動
+  const habitIds = (state.user && state.user.habitActionIds) || [];
+  const habitActions = habitIds.map(id => ACTIONS.find(a => a.id === id)).filter(Boolean);
 
   return `
     <div class="screen active ippo-screen ippo-base-screen">
-      <div class="page-header">
-        <span style="width:36px;"></span>
-        <h1 class="page-title">いっぽ</h1>
-        <span style="width:36px;"></span>
-      </div>
-
-      <!-- ヒーロー: いっぽもよくやったね -->
+      <!-- ヒーロー -->
       <div class="ippo-base-hero">
         <div class="ippo-base-hero-mascot">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
-        <h2 class="ippo-base-hero-h">いっぽもよくやったね！</h2>
+        <h2 class="ippo-base-hero-h">${isDone ? '今日も、一歩すすめたね 🌱' : '今日もいっぽやってみよう 🌱'}</h2>
+        <div class="ippo-base-hero-msg">${isDone
+          ? '小さな一歩の積み重ねが、<br>あなたをやさしく変えていきます。'
+          : 'むりせず、できそうな小さな一歩から。<br>すぷらんが見守っています。'}</div>
         <div class="ippo-base-hero-stats">
           <div class="ippo-base-stat-cell">
+            <div class="ippo-base-stat-icon-line">📅</div>
             <div class="ippo-base-stat-num">${streak}<span class="ippo-base-stat-suf">日</span></div>
             <div class="ippo-base-stat-label">連続日数</div>
           </div>
           <div class="ippo-base-stat-cell">
+            <div class="ippo-base-stat-icon-line">✓</div>
             <div class="ippo-base-stat-num">${totalCount}<span class="ippo-base-stat-suf">回</span></div>
             <div class="ippo-base-stat-label">実施した回数</div>
           </div>
           <div class="ippo-base-stat-cell">
-            <div class="ippo-base-stat-emoji">${todayMoodEmoji}</div>
-            <div class="ippo-base-stat-label">${escapeHtml(todayMoodLabel)}</div>
+            <div class="ippo-base-stat-icon-line ${isDone ? 'done' : 'todo'}">${isDone ? '🌱' : '·'}</div>
+            <div class="ippo-base-stat-num-text ${isDone ? 'done' : 'todo'}">${isDone ? '一歩すすめた' : 'まだ'}</div>
+            <div class="ippo-base-stat-label">今日</div>
           </div>
         </div>
       </div>
 
-      <!-- 今日のおすすめの一歩 -->
-      ${todayRec ? `
-        <div class="ippo-base-section-h">今日のおすすめの一歩</div>
-        <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${todayRec.action.id}">
-          <span class="ippo-base-rec-icon">${todayRec.action.icon}</span>
+      <!-- 今日のおすすめのいっぽ -->
+      ${topRec ? `
+        <div class="ippo-base-section-row">
+          <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">2</span>今日のおすすめのいっぽ</div>
+          <button class="ippo-base-section-link" data-act="ippo-rec-why">なぜこれをおすすめするの？</button>
+        </div>
+        <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${topRec.action.id}">
+          <span class="ippo-base-rec-icon">${topRec.action.icon}</span>
           <div class="ippo-base-rec-body">
-            <div class="ippo-base-rec-title">${escapeHtml(todayRec.action.title)}<span class="ippo-base-rec-time">（${todayRec.action.time}）</span></div>
-            <div class="ippo-base-rec-meta">おすすめ度 ${todayRec.score.total}%</div>
+            <div class="ippo-base-rec-title">${escapeHtml(topRec.action.title)}<span class="ippo-base-rec-time">（${topRec.action.time}）</span></div>
+            <div class="ippo-base-rec-desc">${escapeHtml(topRec.action.desc || topRec.action.technique || '')}</div>
+            <div class="ippo-base-rec-bar-row">
+              <div class="ippo-base-rec-bar-track"><div class="ippo-base-rec-bar-fill" style="width:${Math.max(0, Math.min(100, topRec.score.total))}%;"></div></div>
+              <span class="ippo-base-rec-bar-label">あなたに合います ${topRec.score.total}%</span>
+            </div>
           </div>
           <span class="ippo-base-rec-cta">やってみる</span>
         </button>
       ` : ''}
 
-      <!-- 続けて2回目やった一歩 -->
-      ${repeatAction && repeatLastSession ? `
-        <div class="ippo-base-section-h">続けて2回目やった一歩</div>
-        <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${repeatAction.id}">
-          <span class="ippo-base-rec-icon">${repeatAction.icon}</span>
+      <!-- 最近よくやっているいっぽ -->
+      ${recentAction && recentLastDt ? `
+        <div class="ippo-base-section-row">
+          <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">3</span>最近よくやっているいっぽ</div>
+          <button class="ippo-base-section-link" data-act="ippo-recent-history">履歴を見る</button>
+        </div>
+        <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${recentAction.id}">
+          <span class="ippo-base-rec-icon ippo-base-rec-icon-blue">${recentAction.icon}</span>
           <div class="ippo-base-rec-body">
-            <div class="ippo-base-rec-title">${escapeHtml(repeatAction.title)}<span class="ippo-base-rec-time">（${repeatAction.time}）</span></div>
-            <div class="ippo-base-rec-meta">前回：${formatDate(repeatLastSession.completedAt)}</div>
+            <div class="ippo-base-rec-title">${escapeHtml(recentAction.title)}<span class="ippo-base-rec-time">（${recentAction.time}）</span></div>
+            <div class="ippo-base-rec-meta">前回：${formatDate(recentLastDt)}</div>
           </div>
-          <span class="ippo-base-rec-cta">もう一度やる</span>
+          <span class="ippo-base-rec-cta ippo-base-rec-cta-soft">またやってみる</span>
         </button>
       ` : ''}
 
-      <!-- 習慣にしていること (P8 で実装) -->
-      <div class="ippo-base-section-h">習慣にしていること</div>
-      <div class="ippo-base-soon-card">
-        <span class="ippo-base-soon-icon">🌱</span>
-        <div>
-          <div class="ippo-base-soon-h">習慣化機能 準備中</div>
-          <div class="ippo-base-soon-d">小さな行動を続ける記録機能をまもなく追加します</div>
-        </div>
+      <!-- 習慣にしていること (P8) -->
+      <div class="ippo-base-section-row">
+        <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">4</span>習慣にしていること</div>
+        <button class="ippo-base-section-link" data-act="ippo-base-add-habit">＋ 追加</button>
       </div>
+      ${habitActions.length === 0 ? `
+        <div class="ippo-base-soon-card">
+          <span class="ippo-base-soon-icon">🌱</span>
+          <div>
+            <div class="ippo-base-soon-h">続けたい行動を習慣にしよう</div>
+            <div class="ippo-base-soon-d">「＋ 追加」から、続けたい行動を選んで習慣に加えられます</div>
+          </div>
+        </div>
+      ` : `
+        <div class="ippo-base-habit-list">
+          ${habitActions.map(a => `
+            <div class="ippo-base-habit-row">
+              <button class="ippo-base-habit-tap" data-act="ippo-base-do-rec" data-action-id="${a.id}">
+                <span class="ippo-base-habit-icon">${a.icon}</span>
+                <div class="ippo-base-habit-body">
+                  <div class="ippo-base-habit-title">${escapeHtml(a.title)}</div>
+                  <div class="ippo-base-habit-meta">${escapeHtml(a.time || '')}${a.technique ? ' ・ ' + escapeHtml(a.technique) : ''}</div>
+                </div>
+              </button>
+              <button class="ippo-base-habit-remove" data-act="ippo-toggle-habit" data-action-id="${a.id}" aria-label="習慣から外す">×</button>
+            </div>
+          `).join('')}
+        </div>
+      `}
 
       <!-- きづきタブ導線 -->
       <button class="ippo-base-kizuki-card" data-act="ippo-base-go-kizuki">
@@ -7942,6 +8136,9 @@ function viewIppoTodayDone(session) {
   `;
 }
 
+// 旧名 viewIppoTodayDone は外部から呼ばれていないが念のため互換用エイリアス
+const viewIppoTodayDone = viewIppoBase;
+
 // ============================================================
 // いっぽ 行動を選ぶ画面 (P7・v0.9.45 〜)
 // 3サブタブ: おすすめ / カテゴリから選ぶ / 履歴
@@ -7951,6 +8148,8 @@ function viewIppoTodayDone(session) {
 function viewIppoActionPicker(s) {
   const tab = s.pickerTab || 'recommend';
   const sessions = state.ippoSessions || [];
+  const habitMode = !!s.habitMode;
+  const cardOpts = habitMode ? { habitMode: true } : {};
 
   let body = '';
   if (tab === 'recommend') {
@@ -7963,7 +8162,7 @@ function viewIppoActionPicker(s) {
     }, 8);
     body = recs.length === 0
       ? `<div class="ippo-picker-empty">おすすめが見つかりませんでした<br>カテゴリから選ぶをお試しください</div>`
-      : recs.map(r => renderActionPickerCard(r.action, { meta: `おすすめ度 ${r.score.total}%・${r.action.technique}` })).join('');
+      : recs.map(r => renderActionPickerCard(r.action, { ...cardOpts, meta: `おすすめ度 ${r.score.total}%・${r.action.technique}` })).join('');
   } else if (tab === 'category') {
     body = ACTION_CATEGORIES.map(cat => {
       const items = ACTIONS.filter(a => a.cat === cat.id);
@@ -7971,7 +8170,7 @@ function viewIppoActionPicker(s) {
       return `
         <div class="ippo-picker-cat-h"><span>${cat.icon}</span><span>${escapeHtml(cat.name)}</span><span style="color:var(--text-muted); font-weight:400; font-size:11px; margin-left:auto;">${items.length}件</span></div>
         <div class="ippo-picker-cat-list">
-          ${items.map(a => renderActionPickerCard(a, { meta: a.technique })).join('')}
+          ${items.map(a => renderActionPickerCard(a, { ...cardOpts, meta: a.technique })).join('')}
         </div>
       `;
     }).join('');
@@ -7985,7 +8184,7 @@ function viewIppoActionPicker(s) {
           const avg = h.evalCount > 0 ? (h.evalSum / h.evalCount) : null;
           const metaParts = [`最後: ${formatDate(h.lastDate)}`, `${h.count}回`];
           if (avg !== null) metaParts.push(`平均 ${ippoEvalAvgEmoji(avg)}`);
-          return renderActionPickerCard(a, { meta: metaParts.join(' ・ ') });
+          return renderActionPickerCard(a, { ...cardOpts, meta: metaParts.join(' ・ ') });
         }).join('');
   }
 
@@ -7993,9 +8192,13 @@ function viewIppoActionPicker(s) {
     <div class="screen active ippo-screen ippo-picker-screen">
       <div class="page-header">
         <button class="back-btn" data-act="ippo-picker-back" aria-label="戻る">‹</button>
-        <h1 class="page-title">行動を選ぶ</h1>
+        <h1 class="page-title">${habitMode ? '習慣にする行動を選ぶ' : '行動を選ぶ'}</h1>
         <span style="width:36px;"></span>
       </div>
+
+      ${habitMode ? `
+        <div class="ippo-picker-habit-hint">続けたい行動を選んで「習慣に追加」を押すと、ベース画面の習慣リストに加わります</div>
+      ` : ''}
 
       <div class="ippo-picker-tabs" role="tablist">
         <button class="ippo-picker-tab ${tab === 'recommend' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="recommend" role="tab" aria-selected="${tab === 'recommend'}">おすすめ</button>
@@ -8012,6 +8215,23 @@ function viewIppoActionPicker(s) {
 
 function renderActionPickerCard(action, opts = {}) {
   const meta = opts.meta || action.technique || '';
+  const habitMode = !!opts.habitMode;
+  const habitIds = (state.user && state.user.habitActionIds) || [];
+  const isHabit = habitIds.includes(action.id);
+  if (habitMode) {
+    return `
+      <div class="ippo-picker-card ippo-picker-card-habit">
+        <span class="ippo-picker-icon">${action.icon}</span>
+        <div class="ippo-picker-card-body">
+          <div class="ippo-picker-title">${escapeHtml(action.title)}<span class="ippo-picker-time">（${action.time}）</span></div>
+          <div class="ippo-picker-meta">${escapeHtml(meta)}</div>
+        </div>
+        <button class="ippo-picker-habit-btn ${isHabit ? 'on' : ''}" data-act="ippo-toggle-habit" data-action-id="${action.id}">
+          ${isHabit ? '✓ 習慣中' : '＋ 習慣に追加'}
+        </button>
+      </div>
+    `;
+  }
   return `
     <button class="ippo-picker-card" data-act="ippo-picker-pick" data-action-id="${action.id}">
       <span class="ippo-picker-icon">${action.icon}</span>
@@ -11651,7 +11871,8 @@ function handleAction(act, el, ev) {
 
   // 設定
   // きょうのいっぽ（v0.9.2 仕様書準拠 Steps 0-6）
-  if (act === 'ippo-cancel') { ippoToday = null; go('home'); return; }
+  // P8 〜: キャンセル/戻るは いっぽタブ内のベース画面に戻る (旧: ホームへ)
+  if (act === 'ippo-cancel') { ippoToday = null; render(); return; }
   if (act === 'ippo-onboarding-start') {
     ippoToday = { step: 0, startedAt: new Date().toISOString() };
     render();
@@ -11678,6 +11899,42 @@ function handleAction(act, el, ev) {
   // 「行動を選ぶ」画面を開く (P7・v0.9.45 〜)
   if (act === 'ippo-open-picker') {
     ippoToday = { step: 99, pickerTab: 'recommend', startedAt: new Date().toISOString() };
+    render();
+    return;
+  }
+  // ベース画面: 最近よくやっているいっぽの「履歴を見る」 (P8)
+  if (act === 'ippo-recent-history') {
+    ippoToday = { step: 99, pickerTab: 'history', startedAt: new Date().toISOString() };
+    render();
+    return;
+  }
+  // ベース画面: 「なぜこれをおすすめするの？」 (P8 軽量実装: 一旦トースト)
+  if (act === 'ippo-rec-why') {
+    toast('過去の方向選択と実施履歴から、いま合いそうな行動を提案しています');
+    return;
+  }
+  // ベース画面: 習慣を追加 → ピッカーを習慣選択モードで開く (P8)
+  if (act === 'ippo-base-add-habit') {
+    ippoToday = { step: 99, pickerTab: 'category', startedAt: new Date().toISOString(), habitMode: true };
+    render();
+    return;
+  }
+  // 行動の習慣 ON/OFF トグル (P8)
+  if (act === 'ippo-toggle-habit') {
+    const actionId = el.dataset.actionId;
+    if (!actionId) return;
+    if (!Array.isArray(state.user.habitActionIds)) state.user.habitActionIds = [];
+    const idx = state.user.habitActionIds.indexOf(actionId);
+    if (idx >= 0) {
+      state.user.habitActionIds.splice(idx, 1);
+      toast('習慣から外しました');
+    } else {
+      state.user.habitActionIds.push(actionId);
+      toast('習慣に追加しました 🌱');
+      // 習慣モードで追加した場合はベース画面に戻る
+      if (ippoToday && ippoToday.habitMode) ippoToday = null;
+    }
+    saveState();
     render();
     return;
   }
