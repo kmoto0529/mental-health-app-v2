@@ -4413,6 +4413,14 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 .ippo-base-other-link:active { opacity: 0.7; }
 
+/* 未実施時の Hero下 CTA (P8.2 v0.9.48 〜) */
+.ippo-base-start-cta {
+  width: 100%;
+  margin: -4px 0 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+}
+
 /* ============================================================
    ベース画面 P8 拡張 (v0.9.46 〜)
    ============================================================ */
@@ -5332,7 +5340,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.47-beta.1',  // P8.1: 習慣化フル機能 (週間グリッド/詳細/カレンダー/カスタム作成/編集)
+  appVersion:      '0.9.48-beta.1',  // P8.2: 未実施時CTA・余裕CTA非表示・番号バッジ削除・「一歩」→「いっぽ」統一
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -5830,7 +5838,7 @@ function generateAIFeedback(ippoState) {
   const change = (ippoState.beforeIntensity || 0) - (ippoState.afterIntensity || 0);
   const explain = action && TECHNIQUE_EXPLANATIONS[action.technique]
     ? TECHNIQUE_EXPLANATIONS[action.technique]
-    : '小さな一歩を選んで実施できたこと、それ自体が今日の収穫です';
+    : '小さないっぽを選んで実施できたこと、それ自体が今日の収穫です';
 
   let opening;
   if (change >= 3 && direction) {
@@ -5842,7 +5850,7 @@ function generateAIFeedback(ippoState) {
   } else if (change === 0) {
     opening = 'やってくれてありがとう。今日はそれで十分です';
   } else {
-    opening = '今日は少し重く感じたかも。それでも一歩を踏み出してくれて、十分です';
+    opening = '今日は少し重く感じたかも。それでもいっぽを踏み出してくれて、十分です';
   }
   return { opening, explanation: explain };
 }
@@ -7856,8 +7864,8 @@ function viewIppoNewDay() {
       ` : ''}
 
       ${recs.length > 0 ? `
-        <h3 class="ippo-nd-section-h">🌱 きょうのおすすめの一歩</h3>
-        <p class="text-tiny text-muted" style="margin: -6px 0 10px;">あなたの傾向から、合いそうな一歩を選びました</p>
+        <h3 class="ippo-nd-section-h">🌱 きょうのおすすめのいっぽ</h3>
+        <p class="text-tiny text-muted" style="margin: -6px 0 10px;">あなたの傾向から、合いそうないっぽを選びました</p>
         <div class="ippo-nd-rec-row">
           ${recs.map((r, i) => `
             <button class="ippo-nd-rec-card" data-act="ippo-newday-pick-rec" data-action-id="${r.action.id}">
@@ -7877,7 +7885,7 @@ function viewIppoNewDay() {
       <div class="ippo-nd-cta">
         <div class="ippo-nd-cta-text">
           <div class="ippo-nd-cta-h">まずは今の気分を記録してみよう</div>
-          <div class="ippo-nd-cta-sub">あなたの状態に合わせた一歩を提案します</div>
+          <div class="ippo-nd-cta-sub">あなたの状態に合わせたいっぽを提案します</div>
         </div>
         <button class="btn btn-primary ippo-nd-cta-btn" data-act="ippo-newday-start">気分を記録する →</button>
       </div>
@@ -7889,11 +7897,11 @@ function viewIppoNewDay() {
 function viewIppoOnboarding() {
   return `
     <div class="screen active ippo-ob-screen">
-      <h1 class="ippo-ob-h1">使うほど、<br>あなただけの「効く一歩」が<br>見つかります 🌱</h1>
+      <h1 class="ippo-ob-h1">使うほど、<br>あなただけの「効くいっぽ」が<br>見つかります 🌱</h1>
       <p class="ippo-ob-lead">
         あなたの気分や行動の記録をもとに、<br>
         AIがあなただけに合う行動を学習して、<br>
-        より効果的な一歩をレコメンドします。
+        より効果的ないっぽをレコメンドします。
       </p>
       <div class="ippo-ob-mascot">${suplan({ stage: 'tane', expression: 'happy', size: 80 })}</div>
 
@@ -7902,7 +7910,7 @@ function viewIppoOnboarding() {
         <div class="ippo-ob-flow-row">
           <div class="ippo-ob-flow-cell">
             <div class="ippo-ob-flow-icon">🌱</div>
-            <div class="ippo-ob-flow-text">はじめは、いろいろな<strong>一歩をご提案</strong></div>
+            <div class="ippo-ob-flow-text">はじめは、いろいろな<strong>いっぽをご提案</strong></div>
           </div>
           <div class="ippo-ob-flow-cell">
             <div class="ippo-ob-flow-icon">📊</div>
@@ -7910,7 +7918,7 @@ function viewIppoOnboarding() {
           </div>
           <div class="ippo-ob-flow-cell">
             <div class="ippo-ob-flow-icon">💗</div>
-            <div class="ippo-ob-flow-text">あなたにぴったりの<strong>「効く一歩」を提案</strong></div>
+            <div class="ippo-ob-flow-text">あなたにぴったりの<strong>「効くいっぽ」を提案</strong></div>
           </div>
         </div>
       </div>
@@ -7932,7 +7940,7 @@ function viewIppoOnboarding() {
           <div style="text-align:center;">
             <span class="ippo-ob-compare-badge late">使い続けると...</span>
           </div>
-          <p class="ippo-ob-compare-desc">あなたの傾向から、「効く」一歩を優先してご提案します</p>
+          <p class="ippo-ob-compare-desc">あなたの傾向から、「効く」いっぽを優先してご提案します</p>
           <div class="ippo-ob-compare-item">🌱 植物の世話 (3分)<span class="ippo-ob-compare-item-match">マッチ度<br>92%</span></div>
           <div class="ippo-ob-compare-item">☕ お風呂 (5分)<span class="ippo-ob-compare-item-match">マッチ度<br>88%</span></div>
           <div class="ippo-ob-compare-item">🎧 1分聴く<span class="ippo-ob-compare-item-match">マッチ度<br>85%</span></div>
@@ -8081,7 +8089,7 @@ function viewIppoStep2(s) {
     <div class="screen active ippo-screen">
       ${ippoHeader(2)}
       ${ippoDirectionLine()}
-      <div class="ippo-q">あなたに合いそうな一歩を提案します</div>
+      <div class="ippo-q">あなたに合いそうないっぽを提案します</div>
       <p class="text-tiny text-muted mb-3">${dur === '1min' ? 'まずは、1分でできるものから' : dur === '3min' ? '3分くらいでできるもの' : '5分以上、じっくり取り組めるもの'}</p>
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${visible.map(c => {
@@ -8110,7 +8118,7 @@ function viewIppoStep2(s) {
         }).join('')}
       </div>
       ${canMore ? `
-        <button class="btn btn-secondary" data-act="ippo-step2-more" style="margin-top:12px; width:100%;">他の一歩を見る</button>
+        <button class="btn btn-secondary" data-act="ippo-step2-more" style="margin-top:12px; width:100%;">他のいっぽを見る</button>
       ` : ''}
 
       <!-- もっとできそう？(duration filter) -->
@@ -8124,7 +8132,7 @@ function viewIppoStep2(s) {
       </div>
 
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step2-next" ${!selectedId ? 'disabled' : ''}>この一歩を選ぶ</button>
+        <button class="btn btn-primary" data-act="ippo-step2-next" ${!selectedId ? 'disabled' : ''}>このいっぽを選ぶ</button>
         <button class="btn-ghost" data-act="ippo-back" data-to="0">‹ 戻る</button>
       </div>
     </div>
@@ -8138,7 +8146,7 @@ function viewIppoStep3(s) {
   return `
     <div class="screen active ippo-screen">
       ${ippoHeader(3)}
-      <div class="ippo-q">この一歩、いつやる？</div>
+      <div class="ippo-q">このいっぽ、いつやる？</div>
       <p class="text-tiny text-muted mb-3">無理しないで、自分のペースでだいじょうぶ</p>
       <div class="ippo-do-card">
         <div class="ippo-do-suplan">${suplan({ stage: 'tane', expression: 'happy', size: 64 })}</div>
@@ -8153,7 +8161,7 @@ function viewIppoStep3(s) {
         <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
       </div>
       <p class="text-tiny text-muted text-center" style="margin-top:10px;">
-        「あとでやる」と、サマリ画面の「もう一歩」に保留されます
+        「あとでやる」と、サマリ画面の「もういっぽ」に保留されます
       </p>
     </div>
   `;
@@ -8222,7 +8230,7 @@ function viewIppoStep4(s) {
         <span class="ippo-eval5-thanks-icon">💗</span>
         <p class="ippo-eval5-thanks-text">
           記録してくれてありがとう！<br>
-          小さな一歩が、大きな変化につながります 🌱
+          小さないっぽが、大きな変化につながります 🌱
         </p>
       </div>
 
@@ -8415,7 +8423,7 @@ function renderPendingOrMoreCta() {
     return `
       <div class="ippo-cta-card">
         <p class="text-tiny text-muted text-center" style="margin: 0 0 6px;">あとでやるとした行動</p>
-        <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もう一歩やってみる？</p>
+        <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もういっぽやってみる？</p>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${pending.slice(0, 3).map(p => {
             const act = ACTIONS.find(a => a.id === p.actionId);
@@ -8430,15 +8438,15 @@ function renderPendingOrMoreCta() {
             `;
           }).join('')}
         </div>
-        <button class="btn-ghost" data-act="ippo-open-picker" style="margin-top:8px; width:100%; font-size:12px;">別の一歩を見る</button>
+        <button class="btn-ghost" data-act="ippo-open-picker" style="margin-top:8px; width:100%; font-size:12px;">別のいっぽを見る</button>
       </div>
     `;
   }
   return `
     <div class="ippo-cta-card">
       <p class="text-tiny text-muted text-center" style="margin: 0 0 4px;">もし余裕があれば...</p>
-      <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もう一歩やってみる？</p>
-      <button class="btn btn-primary" data-act="ippo-do-another" style="width:100%;">もう一歩やる</button>
+      <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もういっぽやってみる？</p>
+      <button class="btn btn-primary" data-act="ippo-do-another" style="width:100%;">もういっぽやる</button>
     </div>
   `;
 }
@@ -8510,10 +8518,10 @@ function viewIppoBase(session) {
       <!-- ヒーロー -->
       <div class="ippo-base-hero">
         <div class="ippo-base-hero-mascot">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
-        <h2 class="ippo-base-hero-h">${isDone ? '今日も、一歩すすめたね 🌱' : '今日もいっぽやってみよう 🌱'}</h2>
+        <h2 class="ippo-base-hero-h">${isDone ? '今日も、いっぽすすめたね 🌱' : '今日もいっぽやってみよう 🌱'}</h2>
         <div class="ippo-base-hero-msg">${isDone
-          ? '小さな一歩の積み重ねが、<br>あなたをやさしく変えていきます。'
-          : 'むりせず、できそうな小さな一歩から。<br>すぷらんが見守っています。'}</div>
+          ? '小さないっぽの積み重ねが、<br>あなたをやさしく変えていきます。'
+          : 'むりせず、できそうな小さないっぽから。<br>すぷらんが見守っています。'}</div>
         <div class="ippo-base-hero-stats">
           <div class="ippo-base-stat-cell">
             <div class="ippo-base-stat-icon-line">📅</div>
@@ -8527,16 +8535,20 @@ function viewIppoBase(session) {
           </div>
           <div class="ippo-base-stat-cell">
             <div class="ippo-base-stat-icon-line ${isDone ? 'done' : 'todo'}">${isDone ? '🌱' : '·'}</div>
-            <div class="ippo-base-stat-num-text ${isDone ? 'done' : 'todo'}">${isDone ? '一歩すすめた' : 'まだ'}</div>
+            <div class="ippo-base-stat-num-text ${isDone ? 'done' : 'todo'}">${isDone ? 'いっぽすすめた' : 'まだ'}</div>
             <div class="ippo-base-stat-label">今日</div>
           </div>
         </div>
       </div>
 
+      ${!isDone ? `
+        <button class="btn btn-primary ippo-base-start-cta" data-act="ippo-do-another">おすすめのいっぽを見る →</button>
+      ` : ''}
+
       <!-- 今日のおすすめのいっぽ -->
       ${topRec ? `
         <div class="ippo-base-section-row">
-          <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">2</span>今日のおすすめのいっぽ</div>
+          <div class="ippo-base-section-h">今日のおすすめのいっぽ</div>
           <button class="ippo-base-section-link" data-act="ippo-rec-why">なぜこれをおすすめするの？</button>
         </div>
         <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${topRec.action.id}">
@@ -8556,7 +8568,7 @@ function viewIppoBase(session) {
       <!-- 最近よくやっているいっぽ -->
       ${recentAction && recentLastDt ? `
         <div class="ippo-base-section-row">
-          <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">3</span>最近よくやっているいっぽ</div>
+          <div class="ippo-base-section-h">最近よくやっているいっぽ</div>
           <button class="ippo-base-section-link" data-act="ippo-recent-history">履歴を見る</button>
         </div>
         <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${recentAction.id}">
@@ -8571,7 +8583,7 @@ function viewIppoBase(session) {
 
       <!-- 続けていること（習慣）(P8.1) -->
       <div class="ippo-base-section-row">
-        <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">4</span>続けていること（習慣）</div>
+        <div class="ippo-base-section-h">続けていること（習慣）</div>
         <button class="ippo-base-section-link" data-act="ippo-base-add-habit">${habitItems.length === 0 ? '＋ 追加' : '編集'}</button>
       </div>
       ${habitItems.length === 0 ? `
@@ -8621,7 +8633,7 @@ function viewIppoBase(session) {
         <span class="ippo-base-kizuki-arrow">›</span>
       </button>
 
-      ${renderPendingOrMoreCta()}
+      ${isDone ? renderPendingOrMoreCta() : ''}
 
       <button class="ippo-base-other-link" data-act="ippo-open-picker">他の行動を見る →</button>
     </div>
@@ -12838,7 +12850,7 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'ippo-step2-next') {
-    if (!ippoToday || !ippoToday.selectedActionId) { toast('一歩を選んでね'); return; }
+    if (!ippoToday || !ippoToday.selectedActionId) { toast('いっぽを選んでね'); return; }
     ippoToday.step = 3;
     render();
     return;
@@ -12935,7 +12947,7 @@ function handleAction(act, el, ev) {
     }
     // セッション保存後はベース画面 (viewIppoTodayDone) を直接表示
     ippoToday = null;
-    toast('一歩を記録しました');
+    toast('いっぽを記録しました');
     render();
     return;
   }
@@ -13210,7 +13222,7 @@ function handleAction(act, el, ev) {
       directionIds: sessionDirIds,
     });
     ippoToday = null;
-    toast('一歩を記録しました');
+    toast('いっぽを記録しました');
     go('home');
     return;
   }
