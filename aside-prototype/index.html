@@ -4475,6 +4475,155 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 
 /* ============================================================
+   続けていること（習慣）リスト P8.4 (v0.9.50 〜)
+   画像準拠の新レイアウト: アイコン + 本文 + 右側 (週グリッド or 実施するボタン)
+   ============================================================ */
+.ippo-base-edit-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11px; font-weight: 500;
+  color: var(--text-strong);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ippo-base-edit-pill:active { opacity: 0.7; }
+[data-theme="dark"] .ippo-base-edit-pill {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167, 196, 160, 0.2);
+}
+.ippo-base-edit-pill-icon {
+  font-size: 11px;
+  color: var(--text-soft);
+}
+
+.ippo-base-habit-list2 {
+  display: flex; flex-direction: column;
+  gap: 8px;
+  background: var(--bg-soft);
+  border-radius: 14px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .ippo-base-habit-list2 {
+  background: rgba(47, 62, 62, 0.3);
+}
+
+.ippo-base-habit-row3 {
+  display: flex; align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: inherit;
+  transition: transform 0.15s ease;
+}
+[data-theme="dark"] .ippo-base-habit-row3 {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167, 196, 160, 0.15);
+}
+.ippo-base-habit-row3:active { transform: scale(0.99); }
+
+.ippo-base-habit-row3-icon {
+  font-size: 22px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ippo-base-habit-row3-body {
+  flex: 1; min-width: 0;
+}
+.ippo-base-habit-row3-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.4;
+}
+.ippo-base-habit-row3-time {
+  font-size: 11px; font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+.ippo-base-habit-row3-streak {
+  font-size: 11px;
+  color: #6B8F71;
+  margin-top: 2px;
+  font-weight: 500;
+}
+[data-theme="dark"] .ippo-base-habit-row3-streak { color: #A7C4A0; }
+
+.ippo-base-habit-row3-right {
+  flex-shrink: 0;
+}
+
+/* 右側: 週間グリッド (実施済の日のみ表示) */
+.ippo-base-habit-week2 {
+  display: flex; flex-direction: column;
+  gap: 3px;
+}
+.ippo-base-habit-week2-row {
+  display: grid;
+  grid-template-columns: repeat(7, 18px);
+  gap: 3px;
+}
+.ippo-base-habit-week2-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.2;
+  font-weight: 500;
+}
+.ippo-base-habit-week2-cell {
+  width: 18px; height: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  color: #C5C5C5;
+  border: 1px solid #DDD;
+  border-radius: 50%;
+  background: transparent;
+  line-height: 1;
+}
+[data-theme="dark"] .ippo-base-habit-week2-cell {
+  color: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.18);
+}
+.ippo-base-habit-week2-cell.done {
+  background: #6B8F71;
+  border-color: #6B8F71;
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+/* 右側: 「実施する」ボタン (未実施時) */
+.ippo-base-habit-do-btn {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: var(--bg-card);
+  border: 1.5px solid #6B8F71;
+  border-radius: 999px;
+  padding: 6px 12px 6px 14px;
+  font-size: 12px; font-weight: 600;
+  color: #6B8F71;
+  white-space: nowrap;
+}
+[data-theme="dark"] .ippo-base-habit-do-btn {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: #A7C4A0;
+  color: #A7C4A0;
+}
+.ippo-base-habit-do-arrow {
+  font-size: 14px;
+  margin-left: 2px;
+  line-height: 1;
+}
+
+/* ============================================================
    ベース画面 P8 拡張 (v0.9.46 〜)
    ============================================================ */
 .ippo-base-screen { padding: 14px 16px 90px; }
@@ -5393,7 +5542,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.49-beta.1',  // P8.3: ベース画面統計カードUI刷新・いっぽ+習慣統合の活動指標
+  appVersion:      '0.9.50-beta.1',  // P8.4: 習慣リストUI刷新 (実施済→週グリッド/未実施→実施するボタン・追加・編集ピル)
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -8689,10 +8838,12 @@ function viewIppoBase(session) {
         </button>
       ` : ''}
 
-      <!-- 続けていること（習慣）(P8.1) -->
+      <!-- 続けていること（習慣）(P8.4 v0.9.50 〜) -->
       <div class="ippo-base-section-row">
         <div class="ippo-base-section-h">続けていること（習慣）</div>
-        <button class="ippo-base-section-link" data-act="ippo-base-add-habit">${habitItems.length === 0 ? '＋ 追加' : '編集'}</button>
+        ${habitItems.length === 0
+          ? `<button class="ippo-base-section-link" data-act="ippo-base-add-habit">＋ 追加</button>`
+          : `<button class="ippo-base-edit-pill" data-act="ippo-base-add-habit"><span class="ippo-base-edit-pill-icon">✎</span>追加・編集</button>`}
       </div>
       ${habitItems.length === 0 ? `
         <div class="ippo-base-soon-card">
@@ -8703,27 +8854,33 @@ function viewIppoBase(session) {
           </div>
         </div>
       ` : `
-        <div class="ippo-base-habit-card">
-          <div class="ippo-base-habit-grid-head">
-            <span></span>
-            ${weekLabels.map(l => `<span class="ippo-base-habit-grid-day">${l}</span>`).join('')}
-          </div>
-          ${habitItems.map((h, idx) => {
+        <div class="ippo-base-habit-list2">
+          ${habitItems.map(h => {
             const streak = getHabitStreak(h.id);
+            const todayDone = isHabitDoneOn(h.id, today);
             return `
-              <button class="ippo-base-habit-row2" data-act="ippo-habit-tap" data-habit-id="${h.id}">
-                <span class="ippo-base-habit-num">${idx + 1}</span>
-                <span class="ippo-base-habit-icon2">${h.icon}</span>
-                <div class="ippo-base-habit-body2">
-                  <div class="ippo-base-habit-title2">${escapeHtml(h.title)}${h.time ? `<span class="ippo-base-habit-time">（${escapeHtml(h.time)}）</span>` : ''}</div>
-                  <div class="ippo-base-habit-streak">${streak > 0 ? `${streak}日連続中！` : 'これからスタート'}</div>
+              <button class="ippo-base-habit-row3" data-act="ippo-habit-tap" data-habit-id="${h.id}">
+                <span class="ippo-base-habit-row3-icon">${h.icon}</span>
+                <div class="ippo-base-habit-row3-body">
+                  <div class="ippo-base-habit-row3-title">${escapeHtml(h.title)}${h.time ? `<span class="ippo-base-habit-row3-time">（${escapeHtml(h.time)}）</span>` : ''}</div>
+                  ${todayDone && streak > 0 ? `<div class="ippo-base-habit-row3-streak">${streak}日連続中！</div>` : ''}
                 </div>
-                <div class="ippo-base-habit-grid">
-                  ${weekDates.map(d => {
-                    const done = isHabitDoneOn(h.id, d);
-                    const isFuture = d > today;
-                    return `<span class="ippo-base-habit-cell ${done ? 'done' : ''} ${isFuture ? 'future' : ''}">${done ? '✓' : (isFuture ? '·' : '○')}</span>`;
-                  }).join('')}
+                <div class="ippo-base-habit-row3-right">
+                  ${todayDone ? `
+                    <div class="ippo-base-habit-week2">
+                      <div class="ippo-base-habit-week2-row">
+                        ${weekLabels.map(l => `<span class="ippo-base-habit-week2-label">${l}</span>`).join('')}
+                      </div>
+                      <div class="ippo-base-habit-week2-row">
+                        ${weekDates.map(d => {
+                          const done = isHabitDoneOn(h.id, d);
+                          return `<span class="ippo-base-habit-week2-cell ${done ? 'done' : ''}">${done ? '✓' : '○'}</span>`;
+                        }).join('')}
+                      </div>
+                    </div>
+                  ` : `
+                    <span class="ippo-base-habit-do-btn">実施する <span class="ippo-base-habit-do-arrow">›</span></span>
+                  `}
                 </div>
               </button>
             `;
