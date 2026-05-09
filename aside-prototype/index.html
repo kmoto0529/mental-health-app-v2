@@ -280,6 +280,205 @@
 }
 .home-mood-cta:hover { background: #6B9466; }
 
+/* ===== ホーム統計カード v0.9.51 ===== */
+.home-stat-card {
+  background: #F1E8D5;
+  border-radius: 20px;
+  padding: 16px 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="dark"] .home-stat-card { background: rgba(80, 70, 50, 0.4); }
+.home-stat-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 12px;
+}
+.home-stat-head-title {
+  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  font-size: 14px; font-weight: 600;
+  color: #2D2D2D;
+  display: flex; align-items: center; gap: 6px;
+  line-height: 1.4;
+}
+[data-theme="dark"] .home-stat-head-title { color: #EAEAEA; }
+.home-stat-head-icon { font-size: 16px; line-height: 1; }
+.home-stat-help {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.6);
+  color: #6B6B6B;
+  font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  flex-shrink: 0;
+}
+.home-stat-help:hover { background: rgba(255,255,255,0.9); }
+[data-theme="dark"] .home-stat-help {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+  color: #DDD;
+}
+.home-stat-cells {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.home-stat-cell {
+  background: rgba(255,255,255,0.55);
+  border-radius: 12px;
+  padding: 10px 8px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+[data-theme="dark"] .home-stat-cell { background: rgba(255,255,255,0.06); }
+.home-stat-cell-head {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10.5px;
+  color: #6B6B6B;
+  white-space: nowrap;
+}
+[data-theme="dark"] .home-stat-cell-head { color: #BFC8C0; }
+.home-stat-cell-icon { font-size: 12px; line-height: 1; flex-shrink: 0; }
+.home-stat-cell-label {
+  font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.home-stat-cell-num {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px; font-weight: 700;
+  color: #2D2D2D;
+  line-height: 1.1;
+  text-align: left;
+  padding-left: 2px;
+}
+[data-theme="dark"] .home-stat-cell-num { color: #EAEAEA; }
+.home-stat-cell-unit { font-size: 12px; font-weight: 600; margin-left: 2px; }
+.home-stat-cell-sub {
+  font-size: 9.5px; color: #8B7F70;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+[data-theme="dark"] .home-stat-cell-sub { color: #BFC8C0; }
+.home-stat-progress { margin-top: 14px; }
+.home-stat-progress-text {
+  font-size: 13px; color: #2D2D2D; line-height: 1.5;
+  margin-bottom: 2px;
+}
+[data-theme="dark"] .home-stat-progress-text { color: #EAEAEA; }
+.home-stat-progress-text strong {
+  font-weight: 700;
+  color: #6B8F71;
+}
+.home-stat-progress-sub {
+  font-size: 11px; color: #8B7F70;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .home-stat-progress-sub { color: #BFC8C0; }
+.home-stat-progress-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.home-stat-progress-dots {
+  flex: 1;
+  display: flex; align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.home-stat-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(120, 120, 120, 0.35);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  color: #FFF;
+  flex-shrink: 0;
+}
+.home-stat-dot.filled {
+  background: #7BA876;
+  border: 1.5px solid #6B9466;
+}
+.home-stat-progress-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #6B8F71;
+  color: #FFF;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* ホーム統計の説明モーダル v0.9.51 */
+.home-stat-help-modal h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--text-strong);
+  margin: 0 0 14px;
+}
+.home-stat-help-section {
+  background: var(--bg-soft);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.home-stat-help-section-h {
+  font-size: 14px; font-weight: 700;
+  color: var(--text-strong);
+  margin: 0 0 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.home-stat-help-section-h .num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #6B8F71; color: #FFF;
+  font-size: 12px; font-weight: 700;
+}
+.home-stat-help-section-desc {
+  font-size: 12.5px; color: var(--text-soft);
+  line-height: 1.55;
+  margin: 0 0 10px;
+}
+.home-stat-help-section-row {
+  display: flex; gap: 10px;
+  align-items: stretch;
+}
+.home-stat-help-section-num-box {
+  flex: 0 0 auto;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px;
+  min-width: 90px;
+}
+.home-stat-help-num-icon { font-size: 16px; }
+.home-stat-help-num-label { font-size: 10px; color: var(--text-muted); }
+.home-stat-help-num-val {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px; font-weight: 700; color: var(--text-strong);
+  line-height: 1.1;
+}
+.home-stat-help-num-unit { font-size: 12px; font-weight: 600; margin-left: 2px; }
+.home-stat-help-num-sub { font-size: 9.5px; color: var(--text-muted); }
+.home-stat-help-tip {
+  flex: 1;
+  background: rgba(123, 168, 118, 0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+.home-stat-help-tip strong { color: var(--accent-primary, #6B8F71); display: block; margin-bottom: 2px; font-size: 11px; }
+.home-stat-help-effect {
+  margin-top: 8px;
+  background: rgba(255, 213, 79, 0.14);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 11.5px; color: var(--text-soft);
+  line-height: 1.5;
+}
+.home-stat-help-effect strong { color: #C68B5E; display: block; margin-bottom: 2px; font-size: 11px; }
+
 /* ===== もやもやカード ===== */
 .home-moya-card {
   background: #FFF;
@@ -6770,17 +6969,56 @@ function getGreeting() {
   return 'こんばんは';
 }
 
-function getHomeSubtitle() {
-  return '久しぶりに、きもちを残してみませんか？';
+// ============================================================
+// ホーム統計（きもち記録ベース）— v0.9.51
+// 「きもちログ + もやもや整理」を統合した活動指標
+// ============================================================
+const HOME_STAT_MILESTONES = [3, 7, 10, 14, 30];
+
+function calcHomeActiveDays() {
+  const days = new Set();
+  (state.moodLogs || []).forEach(m => { if (m.createdAt) days.add(dateKey(new Date(m.createdAt))); });
+  (state.moyamoyaRecords || []).forEach(r => { if (r.createdAt) days.add(dateKey(new Date(r.createdAt))); });
+  return days.size;
+}
+function calcHomeTotalCount() {
+  return (state.moodLogs || []).length + (state.moyamoyaRecords || []).length;
+}
+function calcHomeStreak() {
+  const days = new Set();
+  (state.moodLogs || []).forEach(m => { if (m.createdAt) days.add(dateKey(new Date(m.createdAt))); });
+  (state.moyamoyaRecords || []).forEach(r => { if (r.createdAt) days.add(dateKey(new Date(r.createdAt))); });
+  if (days.size === 0) return 0;
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    if (days.has(dateKey(d))) streak++;
+    else { if (i === 0) continue; break; }
+  }
+  return streak;
+}
+function calcNextMilestone(streak) {
+  for (const m of HOME_STAT_MILESTONES) if (streak < m) return m;
+  return Math.ceil((streak + 1) / 30) * 30;
 }
 
 function viewHome() {
+  const activeDays = calcHomeActiveDays();
+  const totalCount = calcHomeTotalCount();
+  const streak = calcHomeStreak();
+  const hasAnyRecord = totalCount > 0;
+  const target = calcNextMilestone(streak);
+  const remaining = Math.max(0, target - streak);
+  const dotMax = Math.min(target, 10);
+  const filledDots = target > 0 ? Math.min(dotMax, Math.round(streak / target * dotMax)) : 0;
+
   return `
     <div class="screen active home-screen">
       <header class="home-header">
         <div class="home-greeting">
           <h1 class="home-greet-h1">${getGreeting()}、${escapeHtml(getUserName())}さん</h1>
-          <p class="home-subtitle">${getHomeSubtitle()}</p>
         </div>
         <button class="home-mascot" data-act="open-suplan-info" aria-label="すぷらんについて">
           ${suplan({ size: 56, expression: suplanHomeExpression() })}
@@ -6809,6 +7047,52 @@ function viewHome() {
           <span style="opacity:0.85;">›</span>
         </button>
       </div>
+
+      ${hasAnyRecord ? `
+      <!-- ホーム統計カード v0.9.51 -->
+      <div class="home-stat-card">
+        <div class="home-stat-head">
+          <div class="home-stat-head-title">
+            <span class="home-stat-head-icon">🌱</span>
+            <span>きもちの記録を続けています！</span>
+          </div>
+          <button class="home-stat-help" data-act="home-stats-help" aria-label="この機能について">?</button>
+        </div>
+        <div class="home-stat-cells">
+          <div class="home-stat-cell">
+            <div class="home-stat-cell-head"><span class="home-stat-cell-icon">🌱</span><span class="home-stat-cell-label">積み重ねた日</span></div>
+            <div class="home-stat-cell-num">${activeDays}<span class="home-stat-cell-unit">日</span></div>
+            <div class="home-stat-cell-sub">はじめてからの累計</div>
+          </div>
+          <div class="home-stat-cell">
+            <div class="home-stat-cell-head"><span class="home-stat-cell-icon">✏️</span><span class="home-stat-cell-label">やってみた回数</span></div>
+            <div class="home-stat-cell-num">${totalCount}<span class="home-stat-cell-unit">回</span></div>
+            <div class="home-stat-cell-sub">きもちを記録した合計</div>
+          </div>
+          <div class="home-stat-cell">
+            <div class="home-stat-cell-head"><span class="home-stat-cell-icon">🔥</span><span class="home-stat-cell-label">続いている日</span></div>
+            <div class="home-stat-cell-num">${streak}<span class="home-stat-cell-unit">日</span></div>
+            <div class="home-stat-cell-sub">連続で記録した日数</div>
+          </div>
+        </div>
+        <div class="home-stat-progress">
+          <div class="home-stat-progress-text">
+            ${remaining > 0
+              ? `あと<strong>${remaining}日</strong>で、連続記録が<strong>${target}日</strong>になります！`
+              : `<strong>${streak}日</strong>連続達成！おめでとう ✨`}
+          </div>
+          <div class="home-stat-progress-sub">${remaining > 0 ? '自分をほめてあげましょう ✨' : '次の節目に向けて、また一歩ずつ。'}</div>
+          <div class="home-stat-progress-row">
+            <div class="home-stat-progress-dots">
+              ${Array.from({ length: dotMax }).map((_, i) => `
+                <span class="home-stat-dot ${i < filledDots ? 'filled' : ''}">${i < filledDots ? '✓' : ''}</span>
+              `).join('')}
+            </div>
+            <span class="home-stat-progress-badge">${target}日</span>
+          </div>
+        </div>
+      </div>
+      ` : ''}
 
       <!-- もやもや整理カード -->
       <div class="home-moya-card">
@@ -12123,6 +12407,92 @@ function generateGraphTrendSummary(tab, logs) {
 }
 
 // ============================================================
+// ホーム統計の説明モーダル v0.9.51
+// ============================================================
+function viewHomeStatsHelpModal() {
+  const activeDays = calcHomeActiveDays();
+  const totalCount = calcHomeTotalCount();
+  const streak = calcHomeStreak();
+  const target = calcNextMilestone(streak);
+  const remaining = Math.max(0, target - streak);
+  return `
+    <h2>各機能の詳細</h2>
+
+    <div class="home-stat-help-section">
+      <div class="home-stat-help-section-h"><span class="num">1</span><span>積み重ねた日（累計日数）</span></div>
+      <p class="home-stat-help-section-desc">はじめてきもちを記録した日からの累計日数を表示します。</p>
+      <div class="home-stat-help-section-row">
+        <div class="home-stat-help-section-num-box">
+          <span class="home-stat-help-num-icon">🌱</span>
+          <span class="home-stat-help-num-label">積み重ねた日</span>
+          <span class="home-stat-help-num-val">${activeDays}<span class="home-stat-help-num-unit">日</span></span>
+          <span class="home-stat-help-num-sub">はじめてからの累計</span>
+        </div>
+        <div class="home-stat-help-tip">
+          <strong>ポイント</strong>続けてきた自分の努力を実感できます。
+        </div>
+      </div>
+      <div class="home-stat-help-effect">
+        <strong>✨ こんな効果があります</strong>積み重ねを可視化することで、「続けてきた自分」を肯定的に感じられます。
+      </div>
+    </div>
+
+    <div class="home-stat-help-section">
+      <div class="home-stat-help-section-h"><span class="num">2</span><span>やってみた回数（合計回数）</span></div>
+      <p class="home-stat-help-section-desc">これまでに「きもちを記録した」回数の合計を表示します。</p>
+      <div class="home-stat-help-section-row">
+        <div class="home-stat-help-section-num-box">
+          <span class="home-stat-help-num-icon">✏️</span>
+          <span class="home-stat-help-num-label">やってみた回数</span>
+          <span class="home-stat-help-num-val">${totalCount}<span class="home-stat-help-num-unit">回</span></span>
+          <span class="home-stat-help-num-sub">きもちを記録した合計</span>
+        </div>
+        <div class="home-stat-help-tip">
+          <strong>ポイント</strong>取り組んだ回数が見えることで、モチベーションにつながります。
+        </div>
+      </div>
+      <div class="home-stat-help-effect">
+        <strong>✨ こんな効果があります</strong>「何回もやってきた」という実感が、自信や継続意欲を高めます。
+      </div>
+    </div>
+
+    <div class="home-stat-help-section">
+      <div class="home-stat-help-section-h"><span class="num">3</span><span>続いている日（連続記録日数）</span></div>
+      <p class="home-stat-help-section-desc">最後に記録した日から、連続で記録している日数を表示します。</p>
+      <div class="home-stat-help-section-row">
+        <div class="home-stat-help-section-num-box">
+          <span class="home-stat-help-num-icon">🔥</span>
+          <span class="home-stat-help-num-label">続いている日</span>
+          <span class="home-stat-help-num-val">${streak}<span class="home-stat-help-num-unit">日</span></span>
+          <span class="home-stat-help-num-sub">連続で記録した日数</span>
+        </div>
+        <div class="home-stat-help-tip">
+          <strong>ポイント</strong>連続記録の達成感やゲーム感覚で楽しめます。
+        </div>
+      </div>
+      <div class="home-stat-help-effect">
+        <strong>✨ こんな効果があります</strong>「途切れずに続いている」ことが、習慣化の後押しになります。
+      </div>
+    </div>
+
+    <div class="home-stat-help-section">
+      <div class="home-stat-help-section-h"><span class="num">★</span><span>連続記録の進捗バーについて</span></div>
+      <p class="home-stat-help-section-desc">次の節目（例：10日連続）までの進捗をわかりやすく表示します。</p>
+      <div class="home-stat-help-tip" style="margin-top:6px;">
+        ${remaining > 0
+          ? `あと <strong style="color:#6B8F71;">${remaining}日</strong> で、連続記録が <strong style="color:#6B8F71;">${target}日</strong> になります。`
+          : `<strong style="color:#6B8F71;">${streak}日</strong> 連続達成中！`}
+      </div>
+      <div class="home-stat-help-effect">
+        <strong>🎯 目安となる節目</strong>3日 ・ 7日 ・ 10日 ・ 14日 ・ 30日 など。
+      </div>
+    </div>
+
+    <button class="btn btn-primary" data-act="close-modal" style="width:100%; margin-top:10px;">閉じる</button>
+  `;
+}
+
+// ============================================================
 // すぷらん紹介モーダル（ホーム右上のすぷらんアイコンタップで表示）
 // ============================================================
 function viewSuplanInfoModal() {
@@ -13492,6 +13862,7 @@ function handleAction(act, el, ev) {
     return;
   }
 
+  if (act === 'home-stats-help') { modal(viewHomeStatsHelpModal(), 'home-stat-help-modal'); return; }
   if (act === 'open-settings') { modal(viewSettingsModal()); return; }
   if (act === 'open-suplan-info') {
     modal(viewSuplanInfoModal(), 'suplan-info-modal-card');
