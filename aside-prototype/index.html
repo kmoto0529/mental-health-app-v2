@@ -4584,6 +4584,378 @@ body.keyboard-open .mood-chat-bottom .input-row {
 .ippo-picker-habit-btn:active { transform: scale(0.96); }
 
 /* ============================================================
+   続けていること（習慣）リスト P8.1 (v0.9.47 〜)
+   週間グリッド + 連続日数 + ナンバー
+   ============================================================ */
+.ippo-base-habit-card {
+  background: var(--bg-card);
+  border: 1.5px solid #E8B5BC;
+  border-radius: 14px;
+  padding: 12px 14px 6px;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .ippo-base-habit-card {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(232, 181, 188, 0.4);
+}
+.ippo-base-habit-grid-head {
+  display: grid;
+  grid-template-columns: 22px 1fr repeat(7, 18px);
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 6px;
+  padding: 0 2px 6px;
+  border-bottom: 1px dashed var(--divider);
+}
+.ippo-base-habit-grid-head > span:nth-child(2) { /* spacer where icon+title goes */ }
+.ippo-base-habit-grid-day {
+  font-size: 10px; color: var(--text-muted);
+  text-align: center;
+  font-weight: 500;
+}
+.ippo-base-habit-row2 {
+  display: grid;
+  grid-template-columns: 22px 1fr repeat(7, 18px);
+  gap: 4px;
+  align-items: center;
+  width: 100%;
+  background: transparent; border: none;
+  padding: 8px 2px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: inherit;
+  border-bottom: 1px dashed var(--divider);
+}
+.ippo-base-habit-row2:last-child { border-bottom: none; }
+.ippo-base-habit-row2:active { background: var(--bg-soft); }
+.ippo-base-habit-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  background: #F4C5CC;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 10px; font-weight: 700;
+  flex-shrink: 0;
+  grid-column: 1;
+}
+[data-theme="dark"] .ippo-base-habit-num { background: rgba(244, 197, 204, 0.5); }
+.ippo-base-habit-icon2 {
+  display: none;  /* デザイン上は番号と本文のみで十分 (icon は本文側に組込) */
+}
+.ippo-base-habit-body2 {
+  grid-column: 2;
+  min-width: 0;
+  padding: 0 4px 0 2px;
+}
+.ippo-base-habit-title2 {
+  font-size: 12.5px; font-weight: 600;
+  color: var(--text-strong);
+  display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap;
+}
+.ippo-base-habit-time { font-size: 10px; font-weight: 400; color: var(--text-muted); }
+.ippo-base-habit-streak {
+  font-size: 10px; color: #6B8F71;
+  font-weight: 500;
+  margin-top: 2px;
+}
+[data-theme="dark"] .ippo-base-habit-streak { color: #A7C4A0; }
+.ippo-base-habit-grid {
+  display: contents;
+}
+.ippo-base-habit-cell {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: transparent;
+  border-radius: 50%;
+}
+.ippo-base-habit-cell.done {
+  background: #C5E1B5;
+  color: #4F7B45;
+  font-weight: 700;
+}
+[data-theme="dark"] .ippo-base-habit-cell.done {
+  background: rgba(167, 196, 160, 0.4);
+  color: #A7C4A0;
+}
+.ippo-base-habit-cell.future {
+  color: #D4D4D4;
+  opacity: 0.4;
+}
+
+/* ============================================================
+   習慣 詳細画面 P8.1 (v0.9.47 〜)
+   ============================================================ */
+.habit-detail-screen { padding: 0 16px 90px; }
+.habit-detail-tabs {
+  display: flex; gap: 4px;
+  background: var(--bg-soft);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+.habit-detail-tab {
+  flex: 1;
+  padding: 8px 10px;
+  background: transparent; border: none;
+  font-size: 12px; font-weight: 500;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.habit-detail-tab.active {
+  background: var(--bg-card);
+  color: var(--text-strong);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+[data-theme="dark"] .habit-detail-tab.active { background: rgba(47, 62, 62, 0.8); }
+
+.habit-detail-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 12px 10px;
+  margin-bottom: 14px;
+}
+[data-theme="dark"] .habit-detail-summary { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.habit-detail-summary-cell { text-align: center; }
+.habit-detail-summary-num {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px; font-weight: 700; color: #6B8F71;
+  line-height: 1.1;
+}
+.habit-detail-summary-suf { font-size: 11px; font-weight: 400; margin-left: 2px; color: var(--text-muted); }
+.habit-detail-summary-text {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.3;
+}
+.habit-detail-summary-label {
+  font-size: 10px; color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* 今日タブ */
+.habit-today-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  padding: 24px 18px;
+  text-align: center;
+}
+[data-theme="dark"] .habit-today-card { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.habit-today-icon-big {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.habit-today-name {
+  font-size: 16px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+.habit-today-time { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+.habit-today-desc {
+  font-size: 12px; color: var(--text-soft);
+  margin-bottom: 16px;
+  line-height: 1.55;
+}
+.habit-today-cta {
+  width: 100%;
+  margin-top: 14px;
+}
+.habit-today-checked {
+  margin-top: 14px;
+}
+.habit-today-checkmark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px;
+  background: #C5E1B5;
+  color: #4F7B45;
+  border-radius: 50%;
+  font-size: 32px; font-weight: 700;
+  margin-bottom: 10px;
+}
+[data-theme="dark"] .habit-today-checkmark { background: rgba(167,196,160,0.4); color: #A7C4A0; }
+.habit-today-msg {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+.habit-today-sub {
+  font-size: 11px; color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.habit-today-undo {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: transparent; border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* 記録(カレンダー)タブ */
+.habit-cal-nav {
+  display: flex; align-items: center; justify-content: center;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+.habit-cal-nav-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-soft);
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+.habit-cal-nav-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
+.habit-cal-nav-label {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-strong);
+}
+.habit-cal-stats {
+  display: flex; justify-content: space-between;
+  background: var(--bg-soft);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 12px;
+}
+.habit-cal-stats strong {
+  color: #6B8F71;
+  font-weight: 700;
+}
+[data-theme="dark"] .habit-cal-stats strong { color: #A7C4A0; }
+.habit-cal-weekhead {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.habit-cal-weekday {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 4px 0;
+}
+.habit-cal-weekday.sun { color: #C25666; }
+.habit-cal-weekday.sat { color: #5C7CB0; }
+.habit-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.habit-cal-cell {
+  aspect-ratio: 1;
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  padding: 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+[data-theme="dark"] .habit-cal-cell { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.habit-cal-cell.empty {
+  background: transparent; border: none;
+}
+.habit-cal-cell.future { opacity: 0.45; }
+.habit-cal-cell.today { border-color: #6B8F71; border-width: 2px; }
+.habit-cal-cell.done {
+  background: #C5E1B5;
+  border-color: transparent;
+}
+[data-theme="dark"] .habit-cal-cell.done { background: rgba(167,196,160,0.4); }
+.habit-cal-num {
+  font-size: 11px; color: var(--text-soft);
+  font-weight: 500;
+}
+.habit-cal-cell.done .habit-cal-num { color: #4F7B45; font-weight: 600; }
+[data-theme="dark"] .habit-cal-cell.done .habit-cal-num { color: #A7C4A0; }
+.habit-cal-mark {
+  font-size: 14px; font-weight: 700;
+  color: #4F7B45;
+  margin-top: -2px;
+}
+[data-theme="dark"] .habit-cal-mark { color: #A7C4A0; }
+
+/* 編集タブ / カスタム作成フォーム */
+.habit-edit-form {
+  display: flex; flex-direction: column; gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 16px;
+}
+[data-theme="dark"] .habit-edit-form { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.habit-create-h {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+.habit-edit-label {
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 12px; font-weight: 500;
+  color: var(--text-soft);
+}
+.habit-edit-input {
+  font: inherit; font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  color: var(--text-strong);
+}
+.habit-edit-input:focus {
+  outline: none;
+  border-color: #6B8F71;
+  background: var(--bg-card);
+}
+.habit-edit-icon-input {
+  width: 80px;
+  text-align: center;
+  font-size: 22px;
+}
+.habit-edit-save { width: 100%; margin-top: 4px; }
+.habit-edit-delete {
+  width: 100%;
+  font-size: 12px;
+  color: #C25666;
+  background: transparent;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+[data-theme="dark"] .habit-edit-delete { color: #E8A5B0; }
+.habit-edit-readonly {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+[data-theme="dark"] .habit-edit-readonly { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.habit-edit-readonly-h {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 8px;
+}
+.habit-edit-readonly-p {
+  font-size: 12px; color: var(--text-soft);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.habit-create-form { padding: 14px; }
+
+/* ============================================================
    いっぽ 行動を選ぶ画面 — v0.9.45 〜 (P7)
    3サブタブ: おすすめ / カテゴリから選ぶ / 履歴
    ============================================================ */
@@ -4960,7 +5332,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.46-beta.1',  // P8: ベース画面刷新 + 習慣化機能 + キャンセル/戻る統一
+  appVersion:      '0.9.47-beta.1',  // P8.1: 習慣化フル機能 (週間グリッド/詳細/カレンダー/カスタム作成/編集)
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -5531,6 +5903,10 @@ const defaultState = () => ({
   // === きょうのいっぽ（v0.9.0 仕様書 §6 データモデル準拠 簡易版） ===
   ippoSessions: [],      // {id, moodLabel, moodIntensity, actionId, score, beforeIntensity, afterIntensity, changeValue, completedAt}
   ippoPending: [],       // 「あとでやる」で保留した行動 {id, actionId, moodLabel, moodIntensity, directionId, savedAt}
+
+  // === 習慣化機能（v0.9.47 P8.1〜） ===
+  customHabits: [],      // ユーザー作成の習慣 {id, name, icon, duration, timing, createdAt}
+  habitLogs: [],         // 日次の達成ログ {id, habitId, date(YYYY-MM-DD), completedAt}
 
   // === 深掘りループ（v0.9.1 仕様書 §5 §6） ===
   deepDiveSessions: [],  // {id, themeType, event, firstThought, deeper:[depth1,depth2,depth3], coreBelief, beliefSince, confidence, extractedBelief, tags[], gentleReflection, startedAt, completedAt}
@@ -7201,6 +7577,103 @@ function formatDate(iso) {
 // きょうのいっぽ 日次ループ（v0.9.0 仕様書 §3 全体フロー）
 // ============================================================
 let ippoToday = null;  // 進行中のセッション（モジュールローカル）
+let habitView = null;  // 習慣詳細画面の状態 {habitId, mode: 'today'|'calendar'|'edit', monthOffset?: 0} (P8.1〜)
+
+// ============================================================
+// 習慣化ヘルパー (P8.1 v0.9.47 〜)
+// ============================================================
+function dateKey(d) {
+  const dt = d instanceof Date ? d : new Date(d);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+
+function getHabitItem(id) {
+  if (!id) return null;
+  const custom = (state.customHabits || []).find(h => h.id === id);
+  if (custom) return {
+    id: custom.id, title: custom.name, icon: custom.icon || '🌱',
+    time: custom.duration || '', technique: '',
+    timing: custom.timing || '', desc: '', isCustom: true,
+  };
+  const a = ACTIONS.find(x => x.id === id);
+  if (a) return {
+    id: a.id, title: a.title, icon: a.icon, time: a.time,
+    technique: a.technique || '', desc: a.desc || '',
+    timing: '', isCustom: false,
+  };
+  return null;
+}
+
+function getAllHabitIds() {
+  const action = (state.user && state.user.habitActionIds) || [];
+  const custom = (state.customHabits || []).map(h => h.id);
+  // dedup, custom が action よりも後ろに来る
+  return [...new Set([...action, ...custom])];
+}
+
+function isHabitDoneOn(habitId, date) {
+  const k = dateKey(date);
+  return (state.habitLogs || []).some(l => l.habitId === habitId && l.date === k);
+}
+
+function getHabitStreak(habitId) {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    if (isHabitDoneOn(habitId, d)) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+  return streak;
+}
+
+function getCurrentWeekDates() {
+  // 月〜日 (週初めを月曜にする)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const day = today.getDay(); // 0=Sun ... 6=Sat
+  const monOffset = day === 0 ? -6 : 1 - day;
+  const result = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + monOffset + i);
+    result.push(d);
+  }
+  return result;
+}
+
+function markHabitDoneToday(habitId) {
+  const today = dateKey(new Date());
+  if (!Array.isArray(state.habitLogs)) state.habitLogs = [];
+  if (state.habitLogs.some(l => l.habitId === habitId && l.date === today)) return false;
+  state.habitLogs.push({
+    id: 'hl_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    habitId, date: today, completedAt: new Date().toISOString(),
+  });
+  return true;
+}
+
+function unmarkHabitToday(habitId) {
+  const today = dateKey(new Date());
+  state.habitLogs = (state.habitLogs || []).filter(l => !(l.habitId === habitId && l.date === today));
+}
+
+function deleteHabit(habitId) {
+  if (Array.isArray(state.user.habitActionIds)) {
+    state.user.habitActionIds = state.user.habitActionIds.filter(id => id !== habitId);
+  }
+  state.customHabits = (state.customHabits || []).filter(h => h.id !== habitId);
+  state.habitLogs = (state.habitLogs || []).filter(l => l.habitId !== habitId);
+}
+
+// 月の日付配列 (1日 〜 月末)
+function getMonthDates(year, month0) {
+  const last = new Date(year, month0 + 1, 0).getDate();
+  const result = [];
+  for (let d = 1; d <= last; d++) result.push(new Date(year, month0, d));
+  return result;
+}
 
 const IPPO_MOODS = [
   { label: 'しんどい',   emoji: '😣' },
@@ -7230,10 +7703,14 @@ function ippoCompletedToday() {
 }
 
 function viewAction() {
+  // P8.1: 習慣詳細画面が開いていれば最優先
+  if (habitView) return viewHabitDetail(habitView);
   // P8 〜: 進行中セッションなし → ベース画面 (今日完了/未完了で文言を可変)
-  //         初回利用 (履歴0) のときのみオンボーディング
+  //         初回利用 (履歴0 + 習慣0) のときのみオンボーディング
   if (!ippoToday) {
-    if ((state.ippoSessions || []).length === 0) return viewIppoOnboarding();
+    const hasIppoHist = (state.ippoSessions || []).length > 0;
+    const hasHabit = getAllHabitIds().length > 0;
+    if (!hasIppoHist && !hasHabit) return viewIppoOnboarding();
     return viewIppoBase(ippoCompletedToday() || null);
   }
   // 進行中: ステップ別画面 (Step 0 → 2 → 3 → 35 → 4 → 完了 → ベース)
@@ -8021,9 +8498,12 @@ function viewIppoBase(session) {
   const recentAction = recentId ? ACTIONS.find(a => a.id === recentId) : null;
   const recentLastDt = recentId ? recentLast[recentId] : null;
 
-  // 習慣にしている行動
-  const habitIds = (state.user && state.user.habitActionIds) || [];
-  const habitActions = habitIds.map(id => ACTIONS.find(a => a.id === id)).filter(Boolean);
+  // 習慣にしている行動 (P8.1: customHabits も含めて統合管理)
+  const habitIds = getAllHabitIds();
+  const habitItems = habitIds.map(id => getHabitItem(id)).filter(Boolean);
+  const weekDates = getCurrentWeekDates();
+  const weekLabels = ['月', '火', '水', '木', '金', '土', '日'];
+  const today = new Date();
 
   return `
     <div class="screen active ippo-screen ippo-base-screen">
@@ -8089,12 +8569,12 @@ function viewIppoBase(session) {
         </button>
       ` : ''}
 
-      <!-- 習慣にしていること (P8) -->
+      <!-- 続けていること（習慣）(P8.1) -->
       <div class="ippo-base-section-row">
-        <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">4</span>習慣にしていること</div>
-        <button class="ippo-base-section-link" data-act="ippo-base-add-habit">＋ 追加</button>
+        <div class="ippo-base-section-h ippo-base-section-h-num"><span class="ippo-base-num">4</span>続けていること（習慣）</div>
+        <button class="ippo-base-section-link" data-act="ippo-base-add-habit">${habitItems.length === 0 ? '＋ 追加' : '編集'}</button>
       </div>
-      ${habitActions.length === 0 ? `
+      ${habitItems.length === 0 ? `
         <div class="ippo-base-soon-card">
           <span class="ippo-base-soon-icon">🌱</span>
           <div>
@@ -8103,19 +8583,31 @@ function viewIppoBase(session) {
           </div>
         </div>
       ` : `
-        <div class="ippo-base-habit-list">
-          ${habitActions.map(a => `
-            <div class="ippo-base-habit-row">
-              <button class="ippo-base-habit-tap" data-act="ippo-base-do-rec" data-action-id="${a.id}">
-                <span class="ippo-base-habit-icon">${a.icon}</span>
-                <div class="ippo-base-habit-body">
-                  <div class="ippo-base-habit-title">${escapeHtml(a.title)}</div>
-                  <div class="ippo-base-habit-meta">${escapeHtml(a.time || '')}${a.technique ? ' ・ ' + escapeHtml(a.technique) : ''}</div>
+        <div class="ippo-base-habit-card">
+          <div class="ippo-base-habit-grid-head">
+            <span></span>
+            ${weekLabels.map(l => `<span class="ippo-base-habit-grid-day">${l}</span>`).join('')}
+          </div>
+          ${habitItems.map((h, idx) => {
+            const streak = getHabitStreak(h.id);
+            return `
+              <button class="ippo-base-habit-row2" data-act="ippo-habit-tap" data-habit-id="${h.id}">
+                <span class="ippo-base-habit-num">${idx + 1}</span>
+                <span class="ippo-base-habit-icon2">${h.icon}</span>
+                <div class="ippo-base-habit-body2">
+                  <div class="ippo-base-habit-title2">${escapeHtml(h.title)}${h.time ? `<span class="ippo-base-habit-time">（${escapeHtml(h.time)}）</span>` : ''}</div>
+                  <div class="ippo-base-habit-streak">${streak > 0 ? `${streak}日連続中！` : 'これからスタート'}</div>
+                </div>
+                <div class="ippo-base-habit-grid">
+                  ${weekDates.map(d => {
+                    const done = isHabitDoneOn(h.id, d);
+                    const isFuture = d > today;
+                    return `<span class="ippo-base-habit-cell ${done ? 'done' : ''} ${isFuture ? 'future' : ''}">${done ? '✓' : (isFuture ? '·' : '○')}</span>`;
+                  }).join('')}
                 </div>
               </button>
-              <button class="ippo-base-habit-remove" data-act="ippo-toggle-habit" data-action-id="${a.id}" aria-label="習慣から外す">×</button>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       `}
 
@@ -8186,6 +8678,8 @@ function viewIppoActionPicker(s) {
           if (avg !== null) metaParts.push(`平均 ${ippoEvalAvgEmoji(avg)}`);
           return renderActionPickerCard(a, { ...cardOpts, meta: metaParts.join(' ・ ') });
         }).join('');
+  } else if (tab === 'custom' && habitMode) {
+    body = renderHabitCreateForm();
   }
 
   return `
@@ -8197,13 +8691,14 @@ function viewIppoActionPicker(s) {
       </div>
 
       ${habitMode ? `
-        <div class="ippo-picker-habit-hint">続けたい行動を選んで「習慣に追加」を押すと、ベース画面の習慣リストに加わります</div>
+        <div class="ippo-picker-habit-hint">続けたい行動を選んで「習慣に追加」を押すと、続けていることリストに加わります</div>
       ` : ''}
 
       <div class="ippo-picker-tabs" role="tablist">
         <button class="ippo-picker-tab ${tab === 'recommend' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="recommend" role="tab" aria-selected="${tab === 'recommend'}">おすすめ</button>
-        <button class="ippo-picker-tab ${tab === 'category' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="category" role="tab" aria-selected="${tab === 'category'}">カテゴリから選ぶ</button>
+        <button class="ippo-picker-tab ${tab === 'category' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="category" role="tab" aria-selected="${tab === 'category'}">カテゴリ</button>
         <button class="ippo-picker-tab ${tab === 'history' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="history" role="tab" aria-selected="${tab === 'history'}">履歴</button>
+        ${habitMode ? `<button class="ippo-picker-tab ${tab === 'custom' ? 'active' : ''}" data-act="ippo-picker-tab" data-tab="custom" role="tab" aria-selected="${tab === 'custom'}">自分でつくる</button>` : ''}
       </div>
 
       <div class="ippo-picker-body">
@@ -8271,6 +8766,187 @@ function ippoEvalAvgEmoji(avg) {
   if (avg >= 0.5) return '🙂';
   if (avg >= -0.5) return '😐';
   return '😞';
+}
+
+// ============================================================
+// 習慣 詳細画面 (P8.1 v0.9.47 〜)
+// habitView = { habitId, mode: 'today'|'calendar'|'edit', monthOffset?: 0 }
+// ============================================================
+function viewHabitDetail(hv) {
+  const item = getHabitItem(hv.habitId);
+  if (!item) {
+    habitView = null;
+    return viewAction();
+  }
+  const mode = hv.mode || 'today';
+  const streak = getHabitStreak(item.id);
+  const totalDone = (state.habitLogs || []).filter(l => l.habitId === item.id).length;
+
+  let body = '';
+  if (mode === 'today') body = renderHabitToday(item);
+  else if (mode === 'calendar') body = renderHabitCalendar(item, hv.monthOffset || 0);
+  else if (mode === 'edit') body = renderHabitEdit(item);
+
+  return `
+    <div class="screen active ippo-screen habit-detail-screen">
+      <div class="page-header">
+        <button class="back-btn" data-act="ippo-habit-back" aria-label="戻る">‹</button>
+        <h1 class="page-title">${escapeHtml(item.title)}</h1>
+        <span style="width:36px;"></span>
+      </div>
+
+      <div class="habit-detail-tabs" role="tablist">
+        <button class="habit-detail-tab ${mode === 'today' ? 'active' : ''}" data-act="ippo-habit-mode" data-mode="today" role="tab">今日</button>
+        <button class="habit-detail-tab ${mode === 'calendar' ? 'active' : ''}" data-act="ippo-habit-mode" data-mode="calendar" role="tab">記録</button>
+        <button class="habit-detail-tab ${mode === 'edit' ? 'active' : ''}" data-act="ippo-habit-mode" data-mode="edit" role="tab">編集</button>
+      </div>
+
+      <div class="habit-detail-summary">
+        <div class="habit-detail-summary-cell">
+          <div class="habit-detail-summary-num">${streak}<span class="habit-detail-summary-suf">日</span></div>
+          <div class="habit-detail-summary-label">連続中</div>
+        </div>
+        <div class="habit-detail-summary-cell">
+          <div class="habit-detail-summary-num">${totalDone}<span class="habit-detail-summary-suf">回</span></div>
+          <div class="habit-detail-summary-label">合計</div>
+        </div>
+        ${item.timing ? `
+          <div class="habit-detail-summary-cell">
+            <div class="habit-detail-summary-text">${escapeHtml(item.timing)}</div>
+            <div class="habit-detail-summary-label">タイミング</div>
+          </div>
+        ` : ''}
+      </div>
+
+      ${body}
+    </div>
+  `;
+}
+
+function renderHabitToday(item) {
+  const doneToday = isHabitDoneOn(item.id, new Date());
+  return `
+    <div class="habit-today-card">
+      <div class="habit-today-icon-big">${item.icon}</div>
+      <div class="habit-today-name">${escapeHtml(item.title)}${item.time ? `<span class="habit-today-time"> ${escapeHtml(item.time)}</span>` : ''}</div>
+      ${item.desc ? `<div class="habit-today-desc">${escapeHtml(item.desc)}</div>` : ''}
+      ${doneToday ? `
+        <div class="habit-today-checked">
+          <div class="habit-today-checkmark">✓</div>
+          <div class="habit-today-msg">今日やった！</div>
+          <div class="habit-today-sub">${formatDate(new Date().toISOString())}</div>
+          <button class="btn-ghost habit-today-undo" data-act="ippo-habit-unmark" data-habit-id="${item.id}">チェックを取り消す</button>
+        </div>
+      ` : `
+        <button class="btn btn-primary habit-today-cta" data-act="ippo-habit-mark" data-habit-id="${item.id}">今日やった！を記録する</button>
+      `}
+    </div>
+  `;
+}
+
+function renderHabitCalendar(item, monthOffset) {
+  const today = new Date();
+  const target = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+  const year = target.getFullYear();
+  const month0 = target.getMonth();
+  const first = new Date(year, month0, 1);
+  const last = new Date(year, month0 + 1, 0);
+  const startDay = first.getDay(); // 0=Sun
+  const daysInMonth = last.getDate();
+  // 月のログ数
+  const monthLogs = (state.habitLogs || []).filter(l => l.habitId === item.id && l.date.startsWith(`${year}-${String(month0+1).padStart(2,'0')}`));
+  const doneCount = monthLogs.length;
+  const achievementRate = daysInMonth > 0 ? Math.round((doneCount / daysInMonth) * 100) : 0;
+
+  // セル構築
+  const cells = [];
+  for (let i = 0; i < startDay; i++) cells.push(`<div class="habit-cal-cell empty"></div>`);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(year, month0, d);
+    const done = isHabitDoneOn(item.id, dt);
+    const isFuture = dt > today;
+    const isToday = dateKey(dt) === dateKey(today);
+    cells.push(`
+      <div class="habit-cal-cell ${done ? 'done' : ''} ${isFuture ? 'future' : ''} ${isToday ? 'today' : ''}">
+        <div class="habit-cal-num">${d}</div>
+        ${done ? '<div class="habit-cal-mark">✓</div>' : ''}
+      </div>
+    `);
+  }
+
+  return `
+    <div class="habit-cal-nav">
+      <button class="btn-ghost habit-cal-nav-btn" data-act="ippo-habit-cal-prev" aria-label="前月">‹</button>
+      <div class="habit-cal-nav-label">${year}年${month0 + 1}月</div>
+      <button class="btn-ghost habit-cal-nav-btn ${monthOffset >= 0 ? 'disabled' : ''}" data-act="ippo-habit-cal-next" aria-label="翌月" ${monthOffset >= 0 ? 'disabled' : ''}>›</button>
+    </div>
+
+    <div class="habit-cal-stats">
+      <div>${month0 + 1}月の記録：<strong>${doneCount}</strong> / ${daysInMonth}日</div>
+      <div>達成率 <strong>${achievementRate}%</strong></div>
+    </div>
+
+    <div class="habit-cal-weekhead">
+      ${['日','月','火','水','木','金','土'].map((l, i) => `<div class="habit-cal-weekday ${i === 0 ? 'sun' : i === 6 ? 'sat' : ''}">${l}</div>`).join('')}
+    </div>
+    <div class="habit-cal-grid">
+      ${cells.join('')}
+    </div>
+  `;
+}
+
+function renderHabitEdit(item) {
+  if (item.isCustom) {
+    const custom = (state.customHabits || []).find(h => h.id === item.id) || {};
+    return `
+      <div class="habit-edit-form">
+        <label class="habit-edit-label">行動名
+          <input type="text" class="habit-edit-input" id="habit-edit-name" value="${escapeHtml(custom.name || '')}" maxlength="40" />
+        </label>
+        <label class="habit-edit-label">どのくらい？（目安時間）
+          <input type="text" class="habit-edit-input" id="habit-edit-duration" value="${escapeHtml(custom.duration || '')}" placeholder="例) 3分" maxlength="20" />
+        </label>
+        <label class="habit-edit-label">いつやる？
+          <input type="text" class="habit-edit-input" id="habit-edit-timing" value="${escapeHtml(custom.timing || '')}" placeholder="例) 朝・起きたあと" maxlength="40" />
+        </label>
+        <label class="habit-edit-label">アイコン（絵文字）
+          <input type="text" class="habit-edit-input habit-edit-icon-input" id="habit-edit-icon" value="${escapeHtml(custom.icon || '🌱')}" maxlength="2" />
+        </label>
+        <button class="btn btn-primary habit-edit-save" data-act="ippo-habit-edit-save" data-habit-id="${item.id}">保存する</button>
+        <button class="btn-ghost habit-edit-delete" data-act="ippo-habit-delete" data-habit-id="${item.id}">この習慣を削除する</button>
+      </div>
+    `;
+  }
+  // ライブラリ行動: 編集不可・削除のみ
+  return `
+    <div class="habit-edit-readonly">
+      <div class="habit-edit-readonly-h">ライブラリの行動</div>
+      <p class="habit-edit-readonly-p">この行動はもやの森のおすすめライブラリから選ばれた習慣です。<br>名前や時間の編集はできませんが、習慣からは外せます。</p>
+      <button class="btn-ghost habit-edit-delete" data-act="ippo-habit-delete" data-habit-id="${item.id}">習慣から外す</button>
+    </div>
+  `;
+}
+
+// 新規カスタム習慣作成フォーム (ピッカーの「自分でつくる」タブ用)
+function renderHabitCreateForm() {
+  return `
+    <div class="habit-edit-form habit-create-form">
+      <div class="habit-create-h">新しい習慣を作る</div>
+      <label class="habit-edit-label">行動名
+        <input type="text" class="habit-edit-input" id="habit-create-name" placeholder="例) 花に水をあげる" maxlength="40" />
+      </label>
+      <label class="habit-edit-label">どのくらい？（目安時間）
+        <input type="text" class="habit-edit-input" id="habit-create-duration" placeholder="例) 3分" maxlength="20" />
+      </label>
+      <label class="habit-edit-label">いつやる？
+        <input type="text" class="habit-edit-input" id="habit-create-timing" placeholder="例) 朝・起きたあと" maxlength="40" />
+      </label>
+      <label class="habit-edit-label">アイコン（絵文字）
+        <input type="text" class="habit-edit-input habit-edit-icon-input" id="habit-create-icon" value="🌱" maxlength="2" />
+      </label>
+      <button class="btn btn-primary habit-edit-save" data-act="ippo-habit-create-submit">この内容で登録する</button>
+    </div>
+  `;
 }
 
 // 旧UI（goal/policy/action）— 当面は viewAction から呼ばれないが互換のため残す
@@ -11913,9 +12589,9 @@ function handleAction(act, el, ev) {
     toast('過去の方向選択と実施履歴から、いま合いそうな行動を提案しています');
     return;
   }
-  // ベース画面: 習慣を追加 → ピッカーを習慣選択モードで開く (P8)
+  // ベース画面: 習慣を追加/編集 → ピッカーを習慣選択モードで開く (P8)
   if (act === 'ippo-base-add-habit') {
-    ippoToday = { step: 99, pickerTab: 'category', startedAt: new Date().toISOString(), habitMode: true };
+    ippoToday = { step: 99, pickerTab: 'recommend', startedAt: new Date().toISOString(), habitMode: true };
     render();
     return;
   }
@@ -11927,14 +12603,119 @@ function handleAction(act, el, ev) {
     const idx = state.user.habitActionIds.indexOf(actionId);
     if (idx >= 0) {
       state.user.habitActionIds.splice(idx, 1);
+      // 関連ログも削除
+      state.habitLogs = (state.habitLogs || []).filter(l => l.habitId !== actionId);
       toast('習慣から外しました');
     } else {
       state.user.habitActionIds.push(actionId);
       toast('習慣に追加しました 🌱');
-      // 習慣モードで追加した場合はベース画面に戻る
-      if (ippoToday && ippoToday.habitMode) ippoToday = null;
     }
     saveState();
+    render();
+    return;
+  }
+
+  // ============================================================
+  // 習慣詳細 (P8.1 v0.9.47 〜)
+  // ============================================================
+  if (act === 'ippo-habit-tap') {
+    const id = el.dataset.habitId;
+    if (!id) return;
+    habitView = { habitId: id, mode: 'today', monthOffset: 0 };
+    render();
+    return;
+  }
+  if (act === 'ippo-habit-back') {
+    habitView = null;
+    render();
+    return;
+  }
+  if (act === 'ippo-habit-mode') {
+    if (!habitView) return;
+    habitView.mode = el.dataset.mode || 'today';
+    if (habitView.mode === 'calendar') habitView.monthOffset = 0;
+    render();
+    return;
+  }
+  if (act === 'ippo-habit-mark') {
+    const id = el.dataset.habitId;
+    if (!id) return;
+    if (markHabitDoneToday(id)) {
+      saveState();
+      toast('今日のいっぽを記録しました 🌱');
+    }
+    render();
+    return;
+  }
+  if (act === 'ippo-habit-unmark') {
+    const id = el.dataset.habitId;
+    if (!id) return;
+    unmarkHabitToday(id);
+    saveState();
+    toast('チェックを取り消しました');
+    render();
+    return;
+  }
+  if (act === 'ippo-habit-cal-prev') {
+    if (habitView) { habitView.monthOffset = (habitView.monthOffset || 0) - 1; render(); }
+    return;
+  }
+  if (act === 'ippo-habit-cal-next') {
+    if (habitView) {
+      const cur = habitView.monthOffset || 0;
+      if (cur < 0) { habitView.monthOffset = cur + 1; render(); }
+    }
+    return;
+  }
+  if (act === 'ippo-habit-edit-save') {
+    const id = el.dataset.habitId;
+    if (!id) return;
+    const custom = (state.customHabits || []).find(h => h.id === id);
+    if (!custom) return;
+    const name = (document.getElementById('habit-edit-name') || {}).value || '';
+    const duration = (document.getElementById('habit-edit-duration') || {}).value || '';
+    const timing = (document.getElementById('habit-edit-timing') || {}).value || '';
+    const icon = (document.getElementById('habit-edit-icon') || {}).value || '🌱';
+    if (!name.trim()) { toast('行動名を入力してください'); return; }
+    custom.name = name.trim();
+    custom.duration = duration.trim();
+    custom.timing = timing.trim();
+    custom.icon = icon.trim() || '🌱';
+    saveState();
+    toast('保存しました');
+    if (habitView) habitView.mode = 'today';
+    render();
+    return;
+  }
+  if (act === 'ippo-habit-delete') {
+    const id = el.dataset.habitId;
+    if (!id) return;
+    if (!confirm('この習慣を削除しますか？\n（記録された達成ログも削除されます）')) return;
+    deleteHabit(id);
+    saveState();
+    habitView = null;
+    toast('削除しました');
+    render();
+    return;
+  }
+  if (act === 'ippo-habit-create-submit') {
+    const name = (document.getElementById('habit-create-name') || {}).value || '';
+    const duration = (document.getElementById('habit-create-duration') || {}).value || '';
+    const timing = (document.getElementById('habit-create-timing') || {}).value || '';
+    const icon = (document.getElementById('habit-create-icon') || {}).value || '🌱';
+    if (!name.trim()) { toast('行動名を入力してください'); return; }
+    if (!Array.isArray(state.customHabits)) state.customHabits = [];
+    state.customHabits.push({
+      id: 'ch_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      name: name.trim(),
+      duration: duration.trim(),
+      timing: timing.trim(),
+      icon: icon.trim() || '🌱',
+      createdAt: new Date().toISOString(),
+    });
+    saveState();
+    toast('習慣を追加しました 🌱');
+    ippoToday = null;
     render();
     return;
   }
