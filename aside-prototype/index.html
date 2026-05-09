@@ -4422,6 +4422,59 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 
 /* ============================================================
+   ベース画面 統計カード (P8.3 v0.9.49 〜)
+   3カード横並び: 積み重ねた日 / やってみた回数 / 続いてる日
+   ============================================================ */
+.ippo-base-stat-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin: -2px 0 14px;
+}
+.ippo-base-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 10px 8px 12px;
+  display: flex; flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+[data-theme="dark"] .ippo-base-stat-card {
+  background: rgba(47, 62, 62, 0.55);
+  border-color: rgba(167, 196, 160, 0.18);
+}
+.ippo-base-stat-card-head {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10.5px;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.ippo-base-stat-card-icon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ippo-base-stat-card-label {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ippo-base-stat-card-num {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--text-strong);
+  line-height: 1.1;
+  text-align: left;
+  padding-left: 2px;
+}
+.ippo-base-stat-card-unit {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-strong);
+  margin-left: 2px;
+}
+
+/* ============================================================
    ベース画面 P8 拡張 (v0.9.46 〜)
    ============================================================ */
 .ippo-base-screen { padding: 14px 16px 90px; }
@@ -5340,7 +5393,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.48-beta.1',  // P8.2: 未実施時CTA・余裕CTA非表示・番号バッジ削除・「一歩」→「いっぽ」統一
+  appVersion:      '0.9.49-beta.1',  // P8.3: ベース画面統計カードUI刷新・いっぽ+習慣統合の活動指標
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -7683,6 +7736,51 @@ function getMonthDates(year, month0) {
   return result;
 }
 
+// ============================================================
+// ベース画面 統計ヘルパー (P8.3 v0.9.49 〜)
+// 「いっぽ」と「習慣」を統合した活動指標
+// ============================================================
+// 積み重ねた日: 累計のユニーク活動日数 (いっぽ実施 or 習慣達成のあった日)
+function calcTotalActiveDays() {
+  const days = new Set();
+  (state.ippoSessions || []).forEach(s => {
+    if (s.completedAt) days.add(dateKey(new Date(s.completedAt)));
+  });
+  (state.habitLogs || []).forEach(l => {
+    if (l.date) days.add(l.date);
+  });
+  return days.size;
+}
+
+// やってみた回数: 累計の活動回数 (いっぽセッション + 習慣達成)
+function calcTotalActivityCount() {
+  const ippo = (state.ippoSessions || []).length;
+  const habit = (state.habitLogs || []).length;
+  return ippo + habit;
+}
+
+// 続いてる日: 連続活動日 (いっぽ or 習慣どちらか1つでもあった日が連続している長さ)
+// 今日まだ何もしていなくても、昨日まで連続していれば継続中とカウント
+function calcCurrentStreak() {
+  const days = new Set();
+  (state.ippoSessions || []).forEach(s => {
+    if (s.completedAt) days.add(dateKey(new Date(s.completedAt)));
+  });
+  (state.habitLogs || []).forEach(l => {
+    if (l.date) days.add(l.date);
+  });
+  if (days.size === 0) return 0;
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    if (days.has(dateKey(d))) streak++;
+    else { if (i === 0) continue; break; }
+  }
+  return streak;
+}
+
 const IPPO_MOODS = [
   { label: 'しんどい',   emoji: '😣' },
   { label: '不安',       emoji: '😟' },
@@ -8470,8 +8568,10 @@ function shouldSuggestDeepDive() {
 //   ヒーロー / 今日のおすすめ / 最近よくやっているいっぽ / 習慣にしていること / きづき導線
 function viewIppoBase(session) {
   const sessions = state.ippoSessions || [];
-  const streak = calcIppoStreakDays();
-  const totalCount = sessions.length;
+  // P8.3 〜: ベース画面の統計はいっぽ+習慣を統合した数値
+  const activeDays = calcTotalActiveDays();
+  const totalCount = calcTotalActivityCount();
+  const streak = calcCurrentStreak();
   const isDone = !!session;
 
   // 今日のおすすめの一歩 (履歴・方向ベース・本日実施済の actionId は除外)
@@ -8522,22 +8622,30 @@ function viewIppoBase(session) {
         <div class="ippo-base-hero-msg">${isDone
           ? '小さないっぽの積み重ねが、<br>あなたをやさしく変えていきます。'
           : 'むりせず、できそうな小さないっぽから。<br>すぷらんが見守っています。'}</div>
-        <div class="ippo-base-hero-stats">
-          <div class="ippo-base-stat-cell">
-            <div class="ippo-base-stat-icon-line">📅</div>
-            <div class="ippo-base-stat-num">${streak}<span class="ippo-base-stat-suf">日</span></div>
-            <div class="ippo-base-stat-label">連続日数</div>
+      </div>
+
+      <!-- 統計カセット (P8.3) -->
+      <div class="ippo-base-stat-cards">
+        <div class="ippo-base-stat-card">
+          <div class="ippo-base-stat-card-head">
+            <span class="ippo-base-stat-card-icon">🌱</span>
+            <span class="ippo-base-stat-card-label">積み重ねた日</span>
           </div>
-          <div class="ippo-base-stat-cell">
-            <div class="ippo-base-stat-icon-line">✓</div>
-            <div class="ippo-base-stat-num">${totalCount}<span class="ippo-base-stat-suf">回</span></div>
-            <div class="ippo-base-stat-label">実施した回数</div>
+          <div class="ippo-base-stat-card-num">${activeDays}<span class="ippo-base-stat-card-unit">日</span></div>
+        </div>
+        <div class="ippo-base-stat-card">
+          <div class="ippo-base-stat-card-head">
+            <span class="ippo-base-stat-card-icon">✓</span>
+            <span class="ippo-base-stat-card-label">やってみた回数</span>
           </div>
-          <div class="ippo-base-stat-cell">
-            <div class="ippo-base-stat-icon-line ${isDone ? 'done' : 'todo'}">${isDone ? '🌱' : '·'}</div>
-            <div class="ippo-base-stat-num-text ${isDone ? 'done' : 'todo'}">${isDone ? 'いっぽすすめた' : 'まだ'}</div>
-            <div class="ippo-base-stat-label">今日</div>
+          <div class="ippo-base-stat-card-num">${totalCount}<span class="ippo-base-stat-card-unit">回</span></div>
+        </div>
+        <div class="ippo-base-stat-card">
+          <div class="ippo-base-stat-card-head">
+            <span class="ippo-base-stat-card-icon">📅</span>
+            <span class="ippo-base-stat-card-label">続いてる日</span>
           </div>
+          <div class="ippo-base-stat-card-num">${streak}<span class="ippo-base-stat-card-unit">日</span></div>
         </div>
       </div>
 
