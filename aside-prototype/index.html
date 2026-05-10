@@ -5293,6 +5293,99 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 [data-theme="dark"] .habit-cal-mark { color: #A7C4A0; }
 
+/* ============================================================
+   全習慣カレンダー画面 v0.9.54 〜
+   ============================================================ */
+.habits-cal-screen { padding-bottom: 80px; }
+.habits-cal-monthnav {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; margin: 8px 0 14px;
+}
+.habits-cal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  padding: 14px 14px 16px;
+  margin-bottom: 12px;
+}
+[data-theme="dark"] .habits-cal-card { background: rgba(47, 62, 62, 0.55); border-color: rgba(167,196,160,0.15); }
+.habits-cal-card-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 10px;
+}
+.habits-cal-card-icon {
+  font-size: 22px; line-height: 1;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-soft);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.habits-cal-card-title-wrap { flex: 1; min-width: 0; }
+.habits-cal-card-title {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.4;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.habits-cal-card-meta {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 2px;
+}
+.habits-cal-mini-weekhead {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 2px; margin-bottom: 4px;
+}
+.habits-cal-mini-weekday {
+  text-align: center;
+  font-size: 9px; color: var(--text-muted);
+  padding: 2px 0;
+}
+.habits-cal-mini-weekday.sun { color: #C97A7A; }
+.habits-cal-mini-weekday.sat { color: #7B9CC6; }
+.habits-cal-mini-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.habits-cal-mini-cell {
+  aspect-ratio: 1 / 1;
+  position: relative;
+  background: var(--bg-soft);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  color: var(--text-soft);
+}
+[data-theme="dark"] .habits-cal-mini-cell { background: rgba(255,255,255,0.04); }
+.habits-cal-mini-cell.empty { background: transparent; }
+.habits-cal-mini-cell.future { opacity: 0.4; }
+.habits-cal-mini-cell.today {
+  outline: 2px solid #6B8F71;
+  outline-offset: -2px;
+}
+.habits-cal-mini-cell.done {
+  background: rgba(123, 168, 118, 0.85);
+  color: #FFF;
+}
+.habits-cal-mini-num {
+  position: absolute;
+  top: 1px; left: 3px;
+  font-size: 8.5px;
+  line-height: 1;
+}
+.habits-cal-mini-cell.done .habits-cal-mini-num { color: rgba(255,255,255,0.85); }
+.habits-cal-mini-mark {
+  font-size: 11px; font-weight: 700;
+  color: #FFF;
+}
+
+/* 習慣セクションヘッダーの右側ボタン群 (v0.9.54 〜) */
+.ippo-base-habit-actions {
+  display: flex; align-items: center; gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 /* 編集タブ / カスタム作成フォーム */
 .habit-edit-form {
   display: flex; flex-direction: column; gap: 14px;
@@ -8210,6 +8303,7 @@ function formatDate(iso) {
 // ============================================================
 let ippoToday = null;  // 進行中のセッション（モジュールローカル）
 let habitView = null;  // 習慣詳細画面の状態 {habitId, mode: 'today'|'calendar'|'edit', monthOffset?: 0} (P8.1〜)
+let habitsCalView = null;  // 全習慣カレンダー画面の状態 {monthOffset: 0} (v0.9.54〜)
 
 // ============================================================
 // 習慣化ヘルパー (P8.1 v0.9.47 〜)
@@ -8380,7 +8474,9 @@ function ippoCompletedToday() {
 }
 
 function viewAction() {
-  // P8.1: 習慣詳細画面が開いていれば最優先
+  // v0.9.54: 全習慣カレンダー画面が開いていれば最優先
+  if (habitsCalView) return viewAllHabitsCalendar(habitsCalView);
+  // P8.1: 習慣詳細画面が開いていれば優先
   if (habitView) return viewHabitDetail(habitView);
   // P8 〜: 進行中セッションなし → ベース画面 (今日完了/未完了で文言を可変)
   //         初回利用 (履歴0 + 習慣0) のときのみオンボーディング
@@ -9403,12 +9499,17 @@ function viewIppoBase(session) {
         </button>
       ` : ''}
 
-      <!-- 続けていること（習慣）(P8.4 v0.9.50 〜) -->
+      <!-- 続けていること（習慣）(P8.4 v0.9.50 〜・v0.9.54 〜「記録を見る」追加) -->
       <div class="ippo-base-section-row">
         <div class="ippo-base-section-h">続けていること（習慣）</div>
-        ${habitItems.length === 0
-          ? `<button class="ippo-base-section-link" data-act="ippo-base-add-habit">＋ 追加</button>`
-          : `<button class="ippo-base-edit-pill" data-act="ippo-base-add-habit"><span class="ippo-base-edit-pill-icon">✎</span>追加・編集</button>`}
+        <div class="ippo-base-habit-actions">
+          ${habitItems.length > 0 ? `
+            <button class="ippo-base-edit-pill" data-act="ippo-habits-cal-open"><span class="ippo-base-edit-pill-icon">📅</span>記録を見る</button>
+          ` : ''}
+          ${habitItems.length === 0
+            ? `<button class="ippo-base-section-link" data-act="ippo-base-add-habit">＋ 追加</button>`
+            : `<button class="ippo-base-edit-pill" data-act="ippo-base-add-habit"><span class="ippo-base-edit-pill-icon">✎</span>追加・編集</button>`}
+        </div>
       </div>
       ${habitItems.length === 0 ? `
         <div class="ippo-base-soon-card">
@@ -9682,6 +9783,95 @@ function renderHabitToday(item) {
       ` : `
         <button class="btn btn-primary habit-today-cta" data-act="ippo-habit-mark" data-habit-id="${item.id}">今日やった！を記録する</button>
       `}
+    </div>
+  `;
+}
+
+// ============================================================
+// 全習慣カレンダー画面 v0.9.54 〜
+// 「習慣セクション右上の記録を見る」から開く。各習慣の月別実施履歴を縦並びで表示
+// ============================================================
+function viewAllHabitsCalendar(hcv) {
+  const monthOffset = hcv.monthOffset || 0;
+  const today = new Date();
+  const target = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+  const year = target.getFullYear();
+  const month0 = target.getMonth();
+
+  const habits = getAllHabitIds().map(id => {
+    const action = ACTIONS.find(a => a.id === id);
+    if (action) return { id, icon: action.icon, title: action.title, time: action.time, isCustom: false };
+    const custom = (state.customHabits || []).find(h => h.id === id);
+    if (custom) return { id, icon: custom.icon || '🌱', title: custom.title, time: custom.time, isCustom: true };
+    return null;
+  }).filter(Boolean);
+
+  return `
+    <div class="screen active ippo-screen habits-cal-screen">
+      <div class="page-header">
+        <button class="back-btn" data-act="ippo-habits-cal-back" aria-label="戻る">‹</button>
+        <h1 class="page-title">習慣の記録</h1>
+        <span style="width:36px;"></span>
+      </div>
+
+      <div class="habits-cal-monthnav">
+        <button class="btn-ghost habit-cal-nav-btn" data-act="ippo-habits-cal-prev" aria-label="前月">‹</button>
+        <div class="habit-cal-nav-label">${year}年${month0 + 1}月</div>
+        <button class="btn-ghost habit-cal-nav-btn ${monthOffset >= 0 ? 'disabled' : ''}" data-act="ippo-habits-cal-next" aria-label="翌月" ${monthOffset >= 0 ? 'disabled' : ''}>›</button>
+      </div>
+
+      ${habits.length === 0 ? `
+        <div class="ippo-base-soon-card" style="margin-top:16px;">
+          <span class="ippo-base-soon-icon">🌱</span>
+          <div>
+            <div class="ippo-base-soon-h">習慣はまだありません</div>
+            <div class="ippo-base-soon-d">「追加・編集」から続けたい行動を選んで習慣にしましょう</div>
+          </div>
+        </div>
+      ` : habits.map(h => renderHabitsCalCard(h, year, month0, today)).join('')}
+    </div>
+  `;
+}
+
+function renderHabitsCalCard(habit, year, month0, today) {
+  const first = new Date(year, month0, 1);
+  const last = new Date(year, month0 + 1, 0);
+  const startDay = first.getDay();
+  const daysInMonth = last.getDate();
+  const monthLogs = (state.habitLogs || []).filter(l => l.habitId === habit.id && l.date.startsWith(`${year}-${String(month0+1).padStart(2,'0')}`));
+  const doneCount = monthLogs.length;
+  const streak = getHabitStreak(habit.id);
+
+  const cells = [];
+  for (let i = 0; i < startDay; i++) cells.push(`<div class="habits-cal-mini-cell empty"></div>`);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(year, month0, d);
+    const done = isHabitDoneOn(habit.id, dt);
+    const isFuture = dt > today;
+    const isToday = dateKey(dt) === dateKey(today);
+    cells.push(`
+      <div class="habits-cal-mini-cell ${done ? 'done' : ''} ${isFuture ? 'future' : ''} ${isToday ? 'today' : ''}">
+        <span class="habits-cal-mini-num">${d}</span>
+        ${done ? '<span class="habits-cal-mini-mark">✓</span>' : ''}
+      </div>
+    `);
+  }
+
+  return `
+    <div class="habits-cal-card">
+      <div class="habits-cal-card-head">
+        <span class="habits-cal-card-icon">${habit.icon}</span>
+        <div class="habits-cal-card-title-wrap">
+          <div class="habits-cal-card-title">${escapeHtml(habit.title)}</div>
+          <div class="habits-cal-card-meta">${month0 + 1}月 ${doneCount} / ${daysInMonth}日　・　連続 ${streak}日</div>
+        </div>
+      </div>
+      <div class="habits-cal-mini-weekhead">
+        ${['日','月','火','水','木','金','土'].map((l, i) => `<div class="habits-cal-mini-weekday ${i === 0 ? 'sun' : i === 6 ? 'sat' : ''}">${l}</div>`).join('')}
+      </div>
+      <div class="habits-cal-mini-grid">
+        ${cells.join('')}
+      </div>
     </div>
   `;
 }
@@ -13562,6 +13752,28 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  // 全習慣カレンダー画面 (v0.9.54 〜)
+  if (act === 'ippo-habits-cal-open') {
+    habitsCalView = { monthOffset: 0 };
+    render();
+    return;
+  }
+  if (act === 'ippo-habits-cal-back') {
+    habitsCalView = null;
+    render();
+    return;
+  }
+  if (act === 'ippo-habits-cal-prev') {
+    if (habitsCalView) { habitsCalView.monthOffset = (habitsCalView.monthOffset || 0) - 1; render(); }
+    return;
+  }
+  if (act === 'ippo-habits-cal-next') {
+    if (habitsCalView && (habitsCalView.monthOffset || 0) < 0) {
+      habitsCalView.monthOffset = (habitsCalView.monthOffset || 0) + 1;
+      render();
+    }
+    return;
+  }
   if (act === 'ippo-habit-back') {
     habitView = null;
     render();
@@ -13863,6 +14075,10 @@ function handleAction(act, el, ev) {
       // 保留から消す（再開していた場合）
       if (ippoToday.resumedPendingId) {
         state.ippoPending = (state.ippoPending || []).filter(p => p.id !== ippoToday.resumedPendingId);
+      }
+      // v0.9.54 〜 行動が習慣に登録されていれば今日実施扱いにする
+      if (ippoToday.selectedActionId && getAllHabitIds().includes(ippoToday.selectedActionId)) {
+        markHabitDoneToday(ippoToday.selectedActionId);
       }
       saveState();
       if (window.MoyaLogger) MoyaLogger.event('ippo_completed', {
