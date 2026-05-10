@@ -13736,11 +13736,18 @@ function handleAction(act, el, ev) {
   // ============================================================
   // 習慣詳細 (P8.1 v0.9.47 〜)
   // ============================================================
-  // v0.9.53 〜 習慣行をタップしたら行動実施画面（タイマー）へ直行
+  // 習慣行タップの分岐 (v0.9.55 〜)
+  // - 既定アクション (ACTIONS 定義あり) → タイマー画面へ直行 (v0.9.53 〜)
+  // - カスタム習慣 (ユーザー作成) → タイマー定義がないので詳細「今日やった！」画面へ
   if (act === 'ippo-habit-tap') {
     const id = el.dataset.habitId;
     if (!id) return;
-    ippoToday = { step: 35, startedAt: new Date().toISOString(), preselectedActionId: id };
+    const isPreset = !!ACTIONS.find(a => a.id === id);
+    if (isPreset) {
+      ippoToday = { step: 35, startedAt: new Date().toISOString(), preselectedActionId: id };
+    } else {
+      habitView = { habitId: id, mode: 'today', monthOffset: 0 };
+    }
     render();
     return;
   }
