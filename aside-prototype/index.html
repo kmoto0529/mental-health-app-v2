@@ -5495,6 +5495,132 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 
 /* ============================================================
+   いっぽ Timer 画面 v0.9.52 〜 行動カテゴリ別UI
+   .ippo-tk-card 共通 / .ippo-tk-ring (呼吸瞑想) / .ippo-tk-count (運動・音楽など)
+   / .ippo-tk-write (書く・セルフケア言葉)
+   ============================================================ */
+.ippo-tk-card {
+  background: var(--bg-card);
+  border-radius: 18px;
+  padding: 22px 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="dark"] .ippo-tk-card { background: rgba(47, 62, 62, 0.55); }
+.ippo-tk-title-row { text-align: center; }
+.ippo-tk-title {
+  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  font-size: 15px; font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.45;
+}
+.ippo-tk-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.ippo-tk-num {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 36px; font-weight: 700;
+  color: var(--text-strong);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+.ippo-tk-icon { font-size: 30px; line-height: 1; }
+.ippo-tk-pause {
+  display: block;
+  margin: 16px auto 0;
+  background: var(--bg-soft);
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 13px; color: var(--text-strong);
+  cursor: pointer;
+  min-width: 130px;
+}
+.ippo-tk-pause:active { opacity: 0.7; }
+[data-theme="dark"] .ippo-tk-pause {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  color: #DDD;
+}
+.ippo-tk-pause-soft { background: rgba(255,255,255,0.6); }
+
+/* === Ring (呼吸・瞑想系) === */
+.ippo-tk-ring { text-align: center; }
+.ippo-tk-ring-wrap {
+  position: relative;
+  width: 180px; height: 180px;
+  margin: 18px auto 12px;
+}
+.ippo-tk-ring-svg { display: block; }
+.ippo-tk-ring-center {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px; height: 60px;
+}
+.ippo-tk-ring-meta { text-align: center; }
+.ippo-tk-ring-meta-line {
+  font-size: 11px; color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* === Countdown (運動・音楽・日課 系) === */
+.ippo-tk-count { text-align: center; }
+.ippo-tk-count-illust {
+  margin: 14px auto 8px;
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFF5E0 0%, #FFE7B5 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+[data-theme="dark"] .ippo-tk-count-illust {
+  background: linear-gradient(135deg, rgba(255, 213, 79, 0.18) 0%, rgba(255, 213, 79, 0.08) 100%);
+}
+.ippo-tk-count-icon { font-size: 56px; line-height: 1; }
+.ippo-tk-count-meta { text-align: center; margin-top: 6px; }
+.ippo-tk-count-label {
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.ippo-tk-count-sub {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* === Writing (書く・セルフケア言葉系) === */
+.ippo-tk-write { padding: 18px 16px 16px; }
+.ippo-tk-write-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.ippo-tk-write-title-wrap { display: flex; flex-direction: column; min-width: 0; }
+.ippo-tk-write-desc {
+  font-size: 12px; color: var(--text-soft);
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+.ippo-tk-write-area {
+  position: relative;
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 12px 12px 8px;
+}
+.ippo-tk-write-textarea {
+  width: 100%;
+  min-height: 140px;
+  border: 0; outline: 0;
+  background: transparent;
+  resize: none;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-strong);
+  box-sizing: border-box;
+}
+.ippo-tk-write-counter {
+  text-align: right;
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================================
    きづき (Kizuki) タブ — v0.9.38 〜
    ============================================================ */
 .kizuki-top-screen, .kizuki-list-screen { padding-bottom: 80px; }
@@ -8252,13 +8378,13 @@ function viewAction() {
     if (!hasIppoHist && !hasHabit) return viewIppoOnboarding();
     return viewIppoBase(ippoCompletedToday() || null);
   }
-  // 進行中: ステップ別画面 (Step 0 → 2 → 3 → 35 → 4 → 完了 → ベース)
-  // (旧 Step 1 気分+強さ・Step 5 サマリ・Step 45 やったね は廃止)
+  // 進行中: ステップ別画面 (Step 2 → 35 → 4 → 完了 → ベース) v0.9.52 〜
+  // 旧 Step 0 (方向選択) / Step 1 (気分+強さ) / Step 3 (いまやる/あとで) / Step 5 / Step 45 は廃止
   // step 99: 行動を選ぶ画面 (P7・3サブタブ)
   switch (ippoToday.step) {
-    case 0:  return viewIppoStep0(ippoToday);
+    case 0:  ippoToday.step = 2; return viewIppoStep2(ippoToday);  // 旧stateからの遷移を救済
     case 2:  return viewIppoStep2(ippoToday);
-    case 3:  return viewIppoStep3(ippoToday);
+    case 3:  ippoToday.step = 35; return viewIppoTimer(ippoToday); // 旧stateからの遷移を救済
     case 35: return viewIppoTimer(ippoToday);
     case 4:  return viewIppoStep4(ippoToday);
     case 99: return viewIppoActionPicker(ippoToday);
@@ -8267,14 +8393,8 @@ function viewAction() {
 }
 
 function ippoHeader(stepNo) {
-  // v0.9.40 〜: 新4ステップ表記 (Step 0 を 1/4 とする)
-  // 0:方向(1/4) → 2:推薦(2/4) → 3:いまやる(3/4) → 4:変化記録(4/4) → 5:サマリ(別画面)
-  const dispMap = { 0: '1 / 4', 2: '2 / 4', 3: '3 / 4', 4: '4 / 4' };
-  const disp = dispMap[stepNo];
-  return `
-    <h1 class="ippo-h1">きょうのいっぽ</h1>
-    ${disp ? `<div class="ippo-step">Step ${disp}</div>` : ''}
-  `;
+  // v0.9.52 〜: ステップ表示削除（社長指示）
+  return `<h1 class="ippo-h1">きょうのいっぽ</h1>`;
 }
 
 // 現在の方向の表示行（Step 2〜4 で表示）— v0.9.40 〜 複数選択対応
@@ -8585,18 +8705,18 @@ function viewIppoStep1(s) {
   `;
 }
 
-// Step 2（v0.9.13・v0.9.40 〜は Step 0 直後）: 推薦カード
-// v0.9.45 〜: preselectedActionId があれば最上位に挿入＆自動選択 (P7・ピッカー/おすすめ直タップ経由)
+// Step 2 推薦カード — v0.9.52 〜 刷新: duration filter削除 / 初期3件・他のいっぽを見るで+3 / step3スキップ
+// preselectedActionId があれば最上位に挿入＆自動選択 (P7・ピッカー/おすすめ直タップ経由)
 function viewIppoStep2(s) {
   if (!s.candidates) {
+    // 全候補をおすすめ順で取得（多めに）
     s.candidates = getTopRecommendations({
       moodLabel: s.moodLabel || 'なんとなく',
       intensity: s.moodIntensity == null ? 5 : s.moodIntensity,
       directionIds: s.directionIds || getDirectionIds(),
-      durationPref: s.durationPref || '1min',
+      durationPref: s.durationPref || 'any',
       history: state.ippoSessions || [],
-    }, 5);
-    // preselectedActionId 対応: 候補に含まれていなければ先頭に追加・既存なら最上位へ繰り上げ
+    }, 30);
     if (s.preselectedActionId) {
       const idx = s.candidates.findIndex(c => c.action.id === s.preselectedActionId);
       if (idx === -1) {
@@ -8614,14 +8734,13 @@ function viewIppoStep2(s) {
   const visible = s.candidates.slice(0, visibleCount);
   const canMore = visibleCount < s.candidates.length;
   const selectedId = s.selectedActionId;
-  const dur = s.durationPref || '1min';
 
   return `
     <div class="screen active ippo-screen">
       ${ippoHeader(2)}
       ${ippoDirectionLine()}
       <div class="ippo-q">あなたに合いそうないっぽを提案します</div>
-      <p class="text-tiny text-muted mb-3">${dur === '1min' ? 'まずは、1分でできるものから' : dur === '3min' ? '3分くらいでできるもの' : '5分以上、じっくり取り組めるもの'}</p>
+      <p class="text-tiny text-muted mb-3">気になるものを1つ選んでね</p>
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${visible.map(c => {
           const tags = c.score.tags;
@@ -8652,19 +8771,9 @@ function viewIppoStep2(s) {
         <button class="btn btn-secondary" data-act="ippo-step2-more" style="margin-top:12px; width:100%;">他のいっぽを見る</button>
       ` : ''}
 
-      <!-- もっとできそう？(duration filter) -->
-      <div style="margin-top:18px; padding:14px 16px; background:var(--bg-soft); border-radius:12px;">
-        <div class="text-tiny text-muted mb-2">もっとできそう？</div>
-        <div style="display:flex; gap:8px;">
-          <button class="ippo-dur-btn ${dur === '1min' ? 'selected' : ''}" data-act="ippo-step2-dur" data-dur="1min">1分くらい</button>
-          <button class="ippo-dur-btn ${dur === '3min' ? 'selected' : ''}" data-act="ippo-step2-dur" data-dur="3min">3分くらい</button>
-          <button class="ippo-dur-btn ${dur === '5min' ? 'selected' : ''}" data-act="ippo-step2-dur" data-dur="5min">5分以上</button>
-        </div>
-      </div>
-
       <div style="margin-top:18px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="ippo-step2-next" ${!selectedId ? 'disabled' : ''}>このいっぽを選ぶ</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="0">‹ 戻る</button>
+        <button class="btn-ghost" data-act="ippo-cancel">キャンセル</button>
       </div>
     </div>
   `;
@@ -8698,39 +8807,190 @@ function viewIppoStep3(s) {
   `;
 }
 
-// Step 35 (タイマー画面・v0.9.41 〜) — 「いまやる」と「変化記録」の間。
-// 行動別の本格タイマー (深呼吸4-7-8 のセット表示等) は別途実装予定のため、
-// 現状は「準備中」プレースホルダ。「終わったよ」で Step 4 へ進む。
+// Step 35 タイマー画面 — v0.9.52 〜 行動カテゴリ別UI
+// kind: 'ring' (呼吸・瞑想) / 'countdown' (運動・日課・音楽など) / 'writing' (書く・セルフケア言葉)
+// 一旦は画像ベース。今後行動ごとに細かく設計予定。
+let ippoTimerIntervalId = null;
+
+function ippoTimerKind(action) {
+  if (!action) return 'countdown';
+  const t = (action.title || '') + ' ' + (action.desc || '') + ' ' + (action.technique || '');
+  if (action.cat === 'cognitive' || action.cat === 'assertion') return 'writing';
+  if (/書|綴|手紙|メモ|3つ|3個|なぜなぜ|ホット|ラベリング|分配|割合|フレーズ|私メッセージ/.test(t)) return 'writing';
+  if (action.cat === 'relax') return 'ring';
+  if (/呼吸|瞑想|マインドフルネス|スキャン|身体スキャン|聴く|味わう|今、ここ|やさしさの言葉/.test(t)) return 'ring';
+  return 'countdown';
+}
+
+function ippoTimerSeconds(action) {
+  const time = action && action.time;
+  if (!time) return 180;
+  const m = String(time).match(/(\d+)/);
+  const n = m ? parseInt(m[1], 10) : 3;
+  return Math.max(30, n * 60);
+}
+
+function formatMmSs(sec) {
+  const s = Math.max(0, Math.floor(sec));
+  const mm = String(Math.floor(s / 60)).padStart(2, '0');
+  const ss = String(s % 60).padStart(2, '0');
+  return `${mm}:${ss}`;
+}
+
+function startIppoTimerLoop() {
+  if (ippoTimerIntervalId) clearInterval(ippoTimerIntervalId);
+  ippoTimerIntervalId = setInterval(() => {
+    if (!ippoToday || ippoToday.step !== 35) {
+      stopIppoTimerLoop();
+      return;
+    }
+    if (ippoToday.timerPaused) return;
+    if (typeof ippoToday.remainingSec !== 'number') return;
+    if (ippoToday.remainingSec <= 0) return;
+    ippoToday.remainingSec--;
+    const numEl = document.getElementById('ippoTimerNum');
+    if (numEl) numEl.textContent = formatMmSs(ippoToday.remainingSec);
+    const ringEl = document.getElementById('ippoTimerRingFill');
+    if (ringEl && ippoToday.targetSec > 0) {
+      const r = parseFloat(ringEl.getAttribute('r')) || 70;
+      const C = 2 * Math.PI * r;
+      const ratio = ippoToday.remainingSec / ippoToday.targetSec;
+      ringEl.setAttribute('stroke-dasharray', `${C}`);
+      ringEl.setAttribute('stroke-dashoffset', `${C * (1 - ratio)}`);
+    }
+  }, 1000);
+}
+
+function stopIppoTimerLoop() {
+  if (ippoTimerIntervalId) {
+    clearInterval(ippoTimerIntervalId);
+    ippoTimerIntervalId = null;
+  }
+}
+
+window.ippoTimerSetNote = (v) => { if (ippoToday) ippoToday.notes = v; const cnt = document.getElementById('ippoTimerNoteCounter'); if (cnt) cnt.textContent = String((v || '').length); };
+
 function viewIppoTimer(s) {
   const c = s.candidates && s.candidates.find(x => x.action.id === s.selectedActionId);
   if (!c) { s.step = 2; return viewIppoStep2(s); }
+  const action = c.action;
+  const kind = ippoTimerKind(action);
+
+  // 初期化（再描画時はリセットしない）
+  if (s.timerInited !== true) {
+    s.targetSec = ippoTimerSeconds(action);
+    s.remainingSec = s.targetSec;
+    s.timerPaused = false;
+    s.timerInited = true;
+    s.notes = s.notes || '';
+  }
+
+  // 画面描画後にタイマー起動（writing 以外）
+  if (kind !== 'writing') {
+    setTimeout(() => startIppoTimerLoop(), 0);
+  } else {
+    stopIppoTimerLoop();
+  }
+
+  if (kind === 'writing') {
+    // 書く・振り返り系 / セルフケア・言葉系
+    const noteLen = (s.notes || '').length;
+    const doneLabel = action.cat === 'assertion' ? '完了する' : '書き終えた';
+    return `
+      <div class="screen active ippo-screen ippo-timer-screen">
+        ${ippoHeader(35)}
+        <div class="ippo-tk-card ippo-tk-write">
+          <div class="ippo-tk-write-head">
+            <span class="ippo-tk-icon">${action.icon}</span>
+            <div class="ippo-tk-write-title-wrap">
+              <div class="ippo-tk-title">${escapeHtml(action.title)}</div>
+              <div class="ippo-tk-sub">（${escapeHtml(action.time)}）</div>
+            </div>
+          </div>
+          <p class="ippo-tk-write-desc">${escapeHtml(action.desc)}</p>
+          <div class="ippo-tk-write-area">
+            <textarea
+              class="ippo-tk-write-textarea"
+              maxlength="200"
+              placeholder="ここに入..."
+              oninput="window.ippoTimerSetNote(this.value);"
+            >${escapeHtml(s.notes || '')}</textarea>
+            <div class="ippo-tk-write-counter">
+              <span id="ippoTimerNoteCounter">${noteLen}</span> / 200
+            </div>
+          </div>
+        </div>
+        <div style="display:grid; gap:10px; margin-top:18px;">
+          <button class="btn btn-primary" data-act="ippo-timer-done">${doneLabel}</button>
+          <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
+        </div>
+      </div>
+    `;
+  }
+
+  if (kind === 'ring') {
+    // 呼吸・瞑想系: リング型タイマー＋中央すぷらん
+    const r = 70;
+    const C = 2 * Math.PI * r;
+    const ratio = s.remainingSec / Math.max(1, s.targetSec);
+    return `
+      <div class="screen active ippo-screen ippo-timer-screen">
+        ${ippoHeader(35)}
+        <div class="ippo-tk-card ippo-tk-ring">
+          <div class="ippo-tk-title-row">
+            <div class="ippo-tk-title">${escapeHtml(action.title)}</div>
+          </div>
+          <div class="ippo-tk-ring-wrap">
+            <svg class="ippo-tk-ring-svg" viewBox="0 0 180 180" width="180" height="180" aria-hidden="true">
+              <circle cx="90" cy="90" r="${r}" fill="none" stroke="rgba(167,196,160,0.25)" stroke-width="6"/>
+              <circle id="ippoTimerRingFill" cx="90" cy="90" r="${r}" fill="none"
+                      stroke="#7BA876" stroke-width="6"
+                      stroke-linecap="round"
+                      stroke-dasharray="${C}"
+                      stroke-dashoffset="${C * (1 - ratio)}"
+                      transform="rotate(-90 90 90)"/>
+            </svg>
+            <div class="ippo-tk-ring-center">${suplan({ stage: 'tane', expression: 'happy', size: 60 })}</div>
+          </div>
+          <div class="ippo-tk-ring-meta">
+            <div class="ippo-tk-ring-meta-line">${escapeHtml(action.desc).slice(0, 14)}…</div>
+            <div class="ippo-tk-num" id="ippoTimerNum">${formatMmSs(s.remainingSec)}</div>
+          </div>
+          <button id="ippoTimerPauseBtn" class="ippo-tk-pause" data-act="ippo-timer-pause">
+            ${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}
+          </button>
+        </div>
+        <div style="display:grid; gap:10px; margin-top:18px;">
+          <button class="btn btn-primary" data-act="ippo-timer-done">終了する</button>
+          <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // countdown: 運動・ストレッチ・音楽・日課 など
   return `
     <div class="screen active ippo-screen ippo-timer-screen">
-      <h1 class="ippo-h1">きょうのいっぽ</h1>
-      <div class="ippo-step">実施中</div>
-
-      <div class="ippo-timer-card">
-        <div class="ippo-timer-action-head">
-          <span class="ippo-timer-icon" aria-hidden="true">${c.action.icon}</span>
-          <div class="ippo-timer-action-body">
-            <div class="ippo-timer-title">${escapeHtml(c.action.title)}</div>
-            <div class="ippo-timer-time">⏱ 目安 ${c.action.time}</div>
-          </div>
+      ${ippoHeader(35)}
+      <div class="ippo-tk-card ippo-tk-count">
+        <div class="ippo-tk-title-row">
+          <div class="ippo-tk-title">${escapeHtml(action.title)}（${escapeHtml(action.time)}）</div>
         </div>
-
-        <div class="ippo-timer-circle-wrap">
-          <div class="ippo-timer-circle">
-            ${suplan({ stage: 'tane', expression: 'happy', size: 80 })}
-          </div>
-          <div class="ippo-timer-soon-label">タイマー機能 準備中</div>
+        <div class="ippo-tk-count-illust">
+          <div class="ippo-tk-count-icon">${action.icon}</div>
         </div>
-
-        <p class="ippo-timer-desc">${escapeHtml(c.action.desc)}</p>
+        <div class="ippo-tk-count-meta">
+          <div class="ippo-tk-count-label">あと</div>
+          <div class="ippo-tk-num" id="ippoTimerNum">${formatMmSs(s.remainingSec)}</div>
+          <div class="ippo-tk-count-sub">⏱ 目安時間 ${escapeHtml(action.time)}</div>
+        </div>
+        <button id="ippoTimerPauseBtn" class="ippo-tk-pause ippo-tk-pause-soft" data-act="ippo-timer-pause">
+          ${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}
+        </button>
       </div>
-
       <div style="display:grid; gap:10px; margin-top:18px;">
-        <button class="btn btn-primary" data-act="ippo-timer-done">終わったよ →</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="3">‹ 戻る</button>
+        <button class="btn btn-primary" data-act="ippo-timer-done">終了する</button>
+        <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
       </div>
     </div>
   `;
@@ -13195,27 +13455,27 @@ function handleAction(act, el, ev) {
   // 設定
   // きょうのいっぽ（v0.9.2 仕様書準拠 Steps 0-6）
   // P8 〜: キャンセル/戻るは いっぽタブ内のベース画面に戻る (旧: ホームへ)
-  if (act === 'ippo-cancel') { ippoToday = null; render(); return; }
+  if (act === 'ippo-cancel') { stopIppoTimerLoop(); ippoToday = null; render(); return; }
   if (act === 'ippo-onboarding-start') {
-    ippoToday = { step: 0, startedAt: new Date().toISOString() };
+    ippoToday = { step: 2, startedAt: new Date().toISOString() };
     render();
     return;
   }
-  // 新しい1日画面 → 通常フロー開始 (v0.9.40 〜 必ず Step 0)
+  // 新しい1日画面 → 通常フロー開始 (v0.9.52 〜 step 2 直行)
   if (act === 'ippo-newday-start') {
-    ippoToday = { step: 0, startedAt: new Date().toISOString() };
+    ippoToday = { step: 2, startedAt: new Date().toISOString() };
     render();
     return;
   }
-  // 新しい1日画面のおすすめカード直接タップ (v0.9.40 〜 Step 0 から方向選択)
+  // 新しい1日画面のおすすめカード直接タップ (v0.9.52 〜 step 2 直行)
   if (act === 'ippo-newday-pick-rec') {
-    ippoToday = { step: 0, startedAt: new Date().toISOString(), preselectedActionId: el.dataset.actionId };
+    ippoToday = { step: 2, startedAt: new Date().toISOString(), preselectedActionId: el.dataset.actionId };
     render();
     return;
   }
-  // 「もう一歩やる」 (v0.9.40 〜 必ず Step 0 から)
+  // 「もう一歩やる」 (v0.9.52 〜 step 2 直行)
   if (act === 'ippo-do-another') {
-    ippoToday = { step: 0, startedAt: new Date().toISOString() };
+    ippoToday = { step: 2, startedAt: new Date().toISOString() };
     render();
     return;
   }
@@ -13374,11 +13634,11 @@ function handleAction(act, el, ev) {
     }
     return;
   }
-  // ピッカーで行動選択 → preselectedActionId を持って Step 0 から開始 (P7)
+  // ピッカーで行動選択 → preselectedActionId を持って Step 2 から開始 (v0.9.52 〜)
   if (act === 'ippo-picker-pick') {
     const actionId = el.dataset.actionId;
     if (!actionId) return;
-    ippoToday = { step: 0, preselectedActionId: actionId, startedAt: new Date().toISOString() };
+    ippoToday = { step: 2, preselectedActionId: actionId, startedAt: new Date().toISOString() };
     render();
     return;
   }
@@ -13403,17 +13663,13 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'ippo-restart') {
-    ippoToday = { step: 0, startedAt: new Date().toISOString() };
+    stopIppoTimerLoop();
+    ippoToday = { step: 2, startedAt: new Date().toISOString() };
     render();
     return;
   }
+  // v0.9.52 〜 方向選択は廃止のため ippo-change-direction はノーオペ
   if (act === 'ippo-change-direction') {
-    if (ippoToday) {
-      ippoToday.step = 0;
-      // 既存選択を引き継いで再編集できるよう directionIds はそのまま残す
-      ippoToday.candidates = null;  // 推薦再計算
-    }
-    render();
     return;
   }
   // Step 0: 方向選択 (v0.9.40 〜 複数選択トグル)
@@ -13470,38 +13726,37 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  // v0.9.52 〜 「他のいっぽを見る」で +3 件ずつ表示
   if (act === 'ippo-step2-more') {
-    if (ippoToday) ippoToday.candidatesShown = Math.min(5, (ippoToday.candidatesShown || 3) + 2);
-    render();
-    return;
-  }
-  if (act === 'ippo-step2-dur') {
     if (ippoToday) {
-      ippoToday.durationPref = el.dataset.dur;
-      ippoToday.candidates = null;
-      ippoToday.candidatesShown = 3;
+      const total = (ippoToday.candidates || []).length;
+      ippoToday.candidatesShown = Math.min(total, (ippoToday.candidatesShown || 3) + 3);
     }
     render();
     return;
   }
+  // v0.9.52 〜 Step 3 (いまやる/あとで) を廃止し直接タイマーへ
   if (act === 'ippo-step2-next') {
     if (!ippoToday || !ippoToday.selectedActionId) { toast('いっぽを選んでね'); return; }
-    ippoToday.step = 3;
-    render();
-    return;
-  }
-  // Step 3: いまやる / あとでやる
-  if (act === 'ippo-step3-now') {
-    if (!ippoToday || !ippoToday.selectedActionId) return;
     ippoToday.beforeIntensity = ippoToday.moodIntensity;
     ippoToday.timerStartedAt = new Date().toISOString();
-    ippoToday.step = 35;  // v0.9.41 〜 タイマー画面 (準備中) を経由
+    ippoToday.timerInited = false;  // タイマー再初期化
+    ippoToday.step = 35;
     render();
     return;
   }
-  // タイマー画面: 終わったよ → Step 4 (変化記録)
+  // タイマー一時停止/再開
+  if (act === 'ippo-timer-pause') {
+    if (!ippoToday) return;
+    ippoToday.timerPaused = !ippoToday.timerPaused;
+    const btn = document.getElementById('ippoTimerPauseBtn');
+    if (btn) btn.innerHTML = ippoToday.timerPaused ? '▶ 再開' : '❚❚ 一時停止';
+    return;
+  }
+  // タイマー画面: 終了する → Step 4 (変化記録)
   if (act === 'ippo-timer-done') {
     if (!ippoToday) return;
+    stopIppoTimerLoop();
     ippoToday.timerEndedAt = new Date().toISOString();
     ippoToday.step = 4;
     render();
@@ -13586,10 +13841,10 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // ベース画面: おすすめの一歩を直接やる → Step 0 から開始 (action 事前選択)
+  // ベース画面: おすすめの一歩を直接やる → Step 2 から開始 (v0.9.52 〜 action 事前選択)
   if (act === 'ippo-base-do-rec') {
     const actionId = el.dataset.actionId;
-    ippoToday = { step: 0, startedAt: new Date().toISOString(), preselectedActionId: actionId };
+    ippoToday = { step: 2, startedAt: new Date().toISOString(), preselectedActionId: actionId };
     render();
     return;
   }
