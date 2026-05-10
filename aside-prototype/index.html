@@ -5971,10 +5971,13 @@ body.keyboard-open .mood-chat-bottom .input-row {
 
 <!-- 設定 -->
 <script>
+// アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
+window.MOYANOMORI_VERSION = 'v0.9.58-beta.1';
+
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
-  appVersion:      '0.9.50-beta.1',  // P8.4: 習慣リストUI刷新 (実施済→週グリッド/未実施→実施するボタン・追加・編集ピル)
+  appVersion:      window.MOYANOMORI_VERSION.replace(/^v/, ''),
   consentVersion:  'v0.2-beta',
   // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
   // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
@@ -6536,15 +6539,11 @@ const defaultState = () => ({
   // === v3 メインデータ（仕様書 §13 準拠） ===
   moodLogs: [],          // {id, moodScore, moodLabel, categories[], comment, createdAt}
   moyamoyaRecords: [],   // {id, eventText, emotion, emotionScoreBefore, alternativeView, emotionScoreAfter, letterTitle, letterBody, createdAt}
-  goals: [],             // {id, goalText, sourceSummary, status, createdAt, updatedAt}
-  policies: [],          // {id, goalId, policyText, depthLevel, createdAt}
-  actions: [],           // {id, goalId, policyId, actionText, status, createdAt}
-  actionLogs: [],        // {id, actionId, rating, comment, createdAt}
-  aiChats: [],           // {id, sourceType, sourceId, messages[], summary, createdAt}
+  aiChats: [],           // {id, sourceType, sourceId, messages[], summary, createdAt} ※sourceType: 'mood_log' | 'moyamoya'
 
   // === きょうのいっぽ（v0.9.0 仕様書 §6 データモデル準拠 簡易版） ===
   ippoSessions: [],      // {id, moodLabel, moodIntensity, actionId, score, beforeIntensity, afterIntensity, changeValue, completedAt}
-  ippoPending: [],       // 「あとでやる」で保留した行動 {id, actionId, moodLabel, moodIntensity, directionId, savedAt}
+  // (旧 ippoPending 「あとでやる」保留機能は v0.9.58 で削除)
 
   // === 習慣化機能（v0.9.47 P8.1〜） ===
   customHabits: [],      // ユーザー作成の習慣 {id, name, icon, duration, timing, createdAt}
@@ -6829,10 +6828,6 @@ function render() {
     case 'action':          html = viewAction(); break;
     case 'kizuki':          html = viewKizuki(); break;
     case 'kizuki-list':     html = viewKizukiList(); break;
-    case 'goal-chat':       html = viewGoalChat(); break;
-    case 'policy-select':   html = viewPolicySelect(); break;
-    case 'action-select':   html = viewActionSelect(); break;
-    case 'action-eval':     html = viewActionEval(); break;
     case 'record':          html = viewRecord(); break;
     case 'day-detail':      html = viewDayDetail(); break;
     case 'kiroku-detail':       html = viewKirokuDetail(); break;
@@ -8281,17 +8276,6 @@ function saveMoyamoyaRecord() {
 // ============================================================
 // 画面: 行動タブ（v3 - 目標→方針→行動）
 // ============================================================
-function activeGoal() { return state.goals.find(g => g.status === 'active') || null; }
-function activePolicy() {
-  const g = activeGoal();
-  if (!g) return null;
-  return state.policies.filter(p => p.goalId === g.id).pop() || null;
-}
-function activeAction() {
-  const p = activePolicy();
-  if (!p) return null;
-  return state.actions.filter(a => a.policyId === p.id && a.status === 'active').pop() || null;
-}
 function sameDay(a, b) { return a.toDateString() === b.toDateString(); }
 function formatDate(iso) {
   const d = new Date(iso);
@@ -8505,25 +8489,6 @@ function ippoHeader(stepNo) {
   return `<h1 class="ippo-h1">きょうのいっぽ</h1>`;
 }
 
-// 現在の方向の表示行（Step 2〜4 で表示）— v0.9.40 〜 複数選択対応
-function ippoDirectionLine() {
-  // ippoToday.directionIds 優先・無ければ state から
-  const ids = (ippoToday && Array.isArray(ippoToday.directionIds))
-    ? ippoToday.directionIds
-    : getDirectionIds();
-  const dirs = ids.map(getDirection).filter(Boolean);
-  if (dirs.length === 0) return '';
-  return `
-    <div class="ippo-dir-line">
-      <span class="ippo-dir-line-label">今日の方向：</span>
-      <div class="ippo-dir-line-chips">
-        ${dirs.map(d => `<span class="ippo-dir-line-chip">${d.icon} ${escapeHtml(d.name)}</span>`).join('')}
-      </div>
-      <button class="btn-ghost ippo-dir-line-change" data-act="ippo-change-direction">変更</button>
-    </div>
-  `;
-}
-
 // 新しい1日画面（v0.9.12 0:00以降の初回訪問・前日にセッションあり）
 function viewIppoNewDay() {
   const sessions = state.ippoSessions || [];
@@ -8723,96 +8688,6 @@ function viewIppoOnboarding() {
   `;
 }
 
-// Step 0: 今日はどうなりたい？(v0.9.40 〜・複数選択UI)
-// 旧 Step 1 (気分10種＋強さ) は廃止し、Step 0 → Step 2 に直接遷移。
-// 行動後の評価は P6 で 5択定性評価に変更予定 (黒くなった/変わらない/...)。
-function viewIppoStep0(s) {
-  // ippoToday.directionIds が無ければ既存ユーザーの保存値で初期化
-  if (!Array.isArray(s.directionIds)) {
-    s.directionIds = getDirectionIds().slice();
-  }
-  const selected = new Set(s.directionIds);
-  return `
-    <div class="screen active ippo-screen">
-      ${ippoHeader(0)}
-      <div class="ippo-q">今日は、どうなりたい？</div>
-      <p class="text-tiny text-muted mb-3">いっぽに合いそうなものを選んでください（複数選択OK）</p>
-      <div class="ippo-dir-grid">
-        ${IPPO_DIRECTIONS.map(d => `
-          <button class="ippo-dir-card ${selected.has(d.id) ? 'selected' : ''}"
-                  data-act="ippo-step0-toggle" data-direction="${d.id}">
-            <span class="ippo-dir-check" aria-hidden="true">${selected.has(d.id) ? '✓' : ''}</span>
-            <span class="ippo-dir-icon">${d.icon}</span>
-            <div class="ippo-dir-body">
-              <div class="ippo-dir-name">${escapeHtml(d.name)}</div>
-              <div class="ippo-dir-desc">${escapeHtml(d.desc)}</div>
-            </div>
-          </button>
-        `).join('')}
-      </div>
-      <div style="display:grid; gap:10px; margin-top:18px;">
-        <button class="btn btn-primary" data-act="ippo-step0-next" ${selected.size === 0 ? 'disabled' : ''}>次へ</button>
-        <button class="btn-ghost" data-act="ippo-cancel">キャンセル</button>
-      </div>
-    </div>
-  `;
-}
-
-// Step 1 (旧 v0.9.13 仕様・気分10種+強さ) — v0.9.40 で廃止。
-// コードは互換のため残すが viewAction.switch から呼ばれない。
-// 行動後評価は P6 で 5択定性評価に置き換える予定。
-function viewIppoStep1(s) {
-  const mainMoods = IPPO_MOODS.filter(m => m.label !== 'なんとなく');
-  const nantonaku = IPPO_MOODS.find(m => m.label === 'なんとなく');
-  const v = s.moodIntensity == null ? 5 : s.moodIntensity;
-  return `
-    <div class="screen active ippo-screen">
-      ${ippoHeader(1)}
-      ${ippoDirectionLine()}
-      <div class="ippo-q">今の気分を選んでください</div>
-      <div class="ippo-mood-grid" style="grid-template-columns: repeat(3, 1fr);">
-        ${mainMoods.map(m => `
-          <button class="ippo-mood-item ${s.moodLabel === m.label ? 'selected' : ''}"
-                  data-act="ippo-step1-mood" data-mood="${m.label}">
-            <span class="ippo-mood-emoji">${m.emoji}</span>
-            <span class="ippo-mood-name">${m.label}</span>
-          </button>
-        `).join('')}
-      </div>
-      ${nantonaku ? `
-        <div style="margin-top:10px;">
-          <button class="ippo-mood-item ${s.moodLabel === nantonaku.label ? 'selected' : ''}" style="width:100%; padding:10px;"
-                  data-act="ippo-step1-mood" data-mood="${nantonaku.label}">
-            <span class="ippo-mood-emoji" style="display:inline-block; vertical-align:middle; margin-right:6px;">${nantonaku.emoji}</span>
-            <span class="ippo-mood-name" style="display:inline-block; vertical-align:middle;">${nantonaku.label}</span>
-          </button>
-        </div>
-      ` : ''}
-
-      <div class="ippo-q" style="margin-top: 22px;">気分の強さは？</div>
-      <p class="text-tiny text-muted mb-3">数字が大きいほど、つらい状態です</p>
-      <div style="text-align:center; margin: 8px 0 12px;">
-        <div id="ippoIntNum" style="font-size:36px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1;">
-          ${v}<span style="font-size:14px; color: var(--text-muted); margin-left:2px;">/10</span>
-        </div>
-      </div>
-      <div class="moya-scale-row">
-        ${Array.from({length: 11}, (_, n) => `
-          <button class="moya-scale-btn ${v === n ? 'selected' : ''}" data-act="ippo-step1-int" data-score="${n}">${n}</button>
-        `).join('')}
-      </div>
-      <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); margin-top:6px; padding: 0 4px;">
-        <span>軽い</span><span>つらい</span>
-      </div>
-
-      <div style="margin-top:24px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step1-next" ${!s.moodLabel ? 'disabled' : ''}>次へ</button>
-        <button class="btn-ghost" data-act="ippo-cancel">キャンセル</button>
-      </div>
-    </div>
-  `;
-}
-
 // Step 2 推薦カード — v0.9.52 〜 刷新: duration filter削除 / 初期3件・他のいっぽを見るで+3 / step3スキップ
 // preselectedActionId があれば最上位に挿入＆自動選択 (P7・ピッカー/おすすめ直タップ経由)
 function viewIppoStep2(s) {
@@ -8882,34 +8757,6 @@ function viewIppoStep2(s) {
         <button class="btn btn-primary" data-act="ippo-step2-next" ${!selectedId ? 'disabled' : ''}>このいっぽを選ぶ</button>
         <button class="btn-ghost" data-act="ippo-cancel">キャンセル</button>
       </div>
-    </div>
-  `;
-}
-
-// Step 3（v0.9.13 新設）: いまやる / あとでやる の選択
-function viewIppoStep3(s) {
-  const c = s.candidates.find(x => x.action.id === s.selectedActionId);
-  if (!c) { s.step = 2; return viewIppoStep2(s); }
-  return `
-    <div class="screen active ippo-screen">
-      ${ippoHeader(3)}
-      <div class="ippo-q">このいっぽ、いつやる？</div>
-      <p class="text-tiny text-muted mb-3">無理しないで、自分のペースでだいじょうぶ</p>
-      <div class="ippo-do-card">
-        <div class="ippo-do-suplan">${suplan({ stage: 'tane', expression: 'happy', size: 64 })}</div>
-        <div class="ippo-do-icon">${c.action.icon}</div>
-        <div class="ippo-do-title">${escapeHtml(c.action.title)}</div>
-        <div class="ippo-do-desc">${escapeHtml(c.action.desc)}</div>
-        <div class="ippo-do-time">⏱ 目安時間 ${c.action.time}</div>
-      </div>
-      <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="ippo-step3-now">いまやる →</button>
-        <button class="btn btn-secondary" data-act="ippo-step3-later">あとでやる（保留）</button>
-        <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
-      </div>
-      <p class="text-tiny text-muted text-center" style="margin-top:10px;">
-        「あとでやる」と、サマリ画面の「もういっぽ」に保留されます
-      </p>
     </div>
   `;
 }
@@ -9324,32 +9171,8 @@ function viewIppoStep5(s) {
   `;
 }
 
-// 「もう一歩」CTA共通レンダラ — 保留があれば保留優先表示
+// 「もう一歩」CTA共通レンダラ — v0.9.58 〜 保留機能廃止に伴いシンプル化
 function renderPendingOrMoreCta() {
-  const pending = (state.ippoPending || []).slice().reverse();  // 最新順
-  if (pending.length > 0) {
-    return `
-      <div class="ippo-cta-card">
-        <p class="text-tiny text-muted text-center" style="margin: 0 0 6px;">あとでやるとした行動</p>
-        <p style="text-align:center; font-weight:600; margin: 0 0 12px;">もういっぽやってみる？</p>
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          ${pending.slice(0, 3).map(p => {
-            const act = ACTIONS.find(a => a.id === p.actionId);
-            return `
-              <button class="ippo-rec-card" style="padding:10px 14px;" data-act="ippo-resume-pending" data-pending-id="${p.id}">
-                <div class="ippo-rec-head" style="margin-bottom:0;">
-                  <span class="ippo-rec-icon" style="font-size:18px;">${act?.icon || '🌱'}</span>
-                  <span class="ippo-rec-title" style="font-size:13px;">${escapeHtml(act?.title || '保留中')}（${act?.time || ''}）</span>
-                  <span class="ippo-rec-pct" style="font-size:11px;">▶ いまやる</span>
-                </div>
-              </button>
-            `;
-          }).join('')}
-        </div>
-        <button class="btn-ghost" data-act="ippo-open-picker" style="margin-top:8px; width:100%; font-size:12px;">別のいっぽを見る</button>
-      </div>
-    `;
-  }
   return `
     <div class="ippo-cta-card">
       <p class="text-tiny text-muted text-center" style="margin: 0 0 4px;">もし余裕があれば...</p>
@@ -10437,412 +10260,10 @@ async function extractCoreBeliefAI(s) {
   }
 }
 
-function viewActionLegacy() {
-  const goal = activeGoal();
-  const policy = activePolicy();
-  const action = activeAction();
+// === v0.9.58 削除: 旧 Goal→Policy→Action フロー (viewActionLegacy / viewGoalChat / viewPolicySelect / viewActionSelect / viewActionEval) ===
+// 旧 Aside 設計時代の「目標→方針→行動」3段階構造を削除。新フローは「いっぽ」(viewIppoStep2 → Timer → Step 4)。
 
-  if (!goal) {
-    return `
-      <div class="screen active">
-        <h1 class="mb-2">行動</h1>
-        <p class="text-soft mb-4">目標→方針→行動の順に進めます。</p>
-
-        <div class="card-warm" style="padding:24px; text-align:center;">
-          <div style="font-size:36px; margin-bottom:12px;">🌱</div>
-          <h2 class="mb-2">まずは、目指したい状態を一緒に整理しましょう</h2>
-          <p class="text-small text-soft mb-4">今の悩みや変えたいことをAIと話しながら、あなたに合った目標を一緒に見つけます。</p>
-          <button class="btn btn-primary" data-act="goal-chat-start">AIと目標を決める</button>
-        </div>
-      </div>
-    `;
-  }
-
-  const actionsForGoal = state.actions.filter(a => a.goalId === goal.id);
-  const recentLogs = state.actionLogs.filter(l => actionsForGoal.find(a => a.id === l.actionId)).slice(-5).reverse();
-  const todayLog = state.actionLogs.find(l => action && l.actionId === action.id && sameDay(new Date(l.createdAt), new Date()));
-
-  return `
-    <div class="screen active">
-      <h1 class="mb-2">行動</h1>
-
-      <div class="card" style="padding:18px;">
-        <div class="text-tiny text-muted">あなたの目標</div>
-        <p style="margin-top:6px; font-family:'Noto Serif JP', serif; font-size:16px; line-height:1.7;">${escapeHtml(goal.goalText)}</p>
-      </div>
-
-      ${!policy ? `
-        <div class="card-warm" style="padding:18px; margin-top:14px;">
-          <h2 class="mb-2">行動方針を決める</h2>
-          <p class="text-small text-soft mb-3">目標に向けて、どんな向き合い方が合いそうか選びましょう。</p>
-          <button class="btn btn-primary" data-act="show-policies">方針を見る</button>
-        </div>
-      ` : !action ? `
-        <div class="card" style="padding:18px; margin-top:14px;">
-          <div class="text-tiny text-muted">選んだ方針</div>
-          <p style="margin-top:6px; font-weight:500;">${escapeHtml(policy.policyText)}</p>
-        </div>
-        <div class="card-warm" style="padding:18px; margin-top:14px;">
-          <h2 class="mb-2">具体アクションを決める</h2>
-          <p class="text-small text-soft mb-3">この方針に沿って、日々できそうなアクションを選びましょう。</p>
-          <button class="btn btn-primary" data-act="show-actions">アクションを見る</button>
-        </div>
-      ` : `
-        <div class="card" style="padding:18px; margin-top:14px;">
-          <div class="text-tiny text-muted">選んだ方針</div>
-          <p style="margin-top:6px; font-weight:500;">${escapeHtml(policy.policyText)}</p>
-        </div>
-
-        <div class="card-warm" style="padding:18px; margin-top:14px;">
-          <div class="text-tiny text-muted">今日のアクション</div>
-          <h2 style="margin:6px 0 12px;">${escapeHtml(action.actionText)}</h2>
-          ${todayLog ? `
-            <p class="text-small text-soft">今日は記録済み（評価 ${todayLog.rating}/5）</p>
-          ` : `
-            <div style="display:grid; gap:10px;">
-              <button class="btn btn-primary" data-act="action-done" data-action-id="${action.id}">実行した</button>
-              <button class="btn btn-secondary" data-act="action-skip" data-action-id="${action.id}">今日はスキップ</button>
-              <button class="btn-ghost" data-act="action-talk">AIと相談する</button>
-            </div>
-          `}
-        </div>
-
-        ${recentLogs.length > 0 ? `
-          <h3 class="section-title">最近の実行</h3>
-          ${recentLogs.map(l => `
-            <div class="card" style="padding:12px;">
-              <div class="text-tiny text-muted">${formatDate(l.createdAt)}</div>
-              <div class="text-small mt-1">${'★'.repeat(l.rating)}${'☆'.repeat(5 - l.rating)} (${l.rating}/5)</div>
-              ${l.comment ? `<p class="text-small text-soft mt-1">${escapeHtml(l.comment)}</p>` : ''}
-            </div>
-          `).join('')}
-        ` : ''}
-
-        <button class="btn-ghost mt-4" data-act="action-change" style="width:100%;">別のアクションに変える</button>
-      `}
-    </div>
-  `;
-}
-
-// 目標設計AIチャット
-let goalChat = null;
-
-function viewGoalChat() {
-  if (!goalChat) startGoalChat();
-  const c = goalChat;
-  return `
-    <div class="screen active" style="padding-bottom:140px;">
-      <div class="page-header">
-        <button class="page-back" data-act="goal-chat-cancel">‹</button>
-        <span class="page-title">目標を決める</span>
-        <span style="width:36px;"></span>
-      </div>
-
-      <div id="goalChatBox">
-        ${c.messages.map(m => renderChatBubble(m)).join('')}
-      </div>
-
-      ${c.awaitingConfirm ? `
-        <div class="card-warm" style="position:fixed; bottom:0; left:0; right:0; max-width:480px; margin:0 auto; padding:16px; z-index:50;">
-          <div style="display:grid; gap:8px;">
-            <button class="btn btn-primary" data-act="goal-confirm">この目標で進める</button>
-            <button class="btn btn-secondary" data-act="goal-redo">もう一度話す</button>
-          </div>
-        </div>
-      ` : `
-        <div class="input-row" style="position:fixed; left:0; right:0; bottom:0; max-width:480px; margin:0 auto; z-index:50;">
-          <textarea class="input-text" id="goalChatInput" placeholder="思っていることを書いてみる…" rows="1" oninput="window.autoExpand(this)"></textarea>
-          <button class="input-send" data-act="goal-chat-send">↑</button>
-        </div>
-      `}
-    </div>
-  `;
-}
-
-function startGoalChat() {
-  goalChat = {
-    messages: [{ role: 'assistant', content: '今、いちばん変えたいことや、少し楽になりたいことはありますか？\n\nまとまっていなくて大丈夫。思っていることをそのまま書いてみてください。', createdAt: new Date().toISOString() }],
-    proposedGoal: null, sourceSummary: null, awaitingConfirm: false
-  };
-}
-
-function goalChatSend() {
-  if (!goalChat) return;
-  const input = document.getElementById('goalChatInput');
-  if (!input) return;
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  input.style.height = 'auto';
-
-  const crisis = detectCrisis(text);
-  if (crisis && crisis.sev >= 4) { showCrisisModal(crisis.sev); return; }
-
-  goalChat.messages.push({ role: 'user', content: text, createdAt: new Date().toISOString() });
-  const turns = goalChat.messages.filter(m => m.role === 'user').length;
-
-  if (turns < 2) {
-    goalChat.messages.push({ role: 'assistant', content: '話してくれてありがとう。\n\nもう少し聞かせてください。それを変えたいと思うのは、最近どんな出来事があったからですか？', createdAt: new Date().toISOString() });
-  } else {
-    const proposal = generateGoalProposal(goalChat.messages);
-    goalChat.proposedGoal = proposal.goalText;
-    goalChat.sourceSummary = proposal.summary;
-    goalChat.awaitingConfirm = true;
-    goalChat.messages.push({ role: 'assistant', content: `話してくれてありがとう。\n\n今の話を整理すると、あなたは「${proposal.summary}」と感じているように見えます。\n\n目標としては、以下のように置くのはどうでしょうか？\n\n「${proposal.goalText}」\n\nこの目標で進めてもよさそうですか？`, createdAt: new Date().toISOString() });
-  }
-
-  document.getElementById('main').innerHTML = viewGoalChat();
-  setTimeout(scrollChatToBottom, 50);
-}
-
-function generateGoalProposal(messages) {
-  const userText = messages.filter(m => m.role === 'user').map(m => m.content).join(' ');
-  let theme = '気持ちの揺れ';
-  if (/仕事|職場|上司|会社|残業/.test(userText)) theme = '仕事での不安';
-  else if (/恋愛|彼|恋人/.test(userText)) theme = '恋愛での不安';
-  else if (/家族|親|母|父/.test(userText)) theme = '家族との関係';
-  else if (/友|友達|友人/.test(userText)) theme = '友人との関係';
-  else if (/将来|未来|キャリア/.test(userText)) theme = '将来への不安';
-  const summary = `${theme}を減らして、自分を責めすぎずに過ごせるようになりたい`;
-  const goalText = `${theme}を感じたときも、自分を責めすぎず、落ち着いて次の行動を選べるようになる`;
-  return { summary, goalText };
-}
-
-function confirmGoal() {
-  if (!goalChat || !goalChat.proposedGoal) return;
-  const goal = {
-    id: uid(),
-    goalText: goalChat.proposedGoal,
-    sourceSummary: goalChat.sourceSummary,
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  state.goals.forEach(g => { g.status = 'archived'; });
-  state.goals.push(goal);
-  persistAIChat({ sourceType: 'goal', sourceId: goal.id, messages: goalChat.messages.slice() });
-  saveState();
-  goalChat = null;
-  if (window.MoyaLogger) MoyaLogger.event('goal_set');
-  toast('目標を決めました');
-  go('action');
-}
-
-// 行動方針選択
-function viewPolicySelect() {
-  const goal = activeGoal();
-  if (!goal) { setTimeout(() => go('action'), 0); return ''; }
-  const policies = generatePolicies(goal);
-  return `
-    <div class="screen active">
-      <div class="page-header">
-        <button class="page-back" data-act="back-action">‹</button>
-        <span class="page-title">行動方針</span>
-        <span style="width:36px;"></span>
-      </div>
-
-      <div class="card" style="padding:14px;">
-        <div class="text-tiny text-muted">あなたの目標</div>
-        <p class="text-small mt-1">${escapeHtml(goal.goalText)}</p>
-      </div>
-
-      <h2 class="section-title">向き合い方を1つ選ぶ</h2>
-      <p class="text-tiny text-muted mb-2">軽いものから深いものまで、いまの気分で選んでOK</p>
-
-      <div class="action-list">
-        ${policies.map((p, i) => `
-          <button class="action-card" data-act="policy-pick" data-policy-text="${encodeURIComponent(p.text)}" data-depth="${p.depth}">
-            <span class="action-icon">${i+1}</span>
-            <div class="action-text">
-              <div class="action-title">${escapeHtml(p.text)}</div>
-              <div class="action-meta">${p.depth === 'light' ? 'まずは軽く' : p.depth === 'middle' ? '一歩ふみこむ' : 'じっくり向き合う'}</div>
-            </div>
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function generatePolicies(goal) {
-  return [
-    { text: 'まずは気持ちを落ち着ける', depth: 'light' },
-    { text: '自分を責めすぎる考え方に気づく', depth: 'light' },
-    { text: '人との関わり方を少し変える', depth: 'middle' },
-    { text: '自信を少しずつ取り戻す', depth: 'middle' },
-    { text: '自分が大切にしたい在り方を見直す', depth: 'deep' },
-  ];
-}
-
-function pickPolicy(text, depth) {
-  const goal = activeGoal();
-  if (!goal) return;
-  const policy = {
-    id: uid(),
-    goalId: goal.id,
-    policyText: text,
-    depthLevel: depth,
-    createdAt: new Date().toISOString()
-  };
-  state.policies.push(policy);
-  saveState();
-  if (window.MoyaLogger) MoyaLogger.event('policy_picked', { depth });
-  toast('方針を選びました');
-  go('action');
-}
-
-// 具体アクション選択
-function viewActionSelect() {
-  const policy = activePolicy();
-  if (!policy) { setTimeout(() => go('action'), 0); return ''; }
-  const actionList = generateActions(policy);
-  return `
-    <div class="screen active">
-      <div class="page-header">
-        <button class="page-back" data-act="back-action">‹</button>
-        <span class="page-title">具体アクション</span>
-        <span style="width:36px;"></span>
-      </div>
-
-      <div class="card" style="padding:14px;">
-        <div class="text-tiny text-muted">選んだ方針</div>
-        <p class="text-small mt-1">${escapeHtml(policy.policyText)}</p>
-      </div>
-
-      <h2 class="section-title">日々できそうなアクションを1つ選ぶ</h2>
-      <p class="text-tiny text-muted mb-2">迷ったら一番軽いものから</p>
-
-      <div class="action-list">
-        ${actionList.map(a => `
-          <button class="action-card" data-act="action-pick" data-action-text="${encodeURIComponent(a)}">
-            <span class="action-icon">✓</span>
-            <div class="action-text">
-              <div class="action-title">${escapeHtml(a)}</div>
-            </div>
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function generateActions(policy) {
-  const t = policy.policyText;
-  if (/落ち着け|気持ち/.test(t)) return [
-    '退勤後に3分だけ深呼吸する', '不安を感じたら4-7-8呼吸を3セット', 'お風呂に5分だけ入る',
-    '寝る前に「今日できたこと」を1つだけ書く', '緑のものを5つ探す（注意の切り替え）'
-  ];
-  if (/責め|気づく|考え/.test(t)) return [
-    '注意された内容と、自分の人格を分けてメモする', '「今回の改善点は何か？」を1つだけ書く',
-    '出来事を事実・解釈・感情に分ける', '自分を責める言葉を、友人にかける言葉に置き換える',
-    '今日できたことを1つだけ書く', '不安が強いときにAIに話す', '「ダメな日もある」と声に出してみる'
-  ];
-  if (/関わり方|人との/.test(t)) return [
-    '挨拶を1人多くする', '「ありがとう」を1日1回伝える', 'NOを言う練習を1回する',
-    '相手の言い分を3分だけ想像してみる', '雑談を1つだけしてみる'
-  ];
-  if (/自信|取り戻/.test(t)) return [
-    '小さな約束を自分と1つだけ守る', '「できたこと」を3つ書く', '昔できていたことを1つ思い出す',
-    '5分だけ得意なことに触れる', '誰かに頼ってみる'
-  ];
-  return [
-    '自分が大切にしたいことを1つ書き出す', '「これだけは譲れない」を1つ言葉にする',
-    '5年後どうありたいかを3行で書く', '尊敬する人を1人挙げて理由を書く',
-    'いまの仕事/関係で「合わない」と感じる部分をメモする'
-  ];
-}
-
-function pickAction(text) {
-  const policy = activePolicy();
-  const goal = activeGoal();
-  if (!policy || !goal) return;
-  state.actions.forEach(a => { if (a.policyId === policy.id) a.status = 'inactive'; });
-  const action = {
-    id: uid(),
-    goalId: goal.id,
-    policyId: policy.id,
-    actionText: text,
-    status: 'active',
-    createdAt: new Date().toISOString()
-  };
-  state.actions.push(action);
-  saveState();
-  if (window.MoyaLogger) MoyaLogger.event('action_picked');
-  toast('今日のアクションを設定しました');
-  go('action');
-}
-
-// 行動評価
-let evalAction = null, evalRating = null, evalComment = '';
-
-function startActionEval(actionId) {
-  evalAction = state.actions.find(a => a.id === actionId);
-  evalRating = null; evalComment = '';
-  go('action-eval');
-}
-
-function viewActionEval() {
-  if (!evalAction) { setTimeout(() => go('action'), 0); return ''; }
-  return `
-    <div class="screen active">
-      <div class="page-header">
-        <button class="page-back" data-act="back-action">‹</button>
-        <span class="page-title">実行をふりかえる</span>
-        <span style="width:36px;"></span>
-      </div>
-
-      <div class="card" style="padding:18px;">
-        <div class="text-tiny text-muted">今日のアクション</div>
-        <p class="mt-1">${escapeHtml(evalAction.actionText)}</p>
-      </div>
-
-      <h2 class="section-title">この行動をして、少し楽になりましたか？</h2>
-      <div class="action-list">
-        ${[
-          {n:1, label:'まったく変わらない'},
-          {n:2, label:'あまり変わらない'},
-          {n:3, label:'少し変わった'},
-          {n:4, label:'楽になった'},
-          {n:5, label:'とても楽になった'},
-        ].map(r => `
-          <button class="action-card ${evalRating === r.n ? 'picked' : ''}" data-act="eval-rating" data-rating="${r.n}">
-            <span class="action-icon">${'★'.repeat(r.n)}${'☆'.repeat(5-r.n)}</span>
-            <div class="action-text">
-              <div class="action-title">${r.label}</div>
-            </div>
-          </button>
-        `).join('')}
-      </div>
-
-      <h2 class="section-title">ひとこと（任意）</h2>
-      <textarea class="textarea-block" id="evalComment" maxlength="300" placeholder="やってみて感じたことがあれば書いてください" oninput="window.evalSetComment(this.value)">${escapeHtml(evalComment)}</textarea>
-
-      <div style="margin-top:24px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="eval-save" ${evalRating == null ? 'disabled' : ''}>記録する</button>
-        <button class="btn-ghost" data-act="back-action">あとで</button>
-      </div>
-    </div>
-  `;
-}
-
-window.evalSetComment = function(t) { evalComment = t; };
-
-function saveActionEval() {
-  if (!evalAction || evalRating == null) return;
-  const log = {
-    id: uid(),
-    actionId: evalAction.id,
-    rating: evalRating,
-    comment: evalComment,
-    createdAt: new Date().toISOString()
-  };
-  state.actionLogs.push(log);
-  saveState();
-  if (window.MoyaLogger) MoyaLogger.event('action_evaluated', { rating: evalRating });
-  evalAction = null; evalRating = null; evalComment = '';
-  toast('記録しました。今日もおつかれさま。');
-  go('action');
-}
+// (旧 Goal→Policy→Action フロー全削除 v0.9.58)
 
 // ============================================================
 // すぷらんキャラクター（v0.9.7: 成長段階を撤去し単一ベースに統合）
@@ -11506,7 +10927,7 @@ window.autoExpand = function(el) {
 //       入力欄が張り付く（LINE/標準iOS Mail と同じ挙動）。
 // ============================================================
 (function setupChatKeyboard() {
-  const CHAT_INPUT_IDS = ['moodChatInput', 'goalChatInput'];
+  const CHAT_INPUT_IDS = ['moodChatInput'];
 
   function isChatInput(el) {
     return el && CHAT_INPUT_IDS.indexOf(el.id) !== -1;
@@ -11545,33 +10966,12 @@ window.autoExpand = function(el) {
     if (!list) return;
     list.scrollTop = list.scrollHeight;
   }
-  // 旧 goal-chat（document スクロール）の最終要素を可視領域に
-  function scrollLegacyChatBottom() {
-    const box = document.getElementById('goalChatBox');
-    if (box && box.lastElementChild) {
-      try { box.lastElementChild.scrollIntoView({ block: 'end', behavior: 'smooth' }); }
-      catch (_) { box.lastElementChild.scrollIntoView(false); }
-    }
-  }
-
-  function adjustLegacyInputForViewport() {
-    // mood-chat-screen は visualViewport 駆動で対応するので除外
-    if (document.querySelector('.mood-chat-screen.active')) return;
-    const inputRow = document.querySelector('.input-row');
-    if (!inputRow || !window.visualViewport) return;
-    const vv = window.visualViewport;
-    const keyboardOffset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
-    inputRow.style.bottom = keyboardOffset + 'px';
-  }
+  // (旧 goal-chat 用の scrollLegacyChatBottom / adjustLegacyInputForViewport は v0.9.58 で削除)
 
   if (window.visualViewport) {
     const onVVChange = () => {
       window.fitChatScreenToViewport();
-      adjustLegacyInputForViewport();
-      requestAnimationFrame(() => {
-        scrollMoodChatBottom();
-        scrollLegacyChatBottom();
-      });
+      requestAnimationFrame(scrollMoodChatBottom);
     };
     window.visualViewport.addEventListener('resize', onVVChange);
     window.visualViewport.addEventListener('scroll', onVVChange);
@@ -11585,9 +10985,7 @@ window.autoExpand = function(el) {
     if (!isChatInput(e.target)) return;
     setTimeout(() => {
       window.fitChatScreenToViewport();
-      adjustLegacyInputForViewport();
       scrollMoodChatBottom();
-      scrollLegacyChatBottom();
     }, 300);
   });
 
@@ -12323,8 +11721,7 @@ function viewDayDetail() {
   };
   const moods = state.moodLogs.filter(m => sameDayKey(m.createdAt));
   const moyas = state.moyamoyaRecords.filter(r => sameDayKey(r.createdAt));
-  const actionLogs = state.actionLogs.filter(l => sameDayKey(l.createdAt));
-  const chats = state.aiChats.filter(c => moods.find(m => m.id === c.sourceId) || moyas.find(m => m.id === c.sourceId));
+  const chats = (state.aiChats || []).filter(c => moods.find(m => m.id === c.sourceId) || moyas.find(m => m.id === c.sourceId));
 
   return `
     <div class="screen active">
@@ -12334,7 +11731,7 @@ function viewDayDetail() {
         <span style="width:36px;"></span>
       </div>
 
-      ${moods.length === 0 && moyas.length === 0 && actionLogs.length === 0 ? `
+      ${moods.length === 0 && moyas.length === 0 ? `
         <p class="text-soft text-center" style="padding:40px;">この日の記録はありません。</p>
       ` : ''}
 
@@ -12348,18 +11745,9 @@ function viewDayDetail() {
         </div>
       `).join('') : ''}
 
-      ${actionLogs.length > 0 ? '<h3 class="section-title">行動の記録</h3>' + actionLogs.map(l => {
-        const a = state.actions.find(x => x.id === l.actionId);
-        return `<div class="card" style="padding:14px;">
-          <div class="text-small">${a ? escapeHtml(a.actionText) : '行動'}</div>
-          <div class="text-tiny mt-1">${l.rating > 0 ? '★'.repeat(l.rating)+'☆'.repeat(5-l.rating)+' ('+l.rating+'/5)' : 'スキップ'}</div>
-          ${l.comment ? `<p class="text-small text-soft mt-1">${escapeHtml(l.comment)}</p>` : ''}
-        </div>`;
-      }).join('') : ''}
-
       ${chats.length > 0 ? '<h3 class="section-title">AIとの会話</h3>' + chats.map(c => `
         <div class="card" style="padding:14px;">
-          <div class="text-tiny text-muted">${c.sourceType === 'mood_log' ? 'きもちチャット' : c.sourceType === 'moyamoya' ? 'もやもや整理' : c.sourceType === 'goal' ? '目標設計' : 'AI'}</div>
+          <div class="text-tiny text-muted">${c.sourceType === 'mood_log' ? 'きもちチャット' : c.sourceType === 'moyamoya' ? 'もやもや整理' : 'AI'}</div>
           <p class="text-small mt-1">${escapeHtml((c.summary || (c.messages || []).map(m=>m.content).join('\n')).slice(0, 120))}…</p>
         </div>
       `).join('') : ''}
@@ -12872,91 +12260,7 @@ function generateGraphTrendSummary(tab, logs) {
   return null;
 }
 
-// ============================================================
-// ホーム統計の説明モーダル v0.9.51
-// ============================================================
-function viewHomeStatsHelpModal() {
-  const activeDays = calcHomeActiveDays();
-  const totalCount = calcHomeTotalCount();
-  const streak = calcHomeStreak();
-  const target = calcNextMilestone(streak);
-  const remaining = Math.max(0, target - streak);
-  return `
-    <h2>各機能の詳細</h2>
-
-    <div class="home-stat-help-section">
-      <div class="home-stat-help-section-h"><span class="num">1</span><span>積み重ねた日（累計日数）</span></div>
-      <p class="home-stat-help-section-desc">はじめてきもちを記録した日からの累計日数を表示します。</p>
-      <div class="home-stat-help-section-row">
-        <div class="home-stat-help-section-num-box">
-          <span class="home-stat-help-num-icon">🌱</span>
-          <span class="home-stat-help-num-label">積み重ねた日</span>
-          <span class="home-stat-help-num-val">${activeDays}<span class="home-stat-help-num-unit">日</span></span>
-          <span class="home-stat-help-num-sub">はじめてからの累計</span>
-        </div>
-        <div class="home-stat-help-tip">
-          <strong>ポイント</strong>続けてきた自分の努力を実感できます。
-        </div>
-      </div>
-      <div class="home-stat-help-effect">
-        <strong>✨ こんな効果があります</strong>積み重ねを可視化することで、「続けてきた自分」を肯定的に感じられます。
-      </div>
-    </div>
-
-    <div class="home-stat-help-section">
-      <div class="home-stat-help-section-h"><span class="num">2</span><span>やってみた回数（合計回数）</span></div>
-      <p class="home-stat-help-section-desc">これまでに「きもちを記録した」回数の合計を表示します。</p>
-      <div class="home-stat-help-section-row">
-        <div class="home-stat-help-section-num-box">
-          <span class="home-stat-help-num-icon">✏️</span>
-          <span class="home-stat-help-num-label">やってみた回数</span>
-          <span class="home-stat-help-num-val">${totalCount}<span class="home-stat-help-num-unit">回</span></span>
-          <span class="home-stat-help-num-sub">きもちを記録した合計</span>
-        </div>
-        <div class="home-stat-help-tip">
-          <strong>ポイント</strong>取り組んだ回数が見えることで、モチベーションにつながります。
-        </div>
-      </div>
-      <div class="home-stat-help-effect">
-        <strong>✨ こんな効果があります</strong>「何回もやってきた」という実感が、自信や継続意欲を高めます。
-      </div>
-    </div>
-
-    <div class="home-stat-help-section">
-      <div class="home-stat-help-section-h"><span class="num">3</span><span>続いている日（連続記録日数）</span></div>
-      <p class="home-stat-help-section-desc">最後に記録した日から、連続で記録している日数を表示します。</p>
-      <div class="home-stat-help-section-row">
-        <div class="home-stat-help-section-num-box">
-          <span class="home-stat-help-num-icon">🔥</span>
-          <span class="home-stat-help-num-label">続いている日</span>
-          <span class="home-stat-help-num-val">${streak}<span class="home-stat-help-num-unit">日</span></span>
-          <span class="home-stat-help-num-sub">連続で記録した日数</span>
-        </div>
-        <div class="home-stat-help-tip">
-          <strong>ポイント</strong>連続記録の達成感やゲーム感覚で楽しめます。
-        </div>
-      </div>
-      <div class="home-stat-help-effect">
-        <strong>✨ こんな効果があります</strong>「途切れずに続いている」ことが、習慣化の後押しになります。
-      </div>
-    </div>
-
-    <div class="home-stat-help-section">
-      <div class="home-stat-help-section-h"><span class="num">★</span><span>連続記録の進捗バーについて</span></div>
-      <p class="home-stat-help-section-desc">次の節目（例：10日連続）までの進捗をわかりやすく表示します。</p>
-      <div class="home-stat-help-tip" style="margin-top:6px;">
-        ${remaining > 0
-          ? `あと <strong style="color:#6B8F71;">${remaining}日</strong> で、連続記録が <strong style="color:#6B8F71;">${target}日</strong> になります。`
-          : `<strong style="color:#6B8F71;">${streak}日</strong> 連続達成中！`}
-      </div>
-      <div class="home-stat-help-effect">
-        <strong>🎯 目安となる節目</strong>3日 ・ 7日 ・ 10日 ・ 14日 ・ 30日 など。
-      </div>
-    </div>
-
-    <button class="btn btn-primary" data-act="close-modal" style="width:100%; margin-top:10px;">閉じる</button>
-  `;
-}
+// (旧 ホーム統計説明モーダル viewHomeStatsHelpModal は v0.9.58 で削除 — ヘルプボタン自体が廃止のため)
 
 // ============================================================
 // すぷらん紹介モーダル（ホーム右上のすぷらんアイコンタップで表示）
@@ -13034,11 +12338,10 @@ window.__moyaForestFallbackSVG = function() {
 // 設定モーダル
 // ============================================================
 function viewSettingsModal() {
-  const goal = activeGoal();
-  const policy = activePolicy();
-  const action = activeAction();
   const apiKey = (state.preferences && state.preferences.geminiApiKey) || '';
   const masked = apiKey ? apiKey.slice(0, 6) + '••••••' + apiKey.slice(-4) : '';
+  // バージョンラベル — service-worker.js の CACHE_VERSION とセットで更新
+  const versionLabel = (typeof window.MOYANOMORI_VERSION === 'string') ? window.MOYANOMORI_VERSION : 'v0.9.x-beta';
   return `
     <h2 class="modal-title">設定</h2>
     <div style="display:flex; flex-direction:column; gap:14px; max-height:70vh; overflow-y:auto;">
@@ -13054,18 +12357,6 @@ function viewSettingsModal() {
       <div>
         <div class="text-tiny text-muted">プロフィール</div>
         <div class="mt-1">${escapeHtml(getUserName())}（利用 ${state.user.daysUsed || 0} 日）</div>
-      </div>
-      <div>
-        <div class="text-tiny text-muted">現在の目標</div>
-        <div class="mt-1 text-small">${goal ? escapeHtml(goal.goalText) : '未設定'}</div>
-      </div>
-      <div>
-        <div class="text-tiny text-muted">行動方針</div>
-        <div class="mt-1 text-small">${policy ? escapeHtml(policy.policyText) : '未設定'}</div>
-      </div>
-      <div>
-        <div class="text-tiny text-muted">選択中のアクション</div>
-        <div class="mt-1 text-small">${action ? escapeHtml(action.actionText) : '未設定'}</div>
       </div>
 
       <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
@@ -13116,7 +12407,7 @@ function viewSettingsModal() {
       <a href="docs/terms-of-service-beta.md" target="_blank" rel="noopener" class="text-small">利用規約</a>
       <a href="docs/privacy-policy-beta.md" target="_blank" rel="noopener" class="text-small">プライバシーポリシー</a>
       <button class="btn-ghost" data-act="reset-data" style="color: var(--text-soft); font-size:13px; text-align:left; padding:0;">データをリセット</button>
-      <p class="text-tiny text-muted text-center mt-2">もやの森 v0.9.35-beta.1（ホーム最近のきろくをきろくタブと統一）</p>
+      <p class="text-tiny text-muted text-center mt-2">もやの森 ${versionLabel}</p>
     </div>
     <div style="margin-top:20px;">
       <button class="btn btn-secondary" data-act="close-modal">閉じる</button>
@@ -13572,47 +12863,7 @@ function handleAction(act, el, ev) {
   // FAB → もやもや整理
   if (act === 'open-dialog') { moyamoya = { step: 1 }; go('moyamoya'); return; }
 
-  // 行動タブ - 目標
-  if (act === 'goal-chat-start')  { startGoalChat(); go('goal-chat'); return; }
-  if (act === 'goal-chat-cancel') { goalChat = null; go('action'); return; }
-  if (act === 'goal-chat-send')   { goalChatSend(); return; }
-  if (act === 'goal-confirm')     { confirmGoal(); return; }
-  if (act === 'goal-redo') {
-    if (!goalChat) return;
-    goalChat.awaitingConfirm = false;
-    goalChat.proposedGoal = null;
-    goalChat.messages.push({ role: 'assistant', content: 'もう少し聞かせてください。', createdAt: new Date().toISOString() });
-    document.getElementById('main').innerHTML = viewGoalChat();
-    return;
-  }
-
-  // 行動タブ - 方針/アクション
-  if (act === 'show-policies')  { go('policy-select'); return; }
-  if (act === 'policy-pick')    { pickPolicy(decodeURIComponent(el.dataset.policyText), el.dataset.depth); return; }
-  if (act === 'show-actions')   { go('action-select'); return; }
-  if (act === 'action-pick')    { pickAction(decodeURIComponent(el.dataset.actionText)); return; }
-  if (act === 'action-done')    { startActionEval(el.dataset.actionId); return; }
-  if (act === 'action-skip') {
-    state.actionLogs.push({
-      id: uid(), actionId: el.dataset.actionId, rating: 0, comment: 'スキップ', createdAt: new Date().toISOString()
-    });
-    saveState();
-    toast('今日はスキップ。明日また。');
-    render();
-    return;
-  }
-  if (act === 'action-talk') { moyamoya = { step: 1 }; go('moyamoya'); return; }
-  if (act === 'action-change') {
-    if (confirm('別のアクションに変更しますか？')) {
-      const a = activeAction();
-      if (a) a.status = 'inactive';
-      saveState();
-      go('action-select');
-    }
-    return;
-  }
-  if (act === 'eval-rating') { evalRating = Number(el.dataset.rating); render(); return; }
-  if (act === 'eval-save')   { saveActionEval(); return; }
+  // (旧 Goal→Policy→Action 関連ハンドラ全削除 v0.9.58)
 
   // きろくサブタブ
   if (act === 'record-sub') {
@@ -13923,58 +13174,7 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // v0.9.52 〜 方向選択は廃止のため ippo-change-direction はノーオペ
-  if (act === 'ippo-change-direction') {
-    return;
-  }
-  // Step 0: 方向選択 (v0.9.40 〜 複数選択トグル)
-  if (act === 'ippo-step0-toggle') {
-    if (!ippoToday) return;
-    if (!Array.isArray(ippoToday.directionIds)) ippoToday.directionIds = [];
-    const id = el.dataset.direction;
-    const idx = ippoToday.directionIds.indexOf(id);
-    if (idx >= 0) ippoToday.directionIds.splice(idx, 1);
-    else ippoToday.directionIds.push(id);
-    render();
-    return;
-  }
-  if (act === 'ippo-step0-next') {
-    if (!ippoToday || !Array.isArray(ippoToday.directionIds) || ippoToday.directionIds.length === 0) {
-      toast('1つ以上選んでね');
-      return;
-    }
-    // 永続化 (今後の NewDay 等で前回値として参照)
-    state.user.directionIds = ippoToday.directionIds.slice();
-    delete state.user.direction;  // 旧5択は廃止
-    saveState();
-    // moodLabel/Intensity は既存推薦エンジン互換のためデフォルト値で埋める
-    if (!ippoToday.moodLabel) ippoToday.moodLabel = 'なんとなく';
-    if (ippoToday.moodIntensity == null) ippoToday.moodIntensity = 5;
-    ippoToday.candidates = null;  // 推薦再計算
-    ippoToday.step = 2;
-    render();
-    return;
-  }
-  // ====== 新5ステップフロー（v0.9.13） ======
-  // Step 1: 気分 + 強さ
-  if (act === 'ippo-step1-mood') {
-    if (ippoToday) ippoToday.moodLabel = el.dataset.mood;
-    render();
-    return;
-  }
-  if (act === 'ippo-step1-int') {
-    if (ippoToday) ippoToday.moodIntensity = parseInt(el.dataset.score, 10);
-    render();
-    return;
-  }
-  if (act === 'ippo-step1-next') {
-    if (!ippoToday || !ippoToday.moodLabel) { toast('気分を選んでね'); return; }
-    if (ippoToday.moodIntensity == null) ippoToday.moodIntensity = 5;
-    ippoToday.candidates = null;  // 推薦再計算
-    ippoToday.step = 2;
-    render();
-    return;
-  }
+  // (旧 Step 0 方向選択 / Step 1 気分+強さ ハンドラ全削除 v0.9.58)
   // Step 2: 推薦
   if (act === 'ippo-step2-pick') {
     if (ippoToday) ippoToday.selectedActionId = el.dataset.actionId;
@@ -14027,26 +13227,7 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  if (act === 'ippo-step3-later') {
-    if (!ippoToday || !ippoToday.selectedActionId) return;
-    // 保留に追加
-    state.ippoPending = state.ippoPending || [];
-    state.ippoPending.push({
-      id: uid(),
-      actionId: ippoToday.selectedActionId,
-      moodLabel: ippoToday.moodLabel,
-      moodIntensity: ippoToday.moodIntensity,
-      directionIds: (ippoToday.directionIds || []).slice(),
-      savedAt: new Date().toISOString(),
-    });
-    saveState();
-    toast('「あとでやる」に保存しました');
-    // 完了済セッションがあれば todayDone、なければホームへ
-    ippoToday = null;
-    if (ippoCompletedToday()) render();
-    else go('home');
-    return;
-  }
+  // (旧 Step 3 「あとでやる」ハンドラ削除 v0.9.58 — 保留機能廃止)
   // Step 4: 5択定性評価 (v0.9.42 〜)
   if (act === 'ippo-step4-eval') {
     if (!ippoToday) return;
@@ -14087,10 +13268,7 @@ function handleAction(act, el, ev) {
         timerEndedAt: ippoToday.timerEndedAt,
         completedAt: new Date().toISOString(),
       });
-      // 保留から消す（再開していた場合）
-      if (ippoToday.resumedPendingId) {
-        state.ippoPending = (state.ippoPending || []).filter(p => p.id !== ippoToday.resumedPendingId);
-      }
+      // (旧 ippoPending 保留機能削除 v0.9.58)
       // v0.9.54 〜 行動が習慣に登録されていれば今日実施扱いにする
       if (ippoToday.selectedActionId && getAllHabitIds().includes(ippoToday.selectedActionId)) {
         markHabitDoneToday(ippoToday.selectedActionId);
@@ -14120,40 +13298,7 @@ function handleAction(act, el, ev) {
   }
   // ベース画面: きづきタブへ
   if (act === 'ippo-base-go-kizuki') { go('kizuki'); return; }
-  // 保留からの再開: Step 3 から
-  if (act === 'ippo-resume-pending') {
-    const pid = el.dataset.pendingId;
-    const p = (state.ippoPending || []).find(x => x.id === pid);
-    if (!p) return;
-    // 保留時の文脈を再構築。candidates にはこの行動だけ入れて Step 3 から
-    const action = ACTIONS.find(a => a.id === p.actionId);
-    if (!action) return;
-    const pDirIds = (Array.isArray(p.directionIds) && p.directionIds.length > 0)
-      ? p.directionIds : (p.directionId ? [p.directionId] : []);
-    const score = scoreAction(action, {
-      moodLabel: p.moodLabel || 'なんとなく',
-      intensity: p.moodIntensity == null ? 5 : p.moodIntensity,
-      directionIds: pDirIds,
-      durationPref: '1min',
-      history: state.ippoSessions || [],
-    });
-    const reasons = generateActionReasons(action, score, {
-      moodLabel: p.moodLabel || 'なんとなく',
-      history: state.ippoSessions || [],
-    });
-    ippoToday = {
-      step: 3,
-      moodLabel: p.moodLabel || 'なんとなく',
-      moodIntensity: p.moodIntensity == null ? 5 : p.moodIntensity,
-      directionIds: pDirIds,
-      candidates: [{ action, score, reasons }],
-      selectedActionId: p.actionId,
-      resumedPendingId: p.id,
-      startedAt: new Date().toISOString(),
-    };
-    render();
-    return;
-  }
+  // (旧 ippo-resume-pending 削除 v0.9.58 — 保留機能廃止)
   // 深掘り（v0.9.1）
   if (act === 'dd-start') {
     deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString() };
@@ -14387,7 +13532,6 @@ function handleAction(act, el, ev) {
     return;
   }
 
-  if (act === 'home-stats-help') { modal(viewHomeStatsHelpModal(), 'home-stat-help-modal'); return; }
   if (act === 'open-settings') { modal(viewSettingsModal()); return; }
   if (act === 'open-suplan-info') {
     modal(viewSuplanInfoModal(), 'suplan-info-modal-card');
@@ -14528,7 +13672,7 @@ function handleAction(act, el, ev) {
 }
 
 // 互換用: 一部ロガーから呼ばれる可能性のため残置
-function endDialog() { moodChatSession = null; goalChat = null; go('home'); }
+function endDialog() { moodChatSession = null; go('home'); }
 
 // ============================================================
 // 起動
@@ -14559,7 +13703,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     const id = document.activeElement?.id;
     if (id === 'moodChatInput') { e.preventDefault(); moodChatSend(); }
-    if (id === 'goalChatInput') { e.preventDefault(); goalChatSend(); }
   }
 });
 
