@@ -186,7 +186,31 @@
               0 0 14px rgba(167, 196, 160, 0.18);
 }
 
-/* ===== 気持ち入力カード ===== */
+/* ===== ホーム 統合カード (mood + stat) v0.9.53 〜 ===== */
+.home-record-card {
+  background: #F1E8D5;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+[data-theme="dark"] .home-record-card { background: rgba(80, 70, 50, 0.4); }
+.home-record-mood {
+  padding: 18px 18px 16px;
+  position: relative;
+}
+.home-record-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+  margin: 0 16px;
+}
+[data-theme="dark"] .home-record-divider { background: rgba(255,255,255,0.08); }
+.home-record-stat {
+  padding: 14px 16px 16px;
+}
+
+/* ===== 気持ち入力カード (旧クラス・後方互換) ===== */
 .home-mood-card {
   background: #F1E8D5;
   border-radius: 20px;
@@ -280,17 +304,9 @@
 }
 .home-mood-cta:hover { background: #6B9466; }
 
-/* ===== ホーム統計カード v0.9.51 ===== */
-.home-stat-card {
-  background: #F1E8D5;
-  border-radius: 20px;
-  padding: 16px 16px 18px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-[data-theme="dark"] .home-stat-card { background: rgba(80, 70, 50, 0.4); }
+/* ===== ホーム統計セクション v0.9.53 〜 (統合カード内) ===== */
 .home-stat-head {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center;
   gap: 8px; margin-bottom: 12px;
 }
 .home-stat-head-title {
@@ -302,41 +318,30 @@
 }
 [data-theme="dark"] .home-stat-head-title { color: #EAEAEA; }
 .home-stat-head-icon { font-size: 16px; line-height: 1; }
-.home-stat-help {
-  width: 24px; height: 24px; border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: rgba(255,255,255,0.6);
-  color: #6B6B6B;
-  font-size: 12px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; padding: 0;
-  flex-shrink: 0;
-}
-.home-stat-help:hover { background: rgba(255,255,255,0.9); }
-[data-theme="dark"] .home-stat-help {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.18);
-  color: #DDD;
-}
 .home-stat-cells {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
 }
 .home-stat-cell {
   background: rgba(255,255,255,0.55);
   border-radius: 12px;
-  padding: 10px 8px 12px;
-  display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 6px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px;
+  min-width: 0;
+  text-align: center;
 }
 [data-theme="dark"] .home-stat-cell { background: rgba(255,255,255,0.06); }
 .home-stat-cell-head {
-  display: flex; align-items: center; gap: 4px;
-  font-size: 10.5px;
+  display: flex; align-items: center; gap: 3px;
+  font-size: 10px;
   color: #6B6B6B;
   white-space: nowrap;
+  min-width: 0;
+  justify-content: center;
 }
 [data-theme="dark"] .home-stat-cell-head { color: #BFC8C0; }
-.home-stat-cell-icon { font-size: 12px; line-height: 1; flex-shrink: 0; }
+.home-stat-cell-icon { font-size: 11px; line-height: 1; flex-shrink: 0; }
 .home-stat-cell-label {
   font-weight: 500;
   overflow: hidden; text-overflow: ellipsis;
@@ -346,17 +351,10 @@
   font-size: 22px; font-weight: 700;
   color: #2D2D2D;
   line-height: 1.1;
-  text-align: left;
-  padding-left: 2px;
+  text-align: center;
 }
 [data-theme="dark"] .home-stat-cell-num { color: #EAEAEA; }
 .home-stat-cell-unit { font-size: 12px; font-weight: 600; margin-left: 2px; }
-.home-stat-cell-sub {
-  font-size: 9.5px; color: #8B7F70;
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-[data-theme="dark"] .home-stat-cell-sub { color: #BFC8C0; }
 .home-stat-progress { margin-top: 14px; }
 .home-stat-progress-text {
   font-size: 13px; color: #2D2D2D; line-height: 1.5;
@@ -5541,6 +5539,22 @@ body.keyboard-open .mood-chat-bottom .input-row {
   color: #DDD;
 }
 .ippo-tk-pause-soft { background: rgba(255,255,255,0.6); }
+/* タイマー スタートボタン (v0.9.53 〜) */
+.ippo-tk-start {
+  display: block;
+  margin: 16px auto 0;
+  background: #7BA876;
+  color: #FFF;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 28px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  min-width: 140px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.ippo-tk-start:hover { background: #6B9466; }
+.ippo-tk-start:active { transform: scale(0.97); }
 
 /* === Ring (呼吸・瞑想系) === */
 .ippo-tk-ring { text-align: center; }
@@ -7151,74 +7165,72 @@ function viewHome() {
         </button>
       </header>
 
-      <!-- 気持ち入力カード -->
-      <div class="home-mood-card">
-        <div class="home-mood-illust" aria-hidden="true">
-          ${suplan({ pose: 'watering', size: 96 })}
+      <!-- 気持ち入力 + 統計 統合カード v0.9.53 -->
+      <div class="home-record-card ${hasAnyRecord ? 'has-stat' : ''}">
+        <div class="home-record-mood">
+          <div class="home-mood-illust" aria-hidden="true">
+            ${suplan({ pose: 'watering', size: 96 })}
+          </div>
+          <div class="home-mood-body">
+            <h2 class="home-mood-title">いまのきもちを教えてください</h2>
+            <p class="home-mood-sub">天気で5段階。書かなくてもOK。</p>
+          </div>
+          <div class="home-mood-row">
+            ${MOODS.map(m => `
+              <button class="home-mood-pick" data-act="quick-mood" data-score="${m.id}" aria-label="${m.label}">
+                <span class="home-mood-circle">${m.emoji}</span>
+                <span class="home-mood-pick-label">${m.label}</span>
+              </button>
+            `).join('')}
+          </div>
+          <button class="btn btn-primary home-mood-cta" data-act="open-mood-full">
+            <span style="flex:1; text-align:center;">きもちを記録する</span>
+            <span style="opacity:0.85;">›</span>
+          </button>
         </div>
-        <div class="home-mood-body">
-          <h2 class="home-mood-title">いまのきもちを教えてください</h2>
-          <p class="home-mood-sub">天気で5段階。書かなくてもOK。</p>
-        </div>
-        <div class="home-mood-row">
-          ${MOODS.map(m => `
-            <button class="home-mood-pick" data-act="quick-mood" data-score="${m.id}" aria-label="${m.label}">
-              <span class="home-mood-circle">${m.emoji}</span>
-              <span class="home-mood-pick-label">${m.label}</span>
-            </button>
-          `).join('')}
-        </div>
-        <button class="btn btn-primary home-mood-cta" data-act="open-mood-full">
-          <span style="flex:1; text-align:center;">きもちを記録する</span>
-          <span style="opacity:0.85;">›</span>
-        </button>
-      </div>
 
-      ${hasAnyRecord ? `
-      <!-- ホーム統計カード v0.9.51 -->
-      <div class="home-stat-card">
-        <div class="home-stat-head">
-          <div class="home-stat-head-title">
-            <span class="home-stat-head-icon">🌱</span>
-            <span>きもちの記録を続けています！</span>
-          </div>
-          <button class="home-stat-help" data-act="home-stats-help" aria-label="この機能について">?</button>
-        </div>
-        <div class="home-stat-cells">
-          <div class="home-stat-cell">
-            <div class="home-stat-cell-head"><span class="home-stat-cell-icon">🌱</span><span class="home-stat-cell-label">積み重ねた日</span></div>
-            <div class="home-stat-cell-num">${activeDays}<span class="home-stat-cell-unit">日</span></div>
-            <div class="home-stat-cell-sub">はじめてからの累計</div>
-          </div>
-          <div class="home-stat-cell">
-            <div class="home-stat-cell-head"><span class="home-stat-cell-icon">✏️</span><span class="home-stat-cell-label">やってみた回数</span></div>
-            <div class="home-stat-cell-num">${totalCount}<span class="home-stat-cell-unit">回</span></div>
-            <div class="home-stat-cell-sub">きもちを記録した合計</div>
-          </div>
-          <div class="home-stat-cell">
-            <div class="home-stat-cell-head"><span class="home-stat-cell-icon">🔥</span><span class="home-stat-cell-label">続いている日</span></div>
-            <div class="home-stat-cell-num">${streak}<span class="home-stat-cell-unit">日</span></div>
-            <div class="home-stat-cell-sub">連続で記録した日数</div>
-          </div>
-        </div>
-        <div class="home-stat-progress">
-          <div class="home-stat-progress-text">
-            ${remaining > 0
-              ? `あと<strong>${remaining}日</strong>で、連続記録が<strong>${target}日</strong>になります！`
-              : `<strong>${streak}日</strong>連続達成！おめでとう ✨`}
-          </div>
-          <div class="home-stat-progress-sub">${remaining > 0 ? '自分をほめてあげましょう ✨' : '次の節目に向けて、また一歩ずつ。'}</div>
-          <div class="home-stat-progress-row">
-            <div class="home-stat-progress-dots">
-              ${Array.from({ length: dotMax }).map((_, i) => `
-                <span class="home-stat-dot ${i < filledDots ? 'filled' : ''}">${i < filledDots ? '✓' : ''}</span>
-              `).join('')}
+        ${hasAnyRecord ? `
+        <div class="home-record-divider"></div>
+        <div class="home-record-stat">
+          <div class="home-stat-head">
+            <div class="home-stat-head-title">
+              <span class="home-stat-head-icon">🌱</span>
+              <span>きもちの記録を続けています！</span>
             </div>
-            <span class="home-stat-progress-badge">${target}日</span>
+          </div>
+          <div class="home-stat-cells">
+            <div class="home-stat-cell">
+              <div class="home-stat-cell-head"><span class="home-stat-cell-icon">🌱</span><span class="home-stat-cell-label">積み重ねた日</span></div>
+              <div class="home-stat-cell-num">${activeDays}<span class="home-stat-cell-unit">日</span></div>
+            </div>
+            <div class="home-stat-cell">
+              <div class="home-stat-cell-head"><span class="home-stat-cell-icon">✏️</span><span class="home-stat-cell-label">やってみた回数</span></div>
+              <div class="home-stat-cell-num">${totalCount}<span class="home-stat-cell-unit">回</span></div>
+            </div>
+            <div class="home-stat-cell">
+              <div class="home-stat-cell-head"><span class="home-stat-cell-icon">🔥</span><span class="home-stat-cell-label">続いている日</span></div>
+              <div class="home-stat-cell-num">${streak}<span class="home-stat-cell-unit">日</span></div>
+            </div>
+          </div>
+          <div class="home-stat-progress">
+            <div class="home-stat-progress-text">
+              ${remaining > 0
+                ? `あと<strong>${remaining}日</strong>で、連続記録が<strong>${target}日</strong>になります！`
+                : `<strong>${streak}日</strong>連続達成！おめでとう ✨`}
+            </div>
+            <div class="home-stat-progress-sub">${remaining > 0 ? '自分をほめてあげましょう ✨' : '次の節目に向けて、また一歩ずつ。'}</div>
+            <div class="home-stat-progress-row">
+              <div class="home-stat-progress-dots">
+                ${Array.from({ length: dotMax }).map((_, i) => `
+                  <span class="home-stat-dot ${i < filledDots ? 'filled' : ''}">${i < filledDots ? '✓' : ''}</span>
+                `).join('')}
+              </div>
+              <span class="home-stat-progress-badge">${target}日</span>
+            </div>
           </div>
         </div>
+        ` : ''}
       </div>
-      ` : ''}
 
       <!-- もやもや整理カード -->
       <div class="home-moya-card">
@@ -8738,7 +8750,6 @@ function viewIppoStep2(s) {
   return `
     <div class="screen active ippo-screen">
       ${ippoHeader(2)}
-      ${ippoDirectionLine()}
       <div class="ippo-q">あなたに合いそうないっぽを提案します</div>
       <p class="text-tiny text-muted mb-3">気になるものを1つ選んでね</p>
       <div style="display:flex; flex-direction:column; gap:10px;">
@@ -8844,6 +8855,7 @@ function startIppoTimerLoop() {
       stopIppoTimerLoop();
       return;
     }
+    if (!ippoToday.timerStarted) return;
     if (ippoToday.timerPaused) return;
     if (typeof ippoToday.remainingSec !== 'number') return;
     if (ippoToday.remainingSec <= 0) return;
@@ -8871,21 +8883,30 @@ function stopIppoTimerLoop() {
 window.ippoTimerSetNote = (v) => { if (ippoToday) ippoToday.notes = v; const cnt = document.getElementById('ippoTimerNoteCounter'); if (cnt) cnt.textContent = String((v || '').length); };
 
 function viewIppoTimer(s) {
+  // 直接エントリ対応 (preselectedActionId だけでcandidatesがない場合に補完) v0.9.53
+  if (!s.candidates && s.preselectedActionId) {
+    const preAction = ACTIONS.find(a => a.id === s.preselectedActionId);
+    if (preAction) {
+      s.candidates = [{ action: preAction, score: { total: 100, tags: { purpose: [], means: [] } }, userPicked: true }];
+      s.selectedActionId = s.preselectedActionId;
+    }
+  }
   const c = s.candidates && s.candidates.find(x => x.action.id === s.selectedActionId);
   if (!c) { s.step = 2; return viewIppoStep2(s); }
   const action = c.action;
   const kind = ippoTimerKind(action);
 
-  // 初期化（再描画時はリセットしない）
+  // 初期化（再描画時はリセットしない）— v0.9.53: timerStarted=false で初期化、ユーザーがスタート押すまで動かない
   if (s.timerInited !== true) {
     s.targetSec = ippoTimerSeconds(action);
     s.remainingSec = s.targetSec;
     s.timerPaused = false;
+    s.timerStarted = false;
     s.timerInited = true;
     s.notes = s.notes || '';
   }
 
-  // 画面描画後にタイマー起動（writing 以外）
+  // タイマーループは常時起動 (中で timerStarted/timerPaused をチェック)
   if (kind !== 'writing') {
     setTimeout(() => startIppoTimerLoop(), 0);
   } else {
@@ -8956,9 +8977,9 @@ function viewIppoTimer(s) {
             <div class="ippo-tk-ring-meta-line">${escapeHtml(action.desc).slice(0, 14)}…</div>
             <div class="ippo-tk-num" id="ippoTimerNum">${formatMmSs(s.remainingSec)}</div>
           </div>
-          <button id="ippoTimerPauseBtn" class="ippo-tk-pause" data-act="ippo-timer-pause">
-            ${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}
-          </button>
+          ${!s.timerStarted
+            ? `<button class="ippo-tk-start" data-act="ippo-timer-start">▶ スタート</button>`
+            : `<button id="ippoTimerPauseBtn" class="ippo-tk-pause" data-act="ippo-timer-pause">${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}</button>`}
         </div>
         <div style="display:grid; gap:10px; margin-top:18px;">
           <button class="btn btn-primary" data-act="ippo-timer-done">終了する</button>
@@ -8984,9 +9005,9 @@ function viewIppoTimer(s) {
           <div class="ippo-tk-num" id="ippoTimerNum">${formatMmSs(s.remainingSec)}</div>
           <div class="ippo-tk-count-sub">⏱ 目安時間 ${escapeHtml(action.time)}</div>
         </div>
-        <button id="ippoTimerPauseBtn" class="ippo-tk-pause ippo-tk-pause-soft" data-act="ippo-timer-pause">
-          ${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}
-        </button>
+        ${!s.timerStarted
+          ? `<button class="ippo-tk-start" data-act="ippo-timer-start">▶ スタート</button>`
+          : `<button id="ippoTimerPauseBtn" class="ippo-tk-pause ippo-tk-pause-soft" data-act="ippo-timer-pause">${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}</button>`}
       </div>
       <div style="display:grid; gap:10px; margin-top:18px;">
         <button class="btn btn-primary" data-act="ippo-timer-done">終了する</button>
@@ -13467,9 +13488,9 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // 新しい1日画面のおすすめカード直接タップ (v0.9.52 〜 step 2 直行)
+  // 新しい1日画面のおすすめカード直接タップ (v0.9.53 〜 タイマー直行)
   if (act === 'ippo-newday-pick-rec') {
-    ippoToday = { step: 2, startedAt: new Date().toISOString(), preselectedActionId: el.dataset.actionId };
+    ippoToday = { step: 35, startedAt: new Date().toISOString(), preselectedActionId: el.dataset.actionId };
     render();
     return;
   }
@@ -13525,7 +13546,16 @@ function handleAction(act, el, ev) {
   // ============================================================
   // 習慣詳細 (P8.1 v0.9.47 〜)
   // ============================================================
+  // v0.9.53 〜 習慣行をタップしたら行動実施画面（タイマー）へ直行
   if (act === 'ippo-habit-tap') {
+    const id = el.dataset.habitId;
+    if (!id) return;
+    ippoToday = { step: 35, startedAt: new Date().toISOString(), preselectedActionId: id };
+    render();
+    return;
+  }
+  // 習慣詳細（カレンダー/編集）を開く専用アクション
+  if (act === 'ippo-habit-detail') {
     const id = el.dataset.habitId;
     if (!id) return;
     habitView = { habitId: id, mode: 'today', monthOffset: 0 };
@@ -13745,6 +13775,14 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  // タイマー スタート (初回のみ・以降は pause/resume) v0.9.53
+  if (act === 'ippo-timer-start') {
+    if (!ippoToday) return;
+    ippoToday.timerStarted = true;
+    ippoToday.timerPaused = false;
+    render();
+    return;
+  }
   // タイマー一時停止/再開
   if (act === 'ippo-timer-pause') {
     if (!ippoToday) return;
@@ -13841,10 +13879,11 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // ベース画面: おすすめの一歩を直接やる → Step 2 から開始 (v0.9.52 〜 action 事前選択)
+  // ベース画面: おすすめ/最近よくやっている を直接やる → タイマー直行 (v0.9.53 〜)
   if (act === 'ippo-base-do-rec') {
     const actionId = el.dataset.actionId;
-    ippoToday = { step: 2, startedAt: new Date().toISOString(), preselectedActionId: actionId };
+    if (!actionId) return;
+    ippoToday = { step: 35, startedAt: new Date().toISOString(), preselectedActionId: actionId };
     render();
     return;
   }
