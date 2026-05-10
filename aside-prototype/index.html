@@ -5972,7 +5972,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.58-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.59-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -6799,6 +6799,18 @@ function go(screen, opts = {}) {
   window.scrollTo(0, 0);
 }
 
+// 論理ビューが切り替わった時にスクロール位置を最上部に戻すためのキー (v0.9.59 〜)
+let _lastRenderKey = '';
+function getRenderKey() {
+  let k = currentScreen || '';
+  if (typeof ippoToday !== 'undefined' && ippoToday) k += ':ippo' + ippoToday.step;
+  if (typeof habitView !== 'undefined' && habitView) k += ':habit:' + habitView.habitId + ':' + (habitView.mode || '');
+  if (typeof habitsCalView !== 'undefined' && habitsCalView) k += ':habitcal';
+  if (typeof moyamoya !== 'undefined' && moyamoya && moyamoya.step) k += ':moya' + moyamoya.step;
+  if (typeof deepDive !== 'undefined' && deepDive && deepDive.step) k += ':dd' + deepDive.step;
+  return k;
+}
+
 function render() {
   // タブバー＆FAB の表示制御（v3.5 仕様: ホームには独自CTAがあるためFABは非表示）
   const showTabbar = ['home', 'action', 'kizuki', 'kizuki-list', 'record'].includes(currentScreen);
@@ -6841,6 +6853,17 @@ function render() {
     default:                html = viewHome();
   }
   document.getElementById('main').innerHTML = html;
+
+  // 論理ビューが切り替わった時にスクロールを最上部に戻す (v0.9.59 〜)
+  // 同じビュー内の再描画 (タイマー一時停止トグル等) では維持。
+  // mood-chat / kiroku-chat は visualViewport で独自管理するため除外。
+  const newKey = getRenderKey();
+  const isChatScreen = currentScreen === 'mood-chat' || currentScreen === 'kiroku-chat';
+  if (newKey !== _lastRenderKey && !isChatScreen) {
+    window.scrollTo(0, 0);
+  }
+  _lastRenderKey = newKey;
+
   // chat-screen をレンダー直後に viewport にフィットさせる
   if (typeof window.fitChatScreenToViewport === 'function') {
     requestAnimationFrame(window.fitChatScreenToViewport);
@@ -8611,7 +8634,7 @@ function viewIppoNewDay() {
           <div class="ippo-nd-cta-h">まずは今の気分を記録してみよう</div>
           <div class="ippo-nd-cta-sub">あなたの状態に合わせたいっぽを提案します</div>
         </div>
-        <button class="btn btn-primary ippo-nd-cta-btn" data-act="ippo-newday-start">気分を記録する →</button>
+        <button class="btn btn-primary ippo-nd-cta-btn" data-act="ippo-newday-start">気分を記録する</button>
       </div>
     </div>
   `;
@@ -8682,7 +8705,7 @@ function viewIppoOnboarding() {
       </div>
 
       <button class="btn btn-primary" data-act="ippo-onboarding-start" style="width:100%;">
-        さっそく始める →
+        さっそく始める
       </button>
     </div>
   `;
@@ -9283,14 +9306,13 @@ function viewIppoBase(session) {
       </div>
 
       ${!isDone ? `
-        <button class="btn btn-primary ippo-base-start-cta" data-act="ippo-do-another">おすすめのいっぽを見る →</button>
+        <button class="btn btn-primary ippo-base-start-cta" data-act="ippo-do-another">おすすめのいっぽを見る</button>
       ` : ''}
 
       <!-- 今日のおすすめのいっぽ -->
       ${topRec ? `
         <div class="ippo-base-section-row">
           <div class="ippo-base-section-h">今日のおすすめのいっぽ</div>
-          <button class="ippo-base-section-link" data-act="ippo-rec-why">なぜこれをおすすめするの？</button>
         </div>
         <button class="ippo-base-rec-card" data-act="ippo-base-do-rec" data-action-id="${topRec.action.id}">
           <span class="ippo-base-rec-icon">${topRec.action.icon}</span>
@@ -9322,16 +9344,16 @@ function viewIppoBase(session) {
         </button>
       ` : ''}
 
-      <!-- 続けていること（習慣）(P8.4 v0.9.50 〜・v0.9.54 〜「記録を見る」追加) -->
+      <!-- 続けていること (P8.4 v0.9.50 〜・v0.9.54 〜「記録を見る」追加・v0.9.59 〜 ラベル/アイコン整理) -->
       <div class="ippo-base-section-row">
-        <div class="ippo-base-section-h">続けていること（習慣）</div>
+        <div class="ippo-base-section-h">続けていること</div>
         <div class="ippo-base-habit-actions">
           ${habitItems.length > 0 ? `
-            <button class="ippo-base-edit-pill" data-act="ippo-habits-cal-open"><span class="ippo-base-edit-pill-icon">📅</span>記録を見る</button>
+            <button class="ippo-base-edit-pill" data-act="ippo-habits-cal-open">記録を見る</button>
           ` : ''}
           ${habitItems.length === 0
             ? `<button class="ippo-base-section-link" data-act="ippo-base-add-habit">＋ 追加</button>`
-            : `<button class="ippo-base-edit-pill" data-act="ippo-base-add-habit"><span class="ippo-base-edit-pill-icon">✎</span>追加・編集</button>`}
+            : `<button class="ippo-base-edit-pill" data-act="ippo-base-add-habit">追加・編集</button>`}
         </div>
       </div>
       ${habitItems.length === 0 ? `
@@ -9389,7 +9411,7 @@ function viewIppoBase(session) {
 
       ${isDone ? renderPendingOrMoreCta() : ''}
 
-      <button class="ippo-base-other-link" data-act="ippo-open-picker">他の行動を見る →</button>
+      <button class="ippo-base-other-link" data-act="ippo-open-picker">他の行動を見る</button>
     </div>
   `;
 }
@@ -9921,7 +9943,7 @@ function viewKizuki() {
       </div>
 
       <button class="btn-ghost kizuki-see-all" data-act="kizuki-see-all">
-        すべてのワークを見る →
+        すべてのワークを見る
       </button>
 
       <!-- いつやるのがおすすめ -->
@@ -12946,11 +12968,6 @@ function handleAction(act, el, ev) {
   if (act === 'ippo-recent-history') {
     ippoToday = { step: 99, pickerTab: 'history', startedAt: new Date().toISOString() };
     render();
-    return;
-  }
-  // ベース画面: 「なぜこれをおすすめするの？」 (P8 軽量実装: 一旦トースト)
-  if (act === 'ippo-rec-why') {
-    toast('過去の方向選択と実施履歴から、いま合いそうな行動を提案しています');
     return;
   }
   // ベース画面: 習慣を追加/編集 → ピッカーを習慣選択モードで開く (P8)
