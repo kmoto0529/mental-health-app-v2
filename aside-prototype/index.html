@@ -9798,13 +9798,8 @@ function viewAllHabitsCalendar(hcv) {
   const year = target.getFullYear();
   const month0 = target.getMonth();
 
-  const habits = getAllHabitIds().map(id => {
-    const action = ACTIONS.find(a => a.id === id);
-    if (action) return { id, icon: action.icon, title: action.title, time: action.time, isCustom: false };
-    const custom = (state.customHabits || []).find(h => h.id === id);
-    if (custom) return { id, icon: custom.icon || '🌱', title: custom.title, time: custom.time, isCustom: true };
-    return null;
-  }).filter(Boolean);
+  // getHabitItem で正規化 (preset / custom 双方対応)
+  const habits = getAllHabitIds().map(id => getHabitItem(id)).filter(Boolean);
 
   return `
     <div class="screen active ippo-screen habits-cal-screen">
@@ -14026,6 +14021,8 @@ function handleAction(act, el, ev) {
     if (!ippoToday) return;
     stopIppoTimerLoop();
     ippoToday.timerEndedAt = new Date().toISOString();
+    // Step 4 → 戻る で step 35 に戻った時に勝手にカウントが進まないよう pause 状態に
+    ippoToday.timerPaused = true;
     ippoToday.step = 4;
     render();
     return;
