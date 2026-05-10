@@ -13883,11 +13883,11 @@ function handleAction(act, el, ev) {
     }
     return;
   }
-  // ピッカーで行動選択 → preselectedActionId を持って Step 2 から開始 (v0.9.52 〜)
+  // ピッカーで行動選択 → タイマー直行 (v0.9.56 〜・base/newday と挙動統一)
   if (act === 'ippo-picker-pick') {
     const actionId = el.dataset.actionId;
     if (!actionId) return;
-    ippoToday = { step: 2, preselectedActionId: actionId, startedAt: new Date().toISOString() };
+    ippoToday = { step: 35, preselectedActionId: actionId, startedAt: new Date().toISOString() };
     render();
     return;
   }
@@ -13907,7 +13907,18 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'ippo-back') {
-    if (ippoToday) ippoToday.step = parseInt(el.dataset.to, 10) || 1;
+    if (ippoToday) {
+      const to = parseInt(el.dataset.to, 10) || 1;
+      // step 35 (タイマー) → step 2 (推薦) で候補が単一 (preselect直行) の場合は
+      // キャンセル相当でベース画面へ戻す (推薦リストに1件だけ表示されるのを避ける)
+      if (ippoToday.step === 35 && to === 2 && (ippoToday.candidates || []).length <= 1) {
+        stopIppoTimerLoop();
+        ippoToday = null;
+        render();
+        return;
+      }
+      ippoToday.step = to;
+    }
     render();
     return;
   }
@@ -14535,7 +14546,13 @@ document.addEventListener('click', (e) => {
   if (tab) {
     const t = tab.dataset.tab;
     if (t === 'home')   go('home');
-    if (t === 'action') go('action');
+    if (t === 'action') {
+      // v0.9.56 〜 action タブをタップしたら習慣詳細・全習慣カレンダーをクリア
+      // (進行中の ippoToday は維持してタイマーを切らない)
+      habitView = null;
+      habitsCalView = null;
+      go('action');
+    }
     if (t === 'kizuki') go('kizuki');
     if (t === 'record') go('record');
   }
