@@ -477,6 +477,90 @@
 }
 .home-stat-help-effect strong { color: #C68B5E; display: block; margin-bottom: 2px; font-size: 11px; }
 
+/* ===== 機能説明 (#11) v0.9.60 〜 ===== */
+.feature-help-row {
+  display: flex; justify-content: flex-end;
+  margin: -4px 0 8px;
+}
+.feature-help-btn {
+  background: var(--bg-soft);
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11px; font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.feature-help-btn:hover { color: var(--text-strong); }
+[data-theme="dark"] .feature-help-btn {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  color: #BFC8C0;
+}
+.feature-help-icon-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--divider);
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  font-size: 14px; font-weight: 500;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+}
+.feature-help-icon-btn:hover { color: var(--text-strong); }
+[data-theme="dark"] .feature-help-icon-btn {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  color: #BFC8C0;
+}
+
+.home-header-right {
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+
+/* 機能説明モーダル本体 */
+.feature-help-modal .feature-help-hero {
+  text-align: center; padding: 4px 0 14px;
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 14px;
+}
+.feature-help-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--text-strong);
+  margin: 0 0 4px;
+}
+.feature-help-subtitle {
+  font-size: 12px; color: var(--text-muted);
+  margin: 0;
+}
+.feature-help-sections {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.feature-help-section {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.feature-help-section-icon {
+  font-size: 22px; line-height: 1;
+  flex-shrink: 0;
+}
+.feature-help-section-body { flex: 1; min-width: 0; }
+.feature-help-section-h {
+  font-weight: 600; font-size: 13.5px;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+.feature-help-section-d {
+  font-size: 12px; color: var(--text-soft);
+  line-height: 1.65;
+  margin: 0;
+}
+
 /* ===== もやもやカード ===== */
 .home-moya-card {
   background: #FFF;
@@ -5972,7 +6056,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.59-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.60-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7271,9 +7355,12 @@ function viewHome() {
         <div class="home-greeting">
           <h1 class="home-greet-h1">${getGreeting()}、${escapeHtml(getUserName())}さん</h1>
         </div>
-        <button class="home-mascot" data-act="open-suplan-info" aria-label="すぷらんについて">
-          ${suplan({ size: 56, expression: suplanHomeExpression() })}
-        </button>
+        <div class="home-header-right">
+          <button class="feature-help-icon-btn" data-act="feature-help" data-feature="home" aria-label="ホームについて">ⓘ</button>
+          <button class="home-mascot" data-act="open-suplan-info" aria-label="すぷらんについて">
+            ${suplan({ size: 56, expression: suplanHomeExpression() })}
+          </button>
+        </div>
       </header>
 
       <!-- 気持ち入力 + 統計 統合カード v0.9.53 -->
@@ -9271,6 +9358,9 @@ function viewIppoBase(session) {
 
   return `
     <div class="screen active ippo-screen ippo-base-screen">
+      <div class="feature-help-row">
+        <button class="feature-help-btn" data-act="feature-help" data-feature="ippo" aria-label="いっぽについて">ⓘ いっぽとは？</button>
+      </div>
       <!-- ヒーロー -->
       <div class="ippo-base-hero">
         <div class="ippo-base-hero-mascot">${suplan({ stage: 'futaba', expression: 'happy', size: 72 })}</div>
@@ -9889,7 +9979,7 @@ function viewKizuki() {
       <div class="page-header">
         <span style="width:36px;"></span>
         <h1 class="page-title">きづき</h1>
-        <span style="width:36px;"></span>
+        <button class="feature-help-icon-btn" data-act="feature-help" data-feature="kizuki" aria-label="きづきについて">ⓘ</button>
       </div>
 
       <!-- ヒーロー: 価値訴求 -->
@@ -11122,7 +11212,10 @@ function viewRecord() {
     <div class="screen active">
       <div class="page-header">
         <h1 style="margin:0;">きろく</h1>
-        <button class="page-back" data-act="open-settings" aria-label="設定">⚙</button>
+        <div style="display:flex; gap:6px;">
+          <button class="feature-help-icon-btn" data-act="feature-help" data-feature="kiroku" aria-label="きろくについて">ⓘ</button>
+          <button class="page-back" data-act="open-settings" aria-label="設定">⚙</button>
+        </div>
       </div>
 
       <div style="display:flex; gap:6px; margin-bottom:14px;">
@@ -12283,6 +12376,71 @@ function generateGraphTrendSummary(tab, logs) {
 }
 
 // (旧 ホーム統計説明モーダル viewHomeStatsHelpModal は v0.9.58 で削除 — ヘルプボタン自体が廃止のため)
+
+// ============================================================
+// 各機能の説明モーダル v0.9.60 (#11 機能説明ライト版)
+// ============================================================
+const FEATURE_HELP = {
+  home: {
+    title: 'ホーム',
+    subtitle: '今日のあなたに寄り添う場所',
+    sections: [
+      { icon: '🌤', h: 'いまの気持ちを簡単記録', d: '5段階の天気アイコンで気分をぱっと記録。書きたい時はメモ欄やAIとの会話もできます。' },
+      { icon: '💭', h: 'もやもやを整理する', d: '頭の中でぐるぐるしていることを、AIと一緒に少しずつ整理。CBT（認知行動療法）に基づく「別の見方」を3つ提案します。' },
+      { icon: '🌱', h: '続けるほど見えてくる', d: '記録を続けるほど、自分の心の動きや傾向が「きろく」タブで可視化されていきます。' },
+    ],
+  },
+  ippo: {
+    title: 'いっぽ',
+    subtitle: '小さな行動でこころを整える',
+    sections: [
+      { icon: '🎯', h: '気分転換の行動を提案', d: '「いっぽ」はCBTの行動活性化に基づき、気分を整える小さな行動（呼吸・散歩・書き出し等）を提案する機能です。' },
+      { icon: '⏱', h: '実施して気分の変化を記録', d: 'タイマーで実施 → 5段階で気分の変化を評価。続けるほど、自分に合う行動パターンが見えてきます。' },
+      { icon: '🔁', h: '続けたい行動は習慣化', d: '気に入った行動は「習慣」として登録できます。連続日数や週間の達成度をベース画面で可視化。' },
+    ],
+  },
+  kizuki: {
+    title: 'きづき',
+    subtitle: '思考のクセを知る',
+    sections: [
+      { icon: '🧠', h: 'CBTのワークで自分を知る', d: '認知行動療法（CBT）に基づくセルフワーク機能。思考のクセや価値観をガイド付きで深掘りできます。' },
+      { icon: '🎯', h: 'いっぽの効果を高める', d: '自分の思考パターンを理解することで、「いっぽ」で提案される行動の効果がさらに高まります。' },
+      { icon: '🌿', h: '無理なく自分のペースで', d: 'ワークは中断・再開OK。週末にゆっくり時間をとる使い方がおすすめです。' },
+    ],
+  },
+  kiroku: {
+    title: 'きろく',
+    subtitle: '振り返りで気づきを得る',
+    sections: [
+      { icon: '📅', h: 'カレンダーで一覧', d: '気もち・もやもや・いっぽの記録を月別カレンダーで一覧。日付タップでその日の詳細が見られます。' },
+      { icon: '📊', h: 'AI分析レポート', d: '記録が貯まると、思考のクセ・気分の傾向・効きやすい行動などを AI が分析してレポートしてくれます。' },
+      { icon: '💌', h: 'もやもや整理のレター', d: 'もやもや整理した記録は、AIが書いてくれた「あなたへのレター」として読み返せます。' },
+    ],
+  },
+};
+
+function viewFeatureHelpModal(key) {
+  const f = FEATURE_HELP[key];
+  if (!f) return '';
+  return `
+    <div class="feature-help-hero">
+      <h2 class="feature-help-title">${escapeHtml(f.title)}</h2>
+      <p class="feature-help-subtitle">${escapeHtml(f.subtitle)}</p>
+    </div>
+    <div class="feature-help-sections">
+      ${f.sections.map(s => `
+        <div class="feature-help-section">
+          <span class="feature-help-section-icon">${s.icon}</span>
+          <div class="feature-help-section-body">
+            <div class="feature-help-section-h">${escapeHtml(s.h)}</div>
+            <p class="feature-help-section-d">${escapeHtml(s.d)}</p>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn btn-primary" data-act="close-modal" style="width:100%; margin-top:14px;">閉じる</button>
+  `;
+}
 
 // ============================================================
 // すぷらん紹介モーダル（ホーム右上のすぷらんアイコンタップで表示）
@@ -13549,6 +13707,11 @@ function handleAction(act, el, ev) {
     return;
   }
 
+  if (act === 'feature-help') {
+    const key = el.dataset.feature;
+    if (key && FEATURE_HELP[key]) modal(viewFeatureHelpModal(key), 'feature-help-modal');
+    return;
+  }
   if (act === 'open-settings') { modal(viewSettingsModal()); return; }
   if (act === 'open-suplan-info') {
     modal(viewSuplanInfoModal(), 'suplan-info-modal-card');
