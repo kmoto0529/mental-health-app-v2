@@ -4488,13 +4488,16 @@ body.keyboard-open .mood-chat-bottom .input-row {
    ============================================================ */
 .ippo-eval5-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
   margin: 4px 0 16px;
 }
 .ippo-eval5-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  gap: 6px;
   padding: 12px 4px;
+  min-width: 0;
+  min-height: 86px;
   background: var(--bg-card);
   border: 1.5px solid var(--divider);
   border-radius: 12px;
@@ -4521,7 +4524,8 @@ body.keyboard-open .mood-chat-bottom .input-row {
   font-size: 10px; line-height: 1.3;
   color: var(--text-soft);
   text-align: center;
-  word-break: keep-all;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 .ippo-eval5-btn.selected .ippo-eval5-label {
   color: var(--text-strong);
@@ -6067,7 +6071,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.62-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.63-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
