@@ -6056,7 +6056,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.60-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.61-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7344,6 +7344,8 @@ function viewHome() {
   const totalCount = calcHomeTotalCount();
   const streak = calcHomeStreak();
   const hasAnyRecord = totalCount > 0;
+  const todayKey = dateKey(new Date());
+  const hasMoodToday = (state.moodLogs || []).some(m => m.createdAt && dateKey(new Date(m.createdAt)) === todayKey);
   const target = calcNextMilestone(streak);
   const remaining = Math.max(0, target - streak);
   const dotMax = Math.min(target, 10);
@@ -7393,7 +7395,7 @@ function viewHome() {
           <div class="home-stat-head">
             <div class="home-stat-head-title">
               <span class="home-stat-head-icon">🌱</span>
-              <span>きもちの記録を続けています！</span>
+              <span>${hasMoodToday ? '今日も気持ちを記録できました！' : 'まだ今日のきもちを記録していません'}</span>
             </div>
           </div>
           <div class="home-stat-cells">
