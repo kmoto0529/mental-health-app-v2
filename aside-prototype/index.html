@@ -9455,7 +9455,7 @@ function viewIppoBase(session) {
             <div class="ippo-base-rec-desc">${escapeHtml(topRec.action.desc || topRec.action.technique || '')}</div>
             <div class="ippo-base-rec-bar-row">
               <div class="ippo-base-rec-bar-track"><div class="ippo-base-rec-bar-fill" style="width:${Math.max(0, Math.min(100, topRec.score.total))}%;"></div></div>
-              <span class="ippo-base-rec-bar-label">あなたに合います ${topRec.score.total}%</span>
+              <span class="ippo-base-rec-bar-label">おすすめ度 ${topRec.score.total}%</span>
             </div>
           </div>
           <span class="ippo-base-rec-cta">やってみる</span>
@@ -10022,7 +10022,6 @@ function viewKizuki() {
     <div class="screen active kizuki-top-screen">
       <div class="page-header">
         <span style="width:36px;"></span>
-        <h1 class="page-title">きづき</h1>
         <button class="feature-help-icon-btn" data-act="feature-help" data-feature="kizuki" aria-label="きづきについて">ⓘ</button>
       </div>
 
