@@ -6077,17 +6077,16 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.63-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.66-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
   supabaseAnonKey: 'sb_publishable_7Cm5rmrNABp7NdEro3PqMA_-KAn2Ug9',
   appVersion:      window.MOYANOMORI_VERSION.replace(/^v/, ''),
-  consentVersion:  'v0.2-beta',
-  // Google Sheets 公開CSV URL（いっぽの行動カタログ ACTIONS）
-  // 空文字の間はバンドル既定値で動作。Sheets を作成したら URL を貼り付ける。
+  consentVersion:  'v0.2-beta'
+  // いっぽの行動カタログは supabase の public.actions テーブルから取得する。
+  // supabase 接続情報は上記 supabaseUrl / supabaseAnonKey をそのまま流用。
   // 詳細: docs/catalog-update-guide.md
-  actionCatalogUrl: ''
 };
 </script>
 <script src="js/logger.js"></script>
@@ -6315,15 +6314,16 @@ const ACTIONS = [
 ];
 
 // ============================================================
-// 行動カタログ Sheets 連携（v0.9.31〜）
-//   ASIDE_CONFIG.actionCatalogUrl が設定されていれば Sheets から取得・上書き
-//   未設定時は ACTIONS（バンドル既定値・50項目）のまま動作
+// 行動カタログ Supabase 連携（v0.9.66〜）
+//   supabase の public.actions テーブル (is_active=true) から取得・上書き
+//   取得失敗時は localStorage キャッシュ → バンドル既定値 (ACTIONS 50項目) にfallback
 //   詳細: docs/catalog-update-guide.md
 // ============================================================
 if (typeof MoyaCatalog !== 'undefined' && window.ASIDE_CONFIG) {
   MoyaCatalog.init({
     target: ACTIONS,
-    url: window.ASIDE_CONFIG.actionCatalogUrl || '',
+    supabaseUrl: window.ASIDE_CONFIG.supabaseUrl,
+    supabaseAnonKey: window.ASIDE_CONFIG.supabaseAnonKey,
     onUpdate: () => { try { if (typeof render === 'function') render(); } catch (e) {} }
   });
 }
