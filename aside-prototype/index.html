@@ -478,6 +478,12 @@
 .home-stat-help-effect strong { color: #C68B5E; display: block; margin-bottom: 2px; font-size: 11px; }
 
 /* ===== 機能説明 (#11) v0.9.60 〜 ===== */
+/* 2026-05-13: ⓘボタンを一時非表示（社長指示・後日改修予定）
+   HTML / FEATURE_HELP データ / viewFeatureHelpModal / アクションハンドラは全て残す。
+   この2行を削除すれば即復活する。 */
+.feature-help-row,
+.feature-help-icon-btn { display: none !important; }
+
 .feature-help-row {
   display: flex; justify-content: flex-end;
   margin: -4px 0 8px;
