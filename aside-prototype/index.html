@@ -6181,7 +6181,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.68-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.69-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7041,6 +7041,7 @@ function render() {
     case 'nickname':        html = viewNickname(); break;
     case 'profile':         html = viewProfile(); break;
     case 'guide':           html = viewGuide(); break;
+    case 'invite-code':     html = viewInviteCode(); break;
     case 'home':            html = viewHome(); break;
     case 'mood-full':       html = viewMoodFull(); break;
     case 'mood-chat':       html = viewMoodChat(); break;
@@ -7417,6 +7418,36 @@ function viewGuide() {
 
 // 旧「初回 mood-input」画面は v0.9.8 オンボーディング刷新で撤去
 // (代わりに viewProfile + viewGuide で「ホームまでに気持ちチェック挟まない」設計)
+
+// ============================================================
+// オンボーディング: 招待コード入力（v0.9.69 β限定アクセス）
+//   - guide → invite-code → home
+//   - 招待コード必須。配布された6桁程度のコードを入力。
+//   - /api/validate-invite で即時検証 → state.preferences.inviteCode に保存
+// ============================================================
+function viewInviteCode() {
+  return `
+    <div class="screen active ob-screen">
+      <div class="ob-step">最後に</div>
+      <h1 class="ob-h1">招待コードを入力</h1>
+      <p class="ob-sub">β版を使うための招待コードを<br>事前にお渡ししています。</p>
+
+      <div style="margin-top:32px; padding:20px 18px; background: var(--bg-soft); border-radius: 14px;">
+        <label for="onboardInviteInput" style="display:block; font-size:13px; color: var(--text-muted); margin-bottom:8px;">招待コード</label>
+        <input type="text" id="onboardInviteInput" placeholder="配布されたコードを入力" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
+               style="width:100%; padding:14px 14px; border:1px solid var(--divider); border-radius:10px; font-family: monospace; font-size:16px; background: var(--bg-card); color: var(--text); box-sizing: border-box; text-align:center; letter-spacing: 1px;">
+        <p style="font-size:12px; color: var(--text-muted); margin:10px 0 0; line-height:1.6;">
+          ※ コードはこの端末にだけ保存されます。<br>
+          ※ コードが分からないときは、配布元（運営）にご確認ください。
+        </p>
+      </div>
+
+      <div class="ob-cta-area" style="margin-top:24px;">
+        <button class="btn btn-primary ob-cta" data-act="invite-code-onboard-save">保存して始める</button>
+      </div>
+    </div>
+  `;
+}
 
 // ============================================================
 // 画面: ホーム（v3 - 気持ち記録＋もやもや整理エントリ）
@@ -10794,45 +10825,60 @@ function suplanSvg(opts = {}) {
 }
 
 // ============================================================
-// Gemini API 呼び出し
+// Gemini API 呼び出し（β: Vercel serverless プロキシ /api/gemini-proxy 経由）
+//   - キー本体はサーバー側環境変数（GEMINI_API_KEY）で保持
+//   - クライアントは招待コードのみ保持し送信する
 // ============================================================
-function getApiKey() {
-  return (state.preferences && state.preferences.geminiApiKey) || null;
+function getInviteCode() {
+  if (!state.preferences) return null;
+  return state.preferences.inviteCode || state.preferences.geminiApiKey || null;
+}
+// 後方互換: 既存呼び出し（if (getApiKey()) 等）を壊さないため alias を維持
+function getApiKey() { return getInviteCode(); }
+
+async function validateInviteCode(code) {
+  try {
+    const res = await fetch('/api/validate-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inviteCode: code }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return !!data.valid;
+  } catch (e) {
+    console.warn('[validate-invite] network', e);
+    return false;
+  }
 }
 
 async function callGemini(systemPrompt, messages, options = {}) {
-  const key = getApiKey();
-  if (!key) return null;
-  const model = options.model || 'gemini-2.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
-  const contents = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
+  const code = getInviteCode();
+  if (!code) return null;
   const body = {
-    contents,
-    systemInstruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
-    generationConfig: {
-      temperature: options.temperature ?? 0.8,
-      maxOutputTokens: options.maxTokens ?? 512,
-      thinkingConfig: { thinkingBudget: 0 },
-    },
+    inviteCode: code,
+    model: options.model || 'gemini-2.5-flash',
+    systemPrompt: systemPrompt || '',
+    messages: messages.map(m => ({ role: m.role, content: m.content })),
+    temperature: options.temperature ?? 0.8,
+    maxTokens: options.maxTokens ?? 512,
+    thinkingBudget: 0,
   };
   try {
-    const res = await fetch(url, {
+    const res = await fetch('/api/gemini-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
     if (!res.ok) {
-      console.warn('[Gemini]', res.status, await res.text());
+      const errBody = await res.text();
+      console.warn('[gemini-proxy]', res.status, errBody);
       return null;
     }
     const data = await res.json();
-    const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    return txt || null;
+    return (data && data.text) || null;
   } catch (e) {
-    console.warn('[Gemini] network', e);
+    console.warn('[gemini-proxy] network', e);
     return null;
   }
 }
@@ -10860,18 +10906,37 @@ const AI_PROMPTS = {
       'detectCrisis でクライシスワード検知（severity 4 以上は専門窓口モーダル）',
       'API失敗時はテンプレ応答にフォールバック',
     ],
-    systemPrompt: `あなたは「ナナメの関係」のAI伴走者。22-28歳のメンタルヘルスサポートアプリ「もやの森」。
-原則:
-- まず受け止める。決めつけない。診断しない。
-- 1ターンは2-3文・80字目安。
-- 「~してください」より「~してみてもいいかも」など柔らかく。
-- 必要なら別の見方を提示。最後は小さな行動につなげる。
-- 「死にたい」「消えたい」など重大ワードが出たら、専門窓口（よりそいホットライン 0120-279-338 / いのちの電話 0570-064-556）を紹介。
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+22-28歳のユーザーと「ナナメの関係」— 親でも上司でもセラピストでもない、少し年上の信頼できる友達のような距離感で接する。
+
+【絶対の原則】
+1. まず受け止める。診断しない・決めつけない・評価しない・励まさない。
+2. ユーザーの言葉を引用または短く反復して、「ちゃんと聞いている」を伝える。
+   例) ユーザー「上司に怒鳴られて辛い」→「上司に怒鳴られたんだね。それは辛かった。」
+3. ターン1〜2はアドバイス・行動提案・別の見方は出さない。受け止めと、もう少し話してもらうための小さな問いだけ。
+4. ターン3以降、相手が落ち着いた雰囲気が出てきたら、はじめて「もしよかったら〜」とそっと提案。
+5. 1ターンは2〜3文・100字以内。間を取る。改行は多用しない（多くて1か所）。
+6. 「〜してください」「〜すべき」は使わない。「〜してみてもいいかも」「〜どう？」など柔らかく。
+
+【ターン2で使える深掘りの聞き方】
+- 「もう少し聞かせてくれる？」
+- 「いつ頃から、その気持ちが続いてる？」
+- 「いま、いちばんしんどいのはどの部分？」
+- 「誰かに話したい、けど話せていないこととかある？」
+
+【絶対NG】
+- 「わかります」「大変ですね」だけで終わる薄い共感
+- ターン1から「呼吸法をしてみては」「散歩がおすすめ」など教科書的提案
+- 「すばらしい」「えらい」と評価する／「がんばって」「大丈夫」と励ます
+- ユーザーがまだ何も詳細を話していないのに、AIが状況を勝手に決めつけて応答する
+
+【セーフティ】
+- 「死にたい」「消えたい」「自分を傷つけたい」等が出たら、専門窓口（よりそいホットライン 0120-279-338 / いのちの電話 0570-064-556）を紹介。
 - 医療行為や診断はしない。`,
     contextTemplate: `ユーザーが記録した気持ち: {moodLabel}{categoryHint}{commentHint}
 （moodLabel: つらい/少しつらい/ふつう/少しよい/とてもよい のいずれか）`,
-    lastUpdated: '2026-04-30',
-    changeNote: 'v0.5.0 で「ナナメの関係」「医療行為しない」原則を明記',
+    lastUpdated: '2026-05-25',
+    changeNote: 'v0.9.69 共感不足・テンプレ者柄・深みなしを解消。言葉の反復＋ターン1-2はアドバイス禁止＋NG例を明示',
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
@@ -12713,8 +12778,8 @@ window.__moyaForestFallbackSVG = function() {
 // 設定モーダル
 // ============================================================
 function viewSettingsModal() {
-  const apiKey = (state.preferences && state.preferences.geminiApiKey) || '';
-  const masked = apiKey ? apiKey.slice(0, 6) + '••••••' + apiKey.slice(-4) : '';
+  const inviteCode = getInviteCode() || '';
+  const masked = inviteCode ? inviteCode.slice(0, 2) + '•••••' + inviteCode.slice(-2) : '';
   // バージョンラベル — service-worker.js の CACHE_VERSION とセットで更新
   const versionLabel = (typeof window.MOYANOMORI_VERSION === 'string') ? window.MOYANOMORI_VERSION : 'v0.9.x-beta';
   return `
@@ -12737,33 +12802,21 @@ function viewSettingsModal() {
       <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
 
       <div>
-        <div class="text-tiny text-muted">AI接続（Gemini API キー）</div>
+        <div class="text-tiny text-muted">AI接続（招待コード）</div>
         <p class="text-tiny text-muted" style="margin-top:4px; line-height:1.5;">
-          AIをパターン応答ではなく実際のGeminiに切り替えます。<br>
-          キーは <strong>このブラウザのlocalStorageにのみ</strong> 保存され、サーバーには送信されません。<br>
-          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color: var(--primary); font-size:11px;">→ Google AI Studioでキーを取得</a>
+          β版でAI応答を有効にするための招待コードです。<br>
+          コードがあれば実際のAI応答に、なければパターン応答になります。
         </p>
-        ${apiKey ? `
+        ${inviteCode ? `
           <div style="display:flex; align-items:center; gap:8px; margin-top:8px; padding:8px 12px; background: var(--bg-soft); border-radius:8px;">
             <span style="flex:1; font-family: monospace; font-size:12px;">${escapeHtml(masked)}</span>
-            <button class="btn-ghost" data-act="api-key-clear" style="color:#C85450; font-size:12px; padding:4px 8px;">クリア</button>
+            <button class="btn-ghost" data-act="invite-code-clear" style="color:#C85450; font-size:12px; padding:4px 8px;">クリア</button>
           </div>
-          <button class="btn btn-secondary" data-act="api-key-edit" style="margin-top:8px; font-size:13px; padding:8px 12px;">変更</button>
+          <button class="btn btn-secondary" data-act="invite-code-edit" style="margin-top:8px; font-size:13px; padding:8px 12px;">変更</button>
         ` : `
-          <input type="password" id="apiKeyInput" placeholder="AIza..." style="width:100%; margin-top:8px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font-family: monospace; font-size:13px; background: var(--bg-card); color: var(--text);">
-          <button class="btn btn-primary" data-act="api-key-save" style="margin-top:8px; font-size:13px; padding:10px 12px;">保存</button>
+          <input type="text" id="inviteCodeInputSettings" placeholder="配布された招待コード" autocomplete="off" style="width:100%; margin-top:8px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font-family: monospace; font-size:13px; background: var(--bg-card); color: var(--text);">
+          <button class="btn btn-primary" data-act="invite-code-save-settings" style="margin-top:8px; font-size:13px; padding:10px 12px;">保存</button>
         `}
-      </div>
-
-      <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
-
-      <div>
-        <div class="text-tiny text-muted">AIプロンプト管理</div>
-        <p class="text-tiny text-muted" style="margin-top:4px; line-height:1.5;">
-          アプリで使われている全AIプロンプトを閲覧できます。<br>
-          心理士レビュー用にコピー可能。
-        </p>
-        <button class="btn btn-secondary" data-act="open-ai-prompts" style="margin-top:8px; font-size:13px; padding:8px 12px;">プロンプト一覧を見る</button>
       </div>
 
       <hr style="border:none; border-top:1px solid var(--divider); margin: 4px 0;">
@@ -13063,12 +13116,42 @@ function handleAction(act, el, ev) {
     return;
   }
 
-  // 使い方ガイド完了
+  // 使い方ガイド完了 → 招待コード入力へ
   if (act === 'guide-done') {
     state.guidedShown = true;
-    state.initialDone = true;  // 後方互換
     saveState();
-    go('home');
+    // 既に招待コードが入っているなら invite-code 画面はスキップ
+    if (getInviteCode()) {
+      state.initialDone = true;
+      saveState();
+      go('home');
+    } else {
+      go('invite-code');
+    }
+    return;
+  }
+
+  // 招待コード（オンボーディング: guide → invite-code → home）
+  if (act === 'invite-code-onboard-save') {
+    (async () => {
+      const v = (document.getElementById('onboardInviteInput')||{}).value || '';
+      const trimmed = v.trim();
+      if (!trimmed) { toast('招待コードを入力してください'); return; }
+      const btn = document.querySelector('[data-act="invite-code-onboard-save"]');
+      if (btn) { btn.disabled = true; btn.textContent = '確認中…'; }
+      const ok = await validateInviteCode(trimmed);
+      if (!ok) {
+        if (btn) { btn.disabled = false; btn.textContent = '保存して始める'; }
+        toast('招待コードが正しくないようです');
+        return;
+      }
+      state.preferences = state.preferences || {};
+      state.preferences.inviteCode = trimmed;
+      delete state.preferences.geminiApiKey;
+      state.initialDone = true;
+      saveState();
+      go('home');
+    })();
     return;
   }
 
@@ -13954,21 +14037,59 @@ function handleAction(act, el, ev) {
     const text = ((ta && ta.value) || '').trim();
     if (!text) { toast('内容を入力してください'); return; }
     if (text.length > 4000) { toast('長すぎます（4000文字以内）'); return; }
-    const cat = state.ui.feedbackCategory || 'request';
+    const catId = state.ui.feedbackCategory || 'request';
+    const catLabel = (FEEDBACK_CATEGORIES.find(c => c.id === catId) || {}).label || catId;
+    const userId = (function() {
+      try { return localStorage.getItem('aside_user_id') || 'unknown'; } catch (e) { return 'unknown'; }
+    })();
+    const appVersion = (typeof window.MOYANOMORI_VERSION === 'string') ? window.MOYANOMORI_VERSION : 'v0.9.x-beta';
+
+    // バックアップ: Supabase 側にも記録（既存運用）
     try {
       if (window.MoyaLogger && typeof window.MoyaLogger.event === 'function') {
         window.MoyaLogger.event('feedback', {
-          category: cat,
+          category: catId,
           text: text,
           screen: 'settings',
           submitted_at: new Date().toISOString()
         });
       }
     } catch (e) {
-      console.warn('feedback送信エラー:', e);
+      console.warn('feedback送信エラー(Supabase):', e);
     }
-    state.ui.feedbackDraft = '';
-    modal(viewFeedbackModal(true));
+
+    // メイン: Vercel /api/feedback → Resend で社長メールに送信
+    const btn = document.querySelector('[data-act="feedback-submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = '送信中…'; }
+    (async () => {
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            category: catLabel,
+            text,
+            userId,
+            nickname: (state.user && state.user.nickname) || '',
+            screen: 'settings',
+            appVersion,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.text();
+          console.warn('[feedback] failed', res.status, err);
+          if (btn) { btn.disabled = false; btn.textContent = '送信する'; }
+          toast('送信に失敗しました。時間をおいてもう一度お試しください');
+          return;
+        }
+        state.ui.feedbackDraft = '';
+        modal(viewFeedbackModal(true));
+      } catch (e) {
+        console.warn('[feedback] network', e);
+        if (btn) { btn.disabled = false; btn.textContent = '送信する'; }
+        toast('ネットワーク接続を確認してください');
+      }
+    })();
     return;
   }
   if (act === 'ai-prompt-expand') {
@@ -14005,35 +14126,39 @@ function handleAction(act, el, ev) {
     }
     return;
   }
-  if (act === 'api-key-save') {
-    const v = (document.getElementById('apiKeyInput')||{}).value || '';
-    const trimmed = v.trim();
-    if (!trimmed) { toast('キーを入力してください'); return; }
-    if (!trimmed.startsWith('AIza')) {
-      if (!confirm('"AIza" で始まらないキーのようです。それでも保存しますか？')) return;
-    }
-    state.preferences = state.preferences || {};
-    state.preferences.geminiApiKey = trimmed;
-    saveState();
-    toast('APIキーを保存しました');
-    closeModal();
-    setTimeout(() => modal(viewSettingsModal()), 50);
+  if (act === 'invite-code-save-settings') {
+    (async () => {
+      const v = (document.getElementById('inviteCodeInputSettings')||{}).value || '';
+      const trimmed = v.trim();
+      if (!trimmed) { toast('招待コードを入力してください'); return; }
+      const ok = await validateInviteCode(trimmed);
+      if (!ok) { toast('招待コードが正しくないようです'); return; }
+      state.preferences = state.preferences || {};
+      state.preferences.inviteCode = trimmed;
+      delete state.preferences.geminiApiKey; // 旧形式があれば破棄
+      saveState();
+      toast('招待コードを保存しました');
+      closeModal();
+      setTimeout(() => modal(viewSettingsModal()), 50);
+    })();
     return;
   }
-  if (act === 'api-key-edit') {
+  if (act === 'invite-code-edit') {
     state.preferences = state.preferences || {};
+    delete state.preferences.inviteCode;
     delete state.preferences.geminiApiKey;
     saveState();
     closeModal();
     setTimeout(() => modal(viewSettingsModal()), 50);
     return;
   }
-  if (act === 'api-key-clear') {
-    if (!confirm('APIキーを削除しますか？AI応答はパターン応答に戻ります。')) return;
+  if (act === 'invite-code-clear') {
+    if (!confirm('招待コードを削除しますか？AI応答はパターン応答に戻ります。')) return;
     state.preferences = state.preferences || {};
+    delete state.preferences.inviteCode;
     delete state.preferences.geminiApiKey;
     saveState();
-    toast('APIキーを削除しました');
+    toast('招待コードを削除しました');
     closeModal();
     setTimeout(() => modal(viewSettingsModal()), 50);
     return;
@@ -14089,6 +14214,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     const id = document.activeElement?.id;
     if (id === 'moodChatInput') { e.preventDefault(); moodChatSend(); }
+    if (id === 'onboardInviteInput') { e.preventDefault(); handleAction('invite-code-onboard-save'); }
+    if (id === 'inviteCodeInputSettings') { e.preventDefault(); handleAction('invite-code-save-settings'); }
   }
 });
 
