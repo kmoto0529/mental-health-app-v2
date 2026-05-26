@@ -7338,7 +7338,6 @@ function render() {
     case 'kiroku-detail':       html = viewKirokuDetail(); break;
     case 'kiroku-letter':       html = viewKirokuLetter(); break;
     case 'kiroku-ippo':         html = viewKirokuIppo(); break;
-    case 'kiroku-distortions':  html = viewKirokuDistortions(); break;
     case 'kiroku-trend':        html = viewKirokuTrend(); break;
     case 'kiroku-radar':        html = viewKirokuRadar(); break;
     case 'kiroku-ai-analysis':  html = viewKirokuAiAnalysis(); break;
@@ -10450,65 +10449,14 @@ const KIZUKI_FILTERS = [
 // きづきワーク用の共通データ（v0.9.70）
 // ============================================================
 
-// 思考のクセチェック用の設問（既存 DISTORTIONS 8種に対応する1問ずつ）
-const DISTORTION_QUESTIONS = {
-  labeling:           'うまくいかないと「自分はダメな人間だ」と感じる',
-  mind_reading:       '相手の反応を見て「私のこと、嫌いなんだ」と決めつけてしまう',
-  should:             '「○○すべき」「○○しなきゃ」と自分にプレッシャーをかけがち',
-  personalization:    'うまくいかないことが起きると「自分のせい」と感じやすい',
-  disqualifying:      '褒められても「お世辞だ」「大したことない」と素直に受け取れない',
-  all_or_nothing:     'うまくいかないとき「もう全部ダメだ」と感じる',
-  overgeneralization: '一度失敗すると「自分はいつもこうだ」と思ってしまう',
-  fortune_telling:    '何かを始める前から「どうせうまくいかない」と思う',
-};
-
-// 5段階スコア（思考のクセチェック）
-const KIZUKI_SCALE_5 = [
-  { score: 0, label: 'あまりない' },
-  { score: 1, label: '少しある' },
-  { score: 2, label: '時々ある' },
-  { score: 3, label: 'よくある' },
-  { score: 4, label: 'とてもよくある' },
-];
-
-// 自動思考チェック用の設問（6問・YES/NO/わからない）
-const AUTO_THOUGHT_QUESTIONS = [
-  '悪いことがあると、すぐに自分を責めてしまう',
-  '考え事を始めると止まらなくなって、頭の中でぐるぐるしてしまう',
-  '言われたひと言や出来事を、後から何度も思い返してしまう',
-  '将来のうまくいかない場面を、つい想像してしまう',
-  '過去の失敗や恥ずかしい記憶が、急によみがえってつらくなる',
-  '気がつくと否定的な考えが浮かんでいて、止められない',
-];
-
-// 3択スコア（distortion / auto-thought 用）
+// 3択スコア（distortion ワーク用）
 const KIZUKI_SCALE_3 = [
   { score: 0, label: 'あてはまらない' },
   { score: 1, label: '少しあてはまる' },
   { score: 2, label: 'よくあてはまる' },
 ];
 
-// 価値観カード（16枚から5枚選ぶ）
-const VALUES_CARDS = [
-  { id: 'health',       icon: '🌿', label: '健康',           desc: '心と体が元気でいられること' },
-  { id: 'family',       icon: '👨‍👩‍👧', label: '家族',         desc: '近しい人と支え合う関係' },
-  { id: 'love',         icon: '💗', label: '愛・つながり',   desc: '誰かと深く結びつくこと' },
-  { id: 'freedom',      icon: '🕊️', label: '自由',           desc: '自分で選び、自分で決められること' },
-  { id: 'growth',       icon: '🌱', label: '成長',           desc: '昨日の自分より少しでも前へ' },
-  { id: 'honesty',      icon: '🤝', label: '誠実',           desc: '自分にも人にも嘘をつかないこと' },
-  { id: 'creativity',   icon: '🎨', label: '創造',           desc: 'まだない何かを生み出す喜び' },
-  { id: 'adventure',    icon: '🧭', label: '冒険',           desc: '新しい経験を求める' },
-  { id: 'stability',    icon: '🏠', label: '安定',           desc: '安心できる日常があること' },
-  { id: 'contribution', icon: '🤲', label: '貢献',           desc: '誰かの役に立てること' },
-  { id: 'fun',          icon: '🎉', label: '楽しさ',         desc: '今この瞬間を味わうこと' },
-  { id: 'wisdom',       icon: '📖', label: '学び・知恵',     desc: '知る・考えることそのもの' },
-  { id: 'nature',       icon: '🌳', label: '自然',           desc: '自然との触れ合いや調和' },
-  { id: 'spirit',       icon: '✨', label: '心の豊かさ',     desc: '内面の満たされた感覚' },
-  { id: 'achievement',  icon: '🏆', label: '達成',           desc: '目標をやり遂げること' },
-  { id: 'aesthetic',    icon: '🌸', label: '美しさ',         desc: '美しいものに触れる時間' },
-];
-
-// セクション順（ワーク一覧画面のグループ化用）
+// セクション順（ワーク一覧画面のグループ化用 / 旧ワーク一覧スクリーンの互換）
 const KIZUKI_SECTIONS = ['思考のクセを知る', '深く掘り下げる', '価値観・方向性'];
 
 let kizukiFilter = 'all';  // ワーク一覧フィルタ状態（モジュールローカル）
@@ -10674,10 +10622,9 @@ function startKizukiWork(workId) {
   kizukiSession = {
     workId,
     step: 1,
-    answers: (workId === 'auto-thought' || workId === 'distortion' || workId === 'thought-check')
+    answers: workId === 'distortion'
       ? {}
-      : (workId === 'values' ? [] : { hypothesis:'', action:'', prediction:'', result:'',
-                                       morning:'', people:'', activity:'' }),
+      : { hypothesis:'', action:'', prediction:'', result:'' },
     result: null,
     aiComment: null,
     loading: false,
@@ -10692,17 +10639,6 @@ function cancelKizukiWork() {
 
 // 結果集計（ワーク別）
 function computeKizukiResult(workId, answers) {
-  if (workId === 'thought-check') {
-    // 8軸のスコア（0-4）を高い順にソート → TOP3
-    const ranked = DISTORTIONS.map(d => ({
-      id: d.id,
-      name: d.name,
-      desc: d.desc,
-      score: answers[d.id] != null ? answers[d.id] : 0,
-    })).sort((a, b) => b.score - a.score);
-    const top3 = ranked.slice(0, 3);
-    return { type: 'top3', ranked, top3 };
-  }
   if (workId === 'distortion') {
     // 8つの歪みごとに 0-2 のスコア。1以上を「あてはまる傾向」として集計
     const applicable = DISTORTIONS
@@ -10711,68 +10647,20 @@ function computeKizukiResult(workId, answers) {
       .sort((a, b) => b.score - a.score);
     return { type: 'applicable', applicable, totalCount: applicable.length };
   }
-  if (workId === 'auto-thought') {
-    // 6問のスコア合計（0-12）
-    const total = AUTO_THOUGHT_QUESTIONS.reduce((s, _, i) => s + (answers[i] != null ? answers[i] : 0), 0);
-    const max = AUTO_THOUGHT_QUESTIONS.length * 2;
-    const ratio = total / max;
-    let level, label, message;
-    if (ratio >= 0.7) {
-      level = 'high';
-      label = '自動思考が活発な傾向';
-      message = '考えごとが頭の中でぐるぐるしやすい状態かも。書き出して外に置く時間が、少し効くかもしれないね。';
-    } else if (ratio >= 0.4) {
-      level = 'mid';
-      label = '時々自動思考が走る';
-      message = '思考が走るときと、落ち着いてるときの差がありそう。走り出したら「これは自動思考だな」と気づくだけで、ちょっと変わる。';
-    } else {
-      level = 'low';
-      label = '自動思考は穏やかめ';
-      message = '思考のコントロールが効きやすい状態。それでもしんどい時はあるから、そのときは無理せずに。';
-    }
-    return { type: 'level', total, max, level, label, message };
-  }
   if (workId === 'behavior-experiment') {
     return { type: 'plan', ...answers };
-  }
-  if (workId === 'values') {
-    // 選択された5枚のカードを返す
-    const selected = (answers || []).map(id => VALUES_CARDS.find(c => c.id === id)).filter(Boolean);
-    return { type: 'values', selected };
-  }
-  if (workId === 'ideal-self') {
-    return { type: 'ideal', ...answers };
   }
   return { type: 'unknown' };
 }
 
 // AI に渡すユーザーメッセージを組み立てる
 function buildKizukiUserMessage(workId, result) {
-  if (workId === 'thought-check') {
-    const top = result.top3 || [];
-    return [
-      '思考のクセチェックの結果です。',
-      `1位: ${top[0]?.name}（${top[0]?.score}/4）`,
-      `2位: ${top[1]?.name}（${top[1]?.score}/4）`,
-      `3位: ${top[2]?.name}（${top[2]?.score}/4）`,
-      '',
-      'すぷらんから、優しいひとことをお願いします。'
-    ].join('\n');
-  }
   if (workId === 'distortion') {
     const apps = (result.applicable || []).slice(0, 3);
     return [
       '認知のゆがみワークの結果です。',
       `当てはまる項目: ${result.totalCount}/8`,
       ...apps.map((a, i) => `${i+1}位: ${a.name}（${a.score}/2）— ${a.desc}`),
-      '',
-      'すぷらんから、優しいひとことをお願いします。'
-    ].join('\n');
-  }
-  if (workId === 'auto-thought') {
-    return [
-      '自動思考チェックの結果です。',
-      `スコア: ${result.total}/${result.max}（${result.label}）`,
       '',
       'すぷらんから、優しいひとことをお願いします。'
     ].join('\n');
@@ -10787,25 +10675,6 @@ function buildKizukiUserMessage(workId, result) {
       '',
       'すぷらんから、この計画について応援のひとことをお願いします。'
     ].filter(Boolean).join('\n');
-  }
-  if (workId === 'values') {
-    const list = (result.selected || []).map(c => `- ${c.label}: ${c.desc}`).join('\n');
-    return [
-      'あなたが選んだ「大切な価値観」5つです。',
-      list,
-      '',
-      'すぷらんから、この人が大事にしてるものを優しく言語化してください。'
-    ].join('\n');
-  }
-  if (workId === 'ideal-self') {
-    return [
-      '理想の自分（5年後）の3つの場面です。',
-      `朝: ${result.morning}`,
-      `人との時間: ${result.people}`,
-      `自分らしさを感じる活動: ${result.activity}`,
-      '',
-      'すぷらんから、これらをまとめてやさしく言語化＋いまできる小さな一歩を1つ提案してください。'
-    ].join('\n');
   }
   return '';
 }
@@ -10883,54 +10752,7 @@ function viewKizukiResultFooter() {
   `;
 }
 
-// ----- ワーク 1: 思考のクセをチェック -----
-function viewKizukiThoughtCheck() {
-  if (kizukiSession.step === 2) {
-    const r = kizukiSession.result;
-    const top3 = r.top3 || [];
-    return `
-      <div class="screen active">
-        ${viewKizukiWorkHeader('思考のクセをチェック', 2)}
-        <h2 style="font-size:18px; margin:8px 0 16px;">あなたの結果（強い順）</h2>
-        ${top3.map((t, i) => `
-          <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:8px;">
-            <span style="font-size:22px; font-weight:700; color: var(--primary); min-width:30px;">${i+1}位</span>
-            <div style="flex:1;">
-              <div style="font-weight:600;">${escapeHtml(t.name)}</div>
-              <div class="text-tiny text-muted" style="margin-top:2px;">${escapeHtml(t.desc)}</div>
-            </div>
-            <span class="text-tiny text-muted">${t.score}/4</span>
-          </div>
-        `).join('')}
-        ${viewKizukiResultFooter()}
-      </div>
-    `;
-  }
-  // step 1
-  return `
-    <div class="screen active">
-      ${viewKizukiWorkHeader('思考のクセをチェック', 2)}
-      <p class="text-small text-muted" style="margin: 4px 0 18px;">最近の自分を思い浮かべて、どのくらい当てはまるかタップしてね（8問）</p>
-      ${DISTORTIONS.map(d => `
-        <div style="padding:14px 14px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
-          <div style="font-size:14px; line-height:1.6; margin-bottom:10px;">${escapeHtml(DISTORTION_QUESTIONS[d.id] || d.desc)}</div>
-          <div style="display:flex; gap:6px; flex-wrap: wrap;">
-            ${KIZUKI_SCALE_5.map(s => `
-              <button class="kr-filter-chip ${kizukiSession.answers[d.id] === s.score ? 'selected' : ''}"
-                      data-act="kizuki-answer-scale" data-key="${d.id}" data-score="${s.score}"
-                      style="font-size:12px;">${s.score} ${escapeHtml(s.label)}</button>
-            `).join('')}
-          </div>
-        </div>
-      `).join('')}
-      <div style="margin-top:16px;">
-        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">結果を見る</button>
-      </div>
-    </div>
-  `;
-}
-
-// ----- ワーク 2: 認知のゆがみを理解する -----
+// ----- ワーク: 認知のゆがみを理解する -----
 function viewKizukiDistortion() {
   if (kizukiSession.step === 2) {
     const r = kizukiSession.result;
@@ -10978,47 +10800,7 @@ function viewKizukiDistortion() {
   `;
 }
 
-// ----- ワーク 3: 自動思考になりやすい？ -----
-function viewKizukiAutoThought() {
-  if (kizukiSession.step === 2) {
-    const r = kizukiSession.result;
-    return `
-      <div class="screen active">
-        ${viewKizukiWorkHeader('自動思考になりやすい？', 2)}
-        <div style="padding:18px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:14px; text-align:center; margin: 12px 0;">
-          <div class="text-tiny text-muted">スコア</div>
-          <div style="font-size:32px; font-weight:700; color: var(--primary); margin:6px 0;">${r.total} / ${r.max}</div>
-          <div style="font-weight:600; margin-top:4px;">${escapeHtml(r.label)}</div>
-          <div class="text-small text-muted" style="margin-top:10px; line-height:1.7;">${escapeHtml(r.message)}</div>
-        </div>
-        ${viewKizukiResultFooter()}
-      </div>
-    `;
-  }
-  return `
-    <div class="screen active">
-      ${viewKizukiWorkHeader('自動思考になりやすい？', 2)}
-      <p class="text-small text-muted" style="margin: 4px 0 18px;">最近1〜2週間の自分を思い浮かべて、当てはまる度合いをタップしてね（6問）</p>
-      ${AUTO_THOUGHT_QUESTIONS.map((q, i) => `
-        <div style="padding:14px 14px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
-          <div style="font-size:14px; line-height:1.6; margin-bottom:10px;">${escapeHtml(q)}</div>
-          <div style="display:flex; gap:6px; flex-wrap: wrap;">
-            ${KIZUKI_SCALE_3.map(s => `
-              <button class="kr-filter-chip ${kizukiSession.answers[i] === s.score ? 'selected' : ''}"
-                      data-act="kizuki-answer-scale" data-key="${i}" data-score="${s.score}"
-                      style="font-size:12px;">${escapeHtml(s.label)}</button>
-            `).join('')}
-          </div>
-        </div>
-      `).join('')}
-      <div style="margin-top:16px;">
-        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">結果を見る</button>
-      </div>
-    </div>
-  `;
-}
-
-// ----- ワーク 4: 行動実験を計画する -----
+// ----- ワーク: 行動実験を計画する -----
 function viewKizukiBehaviorExperiment() {
   const a = kizukiSession.answers;
   if (kizukiSession.step === 2) {
@@ -11064,106 +10846,12 @@ function viewKizukiBehaviorExperiment() {
   `;
 }
 
-// ----- ワーク 5: 価値観を整理する -----
-function viewKizukiValues() {
-  const selected = Array.isArray(kizukiSession.answers) ? kizukiSession.answers : [];
-  if (kizukiSession.step === 2) {
-    const cards = (kizukiSession.result.selected || []);
-    return `
-      <div class="screen active">
-        ${viewKizukiWorkHeader('価値観を整理する', 2)}
-        <h2 style="font-size:18px; margin:8px 0 16px;">あなたが選んだ大切なもの</h2>
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
-          ${cards.map(c => `
-            <div style="padding:14px 12px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; text-align:center;">
-              <div style="font-size:28px;">${c.icon}</div>
-              <div style="font-weight:600; margin-top:6px;">${escapeHtml(c.label)}</div>
-              <div class="text-tiny text-muted" style="margin-top:4px; line-height:1.5;">${escapeHtml(c.desc)}</div>
-            </div>
-          `).join('')}
-        </div>
-        ${viewKizukiResultFooter()}
-      </div>
-    `;
-  }
-  return `
-    <div class="screen active">
-      ${viewKizukiWorkHeader('価値観を整理する', 2)}
-      <p class="text-small text-muted" style="margin: 4px 0 8px;">あなたが大切にしたいものを <strong>5つ</strong> タップで選ぼう</p>
-      <p class="text-tiny text-muted" style="margin: 0 0 16px;">選択中: ${selected.length} / 5</p>
-      <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
-        ${VALUES_CARDS.map(c => {
-          const isSel = selected.includes(c.id);
-          return `
-            <button data-act="kizuki-values-toggle" data-id="${c.id}"
-                    style="padding:12px 10px; background: ${isSel ? 'var(--primary-soft, #c8dcc9)' : 'var(--bg-card)'}; border:2px solid ${isSel ? 'var(--primary)' : 'var(--divider)'}; border-radius:12px; text-align:center; cursor:pointer; transition: all 0.15s;">
-              <div style="font-size:22px;">${c.icon}</div>
-              <div style="font-weight:600; font-size:13px; margin-top:4px;">${escapeHtml(c.label)}</div>
-              <div class="text-tiny text-muted" style="margin-top:2px; line-height:1.4; font-size:10px;">${escapeHtml(c.desc)}</div>
-            </button>
-          `;
-        }).join('')}
-      </div>
-      <div style="margin-top:18px;">
-        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;" ${selected.length === 5 ? '' : 'disabled'}>
-          ${selected.length === 5 ? '結果を見る' : `あと ${5 - selected.length} つ選んでね`}
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-// ----- ワーク 6: 理想の自分をイメージする -----
-function viewKizukiIdealSelf() {
-  const a = kizukiSession.answers;
-  if (kizukiSession.step === 2) {
-    return `
-      <div class="screen active">
-        ${viewKizukiWorkHeader('理想の自分をイメージする', 2)}
-        <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin: 12px 0; line-height:1.8;">
-          <div><span class="text-tiny text-muted">朝</span><br>${escapeHtml(a.morning || '-')}</div>
-          <div style="margin-top:10px;"><span class="text-tiny text-muted">人との時間</span><br>${escapeHtml(a.people || '-')}</div>
-          <div style="margin-top:10px;"><span class="text-tiny text-muted">自分らしさを感じる活動</span><br>${escapeHtml(a.activity || '-')}</div>
-        </div>
-        ${viewKizukiResultFooter()}
-      </div>
-    `;
-  }
-  return `
-    <div class="screen active">
-      ${viewKizukiWorkHeader('理想の自分をイメージする', 2)}
-      <p class="text-small text-muted" style="margin: 4px 0 18px;">5年後の理想の自分を、3つの場面でイメージしてみよう（短くてOK）</p>
-      <div style="display: flex; flex-direction: column; gap:14px;">
-        <div>
-          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">① どんな朝を迎えていたい？</label>
-          <textarea data-act="kizuki-input" data-key="morning" placeholder="例: 自然光で目覚めて、コーヒーを淹れて窓辺で本を読む朝" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.morning || '')}</textarea>
-        </div>
-        <div>
-          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">② どんな人と過ごしていたい？</label>
-          <textarea data-act="kizuki-input" data-key="people" placeholder="例: 信頼できる仲間や家族と週末に食卓を囲む" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.people || '')}</textarea>
-        </div>
-        <div>
-          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">③ 何をしている時に「自分らしい」と感じたい？</label>
-          <textarea data-act="kizuki-input" data-key="activity" placeholder="例: 作ったものを誰かが喜んでくれた瞬間" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.activity || '')}</textarea>
-        </div>
-      </div>
-      <div style="margin-top:16px;">
-        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">結果を見る</button>
-      </div>
-    </div>
-  `;
-}
-
 // ----- ディスパッチ -----
 function viewKizukiWork() {
   if (!kizukiSession) { go('kizuki'); return ''; }
   const w = kizukiSession.workId;
-  if (w === 'thought-check')        return viewKizukiThoughtCheck();
   if (w === 'distortion')           return viewKizukiDistortion();
-  if (w === 'auto-thought')         return viewKizukiAutoThought();
   if (w === 'behavior-experiment')  return viewKizukiBehaviorExperiment();
-  if (w === 'values')               return viewKizukiValues();
-  if (w === 'ideal-self')           return viewKizukiIdealSelf();
   return viewKizuki();
 }
 
@@ -12387,34 +12075,8 @@ const AI_PROMPTS = {
   },
 
   // ==========================================================
-  // きづきワーク用プロンプト（v0.9.70）
+  // きづきワーク用プロンプト（v0.9.74: 認知のゆがみ + 行動実験の2本に集約）
   // ==========================================================
-  kizuki_thought_check: {
-    id: 'kizuki_thought_check',
-    title: 'きづき: 思考のクセをチェック（結果コメント）',
-    purpose: '8つの認知の歪みチェック結果TOP3を見て、すぷらんが優しく言語化する',
-    triggerLocation: 'きづき → 思考のクセをチェック → 結果画面',
-    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_thought_check.systemPrompt, [user])',
-    model: 'gemini-2.5-flash',
-    temperature: 0.7,
-    maxTokens: 280,
-    outputFormat: '自然文（3〜4文・160字目安）',
-    fallbackBehavior: 'API未設定/失敗時はテンプレ',
-    safetyChecks: ['断定しない・診断しない・「直しなさい」と言わない', 'スコアが低い項目は無視し、最上位のみ言及'],
-    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
-ユーザーが「思考のクセをチェック」ワークを終えた直後。結果TOP3を見て、ユーザーが自分の傾向に気づけるよう、やさしく言語化する。
-
-【原則】
-- 「あなたはこう」と決めつけない。「〜の傾向がありそう」と仮置きで返す。
-- TOP1の歪みに絞って、具体的にどんな場面で出やすいかを1文で添える。
-- 「直しなさい」「変えていきましょう」とは言わない。「気づけただけで十分」と受け止める。
-- 3〜4文・160字以内。改行は1か所まで。`,
-    lastUpdated: '2026-05-26',
-    changeNote: 'v0.9.70 初版',
-    psychologistReviewStatus: 'レビュー待ち',
-    psychologistReviewNote: '',
-  },
-
   kizuki_distortion: {
     id: 'kizuki_distortion',
     title: 'きづき: 認知のゆがみを理解する（結果コメント）',
@@ -12434,32 +12096,6 @@ const AI_PROMPTS = {
 - 「当てはまる項目が多い＝悪い」とは絶対に言わない。「気づいたこと自体に意味がある」と受け止める。
 - TOP1の歪みに触れ、「気づいたら『あ、いま出てるな』とラベリングするだけで距離が取れる」というニュアンスを伝える。
 - 3〜4文・160字以内。改行は1か所まで。`,
-    lastUpdated: '2026-05-26',
-    changeNote: 'v0.9.70 初版',
-    psychologistReviewStatus: 'レビュー待ち',
-    psychologistReviewNote: '',
-  },
-
-  kizuki_auto_thought: {
-    id: 'kizuki_auto_thought',
-    title: 'きづき: 自動思考になりやすい？（結果コメント）',
-    purpose: '自動思考スコアのレベル（high/mid/low）に応じた、すぷらんの振り返り',
-    triggerLocation: 'きづき → 自動思考になりやすい？ → 結果画面',
-    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_auto_thought.systemPrompt, [user])',
-    model: 'gemini-2.5-flash',
-    temperature: 0.7,
-    maxTokens: 240,
-    outputFormat: '自然文（3〜4文・140字目安）',
-    fallbackBehavior: 'API未設定/失敗時はテンプレ',
-    safetyChecks: ['スコアの高低を「優劣」として扱わない', 'スコアが高くても「ダメ」と言わない'],
-    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
-ユーザーが「自動思考になりやすい？」ワークを終えた直後。スコアとラベルを見て、やさしく振り返る。
-
-【原則】
-- スコアが高くても「ダメ」「治そう」と言わない。「そういう時期もあるよね」と受け止める。
-- 自動思考が強めなら「書き出して外に置く」「気づくだけで距離が取れる」を1つだけ提案。
-- 自動思考が穏やかでも「普段は落ち着いてても、しんどい時はあるからね」とフォロー。
-- 3〜4文・140字以内。`,
     lastUpdated: '2026-05-26',
     changeNote: 'v0.9.70 初版',
     psychologistReviewStatus: 'レビュー待ち',
@@ -12492,56 +12128,6 @@ const AI_PROMPTS = {
     psychologistReviewNote: '',
   },
 
-  kizuki_values: {
-    id: 'kizuki_values',
-    title: 'きづき: 価値観を整理する（結果コメント）',
-    purpose: 'ユーザーが選んだ価値観カード5枚から、すぷらんが「あなたが大事にしてるもの」を言語化',
-    triggerLocation: 'きづき → 価値観を整理する → 結果画面',
-    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_values.systemPrompt, [user])',
-    model: 'gemini-2.5-flash',
-    temperature: 0.8,
-    maxTokens: 320,
-    outputFormat: '自然文（4〜5文・200字目安）',
-    fallbackBehavior: 'API未設定/失敗時はテンプレ',
-    safetyChecks: ['選ばれなかった価値観を「ない」「足りない」とは言わない', '一方的な解釈を押し付けない'],
-    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
-ユーザーが「価値観カード」で5枚を選び終えたところ。選ばれた5つの価値観から、その人が大切にしてるものを温かく言語化する。
-
-【原則】
-- 5つに共通する「軸」がもしあれば1文で言語化。なければ「この5つの組み合わせから、〜を大事にしてる人なんだなって伝わるよ」と受け止める。
-- 「だからこうすべき」とは言わない。「今、選んだ自分を覚えておくだけでもいい」と添える。
-- 4〜5文・200字以内。改行は2か所まで。`,
-    lastUpdated: '2026-05-26',
-    changeNote: 'v0.9.70 初版',
-    psychologistReviewStatus: 'レビュー待ち',
-    psychologistReviewNote: '',
-  },
-
-  kizuki_ideal_self: {
-    id: 'kizuki_ideal_self',
-    title: 'きづき: 理想の自分をイメージする（結果コメント）',
-    purpose: '5年後の理想の自分を3場面で記述してもらった結果から、すぷらんが要約＋いまできる一歩を1つ提案',
-    triggerLocation: 'きづき → 理想の自分をイメージする → 結果画面',
-    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_ideal_self.systemPrompt, [user])',
-    model: 'gemini-2.5-flash',
-    temperature: 0.8,
-    maxTokens: 340,
-    outputFormat: '自然文（4〜5文・220字目安）',
-    fallbackBehavior: 'API未設定/失敗時はテンプレ',
-    safetyChecks: ['理想を「実現すべき」と圧力をかけない', '提案する一歩はものすごく小さくする（5分以内で今日できる）'],
-    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
-ユーザーが「理想の自分」を3場面（朝/人との時間/自分らしい活動）で書いたところ。やさしく要約＋いまできる小さな一歩を1つだけ提案する。
-
-【原則】
-- 3場面に共通するイメージや感情を1文で言葉にする（「ゆったり」「つながり」「創造」など、その人らしいキーワードで）。
-- 一歩は「今日5分でできる」レベルに小さくする。「資格を取る」「転職する」のような大きな提案は禁止。
-- 「実現しよう」「目指そう」とは言わない。「いまの自分が、その理想に少しだけ重なる時間を1つ作ってみるとしたら？」というトーン。
-- 4〜5文・220字以内。改行は2か所まで。`,
-    lastUpdated: '2026-05-26',
-    changeNote: 'v0.9.70 初版',
-    psychologistReviewStatus: 'レビュー待ち',
-    psychologistReviewNote: '',
-  },
 };
 
 // 旧API互換: 既存の参照を残すための alias
@@ -12903,7 +12489,16 @@ function renderKirokuRowItem(it) {
 }
 
 function viewRecord() {
-  const sub = state.ui.recordSubtab || 'calendar';
+  // v0.9.74: 3 サブタブ（calendar / trend / distortion）
+  // 旧 'report' は 'trend' に集約（過去設定からの自動マイグレーション）
+  let sub = state.ui.recordSubtab || 'calendar';
+  if (sub === 'report') sub = 'trend';
+
+  const tabBtn = (key, label) => `
+    <button data-act="record-sub" data-sub="${key}"
+      style="padding:8px 14px; background:${sub===key?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub===key?'var(--accent-deep)':'var(--text-soft)'}; white-space:nowrap;">${label}</button>
+  `;
+
   return `
     <div class="screen active">
       <div class="page-header">
@@ -12914,12 +12509,15 @@ function viewRecord() {
         </div>
       </div>
 
-      <div style="display:flex; gap:6px; margin-bottom:14px;">
-        <button data-act="record-sub" data-sub="calendar" style="padding:8px 14px; background:${sub==='calendar'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='calendar'?'var(--accent-deep)':'var(--text-soft)'};">カレンダー</button>
-        <button data-act="record-sub" data-sub="report" style="padding:8px 14px; background:${sub==='report'?'var(--accent-soft)':'var(--bg-soft)'}; border-radius:999px; font-weight:500; border:none; cursor:pointer; color:${sub==='report'?'var(--accent-deep)':'var(--text-soft)'};">AI分析レポート</button>
+      <div style="display:flex; gap:6px; margin-bottom:14px; overflow-x:auto; -webkit-overflow-scrolling:touch;">
+        ${tabBtn('calendar',   'カレンダー')}
+        ${tabBtn('trend',      '傾向分析')}
+        ${tabBtn('distortion', '思考のクセ分析')}
       </div>
 
-      ${sub === 'calendar' ? viewCalendarSection() : viewReportSection()}
+      ${sub === 'calendar'   ? viewCalendarSection()
+      : sub === 'trend'      ? viewTrendSection()
+      :                        viewDistortionSection()}
     </div>
   `;
 }
@@ -13179,69 +12777,6 @@ function viewKirokuIppo() {
         </div>
 
         <button class="btn btn-primary" data-act="back-record" style="margin-top: 18px; width:100%;">‹ 過去きろくに戻る</button>
-      </div>
-    </div>
-  `;
-}
-
-// ============================================================
-// 思考のクセ TOP3 画面（仕様書 §4）
-// ============================================================
-function viewKirokuDistortions() {
-  const records = state.moyamoyaRecords || [];
-  const top = analyzeDistortions(records, 28).slice(0, 3);
-  const totalRecs = Math.min(records.length, 28);
-  return `
-    <div class="screen active" style="padding-bottom:40px;">
-      <div class="kr-det-page-h">
-        <button class="kr-det-back" data-act="back-record">‹</button>
-        <span style="font-size:14px; font-weight:500;">思考のクセの分析</span>
-        <span style="width:36px;"></span>
-      </div>
-      <div style="padding: 0 16px;">
-        <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 14px;">
-          <div>${suplan({ pose: 'bulb', size: 56 })}</div>
-          <div style="flex:1;">
-            <h2 style="margin: 0 0 4px; font-size: 18px; font-family:'Noto Serif JP', serif;">あなたによく見られる<br>思考のクセ TOP3</h2>
-            <div class="text-tiny text-muted">直近4週間（${totalRecs}件）の記録から分析しました</div>
-          </div>
-        </div>
-
-        ${top.length === 0 ? `
-          <div class="card" style="padding:30px 20px; text-align:center; color:var(--text-soft);">
-            分析するための記録が足りないみたい。<br>もやもや整理を続けると、傾向が見えてきます。
-          </div>
-        ` : top.map((d, i) => `
-          <div class="kr-distort-card">
-            <div class="kr-distort-rank">${i + 1}</div>
-            <div>
-              <div class="kr-distort-name">${escapeHtml(d.name)}</div>
-              <div class="kr-distort-desc">${escapeHtml(d.desc)}</div>
-            </div>
-            <span class="kr-distort-badge ${d.level.tone}">${d.level.label}</span>
-          </div>
-        `).join('')}
-
-        ${top.length > 0 && top[0].counter ? `
-          <div class="ippo-do-card" style="margin-top: 14px;">
-            <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
-            <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">${escapeHtml(top[0].counter)}</p>
-          </div>
-        ` : ''}
-
-        <button class="dd-entry-card" data-act="open-ai-analysis" style="margin-top:14px;">
-          <span class="dd-entry-icon">🤖</span>
-          <div>
-            <div class="dd-entry-title">AIで詳しく分析する <span style="font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(220,180,100,0.18); color:#B07F2F; margin-left:4px;">近日公開</span></div>
-            <div class="dd-entry-desc">Geminiでクセの組み合わせ・きっかけ・改善のヒントを深掘り</div>
-          </div>
-        </button>
-
-        <div style="display:grid; gap: 10px; margin-top: 18px;">
-          <button class="btn btn-primary" data-act="open-trend">グラフで詳しく見る</button>
-          <button class="btn btn-secondary" data-act="open-radar">バランスを確認する</button>
-          <button class="btn-ghost" data-act="back-record">きろくに戻る</button>
-        </div>
       </div>
     </div>
   `;
@@ -13566,85 +13101,159 @@ function viewDayDetail() {
   `;
 }
 
-function viewReportSection() {
+// v0.9.74: 傾向分析タブ - 気分の変化グラフのみ（日付/時間帯/曜日別）
+function viewTrendSection() {
   const moodLogs = state.moodLogs || [];
-  const distortions = analyzeDistortions(state.moyamoyaRecords || [], 28);
-  const top1 = distortions[0];
-
-  // ---- 上部ヘッダー: AI分析レポート見出し + すぷらん紹介 ----
   let html = `
     <div style="text-align:center; margin: 6px 0 14px;">
       <h2 style="margin: 0 0 4px; font-family:'Noto Serif JP', serif; font-size: 20px;">
-        AI分析レポート
+        傾向分析
         <span style="display:inline-block; width:24px; height:24px; vertical-align:-6px; margin-left:4px;">${suplan({ stage: 'futaba', expression: 'happy', size: 24 })}</span>
       </h2>
-      <p class="text-tiny text-muted" style="margin:0;">気分の変化を多角的に分析して、あなたの傾向をすぷらんが教えてくれます</p>
+      <p class="text-tiny text-muted" style="margin:0;">日付・時間帯・曜日別の気分の傾向をすぷらんが整理します</p>
     </div>
   `;
-
-  // ---- 気分の変化グラフ ----
   html += viewMoodGraphSection();
-
-  // ---- 思考のクセ分析 ----
-  html += `
-    <h3 class="section-title" style="margin-top:18px;">思考のクセ分析</h3>
-  `;
-  if (top1 && top1.score >= 8) {
-    html += `
-      <button class="dd-entry-card" data-act="open-distortions">
-        <span class="dd-entry-icon">🧠</span>
-        <div>
-          <div class="dd-entry-title">思考のクセ分析（直近4週間）</div>
-          <div class="dd-entry-desc">最も多く見られるクセ: ${escapeHtml(top1.name)}（${top1.level.label}）</div>
-        </div>
-      </button>
-    `;
-  } else {
-    html += `
-      <button class="dd-entry-card" data-act="open-distortions">
-        <span class="dd-entry-icon">🧠</span>
-        <div>
-          <div class="dd-entry-title">思考のクセ分析</div>
-          <div class="dd-entry-desc">記録が増えると、あなたの思考パターンが見えてきます</div>
-        </div>
-      </button>
-    `;
-  }
-
-  // ---- 深掘り分析 ----
-  html += `
-    <h3 class="section-title" style="margin-top:18px;">深掘り分析</h3>
-    <button class="dd-entry-card" data-act="dd-start">
-      <span class="dd-entry-icon">🔎</span>
-      <div>
-        <div class="dd-entry-title">深掘り（下向き矢印法）</div>
-        <div class="dd-entry-desc">繰り返すモヤモヤやネガティブな思考の根っこを探ります</div>
-      </div>
-    </button>
-  `;
-
-  if ((state.deepDiveSessions || []).length > 0) {
-    html += `<h4 class="text-small text-soft" style="margin: 14px 0 8px;">これまでの深掘り</h4>`;
-    state.deepDiveSessions.slice(-3).reverse().forEach(d => {
-      html += `
-        <div class="card" style="padding:14px; margin-bottom:8px;">
-          <div class="text-tiny text-muted">${formatDate(d.completedAt)}</div>
-          <div class="mt-1" style="font-weight:500;">${escapeHtml(d.extractedBelief || d.coreBelief || '-')}</div>
-          ${d.tags && d.tags.length > 0 ? `
-            <div class="dd-tag-list" style="margin-top:8px;">
-              ${d.tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
-            </div>
-          ` : ''}
-        </div>
-      `;
-    });
-  }
-
-  // 記録が少ないとき注釈
   if (moodLogs.length < 3) {
     html += `<p class="text-tiny text-muted text-center" style="margin-top:14px;">
       ※ 記録があと${Math.max(1, 3 - moodLogs.length)}件たまると、グラフがより精度高く表示されます
     </p>`;
+  }
+  return html;
+}
+
+// v0.9.74: 思考のクセ分析タブ - TOP3 + グラフで見る/バランスを確認する + 過去のきづきワーク履歴
+function viewDistortionSection() {
+  const records = state.moyamoyaRecords || [];
+  const top = analyzeDistortions(records, 28).slice(0, 3);
+  const totalRecs = Math.min(records.length, 28);
+
+  let html = `
+    <div style="display:flex; align-items:flex-start; gap: 12px; margin: 4px 0 14px;">
+      <div>${suplan({ pose: 'bulb', size: 56 })}</div>
+      <div style="flex:1;">
+        <h2 style="margin: 0 0 4px; font-size: 18px; font-family:'Noto Serif JP', serif;">あなたによく見られる<br>思考のクセ TOP3</h2>
+        <div class="text-tiny text-muted">直近4週間（${totalRecs}件）の記録から分析しました</div>
+      </div>
+    </div>
+  `;
+
+  if (top.length === 0) {
+    html += `
+      <div class="card" style="padding:30px 20px; text-align:center; color:var(--text-soft);">
+        分析するための記録が足りないみたい。<br>もやもや整理を続けると、傾向が見えてきます。
+      </div>
+    `;
+  } else {
+    html += top.map((d, i) => `
+      <div class="kr-distort-card">
+        <div class="kr-distort-rank">${i + 1}</div>
+        <div>
+          <div class="kr-distort-name">${escapeHtml(d.name)}</div>
+          <div class="kr-distort-desc">${escapeHtml(d.desc)}</div>
+        </div>
+        <span class="kr-distort-badge ${d.level.tone}">${d.level.label}</span>
+      </div>
+    `).join('');
+
+    if (top[0].counter) {
+      html += `
+        <div class="ippo-do-card" style="margin-top: 14px;">
+          <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
+          <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">${escapeHtml(top[0].counter)}</p>
+        </div>
+      `;
+    }
+  }
+
+  html += `
+    <div style="display:grid; gap: 10px; margin-top: 16px;">
+      <button class="btn btn-primary" data-act="open-trend">グラフで詳しく見る</button>
+      <button class="btn btn-secondary" data-act="open-radar">バランスを確認する</button>
+    </div>
+  `;
+
+  // ---- 過去のきづきワーク履歴 ----
+  const kr = state.kizukiResults || {};
+  const dist = kr.distortion;
+  const beh = kr['behavior-experiment'];
+  const ddList = (state.deepDiveSessions || []).slice().reverse();
+
+  const hasHistory = !!dist || !!beh || ddList.length > 0;
+  if (hasHistory) {
+    html += `<h3 class="section-title" style="margin-top:24px;">過去のきづきワーク</h3>`;
+  }
+
+  if (dist) {
+    const apps = (dist.result?.applicable || []).slice(0, 3);
+    html += `
+      <div class="card" style="padding:14px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🧠</span>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600;">認知の歪みテスト</div>
+            <div class="text-tiny text-muted">${formatDate(dist.completedAt)} ・ 当てはまり ${dist.result?.totalCount || 0}/8</div>
+          </div>
+        </div>
+        ${apps.length > 0 ? `
+          <div class="dd-tag-list" style="margin-top:8px;">
+            ${apps.map(a => `<span class="dd-tag">#${escapeHtml(a.name)}</span>`).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  if (beh) {
+    html += `
+      <div class="card" style="padding:14px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🧪</span>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600;">行動実験の計画</div>
+            <div class="text-tiny text-muted">${formatDate(beh.completedAt)}</div>
+          </div>
+        </div>
+        ${beh.result?.hypothesis ? `
+          <div style="margin-top:6px; font-size:13px; line-height:1.6;">
+            <span class="text-tiny text-muted">仮説:</span> ${escapeHtml(beh.result.hypothesis)}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  ddList.slice(0, 5).forEach(d => {
+    const oldS = d.oldSchema || d.extractedBelief || d.coreBelief || '-';
+    const newS = d.newSchema || '';
+    html += `
+      <div class="card" style="padding:14px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🔽</span>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600;">下向き矢印法</div>
+            <div class="text-tiny text-muted">${formatDate(d.completedAt)}</div>
+          </div>
+        </div>
+        <div style="margin-top:6px; font-size:13px; line-height:1.7;">
+          <span class="text-tiny text-muted">古いスキーマ:</span> ${escapeHtml(oldS)}
+          ${newS ? `<br><span class="text-tiny text-muted">新しいスキーマ:</span> ${escapeHtml(newS)}` : ''}
+        </div>
+        ${d.tags && d.tags.length > 0 ? `
+          <div class="dd-tag-list" style="margin-top:8px;">
+            ${d.tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  });
+
+  if (!hasHistory) {
+    html += `
+      <p class="text-tiny text-muted text-center" style="margin: 20px 0 10px;">
+        きづきタブのワークを試すと、ここに履歴が残ります 🌱
+      </p>
+    `;
   }
 
   return html;
@@ -14109,7 +13718,7 @@ const FEATURE_HELP = {
     subtitle: '振り返りで気づきを得る',
     sections: [
       { icon: '📅', h: 'カレンダーで一覧', d: '気もち・もやもや・いっぽの記録を月別カレンダーで一覧。日付タップでその日の詳細が見られます。' },
-      { icon: '📊', h: 'AI分析レポート', d: '記録が貯まると、思考のクセ・気分の傾向・効きやすい行動などを AI が分析してレポートしてくれます。' },
+      { icon: '📊', h: '傾向分析・思考のクセ分析', d: '記録が貯まると、気分の傾向（日付・時間帯・曜日別）や、思考のクセ TOP3 を AI が分析して見せてくれます。' },
       { icon: '💌', h: 'もやもや整理のレター', d: 'もやもや整理した記録は、AIが書いてくれた「あなたへのレター」として読み返せます。' },
     ],
   },
@@ -14172,15 +13781,15 @@ function viewMoodCheckHelpModal() {
         <div class="mood-help-ai-mascot">${suplan({ pose: 'heart', size: 56 })}</div>
         <div class="mood-help-ai-body">
           <h3 class="mood-help-ai-title">記録した内容はAIが分析します</h3>
-          <p class="mood-help-ai-text">実施した内容は自動で分析され、「きろく」タブの「AI分析レポート」に反映されます。</p>
+          <p class="mood-help-ai-text">実施した内容は自動で分析され、「きろく」タブの「傾向分析」「思考のクセ分析」に反映されます。</p>
           <p class="mood-help-ai-text-em">より多く、いつでも記録することで、<br>あなただけの気づきがどんどん深まります🌱</p>
         </div>
       </div>
 
       <button class="btn btn-primary mood-help-cta" data-act="mood-help-goto-report">
-        <span>📊</span><span>AI分析レポートを見る</span><span style="opacity:0.85;">›</span>
+        <span>📊</span><span>傾向分析を見る</span><span style="opacity:0.85;">›</span>
       </button>
-      <p class="mood-help-cta-foot">（「きろく」タブのAI分析レポートへ移動します）</p>
+      <p class="mood-help-cta-foot">（「きろく」タブの傾向分析へ移動します）</p>
     </div>
   `;
 }
@@ -14818,7 +14427,13 @@ function handleAction(act, el, ev) {
   if (act === 'kiroku-chat')   { viewParams.chatId = el.dataset.chatId;     go('kiroku-chat');   return; }
   if (act === 'view-kiroku-letter') { viewParams.recordId = el.dataset.recordId; go('kiroku-letter'); return; }
   if (act === 'kiroku-ippo')   { viewParams.ippoId  = el.dataset.ippoId;   go('kiroku-ippo');   return; }
-  if (act === 'open-distortions') { go('kiroku-distortions'); return; }
+  if (act === 'open-distortions') {
+    // v0.9.74: スタンドアロン画面は廃止し、きろくタブ「思考のクセ分析」サブへ集約
+    state.ui.recordSubtab = 'distortion';
+    saveState();
+    go('record');
+    return;
+  }
   if (act === 'open-trend') { go('kiroku-trend'); return; }
   if (act === 'open-radar') { go('kiroku-radar'); return; }
   if (act === 'open-ai-analysis') { go('kiroku-ai-analysis'); return; }
@@ -15280,56 +14895,22 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  if (act === 'kizuki-values-toggle') {
-    if (!kizukiSession) return;
-    const id = el.dataset.id;
-    if (!Array.isArray(kizukiSession.answers)) kizukiSession.answers = [];
-    const i = kizukiSession.answers.indexOf(id);
-    if (i >= 0) {
-      kizukiSession.answers.splice(i, 1);
-    } else if (kizukiSession.answers.length < 5) {
-      kizukiSession.answers.push(id);
-    } else {
-      toast('5つまで選べるよ');
-      return;
-    }
-    render();
-    return;
-  }
   if (act === 'kizuki-work-submit') {
     if (!kizukiSession) return;
     const w = kizukiSession.workId;
-    // 自由記述系は input イベントが拾えていない場合のため、ここで最終収集する
-    if (w === 'behavior-experiment' || w === 'ideal-self') {
+    if (w === 'behavior-experiment') {
       document.querySelectorAll('[data-act="kizuki-input"]').forEach(el => {
         const k = el.dataset.key;
         if (k) kizukiSession.answers[k] = el.value || '';
       });
-      // behavior-experiment は最低限「仮説」だけ必須
-      if (w === 'behavior-experiment' && !(kizukiSession.answers.hypothesis || '').trim()) {
+      if (!(kizukiSession.answers.hypothesis || '').trim()) {
         toast('「確かめたい思い込み」を入れてね'); return;
       }
-      if (w === 'ideal-self' && !(kizukiSession.answers.morning || '').trim()
-          && !(kizukiSession.answers.people || '').trim()
-          && !(kizukiSession.answers.activity || '').trim()) {
-        toast('1つでいいから書いてみよう'); return;
-      }
     }
-    if (w === 'thought-check' || w === 'distortion') {
+    if (w === 'distortion') {
       const answered = Object.keys(kizukiSession.answers || {}).length;
       if (answered < DISTORTIONS.length) {
         toast(`あと ${DISTORTIONS.length - answered} 問残ってるよ`); return;
-      }
-    }
-    if (w === 'auto-thought') {
-      const answered = Object.keys(kizukiSession.answers || {}).length;
-      if (answered < AUTO_THOUGHT_QUESTIONS.length) {
-        toast(`あと ${AUTO_THOUGHT_QUESTIONS.length - answered} 問残ってるよ`); return;
-      }
-    }
-    if (w === 'values') {
-      if (!Array.isArray(kizukiSession.answers) || kizukiSession.answers.length !== 5) {
-        toast('5つ選んでね'); return;
       }
     }
     finishKizukiWork();
@@ -15601,7 +15182,7 @@ function handleAction(act, el, ev) {
   }
   if (act === 'mood-help-goto-report') {
     closeModal();
-    state.ui.recordSubtab = 'report';
+    state.ui.recordSubtab = 'trend';
     saveState();
     go('record');
     return;
