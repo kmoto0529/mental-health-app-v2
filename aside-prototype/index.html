@@ -6315,13 +6315,87 @@ body.keyboard-open .mood-chat-bottom .input-row {
   border-radius: 999px;
 }
 
-/* すべてのワークを見る */
+/* すべてのワークを見る（v0.9.73 で UI から撤去 / クラス自体は互換のため残置） */
 .kizuki-see-all {
   width: 100%;
   margin-top: 10px;
   padding: 10px;
   font-size: 13px;
 }
+
+/* ▼ P12.6 きづきワーク刷新カード（5種類カード）▼ */
+.kizuki-rev-list { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 18px; }
+.kizuki-rev-card {
+  display: flex; align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 12px 14px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit; color: var(--text);
+  transition: transform 0.1s ease, border-color 0.15s ease;
+}
+[data-theme="dark"] .kizuki-rev-card { background: rgba(47, 62, 62, 0.55); }
+.kizuki-rev-card:hover { border-color: rgba(123,168,118,0.45); }
+.kizuki-rev-card:active { transform: scale(0.985); }
+.kizuki-rev-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: #fff;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.kizuki-rev-body { flex: 1; min-width: 0; }
+.kizuki-rev-title {
+  font-size: 14px; font-weight: 700;
+  line-height: 1.4;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.kizuki-rev-subtitle {
+  font-size: 11px; color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.kizuki-rev-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.kizuki-rev-col-h {
+  display: inline-block;
+  font-size: 10px; font-weight: 600;
+  color: var(--text-soft);
+  background: var(--bg-soft);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+[data-theme="dark"] .kizuki-rev-col-h { background: rgba(167,196,160,0.12); color: #B6D2B0; }
+.kizuki-rev-col-h.benefit::before { content: '✓ '; color: #7BA876; font-weight: 700; }
+[data-theme="dark"] .kizuki-rev-col-h.benefit::before { color: #A7C4A0; }
+.kizuki-rev-col-d {
+  font-size: 11px; color: var(--text-soft);
+  line-height: 1.55;
+}
+.kizuki-rev-arrow {
+  align-self: center;
+  color: var(--text-muted);
+  font-size: 22px;
+  padding-left: 2px;
+}
+.kizuki-rev-pending-badge {
+  display: inline-block; margin-left: 6px;
+  font-size: 10px; font-weight: 600;
+  padding: 1px 6px; border-radius: 999px;
+  background: rgba(180,180,180,0.18);
+  color: var(--text-muted);
+  vertical-align: middle;
+}
+/* ▲ P12.6 きづきワーク刷新カード ▲ */
 
 /* いつやるのがおすすめ Tip */
 .kizuki-tip-card {
@@ -10309,18 +10383,60 @@ function renderHabitCreateForm() {
 // Phase 3 で他のワーク本体（思考のクセチェック、認知のゆがみ、価値観整理等）を実装予定。
 // ============================================================
 
-// ワークカタログ（Phase 2: 構造定義 + 下向き矢印法のみ available。他は P3 で実装）
+// ワークカタログ（v0.9.73: 5種類に絞り、解説リッチカードへ刷新。
+// 旧 thought-check / auto-thought / values / ideal-self は UI 表示から外し、
+// 各ワークのコード本体は将来再導入する場合に備えて残置）
 const KIZUKI_WORKS = [
-  // 思考のクセ
-  { id:'thought-check',       cat:'thought',  icon:'🔍', title:'思考のクセをチェック',     desc:'あなたの自動思考の傾向を確認',                 time:'5分',  status:'available', action:'kizuki-start-work', section:'思考のクセを知る' },
-  { id:'auto-thought',        cat:'thought',  icon:'💭', title:'自動思考になりやすい？',   desc:'自動的に考える傾向をチェック',                 time:'3分',  status:'available', action:'kizuki-start-work', section:'思考のクセを知る' },
-  // 深掘り
-  { id:'downward-arrow',      cat:'deepdive', icon:'🔽', title:'下向き矢印法',             desc:'根っこにある思い込みを探るワーク',             time:'10分', status:'available', action:'kizuki-open-deepdive', section:'深く掘り下げる' },
-  { id:'distortion',          cat:'deepdive', icon:'🌀', title:'認知のゆがみを理解する',   desc:'代表的な認知のゆがみをチェック',               time:'7分',  status:'available', action:'kizuki-start-work', section:'深く掘り下げる' },
-  { id:'behavior-experiment', cat:'deepdive', icon:'🧪', title:'行動実験を計画する',       desc:'思い込みを検証する計画を立てる',               time:'5分',  status:'available', action:'kizuki-start-work', section:'深く掘り下げる' },
-  // 価値観・方向性
-  { id:'values',              cat:'value',    icon:'💎', title:'価値観を整理する',         desc:'あなたにとって大切なことを整理する',           time:'7分',  status:'available', action:'kizuki-start-work', section:'価値観・方向性' },
-  { id:'ideal-self',          cat:'value',    icon:'🌟', title:'理想の自分をイメージする', desc:'理想の未来をイメージしてみる',                 time:'7分',  status:'available', action:'kizuki-start-work', section:'価値観・方向性' },
+  {
+    id: 'downward-arrow',
+    title: 'モヤモヤの原因を深掘りする',
+    subtitle: '下向き矢印法',
+    when: '「なぜこう感じるんだろう？」と考えがぐるぐるして、原因をはっきりさせたいとき',
+    benefit: '根っこにある本当の思い込みや価値観に気づけて、納得感のある解決につながります。',
+    icon: '▽', iconBg: '#5B7EC9',
+    time: '10分', status: 'available', action: 'kizuki-open-deepdive',
+    cat: 'deepdive', desc: '根っこにある思い込みを探るワーク', section: '深く掘り下げる',
+  },
+  {
+    id: 'behavior-experiment',
+    title: '考えを確かめてみる',
+    subtitle: '行動実験',
+    when: '「こうに違いない」と決めつけてしまうことが多く、実際に試して確かめたいとき',
+    benefit: '思い込みが思い込みだったと気づけて、不安や心配を減らし、自信をつけることができます。',
+    icon: '🧪', iconBg: '#5FBB72',
+    time: '5分', status: 'available', action: 'kizuki-start-work',
+    cat: 'deepdive', desc: '思い込みを検証する計画を立てる', section: '深く掘り下げる',
+  },
+  {
+    id: 'distortion',
+    title: '考え方のクセに気づく',
+    subtitle: '認知の歪みテスト',
+    when: 'ついネガティブに考えてしまうパターンに気づき、ラクになりたいとき',
+    benefit: '自分の考え方のクセに気づけて、偏りをやわらげ、気持ちが軽くなります。',
+    icon: '🧠', iconBg: '#E68FA0',
+    time: '7分', status: 'available', action: 'kizuki-start-work',
+    cat: 'deepdive', desc: '代表的な認知のゆがみをチェック', section: '深く掘り下げる',
+  },
+  {
+    id: 'column-method',
+    title: '頭の中を整理する',
+    subtitle: 'コラム法',
+    when: '考えや感情がまとまらず、頭の中をスッキリさせたいとき',
+    benefit: 'モヤモヤしていることが整理され、自分にとって大切なことが見えてきます。',
+    icon: '🗒️', iconBg: '#E8B756',
+    time: '10分', status: 'pending', action: 'kizuki-coming-soon',
+    cat: 'thought', desc: '思考と感情をコラムで整理する', section: '思考のクセを知る',
+  },
+  {
+    id: 'stimulus-control',
+    title: '環境を整えてラクになる',
+    subtitle: '刺激統制',
+    when: '気が散って集中できない、だらだらしてしまう、やる気が出にくいとき',
+    benefit: '集中しやすい環境がつくれ、気持ちが安定し、やるべきことに取り組みやすくなります。',
+    icon: '🚪', iconBg: '#5BC0DE',
+    time: '7分', status: 'pending', action: 'kizuki-coming-soon',
+    cat: 'behavior', desc: '集中・睡眠に効く環境調整', section: '環境を整える',
+  },
 ];
 
 const KIZUKI_FILTERS = [
@@ -10414,17 +10530,34 @@ function renderKizukiWorkCard(w, opts = {}) {
   `;
 }
 
+// v0.9.73: 解説リッチカード（こんな時におすすめ + 期待できるメリット）
+function renderKizukiRevCard(w) {
+  const isPending = w.status === 'pending';
+  const action = isPending ? 'kizuki-coming-soon' : (w.action || 'kizuki-coming-soon');
+  return `
+    <button class="kizuki-rev-card" data-act="${action}" data-work="${w.id}">
+      <span class="kizuki-rev-icon" style="background:${w.iconBg || '#7BA876'};">${w.icon}</span>
+      <div class="kizuki-rev-body">
+        <div class="kizuki-rev-title">${escapeHtml(w.title)}${isPending ? '<span class="kizuki-rev-pending-badge">準備中</span>' : ''}</div>
+        <div class="kizuki-rev-subtitle">（${escapeHtml(w.subtitle || w.desc || '')}）</div>
+        <div class="kizuki-rev-cols">
+          <div>
+            <span class="kizuki-rev-col-h">こんな時におすすめ</span>
+            <div class="kizuki-rev-col-d">${escapeHtml(w.when || '')}</div>
+          </div>
+          <div>
+            <span class="kizuki-rev-col-h benefit">期待できるメリット</span>
+            <div class="kizuki-rev-col-d">${escapeHtml(w.benefit || '')}</div>
+          </div>
+        </div>
+      </div>
+      <span class="kizuki-rev-arrow">›</span>
+    </button>
+  `;
+}
+
 // === きづきタブ トップ画面 ===
 function viewKizuki() {
-  // はじめての方おすすめ（思考のクセを知る）
-  const featured = KIZUKI_WORKS.find(w => w.id === 'thought-check');
-  // おすすめ3件（available 優先 → pending）
-  const recommended = [
-    KIZUKI_WORKS.find(w => w.id === 'downward-arrow'),
-    KIZUKI_WORKS.find(w => w.id === 'behavior-experiment'),
-    KIZUKI_WORKS.find(w => w.id === 'values'),
-  ].filter(Boolean);
-
   return `
     <div class="screen active kizuki-top-screen">
       <div class="page-header">
@@ -10463,28 +10596,10 @@ function viewKizuki() {
         </div>
       </div>
 
-      <!-- はじめての方おすすめ -->
-      ${featured ? `
-        <div class="kizuki-section-title">はじめての方におすすめ</div>
-        <button class="kizuki-feature-card" data-act="${featured.action || 'kizuki-coming-soon'}" data-work="${featured.id}">
-          <span class="kizuki-feature-icon">${featured.icon}</span>
-          <div class="kizuki-feature-body">
-            <div class="kizuki-feature-h">${escapeHtml(featured.title)}<span class="kizuki-feature-time">（${featured.time}）</span></div>
-            <div class="kizuki-feature-d">あなたの思考パターンをチェックできます</div>
-          </div>
-          <span class="kizuki-feature-cta">はじめる</span>
-        </button>
-      ` : ''}
-
-      <!-- おすすめのワーク -->
-      <div class="kizuki-section-title">おすすめのワーク</div>
-      <div class="kizuki-work-list">
-        ${recommended.map(w => renderKizukiWorkCard(w)).join('')}
+      <!-- ワーク一覧（5種類・解説リッチカード）-->
+      <div class="kizuki-rev-list">
+        ${KIZUKI_WORKS.map(w => renderKizukiRevCard(w)).join('')}
       </div>
-
-      <button class="btn-ghost kizuki-see-all" data-act="kizuki-see-all">
-        すべてのワークを見る
-      </button>
 
       <!-- いつやるのがおすすめ -->
       <div class="kizuki-tip-card">
