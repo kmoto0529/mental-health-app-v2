@@ -6351,35 +6351,19 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 .kizuki-rev-body { flex: 1; min-width: 0; }
 .kizuki-rev-title {
-  font-size: 14px; font-weight: 700;
-  line-height: 1.4;
+  font-size: 15px; font-weight: 700;
+  line-height: 1.45;
   color: var(--text);
   margin-bottom: 2px;
 }
 .kizuki-rev-subtitle {
-  font-size: 11px; color: var(--text-muted);
-  margin-bottom: 10px;
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 8px;
+  line-height: 1.5;
 }
-.kizuki-rev-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.kizuki-rev-col-h {
-  display: inline-block;
-  font-size: 10px; font-weight: 600;
-  color: var(--text-soft);
-  background: var(--bg-soft);
-  padding: 2px 8px;
-  border-radius: 999px;
-  margin-bottom: 4px;
-}
-[data-theme="dark"] .kizuki-rev-col-h { background: rgba(167,196,160,0.12); color: #B6D2B0; }
-.kizuki-rev-col-h.benefit::before { content: '✓ '; color: #7BA876; font-weight: 700; }
-[data-theme="dark"] .kizuki-rev-col-h.benefit::before { color: #A7C4A0; }
-.kizuki-rev-col-d {
-  font-size: 11px; color: var(--text-soft);
-  line-height: 1.55;
+.kizuki-rev-body-text {
+  font-size: 12px; color: var(--text-soft);
+  line-height: 1.7;
 }
 .kizuki-rev-arrow {
   align-self: center;
@@ -10390,8 +10374,7 @@ const KIZUKI_WORKS = [
     id: 'downward-arrow',
     title: 'モヤモヤの原因を深掘りする',
     subtitle: '下向き矢印法',
-    when: '「なぜこう感じるんだろう？」と考えがぐるぐるして、原因をはっきりさせたいとき',
-    benefit: '根っこにある本当の思い込みや価値観に気づけて、納得感のある解決につながります。',
+    body: '「なぜそう感じるのだろう？」と考えがぐるぐるして、原因をはっきりさせたいとき',
     icon: '▽', iconBg: '#5B7EC9',
     time: '10分', status: 'available', action: 'kizuki-open-deepdive',
     cat: 'deepdive', desc: '根っこにある思い込みを探るワーク', section: '深く掘り下げる',
@@ -10400,8 +10383,7 @@ const KIZUKI_WORKS = [
     id: 'behavior-experiment',
     title: '考えを確かめてみる',
     subtitle: '行動実験',
-    when: '「こうに違いない」と決めつけてしまうことが多く、実際に試して確かめたいとき',
-    benefit: '思い込みが思い込みだったと気づけて、不安や心配を減らし、自信をつけることができます。',
+    body: '「こうに違いない」と決めつけてしまうことが多く、実際に試して確かめたいとき',
     icon: '🧪', iconBg: '#5FBB72',
     time: '5分', status: 'available', action: 'kizuki-start-work',
     cat: 'deepdive', desc: '思い込みを検証する計画を立てる', section: '深く掘り下げる',
@@ -10410,8 +10392,7 @@ const KIZUKI_WORKS = [
     id: 'distortion',
     title: '考え方のクセに気づく',
     subtitle: '認知の歪みテスト',
-    when: 'ついネガティブに考えてしまうパターンに気づき、ラクになりたいとき',
-    benefit: '自分の考え方のクセに気づけて、偏りをやわらげ、気持ちが軽くなります。',
+    body: 'ついネガティブに考えてしまうパターンに気づき、考え方のクセを見直したいとき',
     icon: '🧠', iconBg: '#E68FA0',
     time: '7分', status: 'available', action: 'kizuki-start-work',
     cat: 'deepdive', desc: '代表的な認知のゆがみをチェック', section: '深く掘り下げる',
@@ -10420,8 +10401,7 @@ const KIZUKI_WORKS = [
     id: 'column-method',
     title: '頭の中を整理する',
     subtitle: 'コラム法',
-    when: '考えや感情がまとまらず、頭の中をスッキリさせたいとき',
-    benefit: 'モヤモヤしていることが整理され、自分にとって大切なことが見えてきます。',
+    body: '考えや感情がまとまらず、頭の中をすっきりさせてバランスの取れた考え方を見つけたいとき',
     icon: '🗒️', iconBg: '#E8B756',
     time: '10分', status: 'pending', action: 'kizuki-coming-soon',
     cat: 'thought', desc: '思考と感情をコラムで整理する', section: '思考のクセを知る',
@@ -10430,8 +10410,7 @@ const KIZUKI_WORKS = [
     id: 'stimulus-control',
     title: '環境を整えてラクになる',
     subtitle: '刺激統制',
-    when: '気が散って集中できない、だらだらしてしまう、やる気が出にくいとき',
-    benefit: '集中しやすい環境がつくれ、気持ちが安定し、やるべきことに取り組みやすくなります。',
+    body: '気が散って集中できない、だらだらしてしまうなど、気持ちが安定しにくいとき',
     icon: '🚪', iconBg: '#5BC0DE',
     time: '7分', status: 'pending', action: 'kizuki-coming-soon',
     cat: 'behavior', desc: '集中・睡眠に効く環境調整', section: '環境を整える',
@@ -10478,7 +10457,7 @@ function renderKizukiWorkCard(w, opts = {}) {
   `;
 }
 
-// v0.9.73: 解説リッチカード（こんな時におすすめ + 期待できるメリット）
+// v0.9.75: シンプル化カード（タイトル / (技法名) / 説明文）
 function renderKizukiRevCard(w) {
   const isPending = w.status === 'pending';
   const action = isPending ? 'kizuki-coming-soon' : (w.action || 'kizuki-coming-soon');
@@ -10488,16 +10467,7 @@ function renderKizukiRevCard(w) {
       <div class="kizuki-rev-body">
         <div class="kizuki-rev-title">${escapeHtml(w.title)}${isPending ? '<span class="kizuki-rev-pending-badge">準備中</span>' : ''}</div>
         <div class="kizuki-rev-subtitle">（${escapeHtml(w.subtitle || w.desc || '')}）</div>
-        <div class="kizuki-rev-cols">
-          <div>
-            <span class="kizuki-rev-col-h">こんな時におすすめ</span>
-            <div class="kizuki-rev-col-d">${escapeHtml(w.when || '')}</div>
-          </div>
-          <div>
-            <span class="kizuki-rev-col-h benefit">期待できるメリット</span>
-            <div class="kizuki-rev-col-d">${escapeHtml(w.benefit || '')}</div>
-          </div>
-        </div>
+        <div class="kizuki-rev-body-text">${escapeHtml(w.body || '')}</div>
       </div>
       <span class="kizuki-rev-arrow">›</span>
     </button>
