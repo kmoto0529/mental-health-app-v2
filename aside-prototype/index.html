@@ -2131,6 +2131,214 @@
 }
 [data-theme="dark"] .dd-reflection { background: rgba(47, 62, 62, 0.45); }
 
+/* ▼ P12.5 下向き矢印法リニューアル（9ステップ）追加スタイル ▼ */
+.dd-intro-list { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.dd-intro-list li {
+  font-size: 13px; line-height: 1.7;
+  padding-left: 22px; position: relative;
+  color: var(--text-soft);
+}
+.dd-intro-list li::before {
+  content: '✓'; position: absolute; left: 6px; top: 0;
+  color: #7BA876; font-weight: 700;
+}
+.dd-intro-callout {
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  font-size: 12px; line-height: 1.7;
+  color: var(--text-soft);
+}
+[data-theme="dark"] .dd-intro-callout { background: rgba(47, 62, 62, 0.45); }
+.dd-intro-callout-label { font-weight: 600; color: var(--text); margin-bottom: 6px; font-size: 13px; }
+.dd-intro-ba {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 12px;
+  font-size: 12px; line-height: 1.8;
+}
+[data-theme="dark"] .dd-intro-ba { background: rgba(47,62,62,0.55); }
+.dd-intro-ba-row { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; }
+.dd-intro-ba-badge {
+  display: inline-block; min-width: 56px; text-align: center;
+  padding: 3px 8px; border-radius: 999px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em; flex-shrink: 0;
+}
+.dd-intro-ba-badge.before { background: rgba(189,143,99,0.16); color: #9C7251; }
+.dd-intro-ba-badge.after  { background: rgba(123,168,118,0.18); color: #5C7E60; }
+[data-theme="dark"] .dd-intro-ba-badge.before { background: rgba(220,170,120,0.2); color: #D9B486; }
+[data-theme="dark"] .dd-intro-ba-badge.after  { background: rgba(167,196,160,0.2); color: #A7C4A0; }
+
+/* カテゴリ・感情チップ */
+.dd-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+.dd-chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--divider);
+  cursor: pointer;
+  font: inherit; color: var(--text);
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .dd-chip { background: rgba(47,62,62,0.55); }
+.dd-chip.selected {
+  background: rgba(123,168,118,0.16);
+  border-color: #7BA876;
+  color: #5C7E60;
+  font-weight: 600;
+}
+[data-theme="dark"] .dd-chip.selected { color: #A7C4A0; border-color: #A7C4A0; }
+.dd-section-label { font-size: 12px; color: var(--text-muted); margin: 14px 0 4px; }
+
+/* 下向き矢印 ボックス列 */
+.dd-arrow-col { display: flex; flex-direction: column; gap: 0; margin-top: 8px; }
+.dd-arrow-prev {
+  background: rgba(123,168,118,0.08);
+  border-left: 3px solid #7BA876;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+[data-theme="dark"] .dd-arrow-prev { background: rgba(167,196,160,0.12); border-left-color: #A7C4A0; }
+.dd-arrow-prev-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+.dd-arrow-sep {
+  display: flex; justify-content: center;
+  color: #7BA876; font-size: 22px; line-height: 1;
+  padding: 4px 0; opacity: 0.7;
+}
+[data-theme="dark"] .dd-arrow-sep { color: #A7C4A0; }
+.dd-arrow-box {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--divider);
+  border-radius: 10px;
+  font-size: 13px; line-height: 1.5;
+}
+[data-theme="dark"] .dd-arrow-box { background: rgba(47,62,62,0.55); }
+.dd-arrow-box-label { font-size: 10px; color: var(--text-muted); min-width: 32px; }
+.dd-arrow-input {
+  flex: 1; border: none; background: transparent;
+  font: inherit; color: var(--text); padding: 0;
+}
+.dd-arrow-input:focus { outline: none; }
+.dd-arrow-more {
+  margin-top: 8px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; border: 1px dashed var(--divider);
+  color: var(--text-soft);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font: inherit; font-size: 13px; cursor: pointer;
+  width: 100%; justify-content: center;
+}
+.dd-arrow-more:hover:not(:disabled) { color: #5C7E60; border-color: #7BA876; }
+.dd-arrow-more:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* スキーマ候補（ラジオ風）*/
+.dd-opt-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.dd-opt {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--divider);
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit; color: var(--text);
+  font-size: 14px; line-height: 1.55;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+[data-theme="dark"] .dd-opt { background: rgba(47,62,62,0.55); }
+.dd-opt.selected {
+  border-color: #7BA876;
+  background: rgba(123,168,118,0.12);
+}
+[data-theme="dark"] .dd-opt.selected { border-color: #A7C4A0; background: rgba(167,196,160,0.15); }
+.dd-opt-radio {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--divider); flex-shrink: 0;
+  position: relative; transition: all 0.15s;
+}
+.dd-opt.selected .dd-opt-radio { border-color: #7BA876; }
+.dd-opt.selected .dd-opt-radio::after {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 9px; height: 9px; background: #7BA876; border-radius: 50%;
+}
+[data-theme="dark"] .dd-opt.selected .dd-opt-radio { border-color: #A7C4A0; }
+[data-theme="dark"] .dd-opt.selected .dd-opt-radio::after { background: #A7C4A0; }
+.dd-opt-loading {
+  text-align: center; padding: 24px 8px;
+  font-size: 12px; color: var(--text-muted);
+}
+
+/* メリット・デメリット比較カード */
+.dd-md-card {
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  font-size: 13px; line-height: 1.75;
+}
+.dd-md-card.merit {
+  background: rgba(123,168,118,0.12);
+  border: 1px solid rgba(123,168,118,0.25);
+  color: #5C7E60;
+}
+.dd-md-card.demerit {
+  background: rgba(220,140,140,0.10);
+  border: 1px solid rgba(220,140,140,0.25);
+  color: #9F5F5F;
+}
+[data-theme="dark"] .dd-md-card.merit { color: #B6D2B0; background: rgba(167,196,160,0.14); border-color: rgba(167,196,160,0.28); }
+[data-theme="dark"] .dd-md-card.demerit { color: #E4B5B5; background: rgba(220,140,140,0.14); border-color: rgba(220,140,140,0.28); }
+.dd-md-card-title { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
+.dd-md-list { margin: 0; padding-left: 18px; }
+.dd-md-list li { margin-bottom: 3px; }
+
+/* ハイライト（新スキーマ確定）*/
+.dd-highlight-schema {
+  background: linear-gradient(180deg, rgba(123,168,118,0.10), rgba(123,168,118,0.20));
+  border: 1.5px solid rgba(123,168,118,0.5);
+  border-radius: 14px;
+  padding: 16px 18px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px; line-height: 1.8;
+  color: var(--text);
+  text-align: center;
+  margin: 12px 0 16px;
+}
+[data-theme="dark"] .dd-highlight-schema {
+  background: linear-gradient(180deg, rgba(167,196,160,0.12), rgba(167,196,160,0.22));
+  border-color: rgba(167,196,160,0.55);
+}
+.dd-highlight-label { font-size: 11px; color: var(--text-muted); font-family: 'Noto Sans JP', sans-serif; margin-bottom: 4px; }
+
+/* 次のいっぽ ヒントカード */
+.dd-hint-list { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 16px; }
+.dd-hint-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  font-size: 13px; line-height: 1.5;
+  color: var(--text);
+}
+[data-theme="dark"] .dd-hint-card { background: rgba(47,62,62,0.55); }
+.dd-hint-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(123,168,118,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+[data-theme="dark"] .dd-hint-icon { background: rgba(167,196,160,0.15); }
+/* ▲ P12.5 下向き矢印法リニューアル ▲ */
+
 /* 精度向上の見える化（仕様書 §7） */
 .acc-card {
   background: var(--bg-card);
@@ -6181,7 +6389,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.69-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.70-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7050,6 +7258,7 @@ function render() {
     case 'action':          html = viewAction(); break;
     case 'kizuki':          html = viewKizuki(); break;
     case 'kizuki-list':     html = viewKizukiList(); break;
+    case 'kizuki-work':     html = viewKizukiWork(); break;
     case 'record':          html = viewRecord(); break;
     case 'day-detail':      html = viewDayDetail(); break;
     case 'kiroku-detail':       html = viewKirokuDetail(); break;
@@ -10103,15 +10312,15 @@ function renderHabitCreateForm() {
 // ワークカタログ（Phase 2: 構造定義 + 下向き矢印法のみ available。他は P3 で実装）
 const KIZUKI_WORKS = [
   // 思考のクセ
-  { id:'thought-check',     cat:'thought',      icon:'🔍', title:'思考のクセをチェック',     desc:'あなたの自動思考の傾向を確認',                 time:'5分',  status:'pending', section:'思考のクセを知る' },
-  { id:'auto-thought',      cat:'thought',      icon:'💭', title:'自動思考になりやすい？',   desc:'自動的に考える傾向をチェック',                 time:'3分',  status:'pending', section:'思考のクセを知る' },
+  { id:'thought-check',       cat:'thought',  icon:'🔍', title:'思考のクセをチェック',     desc:'あなたの自動思考の傾向を確認',                 time:'5分',  status:'available', action:'kizuki-start-work', section:'思考のクセを知る' },
+  { id:'auto-thought',        cat:'thought',  icon:'💭', title:'自動思考になりやすい？',   desc:'自動的に考える傾向をチェック',                 time:'3分',  status:'available', action:'kizuki-start-work', section:'思考のクセを知る' },
   // 深掘り
-  { id:'downward-arrow',    cat:'deepdive',     icon:'🔽', title:'下向き矢印法',             desc:'根っこにある思い込みを探るワーク',             time:'10分', status:'available', action:'kizuki-open-deepdive', section:'深く掘り下げる' },
-  { id:'distortion',        cat:'deepdive',     icon:'🌀', title:'認知のゆがみを理解する',   desc:'代表的な認知のゆがみをチェック',               time:'7分',  status:'pending', section:'深く掘り下げる' },
-  { id:'behavior-experiment', cat:'deepdive',   icon:'🧪', title:'行動実験を計画する',       desc:'思い込みを検証する計画を立てる',               time:'5分',  status:'pending', section:'深く掘り下げる' },
+  { id:'downward-arrow',      cat:'deepdive', icon:'🔽', title:'下向き矢印法',             desc:'根っこにある思い込みを探るワーク',             time:'10分', status:'available', action:'kizuki-open-deepdive', section:'深く掘り下げる' },
+  { id:'distortion',          cat:'deepdive', icon:'🌀', title:'認知のゆがみを理解する',   desc:'代表的な認知のゆがみをチェック',               time:'7分',  status:'available', action:'kizuki-start-work', section:'深く掘り下げる' },
+  { id:'behavior-experiment', cat:'deepdive', icon:'🧪', title:'行動実験を計画する',       desc:'思い込みを検証する計画を立てる',               time:'5分',  status:'available', action:'kizuki-start-work', section:'深く掘り下げる' },
   // 価値観・方向性
-  { id:'values',            cat:'value',        icon:'💎', title:'価値観を整理する',         desc:'あなたにとって大切なことを整理する',           time:'10分', status:'pending', section:'価値観・方向性' },
-  { id:'ideal-self',        cat:'value',        icon:'🌟', title:'理想の自分をイメージする', desc:'理想の未来をイメージしてみる',                 time:'7分',  status:'pending', section:'価値観・方向性' },
+  { id:'values',              cat:'value',    icon:'💎', title:'価値観を整理する',         desc:'あなたにとって大切なことを整理する',           time:'7分',  status:'available', action:'kizuki-start-work', section:'価値観・方向性' },
+  { id:'ideal-self',          cat:'value',    icon:'🌟', title:'理想の自分をイメージする', desc:'理想の未来をイメージしてみる',                 time:'7分',  status:'available', action:'kizuki-start-work', section:'価値観・方向性' },
 ];
 
 const KIZUKI_FILTERS = [
@@ -10119,6 +10328,68 @@ const KIZUKI_FILTERS = [
   { id:'thought',      label:'思考のクセ' },
   { id:'value',        label:'価値観・方向性' },
   { id:'relationship', label:'人間関係' },
+];
+
+// ============================================================
+// きづきワーク用の共通データ（v0.9.70）
+// ============================================================
+
+// 思考のクセチェック用の設問（既存 DISTORTIONS 8種に対応する1問ずつ）
+const DISTORTION_QUESTIONS = {
+  labeling:           'うまくいかないと「自分はダメな人間だ」と感じる',
+  mind_reading:       '相手の反応を見て「私のこと、嫌いなんだ」と決めつけてしまう',
+  should:             '「○○すべき」「○○しなきゃ」と自分にプレッシャーをかけがち',
+  personalization:    'うまくいかないことが起きると「自分のせい」と感じやすい',
+  disqualifying:      '褒められても「お世辞だ」「大したことない」と素直に受け取れない',
+  all_or_nothing:     'うまくいかないとき「もう全部ダメだ」と感じる',
+  overgeneralization: '一度失敗すると「自分はいつもこうだ」と思ってしまう',
+  fortune_telling:    '何かを始める前から「どうせうまくいかない」と思う',
+};
+
+// 5段階スコア（思考のクセチェック）
+const KIZUKI_SCALE_5 = [
+  { score: 0, label: 'あまりない' },
+  { score: 1, label: '少しある' },
+  { score: 2, label: '時々ある' },
+  { score: 3, label: 'よくある' },
+  { score: 4, label: 'とてもよくある' },
+];
+
+// 自動思考チェック用の設問（6問・YES/NO/わからない）
+const AUTO_THOUGHT_QUESTIONS = [
+  '悪いことがあると、すぐに自分を責めてしまう',
+  '考え事を始めると止まらなくなって、頭の中でぐるぐるしてしまう',
+  '言われたひと言や出来事を、後から何度も思い返してしまう',
+  '将来のうまくいかない場面を、つい想像してしまう',
+  '過去の失敗や恥ずかしい記憶が、急によみがえってつらくなる',
+  '気がつくと否定的な考えが浮かんでいて、止められない',
+];
+
+// 3択スコア（distortion / auto-thought 用）
+const KIZUKI_SCALE_3 = [
+  { score: 0, label: 'あてはまらない' },
+  { score: 1, label: '少しあてはまる' },
+  { score: 2, label: 'よくあてはまる' },
+];
+
+// 価値観カード（16枚から5枚選ぶ）
+const VALUES_CARDS = [
+  { id: 'health',       icon: '🌿', label: '健康',           desc: '心と体が元気でいられること' },
+  { id: 'family',       icon: '👨‍👩‍👧', label: '家族',         desc: '近しい人と支え合う関係' },
+  { id: 'love',         icon: '💗', label: '愛・つながり',   desc: '誰かと深く結びつくこと' },
+  { id: 'freedom',      icon: '🕊️', label: '自由',           desc: '自分で選び、自分で決められること' },
+  { id: 'growth',       icon: '🌱', label: '成長',           desc: '昨日の自分より少しでも前へ' },
+  { id: 'honesty',      icon: '🤝', label: '誠実',           desc: '自分にも人にも嘘をつかないこと' },
+  { id: 'creativity',   icon: '🎨', label: '創造',           desc: 'まだない何かを生み出す喜び' },
+  { id: 'adventure',    icon: '🧭', label: '冒険',           desc: '新しい経験を求める' },
+  { id: 'stability',    icon: '🏠', label: '安定',           desc: '安心できる日常があること' },
+  { id: 'contribution', icon: '🤲', label: '貢献',           desc: '誰かの役に立てること' },
+  { id: 'fun',          icon: '🎉', label: '楽しさ',         desc: '今この瞬間を味わうこと' },
+  { id: 'wisdom',       icon: '📖', label: '学び・知恵',     desc: '知る・考えることそのもの' },
+  { id: 'nature',       icon: '🌳', label: '自然',           desc: '自然との触れ合いや調和' },
+  { id: 'spirit',       icon: '✨', label: '心の豊かさ',     desc: '内面の満たされた感覚' },
+  { id: 'achievement',  icon: '🏆', label: '達成',           desc: '目標をやり遂げること' },
+  { id: 'aesthetic',    icon: '🌸', label: '美しさ',         desc: '美しいものに触れる時間' },
 ];
 
 // セクション順（ワーク一覧画面のグループ化用）
@@ -10195,7 +10466,7 @@ function viewKizuki() {
       <!-- はじめての方おすすめ -->
       ${featured ? `
         <div class="kizuki-section-title">はじめての方におすすめ</div>
-        <button class="kizuki-feature-card" data-act="kizuki-coming-soon" data-work="${featured.id}">
+        <button class="kizuki-feature-card" data-act="${featured.action || 'kizuki-coming-soon'}" data-work="${featured.id}">
           <span class="kizuki-feature-icon">${featured.icon}</span>
           <div class="kizuki-feature-body">
             <div class="kizuki-feature-h">${escapeHtml(featured.title)}<span class="kizuki-feature-time">（${featured.time}）</span></div>
@@ -10277,86 +10548,664 @@ function viewKizukiList() {
 }
 
 // ============================================================
-// 深掘りループ（v0.9.1 仕様書 §5 下向き矢印法）
+// きづきワーク本体（v0.9.70 — 6種類のワーク共通）
+//   - state: kizukiSession = { workId, step, answers, result, aiComment, loading }
+//   - step1: 入力 / step2: 結果+AIコメント
+//   - 結果は state.kizukiResults[workId] に保存（きろくから後で参照可）
 // ============================================================
-let deepDive = null;  // 進行中のセッション
+let kizukiSession = null;
 
-const DD_THEMES = [
-  { id: 'moyamoya',  icon: '🌫️', name: 'モヤモヤ・悩み' },
-  { id: 'recurring', icon: '🔁', name: '繰り返す思考' },
-  { id: 'relations', icon: '👥', name: '人間関係' },
-  { id: 'self',      icon: '🌱', name: '自分のこと（自己嫌悪）' },
-  { id: 'free',      icon: '✏️', name: '自由入力で始める' },
+function startKizukiWork(workId) {
+  kizukiSession = {
+    workId,
+    step: 1,
+    answers: (workId === 'auto-thought' || workId === 'distortion' || workId === 'thought-check')
+      ? {}
+      : (workId === 'values' ? [] : { hypothesis:'', action:'', prediction:'', result:'',
+                                       morning:'', people:'', activity:'' }),
+    result: null,
+    aiComment: null,
+    loading: false,
+  };
+  go('kizuki-work');
+}
+
+function cancelKizukiWork() {
+  kizukiSession = null;
+  go('kizuki');
+}
+
+// 結果集計（ワーク別）
+function computeKizukiResult(workId, answers) {
+  if (workId === 'thought-check') {
+    // 8軸のスコア（0-4）を高い順にソート → TOP3
+    const ranked = DISTORTIONS.map(d => ({
+      id: d.id,
+      name: d.name,
+      desc: d.desc,
+      score: answers[d.id] != null ? answers[d.id] : 0,
+    })).sort((a, b) => b.score - a.score);
+    const top3 = ranked.slice(0, 3);
+    return { type: 'top3', ranked, top3 };
+  }
+  if (workId === 'distortion') {
+    // 8つの歪みごとに 0-2 のスコア。1以上を「あてはまる傾向」として集計
+    const applicable = DISTORTIONS
+      .map(d => ({ id: d.id, name: d.name, desc: d.desc, counter: d.counter, score: answers[d.id] != null ? answers[d.id] : 0 }))
+      .filter(x => x.score >= 1)
+      .sort((a, b) => b.score - a.score);
+    return { type: 'applicable', applicable, totalCount: applicable.length };
+  }
+  if (workId === 'auto-thought') {
+    // 6問のスコア合計（0-12）
+    const total = AUTO_THOUGHT_QUESTIONS.reduce((s, _, i) => s + (answers[i] != null ? answers[i] : 0), 0);
+    const max = AUTO_THOUGHT_QUESTIONS.length * 2;
+    const ratio = total / max;
+    let level, label, message;
+    if (ratio >= 0.7) {
+      level = 'high';
+      label = '自動思考が活発な傾向';
+      message = '考えごとが頭の中でぐるぐるしやすい状態かも。書き出して外に置く時間が、少し効くかもしれないね。';
+    } else if (ratio >= 0.4) {
+      level = 'mid';
+      label = '時々自動思考が走る';
+      message = '思考が走るときと、落ち着いてるときの差がありそう。走り出したら「これは自動思考だな」と気づくだけで、ちょっと変わる。';
+    } else {
+      level = 'low';
+      label = '自動思考は穏やかめ';
+      message = '思考のコントロールが効きやすい状態。それでもしんどい時はあるから、そのときは無理せずに。';
+    }
+    return { type: 'level', total, max, level, label, message };
+  }
+  if (workId === 'behavior-experiment') {
+    return { type: 'plan', ...answers };
+  }
+  if (workId === 'values') {
+    // 選択された5枚のカードを返す
+    const selected = (answers || []).map(id => VALUES_CARDS.find(c => c.id === id)).filter(Boolean);
+    return { type: 'values', selected };
+  }
+  if (workId === 'ideal-self') {
+    return { type: 'ideal', ...answers };
+  }
+  return { type: 'unknown' };
+}
+
+// AI に渡すユーザーメッセージを組み立てる
+function buildKizukiUserMessage(workId, result) {
+  if (workId === 'thought-check') {
+    const top = result.top3 || [];
+    return [
+      '思考のクセチェックの結果です。',
+      `1位: ${top[0]?.name}（${top[0]?.score}/4）`,
+      `2位: ${top[1]?.name}（${top[1]?.score}/4）`,
+      `3位: ${top[2]?.name}（${top[2]?.score}/4）`,
+      '',
+      'すぷらんから、優しいひとことをお願いします。'
+    ].join('\n');
+  }
+  if (workId === 'distortion') {
+    const apps = (result.applicable || []).slice(0, 3);
+    return [
+      '認知のゆがみワークの結果です。',
+      `当てはまる項目: ${result.totalCount}/8`,
+      ...apps.map((a, i) => `${i+1}位: ${a.name}（${a.score}/2）— ${a.desc}`),
+      '',
+      'すぷらんから、優しいひとことをお願いします。'
+    ].join('\n');
+  }
+  if (workId === 'auto-thought') {
+    return [
+      '自動思考チェックの結果です。',
+      `スコア: ${result.total}/${result.max}（${result.label}）`,
+      '',
+      'すぷらんから、優しいひとことをお願いします。'
+    ].join('\n');
+  }
+  if (workId === 'behavior-experiment') {
+    return [
+      '行動実験の計画です。',
+      `仮説（確かめたい思い込み）: ${result.hypothesis}`,
+      `小さな行動: ${result.action}`,
+      `予想する結果: ${result.prediction}`,
+      result.result ? `実際の結果: ${result.result}` : '',
+      '',
+      'すぷらんから、この計画について応援のひとことをお願いします。'
+    ].filter(Boolean).join('\n');
+  }
+  if (workId === 'values') {
+    const list = (result.selected || []).map(c => `- ${c.label}: ${c.desc}`).join('\n');
+    return [
+      'あなたが選んだ「大切な価値観」5つです。',
+      list,
+      '',
+      'すぷらんから、この人が大事にしてるものを優しく言語化してください。'
+    ].join('\n');
+  }
+  if (workId === 'ideal-self') {
+    return [
+      '理想の自分（5年後）の3つの場面です。',
+      `朝: ${result.morning}`,
+      `人との時間: ${result.people}`,
+      `自分らしさを感じる活動: ${result.activity}`,
+      '',
+      'すぷらんから、これらをまとめてやさしく言語化＋いまできる小さな一歩を1つ提案してください。'
+    ].join('\n');
+  }
+  return '';
+}
+
+async function finishKizukiWork() {
+  if (!kizukiSession) return;
+  const { workId, answers } = kizukiSession;
+  const result = computeKizukiResult(workId, answers);
+  kizukiSession.result = result;
+  kizukiSession.step = 2;
+  kizukiSession.loading = true;
+  render();
+
+  const promptKey = 'kizuki_' + workId.replace(/-/g, '_');
+  const def = AI_PROMPTS[promptKey];
+  let aiText = null;
+  if (def && getInviteCode()) {
+    const userMsg = buildKizukiUserMessage(workId, result);
+    try {
+      aiText = await callGemini(def.systemPrompt, [{ role: 'user', content: userMsg }], {
+        temperature: def.temperature,
+        maxTokens: def.maxTokens,
+      });
+    } catch (e) {
+      console.warn('[kizuki AI]', e);
+    }
+  }
+  if (!aiText) {
+    aiText = '結果を見て、自分の傾向に気づけたら十分。「あ、自分こうなんだ」って気づくこと自体が、もう一歩前に進んでるよ。';
+  }
+  kizukiSession.aiComment = aiText;
+  kizukiSession.loading = false;
+
+  // 保存
+  state.kizukiResults = state.kizukiResults || {};
+  state.kizukiResults[workId] = {
+    completedAt: new Date().toISOString(),
+    answers,
+    result,
+    aiComment: aiText,
+  };
+  saveState();
+  render();
+}
+
+// ----- 共通レイアウト：ヘッダーと完了画面 -----
+function viewKizukiWorkHeader(title, totalSteps) {
+  const cur = kizukiSession ? kizukiSession.step : 1;
+  return `
+    <div class="page-header">
+      <button class="page-back" data-act="kizuki-work-cancel">‹</button>
+      <h1 class="page-title">${escapeHtml(title)}</h1>
+      <span class="text-tiny text-muted" style="min-width:36px; text-align:right;">${cur}/${totalSteps}</span>
+    </div>
+  `;
+}
+
+function viewKizukiResultFooter() {
+  const loading = kizukiSession && kizukiSession.loading;
+  const ai = kizukiSession && kizukiSession.aiComment;
+  return `
+    <div style="margin-top:24px; padding:18px 16px; background: var(--bg-soft); border-radius: 14px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <span style="font-size:22px;">💬</span>
+        <div style="font-weight:600;">すぷらんからのひとこと</div>
+      </div>
+      <div style="line-height:1.8; font-size:14px; white-space: pre-wrap;">
+        ${loading ? '<span class="text-muted">考えています…</span>' : escapeHtml(ai || '')}
+      </div>
+    </div>
+    <div style="margin-top:20px; display:grid; gap:10px;">
+      <button class="btn btn-primary" data-act="kizuki-work-done">きろくに残して終わる</button>
+      <button class="btn-ghost" data-act="kizuki-work-redo">もう一度やる</button>
+    </div>
+  `;
+}
+
+// ----- ワーク 1: 思考のクセをチェック -----
+function viewKizukiThoughtCheck() {
+  if (kizukiSession.step === 2) {
+    const r = kizukiSession.result;
+    const top3 = r.top3 || [];
+    return `
+      <div class="screen active">
+        ${viewKizukiWorkHeader('思考のクセをチェック', 2)}
+        <h2 style="font-size:18px; margin:8px 0 16px;">あなたの結果（強い順）</h2>
+        ${top3.map((t, i) => `
+          <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:8px;">
+            <span style="font-size:22px; font-weight:700; color: var(--primary); min-width:30px;">${i+1}位</span>
+            <div style="flex:1;">
+              <div style="font-weight:600;">${escapeHtml(t.name)}</div>
+              <div class="text-tiny text-muted" style="margin-top:2px;">${escapeHtml(t.desc)}</div>
+            </div>
+            <span class="text-tiny text-muted">${t.score}/4</span>
+          </div>
+        `).join('')}
+        ${viewKizukiResultFooter()}
+      </div>
+    `;
+  }
+  // step 1
+  return `
+    <div class="screen active">
+      ${viewKizukiWorkHeader('思考のクセをチェック', 2)}
+      <p class="text-small text-muted" style="margin: 4px 0 18px;">最近の自分を思い浮かべて、どのくらい当てはまるかタップしてね（8問）</p>
+      ${DISTORTIONS.map(d => `
+        <div style="padding:14px 14px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+          <div style="font-size:14px; line-height:1.6; margin-bottom:10px;">${escapeHtml(DISTORTION_QUESTIONS[d.id] || d.desc)}</div>
+          <div style="display:flex; gap:6px; flex-wrap: wrap;">
+            ${KIZUKI_SCALE_5.map(s => `
+              <button class="kr-filter-chip ${kizukiSession.answers[d.id] === s.score ? 'selected' : ''}"
+                      data-act="kizuki-answer-scale" data-key="${d.id}" data-score="${s.score}"
+                      style="font-size:12px;">${s.score} ${escapeHtml(s.label)}</button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">結果を見る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ワーク 2: 認知のゆがみを理解する -----
+function viewKizukiDistortion() {
+  if (kizukiSession.step === 2) {
+    const r = kizukiSession.result;
+    return `
+      <div class="screen active">
+        ${viewKizukiWorkHeader('認知のゆがみを理解する', 2)}
+        <h2 style="font-size:18px; margin:8px 0 8px;">当てはまった項目: ${r.totalCount}/8</h2>
+        ${r.totalCount === 0
+          ? `<p class="text-small text-muted">いまは大きく引っかかる歪みはなさそう。よかった。</p>`
+          : r.applicable.map(a => `
+            <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+              <div style="font-weight:600;">${escapeHtml(a.name)} <span class="text-tiny text-muted">(${a.score}/2)</span></div>
+              <div class="text-tiny text-muted" style="margin-top:2px;">${escapeHtml(a.desc)}</div>
+              <div style="margin-top:8px; padding:8px 10px; background: var(--bg-soft); border-radius:8px; font-size:13px; line-height:1.7;">
+                💭 ${escapeHtml(a.counter)}
+              </div>
+            </div>
+          `).join('')}
+        ${viewKizukiResultFooter()}
+      </div>
+    `;
+  }
+  // step 1: 8つのカード × 3択
+  return `
+    <div class="screen active">
+      ${viewKizukiWorkHeader('認知のゆがみを理解する', 2)}
+      <p class="text-small text-muted" style="margin: 4px 0 18px;">8つの代表的な「考え方のクセ」について、自分にどのくらい当てはまるかタップしてみよう</p>
+      ${DISTORTIONS.map(d => `
+        <div style="padding:14px 14px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+          <div style="font-weight:600; margin-bottom:4px;">${escapeHtml(d.name)}</div>
+          <div class="text-tiny text-muted" style="margin-bottom:10px;">${escapeHtml(d.desc)}</div>
+          <div style="display:flex; gap:6px; flex-wrap: wrap;">
+            ${KIZUKI_SCALE_3.map(s => `
+              <button class="kr-filter-chip ${kizukiSession.answers[d.id] === s.score ? 'selected' : ''}"
+                      data-act="kizuki-answer-scale" data-key="${d.id}" data-score="${s.score}"
+                      style="font-size:12px;">${escapeHtml(s.label)}</button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">結果を見る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ワーク 3: 自動思考になりやすい？ -----
+function viewKizukiAutoThought() {
+  if (kizukiSession.step === 2) {
+    const r = kizukiSession.result;
+    return `
+      <div class="screen active">
+        ${viewKizukiWorkHeader('自動思考になりやすい？', 2)}
+        <div style="padding:18px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:14px; text-align:center; margin: 12px 0;">
+          <div class="text-tiny text-muted">スコア</div>
+          <div style="font-size:32px; font-weight:700; color: var(--primary); margin:6px 0;">${r.total} / ${r.max}</div>
+          <div style="font-weight:600; margin-top:4px;">${escapeHtml(r.label)}</div>
+          <div class="text-small text-muted" style="margin-top:10px; line-height:1.7;">${escapeHtml(r.message)}</div>
+        </div>
+        ${viewKizukiResultFooter()}
+      </div>
+    `;
+  }
+  return `
+    <div class="screen active">
+      ${viewKizukiWorkHeader('自動思考になりやすい？', 2)}
+      <p class="text-small text-muted" style="margin: 4px 0 18px;">最近1〜2週間の自分を思い浮かべて、当てはまる度合いをタップしてね（6問）</p>
+      ${AUTO_THOUGHT_QUESTIONS.map((q, i) => `
+        <div style="padding:14px 14px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+          <div style="font-size:14px; line-height:1.6; margin-bottom:10px;">${escapeHtml(q)}</div>
+          <div style="display:flex; gap:6px; flex-wrap: wrap;">
+            ${KIZUKI_SCALE_3.map(s => `
+              <button class="kr-filter-chip ${kizukiSession.answers[i] === s.score ? 'selected' : ''}"
+                      data-act="kizuki-answer-scale" data-key="${i}" data-score="${s.score}"
+                      style="font-size:12px;">${escapeHtml(s.label)}</button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">結果を見る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ワーク 4: 行動実験を計画する -----
+function viewKizukiBehaviorExperiment() {
+  const a = kizukiSession.answers;
+  if (kizukiSession.step === 2) {
+    return `
+      <div class="screen active">
+        ${viewKizukiWorkHeader('行動実験を計画する', 2)}
+        <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin: 12px 0; line-height:1.8;">
+          <div><span class="text-tiny text-muted">仮説</span><br>${escapeHtml(a.hypothesis || '-')}</div>
+          <div style="margin-top:10px;"><span class="text-tiny text-muted">小さな行動</span><br>${escapeHtml(a.action || '-')}</div>
+          <div style="margin-top:10px;"><span class="text-tiny text-muted">予想する結果</span><br>${escapeHtml(a.prediction || '-')}</div>
+          ${a.result ? `<div style="margin-top:10px;"><span class="text-tiny text-muted">実際の結果</span><br>${escapeHtml(a.result)}</div>` : ''}
+        </div>
+        ${viewKizukiResultFooter()}
+      </div>
+    `;
+  }
+  return `
+    <div class="screen active">
+      ${viewKizukiWorkHeader('行動実験を計画する', 2)}
+      <p class="text-small text-muted" style="margin: 4px 0 18px;">「もしかしてこうなるかも」を、小さな行動で確かめる計画書だよ</p>
+      <div style="display: flex; flex-direction: column; gap:12px;">
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">① 確かめたい思い込み（仮説）</label>
+          <textarea data-act="kizuki-input" data-key="hypothesis" placeholder="例: 話しかけても無視されるかも" style="width:100%; min-height:60px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.hypothesis || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">② 試す小さな行動</label>
+          <textarea data-act="kizuki-input" data-key="action" placeholder="例: 明日、同僚に「おはよう」って声をかけてみる" style="width:100%; min-height:60px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.action || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">③ どんな結果を予想する？</label>
+          <textarea data-act="kizuki-input" data-key="prediction" placeholder="例: 無視される確率 70% くらいかな" style="width:100%; min-height:60px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.prediction || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">④ 実際の結果（あとで書いてもOK）</label>
+          <textarea data-act="kizuki-input" data-key="result" placeholder="やったあとで、ここに書こう" style="width:100%; min-height:60px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.result || '')}</textarea>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">計画を保存する</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ワーク 5: 価値観を整理する -----
+function viewKizukiValues() {
+  const selected = Array.isArray(kizukiSession.answers) ? kizukiSession.answers : [];
+  if (kizukiSession.step === 2) {
+    const cards = (kizukiSession.result.selected || []);
+    return `
+      <div class="screen active">
+        ${viewKizukiWorkHeader('価値観を整理する', 2)}
+        <h2 style="font-size:18px; margin:8px 0 16px;">あなたが選んだ大切なもの</h2>
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+          ${cards.map(c => `
+            <div style="padding:14px 12px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; text-align:center;">
+              <div style="font-size:28px;">${c.icon}</div>
+              <div style="font-weight:600; margin-top:6px;">${escapeHtml(c.label)}</div>
+              <div class="text-tiny text-muted" style="margin-top:4px; line-height:1.5;">${escapeHtml(c.desc)}</div>
+            </div>
+          `).join('')}
+        </div>
+        ${viewKizukiResultFooter()}
+      </div>
+    `;
+  }
+  return `
+    <div class="screen active">
+      ${viewKizukiWorkHeader('価値観を整理する', 2)}
+      <p class="text-small text-muted" style="margin: 4px 0 8px;">あなたが大切にしたいものを <strong>5つ</strong> タップで選ぼう</p>
+      <p class="text-tiny text-muted" style="margin: 0 0 16px;">選択中: ${selected.length} / 5</p>
+      <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
+        ${VALUES_CARDS.map(c => {
+          const isSel = selected.includes(c.id);
+          return `
+            <button data-act="kizuki-values-toggle" data-id="${c.id}"
+                    style="padding:12px 10px; background: ${isSel ? 'var(--primary-soft, #c8dcc9)' : 'var(--bg-card)'}; border:2px solid ${isSel ? 'var(--primary)' : 'var(--divider)'}; border-radius:12px; text-align:center; cursor:pointer; transition: all 0.15s;">
+              <div style="font-size:22px;">${c.icon}</div>
+              <div style="font-weight:600; font-size:13px; margin-top:4px;">${escapeHtml(c.label)}</div>
+              <div class="text-tiny text-muted" style="margin-top:2px; line-height:1.4; font-size:10px;">${escapeHtml(c.desc)}</div>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;" ${selected.length === 5 ? '' : 'disabled'}>
+          ${selected.length === 5 ? '結果を見る' : `あと ${5 - selected.length} つ選んでね`}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ワーク 6: 理想の自分をイメージする -----
+function viewKizukiIdealSelf() {
+  const a = kizukiSession.answers;
+  if (kizukiSession.step === 2) {
+    return `
+      <div class="screen active">
+        ${viewKizukiWorkHeader('理想の自分をイメージする', 2)}
+        <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin: 12px 0; line-height:1.8;">
+          <div><span class="text-tiny text-muted">朝</span><br>${escapeHtml(a.morning || '-')}</div>
+          <div style="margin-top:10px;"><span class="text-tiny text-muted">人との時間</span><br>${escapeHtml(a.people || '-')}</div>
+          <div style="margin-top:10px;"><span class="text-tiny text-muted">自分らしさを感じる活動</span><br>${escapeHtml(a.activity || '-')}</div>
+        </div>
+        ${viewKizukiResultFooter()}
+      </div>
+    `;
+  }
+  return `
+    <div class="screen active">
+      ${viewKizukiWorkHeader('理想の自分をイメージする', 2)}
+      <p class="text-small text-muted" style="margin: 4px 0 18px;">5年後の理想の自分を、3つの場面でイメージしてみよう（短くてOK）</p>
+      <div style="display: flex; flex-direction: column; gap:14px;">
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">① どんな朝を迎えていたい？</label>
+          <textarea data-act="kizuki-input" data-key="morning" placeholder="例: 自然光で目覚めて、コーヒーを淹れて窓辺で本を読む朝" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.morning || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">② どんな人と過ごしていたい？</label>
+          <textarea data-act="kizuki-input" data-key="people" placeholder="例: 信頼できる仲間や家族と週末に食卓を囲む" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.people || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">③ 何をしている時に「自分らしい」と感じたい？</label>
+          <textarea data-act="kizuki-input" data-key="activity" placeholder="例: 作ったものを誰かが喜んでくれた瞬間" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(a.activity || '')}</textarea>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" data-act="kizuki-work-submit" style="width:100%;">結果を見る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ディスパッチ -----
+function viewKizukiWork() {
+  if (!kizukiSession) { go('kizuki'); return ''; }
+  const w = kizukiSession.workId;
+  if (w === 'thought-check')        return viewKizukiThoughtCheck();
+  if (w === 'distortion')           return viewKizukiDistortion();
+  if (w === 'auto-thought')         return viewKizukiAutoThought();
+  if (w === 'behavior-experiment')  return viewKizukiBehaviorExperiment();
+  if (w === 'values')               return viewKizukiValues();
+  if (w === 'ideal-self')           return viewKizukiIdealSelf();
+  return viewKizuki();
+}
+
+// ============================================================
+// 深掘り（下向き矢印法 9ステップ - v0.9.71）
+//
+// 1: ワーク紹介          → 2: 出来事入力（カテゴリ）
+// 3: 自動思考入力（感情タグ・強さ） → 4: 下向き深掘り（3-5段）
+// 5: スキーマ特定（AI候補から選択）  → 6: メリット・デメリット比較（AI）
+// 7: 新しいスキーマ候補（AI）        → 8: 新しいスキーマ選択
+// 9: 保存 + 次のいっぽヒント
+// ============================================================
+let deepDive = null;
+
+const DD_EVENT_CATEGORIES = ['仕事', '人間関係', '恋愛', '家族', '将来', '自分のこと', 'その他'];
+const DD_EMOTION_TAGS = [
+  { id: 'anxious',     icon: '😟', name: '不安' },
+  { id: 'sad',         icon: '😢', name: '悲しい' },
+  { id: 'angry',       icon: '😠', name: '怒り' },
+  { id: 'rushed',      icon: '😰', name: '焦り' },
+  { id: 'embarrassed', icon: '😳', name: '恥ずかしい' },
+  { id: 'other',       icon: '💭', name: 'その他' },
 ];
 
 const DD_BELIEF_TAGS = [
-  '自己否定が強い',
-  '評価に敏感',
-  '失敗を恐れやすい',
-  '見捨てられ不安',
-  '完璧主義傾向',
-  '他者比較しやすい',
-  '助けを求めにくい',
-  '過剰責任',
+  '自己否定が強い', '評価に敏感', '失敗を恐れやすい', '見捨てられ不安',
+  '完璧主義傾向', '他者比較しやすい', '助けを求めにくい', '過剰責任',
 ];
 
+// 次のいっぽヒント（汎用4種 - 画像のデザインに準拠）
+const DD_NEXT_ACTION_HINTS = [
+  { icon: '💌', text: '信頼できる人に思いを連絡する' },
+  { icon: '📝', text: '今日できたことを3つ書く' },
+  { icon: '🗒️', text: '反証メモを書いてみる' },
+  { icon: '🌳', text: '5分だけ外に出る' },
+];
+
+function ddSessionInit(extra) {
+  return Object.assign({
+    step: 1,
+    eventCategory: '',
+    event: '',
+    autoThought: '',
+    emotionTags: [],
+    emotionIntensity: null,
+    deeper: ['', '', ''],
+    depthSlots: 3,           // 表示中のスロット数（最大5）
+    schemaCandidates: null,  // AI生成（null=未生成 / loading 中も判別）
+    schemaCandidatesLoading: false,
+    schemaSelected: '',
+    schemaCustom: '',
+    meritDemerit: null,      // { merits[], demerits[] }
+    meritDemeritLoading: false,
+    newSchemaCandidates: null,
+    newSchemaCandidatesLoading: false,
+    newSchemaSelected: '',
+    newSchemaCustom: '',
+    aiUsedSchema: false,
+    aiUsedMeritDemerit: false,
+    aiUsedNewSchema: false,
+    startedAt: new Date().toISOString(),
+  }, extra || {});
+}
+
 function viewDeepDive() {
-  if (!deepDive) deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString() };
+  if (!deepDive) deepDive = ddSessionInit();
   const s = deepDive;
   switch (s.step) {
-    case 1: return viewDdTheme(s);
+    case 1: return viewDdIntro(s);
     case 2: return viewDdEvent(s);
-    case 3: return viewDdFirstThought(s);
-    case 4: return viewDdDeeper(s);
-    case 5: return viewDdCoreBelief(s);
-    case 6: return viewDdOutcome(s);
-    default: deepDive = null; return viewDdTheme({ step: 1, deeper: ['', '', ''], depthLevel: 0 });
+    case 3: return viewDdAutoThought(s);
+    case 4: return viewDdDownward(s);
+    case 5: return viewDdSchemaIdentify(s);
+    case 6: return viewDdMeritDemerit(s);
+    case 7: return viewDdNewSchema(s);
+    case 8: return viewDdConfirmSchema(s);
+    case 9: return viewDdSaveActions(s);
+    default: deepDive = null; return viewDdIntro(ddSessionInit());
   }
 }
 
-function ddHeader(stepNo, total = 6) {
+function ddHeader(stepNo, total = 9) {
   return `
     <div class="page-header">
       <button class="page-back" data-act="dd-cancel">‹</button>
-      <span class="page-title">深掘り</span>
+      <span class="page-title">下向き矢印法</span>
       <span class="text-tiny text-muted">Step ${stepNo} / ${total}</span>
     </div>
   `;
 }
 
-// Step 1: テーマを選ぶ
-function viewDdTheme(s) {
+// ───────── Step 1: ワーク紹介 ─────────
+function viewDdIntro() {
   return `
     <div class="screen active dd-screen">
       ${ddHeader(1)}
-      <div class="dd-q">深く知りたいことは？</div>
-      <p class="dd-q-sub">日常で繰り返すモヤモヤやネガティブな思考の「根っこ」を探ります。</p>
-      <div class="dd-theme-grid">
-        ${DD_THEMES.map(t => `
-          <button class="dd-theme-card ${s.themeType === t.id ? 'selected' : ''}"
-                  data-act="dd-step1-pick" data-theme="${t.id}">
-            <span class="dd-theme-icon">${t.icon}</span>
-            <span class="dd-theme-name">${t.name}</span>
-          </button>
-        `).join('')}
+      <div class="dd-q">下向き矢印法とは？</div>
+      <p class="dd-q-sub">つらさの根っこにある「思い込み（スキーマ）」を見つけ、より自分を助ける新しい見方にアップデートするワークです。</p>
+
+      <div class="dd-section-label" style="margin-top:14px;">これをやるとどうなるの？</div>
+      <ul class="dd-intro-list">
+        <li>自分のつらさのパターンに気づける</li>
+        <li>思い込みの「良い面・つらい面」が整理できる</li>
+        <li>自分を助ける新しい考え方を見つけられる</li>
+      </ul>
+
+      <div class="dd-intro-callout">
+        <div class="dd-intro-callout-label">こんな人におすすめ</div>
+        ・同じことでいつも落ち込んでしまう<br>
+        ・自分を責めやすい<br>
+        ・考えすぎてしんどくなることが多い
       </div>
+
+      <div class="dd-intro-ba">
+        <div class="dd-section-label" style="margin:0 0 4px;">例えばこんな変化のイメージ</div>
+        <div class="dd-intro-ba-row">
+          <span class="dd-intro-ba-badge before">Before</span>
+          <span>「私は価値がない」（ふるい思い込み）</span>
+        </div>
+        <div class="dd-arrow-sep" style="padding:0;">↓</div>
+        <div class="dd-intro-ba-row">
+          <span class="dd-intro-ba-badge after">After</span>
+          <span>「私はまだ成長中で、できることからやってみよう」</span>
+        </div>
+      </div>
+
+      <p class="text-tiny text-muted" style="margin:12px 0 12px;">※ すべての問いに答えなくても大丈夫です</p>
+
       <div style="display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step1-next" ${!s.themeType ? 'disabled' : ''}>次へ</button>
+        <button class="btn btn-primary" data-act="dd-step1-start">はじめる</button>
         <button class="btn-ghost" data-act="dd-cancel">キャンセル</button>
       </div>
     </div>
   `;
 }
 
-// Step 2: きっかけとなる出来事
+// ───────── Step 2: 出来事入力 ─────────
 function viewDdEvent(s) {
   return `
     <div class="screen active dd-screen">
       ${ddHeader(2)}
-      <div class="dd-q">きっかけとなる出来事</div>
-      <p class="dd-q-sub">最近あった、気になる出来事は？</p>
-      <textarea class="textarea-block" id="ddEventInput" placeholder="例：上司に注意された" rows="4">${escapeHtml(s.event || '')}</textarea>
-      <div style="margin-top:16px; display:grid; gap:10px;">
+      <div class="dd-q">どんな出来事がありましたか？</div>
+      <p class="dd-q-sub">最近あった、気になる出来事を書いてみましょう。</p>
+      <textarea class="textarea-block" id="ddEventInput"
+        placeholder="例：LINEの返信がこなかった / 会議でうまく話せなかった"
+        maxlength="200" rows="4">${escapeHtml(s.event || '')}</textarea>
+      <div class="text-tiny text-muted" style="text-align:right; margin-top:2px;">最大200字</div>
+
+      <div class="dd-section-label">出来事の種類を選ぶ（任意）</div>
+      <div class="dd-chip-grid">
+        ${DD_EVENT_CATEGORIES.map(c => `
+          <button class="dd-chip ${s.eventCategory === c ? 'selected' : ''}"
+            data-act="dd-step2-cat" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>
+        `).join('')}
+      </div>
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="dd-step2-next">次へ</button>
         <button class="btn-ghost" data-act="dd-back" data-to="1">‹ 戻る</button>
       </div>
@@ -10364,191 +11213,472 @@ function viewDdEvent(s) {
   `;
 }
 
-// Step 3: その時の考え・感情
-function viewDdFirstThought(s) {
+// ───────── Step 3: 自動思考入力 ─────────
+function viewDdAutoThought(s) {
+  const intensity = s.emotionIntensity == null ? 5 : s.emotionIntensity;
   return `
     <div class="screen active dd-screen">
       ${ddHeader(3)}
-      <div class="dd-q">その時の考え・感情</div>
-      <p class="dd-q-sub">その時、どんなことを考えましたか？</p>
-      <div class="dd-prev">
-        <div class="dd-prev-label">きっかけ</div>
-        ${escapeHtml(s.event)}
+      <div class="dd-q">その時、どんな考えが浮かびましたか？</div>
+      <p class="dd-q-sub">頭の中に出てきた言葉や考えを、そのまま書き出してみましょう。</p>
+      <textarea class="textarea-block" id="ddAutoThoughtInput"
+        placeholder="例：自分は役に立っていない / また失敗した"
+        maxlength="200" rows="4">${escapeHtml(s.autoThought || '')}</textarea>
+      <div class="text-tiny text-muted" style="text-align:right; margin-top:2px;">最大200字</div>
+
+      <div class="dd-section-label">その時の気持ちは？（複数選択可）</div>
+      <div class="dd-chip-grid">
+        ${DD_EMOTION_TAGS.map(t => `
+          <button class="dd-chip ${(s.emotionTags || []).includes(t.id) ? 'selected' : ''}"
+            data-act="dd-step3-emo" data-emo="${t.id}">
+            <span style="margin-right:4px;">${t.icon}</span>${escapeHtml(t.name)}
+          </button>
+        `).join('')}
       </div>
-      <textarea class="textarea-block" id="ddFirstThoughtInput" placeholder="例：自分がダメだと思った" rows="4">${escapeHtml(s.firstThought || '')}</textarea>
-      <div style="margin-top:16px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step3-next">さらに深く</button>
+
+      <div class="dd-section-label">気持ちの強さ</div>
+      <div class="moya-scale-row">
+        ${Array.from({length: 11}, (_, n) => `
+          <button class="moya-scale-btn ${intensity === n ? 'selected' : ''}"
+            data-act="dd-step3-intensity" data-score="${n}">${n}</button>
+        `).join('')}
+      </div>
+      <div class="text-tiny text-muted" style="text-align:center; margin-top:4px;">0 ← 弱い ／ 強い → 10</div>
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step3-next">次へ</button>
         <button class="btn-ghost" data-act="dd-back" data-to="2">‹ 戻る</button>
       </div>
     </div>
   `;
 }
 
-// Step 4: さらに深く（depth 0..2）
-function viewDdDeeper(s) {
-  const lv = s.depthLevel || 0;  // 0,1,2
-  const prevAnswer = lv === 0 ? s.firstThought : s.deeper[lv - 1];
-  const questions = [
-    'それはどういう意味ですか？',
-    'その意味は、あなたにとって何を意味しますか？',
-    'さらに、その根本にある考えは何でしょうか？',
-  ];
-  const examples = [
-    '例：失敗するから、嫌われる',
-    '例：人として価値がない',
-    '例：誰からも必要とされない',
-  ];
+// ───────── Step 4: 下向き深掘り ─────────
+function viewDdDownward(s) {
+  const slots = Math.max(1, Math.min(s.depthSlots || 3, 5));
+  const boxes = [];
+  for (let i = 0; i < slots; i++) {
+    boxes.push(`
+      <div class="dd-arrow-sep">↓</div>
+      <div class="dd-arrow-box">
+        <span class="dd-arrow-box-label">${i + 1}回目</span>
+        <input class="dd-arrow-input" type="text" id="ddDeeper${i}"
+          data-act="dd-step4-input" data-idx="${i}"
+          placeholder="${i === 0 ? '例: 大切にされていないのかも' : i === 1 ? '例: 自分には魅力がないのかも' : '例: 私は人から必要とされない…'}"
+          value="${escapeHtml((s.deeper && s.deeper[i]) || '')}">
+      </div>
+    `);
+  }
   return `
     <div class="screen active dd-screen">
       ${ddHeader(4)}
-      <div class="dd-q">さらに深く（${lv + 1}/3）</div>
-      <p class="dd-q-sub">${escapeHtml(questions[lv])}</p>
-      <div class="dd-prev">
-        <div class="dd-prev-label">${lv === 0 ? '最初の考え' : `Lv.${lv} の答え`}</div>
-        ${escapeHtml(prevAnswer || '')}
+      <div class="dd-q">深掘り（下向き質問）</div>
+      <p class="dd-q-sub">それが本当だとしたら、自分にとってどういう意味がありますか？<br>考えが浮かんだら、書き出してみましょう。</p>
+
+      <div class="dd-section-label" style="margin-top:8px;">きっかけの考え</div>
+      <div class="dd-arrow-prev">
+        <div class="dd-arrow-prev-label">最初に浮かんだこと</div>
+        ${escapeHtml(s.autoThought || '')}
       </div>
-      <textarea class="textarea-block" id="ddDeeperInput" placeholder="${examples[lv]}" rows="4">${escapeHtml(s.deeper[lv] || '')}</textarea>
-      <div style="margin-top:16px; display:grid; gap:10px;">
-        ${lv < 2 ? `
-          <button class="btn btn-primary" data-act="dd-step4-deeper">さらに深く</button>
-          <button class="btn btn-secondary" data-act="dd-step4-stop">ここまでにする</button>
-        ` : `
-          <button class="btn btn-primary" data-act="dd-step4-stop">コア信念を整理する</button>
-        `}
-        <button class="btn-ghost" data-act="dd-back" data-to="${lv === 0 ? 3 : 4}">‹ 戻る</button>
+
+      <div class="dd-arrow-col">
+        ${boxes.join('')}
+      </div>
+
+      <button class="dd-arrow-more" data-act="dd-step4-more" ${slots >= 5 ? 'disabled' : ''}>
+        + さらに深掘りする${slots >= 5 ? '（最大5回まで）' : ''}
+      </button>
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step4-next">次へ</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="3">‹ 戻る</button>
       </div>
     </div>
   `;
 }
 
-// Step 5: コア信念の候補
-function viewDdCoreBelief(s) {
-  // 最後の deeper が初期値（自動入力）
-  if (!s.coreBelief) {
-    const lastDeep = [s.deeper[2], s.deeper[1], s.deeper[0]].find(t => t && t.trim());
-    s.coreBelief = lastDeep || s.firstThought || '';
+// ───────── Step 5: スキーマを特定 ─────────
+function viewDdSchemaIdentify(s) {
+  // 候補がまだなら非同期で取得開始
+  if (s.schemaCandidates == null && !s.schemaCandidatesLoading) {
+    s.schemaCandidatesLoading = true;
+    const ref = s;
+    (async () => {
+      const ai = await generateSchemaCandidatesAI(ref);
+      if (deepDive !== ref) return;
+      if (ai) { ref.schemaCandidates = ai; ref.aiUsedSchema = true; }
+      else    { ref.schemaCandidates = generateSchemaCandidatesRule(ref); ref.aiUsedSchema = false; }
+      ref.schemaCandidatesLoading = false;
+      ddPersistCurrentSafe();
+      render();
+    })();
   }
-  const conf = s.confidence == null ? 5 : s.confidence;
+  const cands = s.schemaCandidates || [];
   return `
     <div class="screen active dd-screen">
       ${ddHeader(5)}
-      <div class="dd-q">コア信念の候補</div>
-      <p class="dd-q-sub">たどり着いた考え・信念は？</p>
-      <textarea class="textarea-block" id="ddCoreBeliefInput" placeholder="例：自分は価値がない" rows="3">${escapeHtml(s.coreBelief || '')}</textarea>
-
-      <p class="dd-q-sub" style="margin-top:14px;">そう思うようになったのはいつから？</p>
-      <textarea class="textarea-block" id="ddSinceInput" placeholder="例：小さい頃から / 大学生の頃から" rows="2" style="min-height:auto;">${escapeHtml(s.beliefSince || '')}</textarea>
-
-      <p class="dd-q-sub" style="margin-top:14px;">確信度はどのくらい？</p>
-      <div style="text-align:center; margin: 8px 0;">
-        <div id="ddConfNum" style="font-size:36px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1;">${conf}</div>
-        <div class="text-tiny text-muted">0=低い / 10=高い</div>
+      <div class="dd-q">スキーマを特定</div>
+      <p class="dd-q-sub">根っこにある思い込み（スキーマ）はどれに近いですか？</p>
+      <div class="text-tiny text-muted" style="margin-bottom:6px;">
+        ${s.schemaCandidatesLoading ? '🌱 AIが候補を考えています…' : (s.aiUsedSchema ? '⚠️ AIが推定した参考情報です' : '※ 簡易ルールで抽出した候補です')}
       </div>
-      <div class="moya-scale-row">
-        ${Array.from({length: 11}, (_, n) => `
-          <button class="moya-scale-btn ${conf === n ? 'selected' : ''}" data-act="dd-step5-conf" data-score="${n}">${n}</button>
-        `).join('')}
-      </div>
+
+      ${s.schemaCandidatesLoading ? `<div class="dd-opt-loading">候補を準備中…</div>` : `
+        <div class="dd-opt-list">
+          ${cands.map((c, i) => `
+            <button class="dd-opt ${s.schemaSelected === c ? 'selected' : ''}"
+              data-act="dd-step5-pick" data-val="${escapeHtml(c)}">
+              <span class="dd-opt-radio"></span>
+              <span>${escapeHtml(c)}</span>
+            </button>
+          `).join('')}
+          <button class="dd-opt ${s.schemaSelected === '__custom__' ? 'selected' : ''}"
+            data-act="dd-step5-pick" data-val="__custom__">
+            <span class="dd-opt-radio"></span>
+            <span>その他（自分で入力する）</span>
+          </button>
+        </div>
+        ${s.schemaSelected === '__custom__' ? `
+          <textarea class="textarea-block" id="ddSchemaCustomInput"
+            placeholder="例：私は自分のペースで進めればOK" maxlength="60" rows="2"
+            style="margin-top:10px;">${escapeHtml(s.schemaCustom || '')}</textarea>
+        ` : ''}
+      `}
+
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step5-next">保存して結果を見る</button>
+        <button class="btn btn-primary" data-act="dd-step5-next" ${s.schemaCandidatesLoading ? 'disabled' : ''}>次へ</button>
         <button class="btn-ghost" data-act="dd-back" data-to="4">‹ 戻る</button>
       </div>
     </div>
   `;
 }
 
-// Step 6: 深掘りの成果
-function viewDdOutcome(s) {
-  const tags = s.tags && s.tags.length > 0 ? s.tags : ['自己否定が強い'];
+// ───────── Step 6: メリット・デメリット比較 ─────────
+function viewDdMeritDemerit(s) {
+  if (s.meritDemerit == null && !s.meritDemeritLoading) {
+    s.meritDemeritLoading = true;
+    const ref = s;
+    (async () => {
+      const ai = await generateMeritDemeritAI(ref);
+      if (deepDive !== ref) return;
+      if (ai) { ref.meritDemerit = ai; ref.aiUsedMeritDemerit = true; }
+      else    { ref.meritDemerit = generateMeritDemeritRule(ref); ref.aiUsedMeritDemerit = false; }
+      ref.meritDemeritLoading = false;
+      ddPersistCurrentSafe();
+      render();
+    })();
+  }
+  const md = s.meritDemerit || { merits: [], demerits: [] };
+  const schemaText = ddCurrentOldSchema(s);
   return `
     <div class="screen active dd-screen">
       ${ddHeader(6)}
-      <div style="text-align:center; margin: 20px 0 14px;">
-        <div style="margin: 0 auto 8px;">${suplan({ pose: 'bulb', size: 64 })}</div>
-        <div class="dd-q" style="margin-bottom:0;">深掘りができたね</div>
-        <p class="text-tiny text-muted mt-1">${s.aiUsed ? '⚠️ AIが推定した参考情報です' : '※ 簡易ルールで抽出した候補です'}</p>
+      <div class="dd-q">メリット・デメリット比較</div>
+      <p class="dd-q-sub">このスキーマを持つことでのメリット・デメリットを比較してみましょう。</p>
+      <div class="text-tiny text-muted" style="margin-bottom:6px;">
+        ${s.meritDemeritLoading ? '🌱 AIが整理中です…' : (s.aiUsedMeritDemerit ? 'AIの例を参考にしています' : '簡易ルールでの参考例です')}
       </div>
 
-      <div class="dd-outcome-belief">
-        <div class="dd-outcome-belief-label">あなたのコア信念の候補</div>
-        ${escapeHtml(s.extractedBelief || s.coreBelief)}
+      <div class="dd-arrow-prev" style="margin-bottom:14px;">
+        <div class="dd-arrow-prev-label">対象のスキーマ</div>
+        ${escapeHtml(schemaText)}
       </div>
 
-      <div class="text-tiny text-muted" style="margin-bottom:6px;">抽出されたタグ（あなたの傾向）</div>
-      <div class="dd-tag-list">
-        ${tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
+      ${s.meritDemeritLoading ? `<div class="dd-opt-loading">メリット・デメリットを準備中…</div>` : `
+        <div class="dd-md-card merit">
+          <div class="dd-md-card-title">メリット（得られるもの）</div>
+          <ul class="dd-md-list">
+            ${(md.merits || []).map(t => `<li>${escapeHtml(t)}</li>`).join('') || '<li>—</li>'}
+          </ul>
+        </div>
+        <div class="dd-md-card demerit">
+          <div class="dd-md-card-title">デメリット（つらくなるもの）</div>
+          <ul class="dd-md-list">
+            ${(md.demerits || []).map(t => `<li>${escapeHtml(t)}</li>`).join('') || '<li>—</li>'}
+          </ul>
+        </div>
+      `}
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step6-next" ${s.meritDemeritLoading ? 'disabled' : ''}>次へ</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="5">‹ 戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ───────── Step 7: 新しいスキーマ候補 ─────────
+function viewDdNewSchema(s) {
+  if (s.newSchemaCandidates == null && !s.newSchemaCandidatesLoading) {
+    s.newSchemaCandidatesLoading = true;
+    const ref = s;
+    (async () => {
+      const ai = await generateNewSchemaCandidatesAI(ref);
+      if (deepDive !== ref) return;
+      if (ai) { ref.newSchemaCandidates = ai; ref.aiUsedNewSchema = true; }
+      else    { ref.newSchemaCandidates = generateNewSchemaCandidatesRule(ref); ref.aiUsedNewSchema = false; }
+      ref.newSchemaCandidatesLoading = false;
+      ddPersistCurrentSafe();
+      render();
+    })();
+  }
+  const cands = s.newSchemaCandidates || [];
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(7)}
+      <div class="dd-q">新しいスキーマを検討</div>
+      <p class="dd-q-sub">より自分を助けてくれる新しいスキーマを考えてみましょう。</p>
+      <div class="text-tiny text-muted" style="margin-bottom:6px;">
+        ${s.newSchemaCandidatesLoading ? '🌱 AIが提案を考えています…' : (s.aiUsedNewSchema ? 'AIからの提案例' : '簡易ルールでの提案例')}
       </div>
 
-      ${s.gentleReflection ? `
-        <div class="dd-reflection">${escapeHtml(s.gentleReflection)}</div>
-      ` : ''}
+      ${s.newSchemaCandidatesLoading ? `<div class="dd-opt-loading">提案を準備中…</div>` : `
+        <div class="dd-opt-list">
+          ${cands.map(c => `
+            <button class="dd-opt ${s.newSchemaSelected === c ? 'selected' : ''}"
+              data-act="dd-step7-pick" data-val="${escapeHtml(c)}">
+              <span class="dd-opt-radio"></span>
+              <span>${escapeHtml(c)}</span>
+            </button>
+          `).join('')}
+          <button class="dd-opt ${s.newSchemaSelected === '__custom__' ? 'selected' : ''}"
+            data-act="dd-step7-pick" data-val="__custom__">
+            <span class="dd-opt-radio"></span>
+            <span>自分で考えて入力する</span>
+          </button>
+        </div>
+        ${s.newSchemaSelected === '__custom__' ? `
+          <textarea class="textarea-block" id="ddNewSchemaCustomInput"
+            placeholder="例: 私は自分のペースで進めればOK"
+            maxlength="60" rows="2"
+            style="margin-top:10px;">${escapeHtml(s.newSchemaCustom || '')}</textarea>
+        ` : ''}
+      `}
 
-      <p class="text-tiny text-muted" style="margin-bottom:14px; line-height:1.7;">
-        これらのタグは「きょうのいっぽ」のレコメンド精度向上に活用されます。<br>
-        変化の推移はきろくタブで見られます。
-      </p>
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step7-next" ${s.newSchemaCandidatesLoading ? 'disabled' : ''}>次へ</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="6">‹ 戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// ───────── Step 8: 新しいスキーマを選択 ─────────
+function viewDdConfirmSchema(s) {
+  const newSchema = ddCurrentNewSchema(s);
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(8)}
+      <div class="dd-q">この新しいスキーマにしますか？</div>
+      <p class="dd-q-sub">この考え方を日常で意識してみると、心がやすらかになるかもしれません。<br>小さないっぽから試してみましょう。</p>
+
+      <div style="text-align:center; margin: 18px 0 8px;">
+        <div style="margin: 0 auto 6px;">${suplan({ expression: 'excited', size: 80 })}</div>
+        <div class="dd-highlight-label">新しいスキーマ</div>
+      </div>
+      <div class="dd-highlight-schema">「${escapeHtml(newSchema || '—')}」</div>
+
+      <div style="margin-top:10px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step8-confirm">このスキーマにする</button>
+        <button class="btn btn-secondary" data-act="dd-step8-other">他の候補にする</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="7">‹ もう少し考える</button>
+      </div>
+    </div>
+  `;
+}
+
+// ───────── Step 9: 保存 + 次のいっぽヒント ─────────
+function viewDdSaveActions(s) {
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(9)}
+      <div class="dd-q">次のいっぽを選びましょう</div>
+      <p class="dd-q-sub">あなたの新しいスキーマに合わせた行動のヒントです。<br>気になるものから試してみましょう。</p>
+
+      <div class="dd-arrow-prev" style="margin: 8px 0 14px;">
+        <div class="dd-arrow-prev-label">新しいスキーマ</div>
+        ${escapeHtml(ddCurrentNewSchema(s))}
+      </div>
+
+      <div class="dd-hint-list">
+        ${DD_NEXT_ACTION_HINTS.map(h => `
+          <div class="dd-hint-card">
+            <div class="dd-hint-icon">${h.icon}</div>
+            <div>${escapeHtml(h.text)}</div>
+          </div>
+        `).join('')}
+      </div>
+
       <div style="display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-save">保存して終わる</button>
-        <button class="btn-ghost" data-act="dd-cancel">破棄して終わる</button>
+        <button class="btn btn-primary" data-act="dd-save">保存して完了</button>
+        <button class="btn-ghost" data-act="dd-save-and-ippo">いっぽ一覧へ進む</button>
       </div>
     </div>
   `;
 }
 
 // ============================================================
-// 深掘り: コア信念抽出（AI / フォールバック）
+// 下向き矢印法 - ヘルパー / AI / フォールバック
 // ============================================================
+function ddCollectDeeperInputs() {
+  if (!deepDive) return;
+  const slots = deepDive.depthSlots || 3;
+  for (let i = 0; i < slots; i++) {
+    const inp = document.getElementById('ddDeeper' + i);
+    if (inp) deepDive.deeper[i] = (inp.value || '').trim();
+  }
+}
+function ddPersistCurrent() {
+  if (!deepDive) return;
+  const eventInp = document.getElementById('ddEventInput');
+  if (eventInp) deepDive.event = (eventInp.value || '').trim();
+  const autoInp = document.getElementById('ddAutoThoughtInput');
+  if (autoInp) deepDive.autoThought = (autoInp.value || '').trim();
+  ddCollectDeeperInputs();
+  const schemaInp = document.getElementById('ddSchemaCustomInput');
+  if (schemaInp) deepDive.schemaCustom = (schemaInp.value || '').trim();
+  const newInp = document.getElementById('ddNewSchemaCustomInput');
+  if (newInp) deepDive.newSchemaCustom = (newInp.value || '').trim();
+}
+function ddPersistCurrentSafe() { try { ddPersistCurrent(); } catch (e) {} }
+
+function ddCurrentOldSchema(s) {
+  return s.schemaSelected === '__custom__' ? (s.schemaCustom || '') : (s.schemaSelected || '');
+}
+function ddCurrentNewSchema(s) {
+  return s.newSchemaSelected === '__custom__' ? (s.newSchemaCustom || '') : (s.newSchemaSelected || '');
+}
+
+// 旧コア信念抽出（深掘りログ→傾向タグ）はタグ集計で引き続き使う
 function extractCoreBeliefRule(s) {
-  const allText = [s.event, s.firstThought, ...(s.deeper || []), s.coreBelief].filter(Boolean).join(' ');
+  const allText = [s.event, s.autoThought, ...(s.deeper || []), ddCurrentOldSchema(s)].filter(Boolean).join(' ');
   const tags = [];
-  // ルールベースのキーワード判定
   if (/ダメ|無価値|価値.*ない|存在.*意味/.test(allText)) tags.push('自己否定が強い');
   if (/評価|嫌われ|ダメな人|どう見られ/.test(allText)) tags.push('評価に敏感');
   if (/失敗|うまくいかない|ミス|落ちこぼれ/.test(allText)) tags.push('失敗を恐れやすい');
-  if (/捨て|見捨て|ひとり|孤独|去られる/.test(allText)) tags.push('見捨てられ不安');
+  if (/捨て|見捨て|ひとり|孤独|去られる|必要とされない/.test(allText)) tags.push('見捨てられ不安');
   if (/完璧|きちんと|ちゃんと|完全|妥協/.test(allText)) tags.push('完璧主義傾向');
   if (/比べ|周りは|みんな|あの人/.test(allText)) tags.push('他者比較しやすい');
   if (/迷惑|頼れない|甘え|助け.*求め/.test(allText)) tags.push('助けを求めにくい');
   if (/全部.*せい|私のせい|責任|全て.*悪い/.test(allText)) tags.push('過剰責任');
-  return {
-    extractedBelief: s.coreBelief,
-    tags: tags.slice(0, 3).length > 0 ? tags.slice(0, 3) : ['自己否定が強い'],
-    gentleReflection: 'たどり着いた考えは、これまでのあなたを守ろうとしてきた一部かもしれません。決めつけず、ゆっくり眺めてみるだけでも十分です。',
-  };
+  return tags.slice(0, 3).length > 0 ? tags.slice(0, 3) : ['自己否定が強い'];
 }
 
-async function extractCoreBeliefAI(s) {
+// Step 5: スキーマ候補 - ルールベース
+function generateSchemaCandidatesRule(s) {
+  const text = [s.autoThought, ...(s.deeper || [])].filter(Boolean).join(' ');
+  const base = [
+    '私は人から必要とされない',
+    '私は大切にされない',
+    '失敗すると価値がなくなる',
+    '私には価値がない',
+  ];
+  // 文脈に応じて並び替え
+  const score = (c) => {
+    let n = 0;
+    if (c.includes('必要') && /必要|役立|貢献/.test(text)) n += 2;
+    if (c.includes('大切') && /大切|愛|気にかけ/.test(text)) n += 2;
+    if (c.includes('失敗') && /失敗|ミス|うまく/.test(text)) n += 2;
+    if (c.includes('価値') && /価値|無価値|意味/.test(text)) n += 2;
+    return n;
+  };
+  return base.slice().sort((a, b) => score(b) - score(a));
+}
+
+// Step 5: スキーマ候補 - AI
+async function generateSchemaCandidatesAI(s) {
   if (!getApiKey()) return null;
-  const def = AI_PROMPTS.deep_dive_extraction;
+  const def = AI_PROMPTS.dd_schema_identify;
+  if (!def) return null;
   const user = def.userTemplate
     .replace('{event}', s.event || '')
-    .replace('{firstThought}', s.firstThought || '')
+    .replace('{eventCategory}', s.eventCategory || '')
+    .replace('{autoThought}', s.autoThought || '')
+    .replace('{emotionTags}', (s.emotionTags || []).join('・'))
+    .replace('{emotionIntensity}', s.emotionIntensity == null ? '' : s.emotionIntensity)
     .replace('{deeper1}', (s.deeper && s.deeper[0]) || '')
     .replace('{deeper2}', (s.deeper && s.deeper[1]) || '')
     .replace('{deeper3}', (s.deeper && s.deeper[2]) || '')
-    .replace('{coreBelief}', s.coreBelief || '')
-    .replace('{beliefSince}', s.beliefSince || '')
-    .replace('{confidence}', s.confidence == null ? 5 : s.confidence);
-
+    .replace('{deeper4}', (s.deeper && s.deeper[3]) || '')
+    .replace('{deeper5}', (s.deeper && s.deeper[4]) || '');
   try {
     const text = await callGemini(def.systemPrompt, [{ role: 'user', content: user }], { temperature: def.temperature, maxTokens: def.maxTokens });
     if (!text) return null;
     const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
-    const start = cleaned.indexOf('{'), end = cleaned.lastIndexOf('}');
-    if (start < 0 || end <= start) return null;
-    const parsed = JSON.parse(cleaned.slice(start, end + 1));
-    if (typeof parsed.extractedBelief !== 'string') return null;
-    // タグは固定候補にフィルタ
-    const tags = (parsed.tags || []).filter(t => DD_BELIEF_TAGS.includes(t));
+    const sIdx = cleaned.indexOf('['), eIdx = cleaned.lastIndexOf(']');
+    if (sIdx < 0 || eIdx <= sIdx) return null;
+    const parsed = JSON.parse(cleaned.slice(sIdx, eIdx + 1));
+    if (!Array.isArray(parsed)) return null;
+    return parsed.filter(t => typeof t === 'string' && t.trim()).slice(0, 4);
+  } catch (e) { console.warn('[DD-schema] failed', e); return null; }
+}
+
+// Step 6: メリット・デメリット - ルールベース
+function generateMeritDemeritRule(s) {
+  return {
+    merits: [
+      '失敗しないように慎重になれる',
+      '他人の気持ちに敏感に気づける',
+      '謙虚さや努力する姿勢を保てる',
+    ],
+    demerits: [
+      '自分を責めて落ち込みやすくなる',
+      '人に助けを求めにくくなる',
+      '小さなことでもひどく傷ついてしまう',
+    ],
+  };
+}
+
+// Step 6: メリット・デメリット - AI
+async function generateMeritDemeritAI(s) {
+  if (!getApiKey()) return null;
+  const def = AI_PROMPTS.dd_merit_demerit;
+  if (!def) return null;
+  const user = def.userTemplate.replace('{schema}', ddCurrentOldSchema(s) || '');
+  try {
+    const text = await callGemini(def.systemPrompt, [{ role: 'user', content: user }], { temperature: def.temperature, maxTokens: def.maxTokens });
+    if (!text) return null;
+    const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+    const sIdx = cleaned.indexOf('{'), eIdx = cleaned.lastIndexOf('}');
+    if (sIdx < 0 || eIdx <= sIdx) return null;
+    const parsed = JSON.parse(cleaned.slice(sIdx, eIdx + 1));
+    if (!Array.isArray(parsed.merits) || !Array.isArray(parsed.demerits)) return null;
     return {
-      extractedBelief: parsed.extractedBelief,
-      tags: tags.length > 0 ? tags.slice(0, 3) : null,
-      gentleReflection: typeof parsed.gentleReflection === 'string' ? parsed.gentleReflection : '',
+      merits:   parsed.merits.filter(t => typeof t === 'string').slice(0, 4),
+      demerits: parsed.demerits.filter(t => typeof t === 'string').slice(0, 4),
     };
-  } catch (e) {
-    console.warn('[DD-AI] failed', e);
-    return null;
-  }
+  } catch (e) { console.warn('[DD-md] failed', e); return null; }
+}
+
+// Step 7: 新しいスキーマ候補 - ルールベース
+function generateNewSchemaCandidatesRule(s) {
+  return [
+    '私は価値があり、必要とされる存在だ',
+    '完璧じゃなくても、人は私を受け入れてくれる',
+    '私は人とつながり、支え合うことができる',
+    '失敗しても、私は成長していける',
+  ];
+}
+
+// Step 7: 新しいスキーマ候補 - AI
+async function generateNewSchemaCandidatesAI(s) {
+  if (!getApiKey()) return null;
+  const def = AI_PROMPTS.dd_new_schema;
+  if (!def) return null;
+  const user = def.userTemplate
+    .replace('{oldSchema}', ddCurrentOldSchema(s) || '')
+    .replace('{autoThought}', s.autoThought || '')
+    .replace('{event}', s.event || '');
+  try {
+    const text = await callGemini(def.systemPrompt, [{ role: 'user', content: user }], { temperature: def.temperature, maxTokens: def.maxTokens });
+    if (!text) return null;
+    const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+    const sIdx = cleaned.indexOf('['), eIdx = cleaned.lastIndexOf(']');
+    if (sIdx < 0 || eIdx <= sIdx) return null;
+    const parsed = JSON.parse(cleaned.slice(sIdx, eIdx + 1));
+    if (!Array.isArray(parsed)) return null;
+    return parsed.filter(t => typeof t === 'string' && t.trim()).slice(0, 4);
+  } catch (e) { console.warn('[DD-newschema] failed', e); return null; }
 }
 
 // === v0.9.58 削除: 旧 Goal→Policy→Action フロー (viewActionLegacy / viewGoalChat / viewPolicySelect / viewActionSelect / viewActionEval) ===
@@ -11004,58 +12134,296 @@ const AI_PROMPTS = {
     psychologistReviewNote: '',
   },
 
-  deep_dive_extraction: {
-    id: 'deep_dive_extraction',
-    title: '深掘りループ - コア信念抽出（CBT下向き矢印法）',
-    purpose: '下向き矢印法によって深掘りされた一連の回答から、根本にあるコア信念と思考パターンタグを抽出する。',
-    triggerLocation: 'いっぽタブ または きろくタブ → 深掘り → 最終ステップで保存時',
-    callSite: 'extractCoreBeliefAI() → callGemini(AI_PROMPTS.deep_dive_extraction.systemPrompt, [user])',
+  // ==========================================================
+  // 下向き矢印法 9ステップ用プロンプト群（v0.9.71）
+  // ※ 旧 deep_dive_extraction は 9ステップ刷新により撤去（v0.9.71）
+  // ==========================================================
+  dd_schema_identify: {
+    id: 'dd_schema_identify',
+    title: '下向き矢印法 - スキーマ特定（Step5）',
+    purpose: 'Step2-4 で書かれた出来事・自動思考・深掘り内容から、根っこのスキーマ候補を4つ提案する。',
+    triggerLocation: '下向き矢印法 Step 5（スキーマを特定）',
+    callSite: 'generateSchemaCandidatesAI() → callGemini(AI_PROMPTS.dd_schema_identify.systemPrompt, [user])',
     model: 'gemini-2.5-flash',
-    temperature: 0.6,
-    maxTokens: 800,
-    outputFormat: 'JSON {extractedBelief, tags[1-3 from fixed candidates], gentleReflection}',
-    fallbackBehavior: 'API未設定 / 失敗時はキーワードルールベースで抽出（extractCoreBeliefRule）',
+    temperature: 0.7,
+    maxTokens: 600,
+    outputFormat: 'JSON 配列（4要素・各 12〜28字の短文）',
+    fallbackBehavior: 'API未設定 / 失敗 / パース失敗時は generateSchemaCandidatesRule の固定候補にフォールバック',
     safetyChecks: [
-      'JSON抽出失敗時はルールベースへフォールバック',
-      '本人が言語化したコア信念は必ず保持し、AI抽出は補助情報として扱う',
-      'tags は固定の候補リストからのみ採用（誤ラベル防止）',
+      'JSON抽出失敗時は静かにルールへフォールバック',
+      '生成された候補は本人が選ぶ仕組み（押し付けない）',
     ],
     systemPrompt: `あなたは認知行動療法（CBT）のセラピストです。
-クライエントが下向き矢印法で深掘りした一連の回答から、
-根本にあるコア信念と思考パターンタグを抽出してください。
+クライエントが下向き矢印法で深掘りした内容から、
+根っこにある「スキーマ（中核信念）」の候補を4つ提示してください。
 
-# CBT 思考パターンタグ候補（必ずこの中から1〜3個選ぶ）
-- 自己否定が強い
-- 評価に敏感
-- 失敗を恐れやすい
-- 見捨てられ不安
-- 完璧主義傾向
-- 他者比較しやすい
-- 助けを求めにくい
-- 過剰責任
+# スキーマの典型例（参考）
+- 私は人から必要とされない
+- 私は大切にされない
+- 失敗すると価値がなくなる
+- 私には価値がない
+- 完璧でないと愛されない
+- 助けを求めると見捨てられる
 
 # 出力ルール
-- 必ず JSON のみ出力（説明・コードブロック・前置き不要）
-- extractedBelief: 60字程度で根本のコア信念を1文に要約
-- tags: 上記候補から1-3個。最も該当度が高い順に並べる
-- gentleReflection: 90字程度のやさしい返し。決めつけない、押し付けない
-- 22-28歳の若者に話しかける温かい口語トーン
+- 必ず JSON 配列のみで出力（説明・コードブロック・前置き不要）
+- 4要素。それぞれ 12〜28字の「私は〜」「〜と価値がなくなる」など1人称の短文
+- クライエントの言葉に沿いつつ、深掘りログから抽象化する
+- 似た候補ばかりにならないよう、少しずつ角度を変える（必要・価値・大切・失敗 など）
+- 22-28歳の若者に伝わる自然な口語
 
 # 出力フォーマット
-{"extractedBelief":"...","tags":["...","..."],"gentleReflection":"..."}`,
-    userTemplate: `# 深掘りログ
-- きっかけのできごと: {event}
-- 最初の考え・感情: {firstThought}
+["候補1","候補2","候補3","候補4"]`,
+    userTemplate: `# 入力
+- できごと: {event}
+- 種類: {eventCategory}
+- 自動思考: {autoThought}
+- そのときの感情: {emotionTags}（強さ {emotionIntensity}/10）
 - 深掘り Lv.1: {deeper1}
 - 深掘り Lv.2: {deeper2}
 - 深掘り Lv.3: {deeper3}
-- 本人が言語化したコア信念: {coreBelief}
-- そう思うようになった時期: {beliefSince}
-- 確信度: {confidence}/10
+- 深掘り Lv.4: {deeper4}
+- 深掘り Lv.5: {deeper5}
 
-上記からコア信念とタグを抽出して JSON で出力してください。`,
-    lastUpdated: '2026-05-03',
-    changeNote: 'v0.9.1 で初版（下向き矢印法 + 8種パターンタグ）',
+上記から、根っこにあるスキーマ候補を4つ JSON 配列で出力してください。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.71 初版（9ステップ化に伴うスキーマ候補生成）',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  dd_merit_demerit: {
+    id: 'dd_merit_demerit',
+    title: '下向き矢印法 - メリット・デメリット比較（Step6）',
+    purpose: '特定したスキーマを持ち続けることのメリット・デメリットを各3つずつ整理する。',
+    triggerLocation: '下向き矢印法 Step 6（メリット・デメリット比較）',
+    callSite: 'generateMeritDemeritAI() → callGemini(AI_PROMPTS.dd_merit_demerit.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.7,
+    maxTokens: 600,
+    outputFormat: 'JSON {merits:[3つの短文], demerits:[3つの短文]}',
+    fallbackBehavior: 'API未設定 / 失敗時は generateMeritDemeritRule の汎用例にフォールバック',
+    safetyChecks: [
+      'JSON抽出失敗時はルールへフォールバック',
+      'デメリットを過度にネガティブに煽らない',
+    ],
+    systemPrompt: `あなたは認知行動療法（CBT）のセラピストです。
+クライエントが特定した「スキーマ」について、
+それを持ち続けることでの「メリット（守られているもの・得ているもの）」と
+「デメリット（つらくなる側面）」を、それぞれ3つずつ提示してください。
+
+# 出力ルール
+- 必ず JSON のみで出力（説明・コードブロック・前置き不要）
+- merits / demerits は各3つ。短く具体的に（各 18〜34字）
+- メリットは「そのスキーマが本人を守ってきた側面」を尊重して書く
+- デメリットは「そのスキーマがあるせいで起きやすい困りごと」を、否定せず淡々と書く
+- 22-28歳の若者に伝わる自然な口語
+
+# 出力フォーマット
+{"merits":["...","...","..."],"demerits":["...","...","..."]}`,
+    userTemplate: `# 対象のスキーマ
+{schema}
+
+上記スキーマを持ち続けることのメリット・デメリットを各3つ、JSON で出力してください。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.71 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  dd_new_schema: {
+    id: 'dd_new_schema',
+    title: '下向き矢印法 - 新しいスキーマ候補（Step7）',
+    purpose: '今のスキーマよりも自分を助けてくれる代替スキーマを4つ提示する。',
+    triggerLocation: '下向き矢印法 Step 7（新しいスキーマを検討）',
+    callSite: 'generateNewSchemaCandidatesAI() → callGemini(AI_PROMPTS.dd_new_schema.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.85,
+    maxTokens: 600,
+    outputFormat: 'JSON 配列（4つの短文）',
+    fallbackBehavior: 'API未設定 / 失敗時は generateNewSchemaCandidatesRule の汎用候補にフォールバック',
+    safetyChecks: [
+      'JSON抽出失敗時はルールへフォールバック',
+      '無理にポジティブにしすぎず「やわらかく現実的」な代替案を出す',
+    ],
+    systemPrompt: `あなたは認知行動療法（CBT）のセラピストです。
+クライエントが特定した「ふるいスキーマ」を、より自分を助ける新しいスキーマに置き換える候補を4つ提示してください。
+
+# 出力ルール
+- 必ず JSON 配列のみで出力（説明・コードブロック・前置き不要）
+- 4要素。各 14〜34字の「私は〜」「〜してもいい」など1人称の短文
+- 過剰にポジティブな全肯定にしない。「完璧でなくてもいい」「失敗しても成長できる」など現実的・条件付きで温かい
+- ふるいスキーマと真逆ではなく、ニュアンスをやさしく解きほぐす
+- 4候補は少しずつ角度を変える（自己肯定 / 受容 / 関係性 / 成長 など）
+- 22-28歳の若者に伝わる自然な口語
+
+# 出力フォーマット
+["候補1","候補2","候補3","候補4"]`,
+    userTemplate: `# 入力
+- ふるいスキーマ: {oldSchema}
+- 自動思考: {autoThought}
+- きっかけの出来事: {event}
+
+上記をふまえて、新しいスキーマ候補を4つ JSON 配列で出力してください。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.71 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  // ==========================================================
+  // きづきワーク用プロンプト（v0.9.70）
+  // ==========================================================
+  kizuki_thought_check: {
+    id: 'kizuki_thought_check',
+    title: 'きづき: 思考のクセをチェック（結果コメント）',
+    purpose: '8つの認知の歪みチェック結果TOP3を見て、すぷらんが優しく言語化する',
+    triggerLocation: 'きづき → 思考のクセをチェック → 結果画面',
+    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_thought_check.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.7,
+    maxTokens: 280,
+    outputFormat: '自然文（3〜4文・160字目安）',
+    fallbackBehavior: 'API未設定/失敗時はテンプレ',
+    safetyChecks: ['断定しない・診断しない・「直しなさい」と言わない', 'スコアが低い項目は無視し、最上位のみ言及'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが「思考のクセをチェック」ワークを終えた直後。結果TOP3を見て、ユーザーが自分の傾向に気づけるよう、やさしく言語化する。
+
+【原則】
+- 「あなたはこう」と決めつけない。「〜の傾向がありそう」と仮置きで返す。
+- TOP1の歪みに絞って、具体的にどんな場面で出やすいかを1文で添える。
+- 「直しなさい」「変えていきましょう」とは言わない。「気づけただけで十分」と受け止める。
+- 3〜4文・160字以内。改行は1か所まで。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.70 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  kizuki_distortion: {
+    id: 'kizuki_distortion',
+    title: 'きづき: 認知のゆがみを理解する（結果コメント）',
+    purpose: '8つの歪みで当てはまった項目の数とTOP3を踏まえ、すぷらんが優しく振り返る',
+    triggerLocation: 'きづき → 認知のゆがみを理解する → 結果画面',
+    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_distortion.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.7,
+    maxTokens: 280,
+    outputFormat: '自然文（3〜4文・160字目安）',
+    fallbackBehavior: 'API未設定/失敗時はテンプレ',
+    safetyChecks: ['当てはまる項目が多くても「悪いこと」と評価しない', '具体的な行動指示は出さず、観察にとどめる'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが「認知のゆがみを理解する」ワークを終えた直後。当てはまった項目数とTOP3を見て、やさしく振り返る。
+
+【原則】
+- 「当てはまる項目が多い＝悪い」とは絶対に言わない。「気づいたこと自体に意味がある」と受け止める。
+- TOP1の歪みに触れ、「気づいたら『あ、いま出てるな』とラベリングするだけで距離が取れる」というニュアンスを伝える。
+- 3〜4文・160字以内。改行は1か所まで。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.70 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  kizuki_auto_thought: {
+    id: 'kizuki_auto_thought',
+    title: 'きづき: 自動思考になりやすい？（結果コメント）',
+    purpose: '自動思考スコアのレベル（high/mid/low）に応じた、すぷらんの振り返り',
+    triggerLocation: 'きづき → 自動思考になりやすい？ → 結果画面',
+    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_auto_thought.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.7,
+    maxTokens: 240,
+    outputFormat: '自然文（3〜4文・140字目安）',
+    fallbackBehavior: 'API未設定/失敗時はテンプレ',
+    safetyChecks: ['スコアの高低を「優劣」として扱わない', 'スコアが高くても「ダメ」と言わない'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが「自動思考になりやすい？」ワークを終えた直後。スコアとラベルを見て、やさしく振り返る。
+
+【原則】
+- スコアが高くても「ダメ」「治そう」と言わない。「そういう時期もあるよね」と受け止める。
+- 自動思考が強めなら「書き出して外に置く」「気づくだけで距離が取れる」を1つだけ提案。
+- 自動思考が穏やかでも「普段は落ち着いてても、しんどい時はあるからね」とフォロー。
+- 3〜4文・140字以内。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.70 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  kizuki_behavior_experiment: {
+    id: 'kizuki_behavior_experiment',
+    title: 'きづき: 行動実験を計画する（結果コメント）',
+    purpose: 'ユーザーが立てた行動実験計画を見て、すぷらんが応援＋小さな補強提案',
+    triggerLocation: 'きづき → 行動実験を計画する → 結果画面',
+    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_behavior_experiment.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.75,
+    maxTokens: 280,
+    outputFormat: '自然文（3〜5文・180字目安）',
+    fallbackBehavior: 'API未設定/失敗時はテンプレ',
+    safetyChecks: ['仮説を否定しない', '実験のハードルを上げない', '「もっと頑張れ」とは言わない'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが行動実験の計画を立てたところ。仮説・行動・予想を見て、やさしく応援＋必要なら補強提案を1つ。
+
+【原則】
+- 仮説（思い込み）を否定しない。「確かめてみる」姿勢自体を歓迎する。
+- 行動が大きすぎる/小さすぎる場合だけ「もっと小さくしても/このくらいで十分」と1文だけ提案。
+- 予想がかなり悲観的でも「予想は予想、やってみたら違うかも」と添える。
+- 3〜5文・180字以内。改行は2か所まで。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.70 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  kizuki_values: {
+    id: 'kizuki_values',
+    title: 'きづき: 価値観を整理する（結果コメント）',
+    purpose: 'ユーザーが選んだ価値観カード5枚から、すぷらんが「あなたが大事にしてるもの」を言語化',
+    triggerLocation: 'きづき → 価値観を整理する → 結果画面',
+    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_values.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.8,
+    maxTokens: 320,
+    outputFormat: '自然文（4〜5文・200字目安）',
+    fallbackBehavior: 'API未設定/失敗時はテンプレ',
+    safetyChecks: ['選ばれなかった価値観を「ない」「足りない」とは言わない', '一方的な解釈を押し付けない'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが「価値観カード」で5枚を選び終えたところ。選ばれた5つの価値観から、その人が大切にしてるものを温かく言語化する。
+
+【原則】
+- 5つに共通する「軸」がもしあれば1文で言語化。なければ「この5つの組み合わせから、〜を大事にしてる人なんだなって伝わるよ」と受け止める。
+- 「だからこうすべき」とは言わない。「今、選んだ自分を覚えておくだけでもいい」と添える。
+- 4〜5文・200字以内。改行は2か所まで。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.70 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  kizuki_ideal_self: {
+    id: 'kizuki_ideal_self',
+    title: 'きづき: 理想の自分をイメージする（結果コメント）',
+    purpose: '5年後の理想の自分を3場面で記述してもらった結果から、すぷらんが要約＋いまできる一歩を1つ提案',
+    triggerLocation: 'きづき → 理想の自分をイメージする → 結果画面',
+    callSite: 'finishKizukiWork() → callGemini(AI_PROMPTS.kizuki_ideal_self.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.8,
+    maxTokens: 340,
+    outputFormat: '自然文（4〜5文・220字目安）',
+    fallbackBehavior: 'API未設定/失敗時はテンプレ',
+    safetyChecks: ['理想を「実現すべき」と圧力をかけない', '提案する一歩はものすごく小さくする（5分以内で今日できる）'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが「理想の自分」を3場面（朝/人との時間/自分らしい活動）で書いたところ。やさしく要約＋いまできる小さな一歩を1つだけ提案する。
+
+【原則】
+- 3場面に共通するイメージや感情を1文で言葉にする（「ゆったり」「つながり」「創造」など、その人らしいキーワードで）。
+- 一歩は「今日5分でできる」レベルに小さくする。「資格を取る」「転職する」のような大きな提案は禁止。
+- 「実現しよう」「目指そう」とは言わない。「いまの自分が、その理想に少しだけ重なる時間を1つ作ってみるとしたら？」というトーン。
+- 4〜5文・220字以内。改行は2か所まで。`,
+    lastUpdated: '2026-05-26',
+    changeNote: 'v0.9.70 初版',
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
@@ -13752,15 +15120,15 @@ function handleAction(act, el, ev) {
   // ベース画面: きづきタブへ
   if (act === 'ippo-base-go-kizuki') { go('kizuki'); return; }
   // (旧 ippo-resume-pending 削除 v0.9.58 — 保留機能廃止)
-  // 深掘り（v0.9.1）
+  // 深掘り（v0.9.71: 下向き矢印法 9ステップ）
   if (act === 'dd-start') {
-    deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString() };
+    deepDive = ddSessionInit({ from: 'record' });
     go('deepdive');
     return;
   }
   // きづきタブから下向き矢印法を起動
   if (act === 'kizuki-open-deepdive') {
-    deepDive = { step: 1, deeper: ['', '', ''], depthLevel: 0, startedAt: new Date().toISOString(), from: 'kizuki' };
+    deepDive = ddSessionInit({ from: 'kizuki' });
     go('deepdive');
     return;
   }
@@ -13774,157 +15142,279 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // きづきタブ: 未実装ワーク (Phase 3 で実装予定)
+  // きづきタブ: 未実装ワーク (Phase 3 で実装予定 / フォールバック用に残置)
   if (act === 'kizuki-coming-soon') {
     toast('このワークはまもなく実装予定です 🌱');
     return;
   }
+
+  // きづきワーク: 開始 / キャンセル / 入力 / 提出 / 完了
+  if (act === 'kizuki-start-work') {
+    const workId = el && el.dataset && el.dataset.work;
+    if (!workId) return;
+    startKizukiWork(workId);
+    return;
+  }
+  if (act === 'kizuki-work-cancel') { cancelKizukiWork(); return; }
+  if (act === 'kizuki-answer-scale') {
+    if (!kizukiSession) return;
+    const key = el.dataset.key;
+    const score = Number(el.dataset.score);
+    // thought-check と distortion は key が distortion id (文字列)、auto-thought は インデックス（数字文字列）
+    kizukiSession.answers[key] = score;
+    render();
+    return;
+  }
+  if (act === 'kizuki-values-toggle') {
+    if (!kizukiSession) return;
+    const id = el.dataset.id;
+    if (!Array.isArray(kizukiSession.answers)) kizukiSession.answers = [];
+    const i = kizukiSession.answers.indexOf(id);
+    if (i >= 0) {
+      kizukiSession.answers.splice(i, 1);
+    } else if (kizukiSession.answers.length < 5) {
+      kizukiSession.answers.push(id);
+    } else {
+      toast('5つまで選べるよ');
+      return;
+    }
+    render();
+    return;
+  }
+  if (act === 'kizuki-work-submit') {
+    if (!kizukiSession) return;
+    const w = kizukiSession.workId;
+    // 自由記述系は input イベントが拾えていない場合のため、ここで最終収集する
+    if (w === 'behavior-experiment' || w === 'ideal-self') {
+      document.querySelectorAll('[data-act="kizuki-input"]').forEach(el => {
+        const k = el.dataset.key;
+        if (k) kizukiSession.answers[k] = el.value || '';
+      });
+      // behavior-experiment は最低限「仮説」だけ必須
+      if (w === 'behavior-experiment' && !(kizukiSession.answers.hypothesis || '').trim()) {
+        toast('「確かめたい思い込み」を入れてね'); return;
+      }
+      if (w === 'ideal-self' && !(kizukiSession.answers.morning || '').trim()
+          && !(kizukiSession.answers.people || '').trim()
+          && !(kizukiSession.answers.activity || '').trim()) {
+        toast('1つでいいから書いてみよう'); return;
+      }
+    }
+    if (w === 'thought-check' || w === 'distortion') {
+      const answered = Object.keys(kizukiSession.answers || {}).length;
+      if (answered < DISTORTIONS.length) {
+        toast(`あと ${DISTORTIONS.length - answered} 問残ってるよ`); return;
+      }
+    }
+    if (w === 'auto-thought') {
+      const answered = Object.keys(kizukiSession.answers || {}).length;
+      if (answered < AUTO_THOUGHT_QUESTIONS.length) {
+        toast(`あと ${AUTO_THOUGHT_QUESTIONS.length - answered} 問残ってるよ`); return;
+      }
+    }
+    if (w === 'values') {
+      if (!Array.isArray(kizukiSession.answers) || kizukiSession.answers.length !== 5) {
+        toast('5つ選んでね'); return;
+      }
+    }
+    finishKizukiWork();
+    return;
+  }
+  if (act === 'kizuki-work-done') {
+    kizukiSession = null;
+    go('kizuki');
+    return;
+  }
+  if (act === 'kizuki-work-redo') {
+    if (!kizukiSession) return;
+    const w = kizukiSession.workId;
+    startKizukiWork(w);
+    return;
+  }
+  // ───────── 下向き矢印法（9ステップ）ハンドラ ─────────
   if (act === 'dd-cancel') {
-    const backTo = (deepDive && deepDive.from) || 'record';
+    const backTo = (deepDive && deepDive.from) || 'kizuki';
     deepDive = null;
     go(backTo);
     return;
   }
   if (act === 'dd-back') {
-    if (deepDive) {
-      const to = parseInt(el.dataset.to, 10) || 1;
-      deepDive.step = to;
-      if (to === 4 && deepDive.depthLevel > 0) deepDive.depthLevel -= 1;
-    }
+    if (!deepDive) return;
+    ddPersistCurrent();
+    deepDive.step = parseInt(el.dataset.to, 10) || 1;
     render();
     return;
   }
-  if (act === 'dd-step1-pick') {
-    if (deepDive) deepDive.themeType = el.dataset.theme;
-    render();
+  if (act === 'dd-step1-start') {
+    if (deepDive) { deepDive.step = 2; render(); }
     return;
   }
-  if (act === 'dd-step1-next') {
-    if (!deepDive || !deepDive.themeType) { toast('テーマを選んでね'); return; }
-    deepDive.step = 2;
+  if (act === 'dd-step2-cat') {
+    if (deepDive) deepDive.eventCategory = el.dataset.cat || '';
+    ddPersistCurrent();
     render();
     return;
   }
   if (act === 'dd-step2-next') {
-    const v = (document.getElementById('ddEventInput') || {}).value || '';
-    if (!v.trim()) { toast('気になる出来事を書いてみて'); return; }
+    const v = ((document.getElementById('ddEventInput') || {}).value || '').trim();
+    if (!v) { toast('気になる出来事を書いてみて'); return; }
     if (!deepDive) return;
-    deepDive.event = v.trim();
+    deepDive.event = v;
     const c = detectCrisis(v);
     if (c && c.sev >= 4) { showCrisisModal(c.sev); return; }
     deepDive.step = 3;
     render();
     return;
   }
-  if (act === 'dd-step3-next') {
-    const v = (document.getElementById('ddFirstThoughtInput') || {}).value || '';
-    if (!v.trim()) { toast('その時の考えを書いてみて'); return; }
+  if (act === 'dd-step3-emo') {
     if (!deepDive) return;
-    deepDive.firstThought = v.trim();
-    deepDive.depthLevel = 0;
+    const id = el.dataset.emo;
+    const arr = deepDive.emotionTags || (deepDive.emotionTags = []);
+    const i = arr.indexOf(id);
+    if (i >= 0) arr.splice(i, 1); else arr.push(id);
+    ddPersistCurrent();
+    render();
+    return;
+  }
+  if (act === 'dd-step3-intensity') {
+    if (deepDive) deepDive.emotionIntensity = parseInt(el.dataset.score, 10);
+    ddPersistCurrent();
+    render();
+    return;
+  }
+  if (act === 'dd-step3-next') {
+    const v = ((document.getElementById('ddAutoThoughtInput') || {}).value || '').trim();
+    if (!v) { toast('その時の考えを書いてみて'); return; }
+    if (!deepDive) return;
+    deepDive.autoThought = v;
     deepDive.step = 4;
     render();
     return;
   }
-  if (act === 'dd-step4-deeper' || act === 'dd-step4-stop') {
-    const v = (document.getElementById('ddDeeperInput') || {}).value || '';
-    if (!v.trim()) { toast('言葉にしてみよう（短くてOK）'); return; }
-    if (!deepDive) return;
-    deepDive.deeper[deepDive.depthLevel] = v.trim();
-    if (act === 'dd-step4-deeper' && deepDive.depthLevel < 2) {
-      deepDive.depthLevel += 1;
-      render();
-    } else {
-      deepDive.step = 5;
-      render();
-    }
+  if (act === 'dd-step4-input') {
+    // input 都度の保持はしない（次へ時にまとめて取得）。再レンダーは不要
     return;
   }
-  if (act === 'dd-step5-conf') {
-    if (deepDive) deepDive.confidence = parseInt(el.dataset.score, 10);
-    // 入力中のテキストを保持
-    if (deepDive) {
-      deepDive.coreBelief = (document.getElementById('ddCoreBeliefInput') || {}).value || deepDive.coreBelief || '';
-      deepDive.beliefSince = (document.getElementById('ddSinceInput') || {}).value || deepDive.beliefSince || '';
-    }
+  if (act === 'dd-step4-more') {
+    if (!deepDive) return;
+    ddCollectDeeperInputs();
+    if (deepDive.depthSlots < 5) deepDive.depthSlots += 1;
+    render();
+    return;
+  }
+  if (act === 'dd-step4-next') {
+    if (!deepDive) return;
+    ddCollectDeeperInputs();
+    const filled = (deepDive.deeper || []).filter(t => (t || '').trim());
+    if (filled.length === 0) { toast('1段だけでも書いてみよう'); return; }
+    deepDive.step = 5;
+    // 候補を再生成させたいときは null にする（戻ってきても再利用）
+    render();
+    return;
+  }
+  if (act === 'dd-step5-pick') {
+    if (!deepDive) return;
+    deepDive.schemaSelected = el.dataset.val || '';
+    if (deepDive.schemaSelected !== '__custom__') deepDive.schemaCustom = '';
     render();
     return;
   }
   if (act === 'dd-step5-next') {
     if (!deepDive) return;
-    const cb = (document.getElementById('ddCoreBeliefInput') || {}).value || '';
-    const sn = (document.getElementById('ddSinceInput') || {}).value || '';
-    if (!cb.trim()) { toast('コア信念を1行で書いてみよう'); return; }
-    deepDive.coreBelief = cb.trim();
-    deepDive.beliefSince = sn.trim();
-    if (deepDive.confidence == null) deepDive.confidence = 5;
-    // AI抽出（バックグラウンド、フォールバックあり）
+    if (!deepDive.schemaSelected) { toast('スキーマを選んでね'); return; }
+    if (deepDive.schemaSelected === '__custom__') {
+      const v = ((document.getElementById('ddSchemaCustomInput') || {}).value || '').trim();
+      if (!v) { toast('1行で書いてみよう'); return; }
+      deepDive.schemaCustom = v;
+    }
     deepDive.step = 6;
-    deepDive.extractedBelief = deepDive.coreBelief;
-    deepDive.tags = ['抽出中...'];
-    deepDive.gentleReflection = '';
-    deepDive.aiUsed = false;
+    deepDive.meritDemerit = null;  // スキーマが変わったら再生成
+    deepDive.aiUsedMeritDemerit = false;
     render();
-    const sessionRef = deepDive;
-    extractCoreBeliefAI(sessionRef).then(result => {
-      if (deepDive !== sessionRef) return;
-      if (result) {
-        sessionRef.extractedBelief = result.extractedBelief;
-        sessionRef.tags = result.tags || [];
-        sessionRef.gentleReflection = result.gentleReflection;
-        sessionRef.aiUsed = true;
-      } else {
-        const r = extractCoreBeliefRule(sessionRef);
-        sessionRef.extractedBelief = r.extractedBelief;
-        sessionRef.tags = r.tags;
-        sessionRef.gentleReflection = r.gentleReflection;
-        sessionRef.aiUsed = false;
-      }
-      render();
-    });
     return;
   }
-  if (act === 'dd-save') {
+  if (act === 'dd-step6-next') {
     if (!deepDive) return;
+    deepDive.step = 7;
+    render();
+    return;
+  }
+  if (act === 'dd-step7-pick') {
+    if (!deepDive) return;
+    deepDive.newSchemaSelected = el.dataset.val || '';
+    if (deepDive.newSchemaSelected !== '__custom__') deepDive.newSchemaCustom = '';
+    render();
+    return;
+  }
+  if (act === 'dd-step7-next') {
+    if (!deepDive) return;
+    if (!deepDive.newSchemaSelected) { toast('新しいスキーマを選んでね'); return; }
+    if (deepDive.newSchemaSelected === '__custom__') {
+      const v = ((document.getElementById('ddNewSchemaCustomInput') || {}).value || '').trim();
+      if (!v) { toast('1行で書いてみよう'); return; }
+      deepDive.newSchemaCustom = v;
+    }
+    deepDive.step = 8;
+    render();
+    return;
+  }
+  if (act === 'dd-step8-confirm') {
+    if (deepDive) { deepDive.step = 9; render(); }
+    return;
+  }
+  if (act === 'dd-step8-other') {
+    if (deepDive) { deepDive.step = 7; render(); }
+    return;
+  }
+  if (act === 'dd-save' || act === 'dd-save-and-ippo') {
+    if (!deepDive) return;
+    const oldSchema = ddCurrentOldSchema(deepDive);
+    const newSchema = ddCurrentNewSchema(deepDive);
+    const tags = extractCoreBeliefRule(deepDive);
     state.deepDiveSessions.push({
       id: uid(),
-      themeType: deepDive.themeType,
+      // 新フィールド
+      eventCategory: deepDive.eventCategory || '',
+      emotionTags: deepDive.emotionTags || [],
+      emotionIntensity: deepDive.emotionIntensity,
+      autoThought: deepDive.autoThought || '',
+      oldSchema, newSchema,
+      meritDemerit: deepDive.meritDemerit || null,
+      // 旧フィールド（互換維持）
       event: deepDive.event,
-      firstThought: deepDive.firstThought,
+      firstThought: deepDive.autoThought,
       deeper: deepDive.deeper,
-      coreBelief: deepDive.coreBelief,
-      beliefSince: deepDive.beliefSince,
-      confidence: deepDive.confidence,
-      extractedBelief: deepDive.extractedBelief,
-      tags: deepDive.tags || [],
-      gentleReflection: deepDive.gentleReflection || '',
-      aiUsed: !!deepDive.aiUsed,
+      coreBelief: oldSchema,
+      extractedBelief: oldSchema,
+      tags,
+      gentleReflection: '',
+      aiUsed: !!(deepDive.aiUsedSchema || deepDive.aiUsedMeritDemerit || deepDive.aiUsedNewSchema),
       startedAt: deepDive.startedAt,
       completedAt: new Date().toISOString(),
     });
-    // タグ集計の更新
-    (deepDive.tags || []).forEach(tagCode => {
+    // タグ集計
+    tags.forEach(tagCode => {
       const existing = state.coreBeliefTags.find(t => t.tagCode === tagCode);
       if (existing) {
         existing.confidence = Math.min(1, (existing.confidence || 0) + 0.15);
         existing.updatedAt = new Date().toISOString();
       } else {
         state.coreBeliefTags.push({
-          id: uid(),
-          tagCode,
-          confidence: 0.4,
-          updatedAt: new Date().toISOString(),
+          id: uid(), tagCode, confidence: 0.4, updatedAt: new Date().toISOString(),
         });
       }
     });
     saveState();
-    if (window.MoyaLogger) MoyaLogger.event('deepdive_saved', { tags: deepDive.tags || [], theme: deepDive.themeType });
-    const backTo = deepDive.from || 'record';
+    if (window.MoyaLogger) MoyaLogger.event('deepdive_saved', { tags, oldSchema, newSchema });
+    const fromTab = deepDive.from || 'kizuki';
     deepDive = null;
     toast('深掘りを保存しました');
-    go(backTo);
+    go(act === 'dd-save-and-ippo' ? 'ippo' : fromTab);
     return;
   }
+
+  // 深掘り内部ヘルパは下向き矢印法のビュー定義側（モジュールスコープ）に
+  // 移設したのでここでは何もしない（後方互換のためコメント残し）
   if (act === 'ippo-save-then-dd') {
     // 先に ippo を保存してから深掘りへ
     if (ippoToday) {
