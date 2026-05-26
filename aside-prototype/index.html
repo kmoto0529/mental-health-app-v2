@@ -6342,24 +6342,36 @@ body.keyboard-open .mood-chat-bottom .input-row {
 .kizuki-rev-card:hover { border-color: rgba(123,168,118,0.45); }
 .kizuki-rev-card:active { transform: scale(0.985); }
 .kizuki-rev-icon {
-  width: 56px; height: 56px;
-  border-radius: 14px;
+  width: 64px; height: 64px;
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 26px; color: #fff;
+  overflow: hidden;
   flex-shrink: 0;
-  align-self: flex-start;
+  align-self: center;
+}
+.kizuki-rev-icon-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+.kizuki-rev-icon-emoji {
+  font-size: 30px; line-height: 1;
 }
 .kizuki-rev-body { flex: 1; min-width: 0; }
+.kizuki-rev-chip {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
 .kizuki-rev-title {
   font-size: 15px; font-weight: 700;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--text);
-  margin-bottom: 2px;
-}
-.kizuki-rev-subtitle {
-  font-size: 12px; color: var(--text-muted);
-  margin-bottom: 8px;
-  line-height: 1.5;
+  margin-bottom: 6px;
 }
 .kizuki-rev-body-text {
   font-size: 12px; color: var(--text-soft);
@@ -10375,7 +10387,8 @@ const KIZUKI_WORKS = [
     title: 'モヤモヤの原因を深掘りする',
     subtitle: '下向き矢印法',
     body: '「なぜそう感じるのだろう？」と考えがぐるぐるして、原因をはっきりさせたいとき',
-    icon: '▽', iconBg: '#5B7EC9',
+    icon: '▽', iconBg: '#DDEBF7',
+    chipBg: '#E0EBF7', chipText: '#3F73B9',
     time: '10分', status: 'available', action: 'kizuki-open-deepdive',
     cat: 'deepdive', desc: '根っこにある思い込みを探るワーク', section: '深く掘り下げる',
   },
@@ -10384,7 +10397,8 @@ const KIZUKI_WORKS = [
     title: '考えを確かめてみる',
     subtitle: '行動実験',
     body: '「こうに違いない」と決めつけてしまうことが多く、実際に試して確かめたいとき',
-    icon: '🧪', iconBg: '#5FBB72',
+    icon: '🧪', iconBg: '#E0F1E5',
+    chipBg: '#DFF3E5', chipText: '#2D8C4E',
     time: '5分', status: 'available', action: 'kizuki-start-work',
     cat: 'deepdive', desc: '思い込みを検証する計画を立てる', section: '深く掘り下げる',
   },
@@ -10393,7 +10407,8 @@ const KIZUKI_WORKS = [
     title: '考え方のクセに気づく',
     subtitle: '認知の歪みテスト',
     body: 'ついネガティブに考えてしまうパターンに気づき、考え方のクセを見直したいとき',
-    icon: '🧠', iconBg: '#E68FA0',
+    icon: '🧠', iconBg: '#FBE2EA',
+    chipBg: '#FBE2EA', chipText: '#C95571',
     time: '7分', status: 'available', action: 'kizuki-start-work',
     cat: 'deepdive', desc: '代表的な認知のゆがみをチェック', section: '深く掘り下げる',
   },
@@ -10402,7 +10417,8 @@ const KIZUKI_WORKS = [
     title: '頭の中を整理する',
     subtitle: 'コラム法',
     body: '考えや感情がまとまらず、頭の中をすっきりさせてバランスの取れた考え方を見つけたいとき',
-    icon: '🗒️', iconBg: '#E8B756',
+    icon: '🗒️', iconBg: '#FBEACB',
+    chipBg: '#FBEACB', chipText: '#C97F2A',
     time: '10分', status: 'pending', action: 'kizuki-coming-soon',
     cat: 'thought', desc: '思考と感情をコラムで整理する', section: '思考のクセを知る',
   },
@@ -10411,7 +10427,8 @@ const KIZUKI_WORKS = [
     title: '環境を整えてラクになる',
     subtitle: '刺激統制',
     body: '気が散って集中できない、だらだらしてしまうなど、気持ちが安定しにくいとき',
-    icon: '🚪', iconBg: '#5BC0DE',
+    icon: '🚪', iconBg: '#E9E3FB',
+    chipBg: '#E9E3FB', chipText: '#6E5BCE',
     time: '7分', status: 'pending', action: 'kizuki-coming-soon',
     cat: 'behavior', desc: '集中・睡眠に効く環境調整', section: '環境を整える',
   },
@@ -10457,22 +10474,41 @@ function renderKizukiWorkCard(w, opts = {}) {
   `;
 }
 
-// v0.9.75: シンプル化カード（タイトル / (技法名) / 説明文）
+// v0.9.76: チップ化された技法名 + 差し替え可能PNGアイコン
+// PNG は ./assets/kizuki/<id>.png に置けば自動で読み込まれる。
+// 見つからなければ絵文字（w.icon）にフォールバック。
 function renderKizukiRevCard(w) {
   const isPending = w.status === 'pending';
   const action = isPending ? 'kizuki-coming-soon' : (w.action || 'kizuki-coming-soon');
+  const imgPath = `./assets/kizuki/${w.id}.png`;
+  const safeEmoji = String(w.icon || '').replace(/[<>"&]/g, '');
   return `
     <button class="kizuki-rev-card" data-act="${action}" data-work="${w.id}">
-      <span class="kizuki-rev-icon" style="background:${w.iconBg || '#7BA876'};">${w.icon}</span>
+      <span class="kizuki-rev-icon" style="background:${w.iconBg || '#EEEEEE'};">
+        <img src="${imgPath}" alt="" class="kizuki-rev-icon-img"
+          onerror="window.kizukiIconFail && window.kizukiIconFail(this, '${safeEmoji}')">
+      </span>
       <div class="kizuki-rev-body">
+        <span class="kizuki-rev-chip"
+          style="background:${w.chipBg || 'var(--bg-soft)'}; color:${w.chipText || 'var(--text-soft)'};">
+          ${escapeHtml(w.subtitle || w.desc || '')}
+        </span>
         <div class="kizuki-rev-title">${escapeHtml(w.title)}${isPending ? '<span class="kizuki-rev-pending-badge">準備中</span>' : ''}</div>
-        <div class="kizuki-rev-subtitle">（${escapeHtml(w.subtitle || w.desc || '')}）</div>
         <div class="kizuki-rev-body-text">${escapeHtml(w.body || '')}</div>
       </div>
       <span class="kizuki-rev-arrow">›</span>
     </button>
   `;
 }
+
+// PNGが見つからなかったときに絵文字フォールバック
+window.kizukiIconFail = function(img, emoji) {
+  if (!img || !img.parentNode) return;
+  const span = document.createElement('span');
+  span.className = 'kizuki-rev-icon-emoji';
+  span.textContent = emoji || '✨';
+  img.replaceWith(span);
+};
 
 // === きづきタブ トップ画面 ===
 function viewKizuki() {
