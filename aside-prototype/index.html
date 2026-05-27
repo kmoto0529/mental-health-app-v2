@@ -927,6 +927,18 @@
 .moya-altview-card.selected .moya-altview-num { color: #5C7E60; }
 [data-theme="dark"] .moya-altview-card.selected .moya-altview-num { color: #C0D8B7; }
 
+/* v0.9.80: もやもや整理 step 5/6 で「さっき書いた考え」を引用表示 */
+.moya-context-quote {
+  padding: 12px 14px;
+  background: var(--bg-soft);
+  border-left: 3px solid #9CB880;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+  margin-top: 4px;
+}
+
 /* 別の見方カード ラベルバッジ（v0.9.34〜CBT技法ラベル） */
 .moya-altview-body { flex: 1; min-width: 0; }
 .moya-altview-label {
@@ -6459,7 +6471,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.79-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.80-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -8239,20 +8251,30 @@ function endMoodChat() {
 }
 
 // ============================================================
-// 画面: もやもや整理（6ステップ）
+// 画面: もやもや整理（v0.9.80 — コラム法準拠 8ステップ + レター）
+//
+// step 1: 状況（出来事を書く）          — コラム法 ①状況
+// step 2: 気持ち（感情を選ぶ）          — コラム法 ②気分
+// step 3: 強さ（0-10）                  — コラム法 ②気分（強さ%）
+// step 4: 自動思考（パッと浮かんだ考え） — コラム法 ③自動思考  ★NEW
+// step 5: 根拠（事実だと思う理由）        — コラム法 ④根拠      ★NEW
+// step 6: 反証（事実じゃないかも？）      — コラム法 ⑤反証      ★NEW（AIヒント付き）
+// step 7: 別の見方（AI 適応的思考）       — コラム法 ⑥適応的思考（旧 step 4）
+// step 8: 強さ再評価（0-10）             — コラム法 ⑦気分の変化（旧 step 5）
+// step 9: レター生成（独自要素）          — レター（旧 step 6、ユーザーステップ数には含めない）
 // ============================================================
 let moyamoya = null;
 
 function viewMoyamoya() {
   if (!moyamoya) moyamoya = { step: 1 };
   const s = moyamoya;
-  // step 6 はレターでステップ表示しない。1-5のみ "Step X / 5"
-  const stepLabel = `Step ${s.step} / 5`;
+  // step 9 はレターでステップ表示しない。1-8 のみ "Step X / 8"
+  const stepLabel = `Step ${s.step} / 8`;
 
   if (s.step === 1) {
     return moyamoyaScreen(stepLabel, '何があったのかを教えてください', `
-      <p class="text-soft mb-3">うまくまとまっていなくても大丈夫。</p>
-      <textarea class="textarea-block" id="moyaInput" placeholder="例：上司に強く注意された" rows="4">${escapeHtml(s.eventText || '')}</textarea>
+      <p class="text-soft mb-3">うまくまとまっていなくても大丈夫。<br>事実だけを、淡々と書いてみよう。</p>
+      <textarea class="textarea-block" id="moyaInput" placeholder="例：上司に「資料の質が低い」と強く注意された" rows="4">${escapeHtml(s.eventText || '')}</textarea>
       <div style="margin-top:16px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="moya-step1-next">つづける</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
@@ -8304,13 +8326,74 @@ function viewMoyamoya() {
       </div>
     `);
   }
+  // ─────── Step 4: 自動思考（NEW v0.9.80）───────
   if (s.step === 4) {
+    return moyamoyaScreen(stepLabel, 'その時、頭にパッと浮かんだ考えは？', `
+      <p class="text-soft mb-3">「どうせ〜だ」「〜に違いない」など、検証する前に自動的に浮かんだ考えをそのまま書いてみよう。</p>
+      <textarea class="textarea-block" id="moyaAutoThoughtInput" placeholder="例：自分はこの仕事に向いていない／また怒られる" rows="4">${escapeHtml(s.automaticThought || '')}</textarea>
+      <div style="margin-top:16px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="moya-step4-next">つづける</button>
+        <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
+      </div>
+    `);
+  }
+
+  // ─────── Step 5: 根拠（NEW v0.9.80）───────
+  if (s.step === 5) {
+    return moyamoyaScreen(stepLabel, 'なぜそう思える？事実だと思う理由', `
+      <p class="text-soft mb-2">さっき書いた考え：</p>
+      <div class="moya-context-quote">「${escapeHtml(s.automaticThought || '')}」</div>
+      <p class="text-soft mb-3" style="margin-top:12px;">これを「事実」だと思える理由や、思い当たる証拠を書き出してみよう。</p>
+      <textarea class="textarea-block" id="moyaEvidenceInput" placeholder="例：先週も同じミスをした／同期は問題なくこなしている" rows="4">${escapeHtml(s.evidence || '')}</textarea>
+      <div style="margin-top:16px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="moya-step5-next">つづける</button>
+        <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
+      </div>
+    `);
+  }
+
+  // ─────── Step 6: 反証（NEW v0.9.80・AIヒント付き）───────
+  if (s.step === 6) {
+    const hintsLoading = s.counterEvidenceHintsLoading;
+    const hints = s.counterEvidenceHints;
+    return moyamoyaScreen(stepLabel, '事実じゃないかも？別の見方の証拠', `
+      <p class="text-soft mb-2">さっきの考え：</p>
+      <div class="moya-context-quote">「${escapeHtml(s.automaticThought || '')}」</div>
+      <p class="text-soft mb-3" style="margin-top:12px;">この考えが「事実じゃないかもしれない」と思える別の証拠や、過去の例外を探してみよう。<br>難しければ、下のボタンでAIヒントを取れます。</p>
+      <textarea class="textarea-block" id="moyaCounterEvidenceInput" placeholder="例：先月の資料は評価された／忙しいピーク時の指摘で口調が強くなっただけかも" rows="4">${escapeHtml(s.counterEvidence || '')}</textarea>
+
+      ${hintsLoading ? `
+        <div class="moya-hint-loading" style="margin-top:14px; padding:14px 16px; background: var(--bg-soft); border-radius:12px; text-align:center; color: var(--text-muted); font-size:13px;">
+          💭 AIがヒントを考えています…
+        </div>
+      ` : ''}
+      ${Array.isArray(hints) && hints.length ? `
+        <div style="margin-top:14px; padding:14px 16px; background: var(--bg-soft); border-radius:12px;">
+          <div class="text-tiny text-muted" style="margin-bottom:8px;">💡 AIからのヒント（参考）</div>
+          <ul style="margin:0; padding-left:20px; line-height:1.8; font-size:13px;">
+            ${hints.map(h => `<li>${escapeHtml(h)}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      <div style="margin-top:16px; display:grid; gap:10px;">
+        <button class="btn-ghost" data-act="moya-step6-hint" ${hintsLoading ? 'disabled' : ''} style="width:100%;">
+          ${hints && hints.length ? '🔄 もう一度ヒントを取る' : '💡 AIにヒントをもらう'}
+        </button>
+        <button class="btn btn-primary" data-act="moya-step6-next">つづける</button>
+        <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
+      </div>
+    `);
+  }
+
+  // ─────── Step 7: 適応的思考 / 別の見方（旧 step 4）───────
+  if (s.step === 7) {
     // 初回到達時に AI 生成を発火（既に生成済みなら何もしない）
     if (!s.alternativeViewsFetched) {
       s.alternativeViewsFetched = true;
       s.alternativeViewsLoading = true;
       const sessionRef = s;
-      generateAlternativeViewsAI(s.eventText, s.emotion, s.emotionScoreBefore).then(views => {
+      generateAlternativeViewsAI(s.eventText, s.emotion, s.emotionScoreBefore, s.automaticThought, s.evidence, s.counterEvidence).then(views => {
         if (moyamoya !== sessionRef) return; // 中断/離脱
         sessionRef.alternativeViews = views || generateAlternativeViewsTemplate(sessionRef.eventText, sessionRef.emotion);
         sessionRef.alternativeViewsRevealed = 3;
@@ -8331,7 +8414,7 @@ function viewMoyamoya() {
       return moyamoyaScreen(stepLabel, '別の見方を考えています...', `
         <div class="moya-loading">
           <div class="moya-loading-spinner"></div>
-          <p class="moya-loading-text">あなたのできごとに合わせて、<br>AIが認知行動療法の観点から考え中です。</p>
+          <p class="moya-loading-text">あなたの根拠と反証をふまえて、<br>AIが認知行動療法の観点から考え中です。</p>
         </div>
         <div style="margin-top:8px;">
           <button class="btn-ghost" data-act="moya-cancel" style="width:100%;">キャンセル</button>
@@ -8343,13 +8426,13 @@ function viewMoyamoya() {
     const canMore = s.alternativeViewsRevealed < s.alternativeViews.length;
     const selectedIdx = s.alternativeViewSelectedIndex;
     const hasSelection = typeof selectedIdx === 'number' && selectedIdx >= 0 && selectedIdx < s.alternativeViewsRevealed;
-    return moyamoyaScreen(stepLabel, '別の見方を考えてみました', `
+    return moyamoyaScreen(stepLabel, 'バランスのとれた別の見方', `
       <p class="text-tiny text-muted mb-3">⚠️ AIが推定した参考情報です。納得できるものを1つ選んでください。</p>
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${visible.map((rawV, i) => {
           const v = normalizeAltView(rawV);
           return `
-          <button class="moya-altview-card ${selectedIdx === i ? 'selected' : ''}" data-act="moya-step4-pick" data-index="${i}">
+          <button class="moya-altview-card ${selectedIdx === i ? 'selected' : ''}" data-act="moya-step7-pick" data-index="${i}">
             <span class="moya-altview-num">${i+1}</span>
             <div class="moya-altview-body">
               ${v.label ? `<span class="moya-altview-label">${escapeHtml(v.label)}</span>` : ''}
@@ -8359,15 +8442,17 @@ function viewMoyamoya() {
         }).join('')}
       </div>
       ${canMore ? `
-        <button class="btn btn-secondary" data-act="moya-step4-more" style="margin-top:14px; width:100%;">他の見方も見てみる</button>
+        <button class="btn btn-secondary" data-act="moya-step7-more" style="margin-top:14px; width:100%;">他の見方も見てみる</button>
       ` : ''}
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="moya-step4-next" ${!hasSelection ? 'disabled' : ''}>この見方で進む</button>
+        <button class="btn btn-primary" data-act="moya-step7-next" ${!hasSelection ? 'disabled' : ''}>この見方で進む</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
       </div>
     `);
   }
-  if (s.step === 5) {
+
+  // ─────── Step 8: 強さ再評価（旧 step 5）───────
+  if (s.step === 8) {
     const v = s.emotionScoreAfter == null ? Math.max(0, (s.emotionScoreBefore || 5) - 2) : s.emotionScoreAfter;
     return moyamoyaScreen(stepLabel, 'いま、気持ちの強さはどのくらい？', `
       <p class="text-soft mb-2">さっきは <strong>${s.emotionScoreBefore}</strong> でした。</p>
@@ -8380,12 +8465,14 @@ function viewMoyamoya() {
         `).join('')}
       </div>
       <div style="margin-top:24px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="moya-step5-next">レターを作る</button>
+        <button class="btn btn-primary" data-act="moya-step8-next">レターを作る</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
       </div>
     `);
   }
-  if (s.step === 6) {
+
+  // ─────── Step 9: レター（旧 step 6）───────
+  if (s.step === 9) {
     if (!s.letterBody) {
       const letter = generateLetter(s);
       s.letterTitle = letter.title;
@@ -8462,14 +8549,18 @@ function generateAlternativeViewsTemplate(eventText, emotion) {
 
 // v0.7.5 CBT (認知行動療法) ベースのAI別の見方生成
 // プロンプトは AI_PROMPTS.cbt_alternative_views を参照
-async function generateAlternativeViewsAI(eventText, emotion, score) {
+// v0.9.80: 自動思考・根拠・反証も受け取る（コラム法準拠）
+async function generateAlternativeViewsAI(eventText, emotion, score, automaticThought, evidence, counterEvidence) {
   if (!getApiKey()) return null;
   const def = AI_PROMPTS.cbt_alternative_views;
   const sys = def.systemPrompt;
   const user = def.userTemplate
     .replace('{eventText}', eventText || '')
     .replace('{emotion}', emotion || '')
-    .replace('{score}', score == null ? 5 : score);
+    .replace('{score}', score == null ? 5 : score)
+    .replace('{automaticThought}', automaticThought || '（未記入）')
+    .replace('{evidence}', evidence || '（未記入）')
+    .replace('{counterEvidence}', counterEvidence || '（未記入）');
 
   try {
     const text = await callGemini(sys, [{ role: 'user', content: user }], { temperature: def.temperature, maxTokens: def.maxTokens });
@@ -8511,6 +8602,39 @@ function generateAlternativeView(eventText, emotion) {
   return generateAlternativeViewsTemplate(eventText, emotion).join('\n\n');
 }
 
+// v0.9.80: 反証ステップ（コラム法⑤）の AI ヒント
+//   ユーザーが書いた自動思考＋根拠を踏まえて、反証の観点を3〜5個提示する
+async function generateCounterEvidenceHintsAI(eventText, emotion, automaticThought, evidence) {
+  if (!getApiKey()) return null;
+  const def = AI_PROMPTS.cbt_counter_evidence_hints;
+  if (!def) return null;
+  const user = def.userTemplate
+    .replace('{eventText}', eventText || '')
+    .replace('{emotion}', emotion || '')
+    .replace('{automaticThought}', automaticThought || '')
+    .replace('{evidence}', evidence || '（未記入）');
+  try {
+    const text = await callGemini(def.systemPrompt, [{ role: 'user', content: user }], {
+      temperature: def.temperature,
+      maxTokens: def.maxTokens,
+    });
+    if (!text) return null;
+    const cleaned = text.trim()
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/```\s*$/, '')
+      .trim();
+    const start = cleaned.indexOf('[');
+    const end = cleaned.lastIndexOf(']');
+    if (start < 0 || end < 0 || end <= start) return null;
+    const arr = JSON.parse(cleaned.slice(start, end + 1));
+    if (!Array.isArray(arr)) return null;
+    return arr.map(x => String(x || '').trim()).filter(x => x).slice(0, 5);
+  } catch (e) {
+    console.warn('[counter-evidence-hints]', e);
+    return null;
+  }
+}
+
 function generateLetter(s) {
   const date = new Date();
   const dateStr = `${date.getMonth()+1}月${date.getDate()}日`;
@@ -8523,9 +8647,19 @@ function generateLetter(s) {
     : diff > 0
     ? '気持ちは少しずつほぐれていきます。今日は書けただけでも一歩。'
     : '今日はまだ重く感じるかもしれない。それでも書いてくれたこと、覚えておこう。';
-  // alternativeView は step4 で1つ選択された見方
+  // alternativeView は step 7 で1つ選択された見方
   const altText = s.alternativeView || (Array.isArray(s.alternativeViews) ? s.alternativeViews.slice(0, s.alternativeViewsRevealed || 3).map((v, i) => `${i+1}. ${normalizeAltView(v).text}`).join('\n\n') : '');
-  const body = `今日起きたこと\n${s.eventText}\n\n感じていたこと\n${s.emotion}（強さ ${s.emotionScoreBefore} / 10）\n\n別の見方\n${altText}\n\n少し楽になるための一言\n${closing}`;
+  // v0.9.80: コラム法⑦本文（自動思考/根拠/反証も含めて整理）
+  const parts = [
+    `今日起きたこと\n${s.eventText || ''}`,
+    `感じていたこと\n${s.emotion || ''}（強さ ${s.emotionScoreBefore == null ? '' : s.emotionScoreBefore} / 10）`,
+  ];
+  if (s.automaticThought) parts.push(`頭に浮かんだ考え\n${s.automaticThought}`);
+  if (s.evidence)         parts.push(`そう思った理由\n${s.evidence}`);
+  if (s.counterEvidence)  parts.push(`別の見方の証拠\n${s.counterEvidence}`);
+  parts.push(`バランスの取れた別の見方\n${altText}`);
+  parts.push(`少し楽になるための一言\n${closing}`);
+  const body = parts.join('\n\n');
   return { title, body };
 }
 
@@ -8625,8 +8759,17 @@ function renderMoyamoyaLetter(s, opts) {
   const altText = s.alternativeView || '';
   const eventText = s.eventText || '';
   const emotion = s.emotion || '';
+  // v0.9.80: コラム法 ③④⑤ 拡張フィールド（過去データには無い → 空のときは表示スキップ）
+  const automaticThought = s.automaticThought || '';
+  const evidence = s.evidence || '';
+  const counterEvidence = s.counterEvidence || '';
+  const hasColumnFields = !!(automaticThought || evidence || counterEvidence);
+  const stepCountLabel = hasColumnFields ? '8つ' : '5つ';
 
   const summaryAltShort = altText.length > 60 ? altText.slice(0, 58) + '…' : altText;
+  const summaryAutoThoughtShort = automaticThought.length > 60 ? automaticThought.slice(0, 58) + '…' : automaticThought;
+  const summaryEvidenceShort = evidence.length > 60 ? evidence.slice(0, 58) + '…' : evidence;
+  const summaryCounterShort = counterEvidence.length > 60 ? counterEvidence.slice(0, 58) + '…' : counterEvidence;
 
   return `
     <div class="screen active letter-screen">
@@ -8658,7 +8801,7 @@ function renderMoyamoyaLetter(s, opts) {
           <p class="letter-sub">心を整えるための、やさしい整理レター</p>
 
           <p class="letter-intro">
-            5つのステップで気持ちを整理してくれて、ありがとう。<br>
+            ${stepCountLabel}のステップで気持ちを整理してくれて、ありがとう。<br>
             あなたの気持ちを、ここにそっと形にしてお届けします。
           </p>
 
@@ -8707,10 +8850,29 @@ function renderMoyamoyaLetter(s, opts) {
                 <p class="lp-extra">${escapeHtml(need)}</p>
               </div>
             </div>
+            ${automaticThought ? `
+            <div class="letter-point">
+              <span class="letter-point-icon" style="background:#FBE2EA; color:#C95571;">💭</span>
+              <div>
+                <div class="letter-point-title" style="color:#C95571;">頭に浮かんだ考え</div>
+                <p>${escapeHtml(automaticThought).replace(/\n/g, '<br>')}</p>
+              </div>
+            </div>
+            ` : ''}
+            ${evidence || counterEvidence ? `
+            <div class="letter-point">
+              <span class="letter-point-icon" style="background:#FBEACB; color:#C97F2A;">⚖️</span>
+              <div>
+                <div class="letter-point-title" style="color:#C97F2A;">事実と反証</div>
+                ${evidence ? `<p><strong>そう思った理由：</strong><br>${escapeHtml(evidence).replace(/\n/g, '<br>')}</p>` : ''}
+                ${counterEvidence ? `<p style="margin-top:8px;"><strong>でも、別の見方の証拠：</strong><br>${escapeHtml(counterEvidence).replace(/\n/g, '<br>')}</p>` : ''}
+              </div>
+            </div>
+            ` : ''}
             <div class="letter-point">
               <span class="letter-point-icon view">💡</span>
               <div>
-                <div class="letter-point-title view">別の見方</div>
+                <div class="letter-point-title view">バランスの取れた別の見方</div>
                 <p>${escapeHtml(altText).replace(/\n/g, '<br>')}</p>
               </div>
             </div>
@@ -8753,8 +8915,7 @@ function renderMoyamoyaLetter(s, opts) {
             <div class="letter-summary-icon">❤</div>
             <div>
               <div class="letter-summary-stepname">2 / どんな気持ち？</div>
-              <div class="letter-summary-content">${escapeHtml(emotion)}（強さ：${before}/10）</div>
-              <div class="letter-summary-content accent">→ いまは ${after}/10</div>
+              <div class="letter-summary-content">${escapeHtml(emotion)}</div>
             </div>
           </div>
           <div class="letter-summary-card">
@@ -8764,17 +8925,44 @@ function renderMoyamoyaLetter(s, opts) {
               <div class="letter-summary-content">整理前の強さ<br>${before} / 10</div>
             </div>
           </div>
+          ${automaticThought ? `
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">💭</div>
+            <div>
+              <div class="letter-summary-stepname">4 / 頭に浮かんだ考え</div>
+              <div class="letter-summary-content">${escapeHtml(summaryAutoThoughtShort)}</div>
+            </div>
+          </div>
+          ` : ''}
+          ${evidence ? `
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">📌</div>
+            <div>
+              <div class="letter-summary-stepname">5 / そう思った理由</div>
+              <div class="letter-summary-content">${escapeHtml(summaryEvidenceShort)}</div>
+            </div>
+          </div>
+          ` : ''}
+          ${counterEvidence ? `
+          <div class="letter-summary-card">
+            <div class="letter-summary-icon">⚖️</div>
+            <div>
+              <div class="letter-summary-stepname">6 / 別の見方の証拠</div>
+              <div class="letter-summary-content">${escapeHtml(summaryCounterShort)}</div>
+            </div>
+          </div>
+          ` : ''}
           <div class="letter-summary-card">
             <div class="letter-summary-icon">🌱</div>
             <div>
-              <div class="letter-summary-stepname">4 / 別の見方</div>
+              <div class="letter-summary-stepname">${hasColumnFields ? '7' : '4'} / バランスの取れた別の見方</div>
               <div class="letter-summary-content">${escapeHtml(summaryAltShort)}</div>
             </div>
           </div>
           <div class="letter-summary-card">
             <div class="letter-summary-icon">🌱</div>
             <div>
-              <div class="letter-summary-stepname">5 / いまの強さは？</div>
+              <div class="letter-summary-stepname">${hasColumnFields ? '8' : '5'} / いまの強さは？</div>
               <div class="letter-summary-content">${after} / 10</div>
             </div>
           </div>
@@ -8810,7 +8998,12 @@ function saveMoyamoyaRecord() {
     eventText: moyamoya.eventText,
     emotion: moyamoya.emotion,
     emotionScoreBefore: moyamoya.emotionScoreBefore,
+    // v0.9.80: コラム法 ③④⑤
+    automaticThought: moyamoya.automaticThought || '',
+    evidence: moyamoya.evidence || '',
+    counterEvidence: moyamoya.counterEvidence || '',
     alternativeView: moyamoya.alternativeView,
+    alternativeViewLabel: moyamoya.alternativeViewLabel || '',
     emotionScoreAfter: moyamoya.emotionScoreAfter,
     letterTitle: moyamoya.letterTitle,
     letterBody: moyamoya.letterBody,
@@ -10407,12 +10600,12 @@ const KIZUKI_WORKS = [
   {
     id: 'column-method',
     title: '頭の中を整理する',
-    subtitle: 'コラム法',
+    subtitle: 'コラム法（もやもや整理）',
     body: '考えや感情がまとまらず、頭の中をすっきりさせてバランスの取れた考え方を見つけたいとき',
     icon: '🗒️', iconBg: '#FBEACB',
     chipBg: '#FBEACB', chipText: '#C97F2A',
-    time: '10分', status: 'pending', action: 'kizuki-coming-soon',
-    cat: 'thought', desc: '思考と感情をコラムで整理する', section: '思考のクセを知る',
+    time: '10分', status: 'available', action: 'kizuki-open-column-method',
+    cat: 'thought', desc: 'CBT 7列コラム法で思考と感情を整理（もやもや整理に遷移）', section: '思考のクセを知る',
   },
   {
     id: 'stimulus-control',
@@ -12330,9 +12523,9 @@ const AI_PROMPTS = {
 
   cbt_alternative_views: {
     id: 'cbt_alternative_views',
-    title: 'もやもや整理 - 別の見方（CBT）',
-    purpose: '相談者のできごとと感情から、認知行動療法（CBT）の認知再構成の観点で6つの別の見方を生成する。',
-    triggerLocation: 'ホーム → もやもや整理 → Step 4（強さ入力後の自動遷移）',
+    title: 'もやもや整理 - 別の見方（CBT・コラム法⑥適応的思考）',
+    purpose: '相談者の状況・感情・自動思考・根拠・反証を踏まえ、認知再構成の観点で6つのバランスの取れた見方を生成する。',
+    triggerLocation: 'ホーム → もやもや整理 → Step 7（反証入力後の自動遷移）',
     callSite: 'generateAlternativeViewsAI() → callGemini(AI_PROMPTS.cbt_alternative_views.systemPrompt, [user])',
     model: 'gemini-2.5-flash',
     temperature: 0.95,
@@ -12344,12 +12537,14 @@ const AI_PROMPTS = {
       'JSON 抽出 / パース失敗時は静かにテンプレへフォールバック',
       '生成失敗時もユーザーには loading 解除後にテンプレで表示',
       'label が固定8種以外なら空文字に正規化（誤ラベル防止）',
+      'ユーザーが書いた反証を必ず1つは反映する（独自視点で上書きしない）',
     ],
-    systemPrompt: `あなたは認知行動療法（CBT）に基づいてサポートする経験豊富なセラピストです。
-22-28歳の若者の相談に対し、認知再構成（cognitive restructuring）の観点から「別の見方」を6つ提示してください。
+    systemPrompt: `あなたは認知行動療法（CBT）コラム法に基づいてサポートする経験豊富なセラピストです。
+22-28歳の若者が、自動思考に対する「根拠」と「反証」を既に書き出した状態で相談に来ています。
+これら全てを踏まえ、認知再構成（cognitive restructuring）の観点から「適応的思考（バランスの取れた別の見方）」を6つ提示してください。
 各見方には、その見方が属するCBT技法ラベル（下記候補から1つ）を付けます。
 
-# CBTの認知の歪み（相談者の思考に隠れがちな代表例）
+# CBTの認知の歪み（相談者の自動思考に隠れがちな代表例）
 - 全か無か思考（白黒で決めつける）
 - 過度の一般化（いつも・絶対・どうせ）
 - 心の読みすぎ（相手の気持ちを断定）
@@ -12371,6 +12566,8 @@ const AI_PROMPTS = {
 
 # 出力ルール
 - 6つはそれぞれ違うラベルにする（同じラベルが2つ以上にならない）
+- **ユーザーが書いた「反証」を必ず1つ以上の見方に反映させる**（独自視点だけで埋めない）
+- 「根拠」も完全には否定せず、「事実の一部であって全部ではない」というニュアンスで扱う
 - 否定せず共感ベース。「〜かもしれない」「〜と考えてみてもいいかも」など断定を避ける
 - text は 2-3文・80-130字
 - 22-28歳の若者に話しかける温かい口語トーン
@@ -12379,14 +12576,66 @@ const AI_PROMPTS = {
 
 # 出力フォーマット
 [{"label":"第三者視点","text":"見方1のテキスト"},{"label":"時間軸","text":"見方2のテキスト"},{"label":"事実と解釈","text":"見方3のテキスト"},{"label":"自分への声かけ","text":"見方4のテキスト"},{"label":"状況の幅","text":"見方5のテキスト"},{"label":"小さな事実","text":"見方6のテキスト"}]`,
-    userTemplate: `# 相談内容
+    userTemplate: `# 相談内容（コラム法 ①〜⑤）
+- ①できごと: {eventText}
+- ②主な感情: {emotion}（強さ {score}/10）
+- ③自動思考（パッと浮かんだ考え）: {automaticThought}
+- ④根拠（事実だと思う理由）: {evidence}
+- ⑤反証（事実じゃないかもしれない別の証拠）: {counterEvidence}
+
+上記をふまえて、⑥適応的思考（バランスの取れた別の見方）を6つ {label, text} 形式の JSON 配列で出力してください。
+特に⑤反証を必ず1つ以上の見方に反映させてください。`,
+    lastUpdated: '2026-05-27',
+    changeNote: 'v0.9.80 コラム法準拠 — 自動思考/根拠/反証を入力に取り、反証を反映した適応的思考を生成。',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  cbt_counter_evidence_hints: {
+    id: 'cbt_counter_evidence_hints',
+    title: 'もやもや整理 - 反証ヒント（コラム法⑤）',
+    purpose: '自動思考と根拠を踏まえ、反証を考えるためのヒントを3〜5個 JSON 配列で生成。',
+    triggerLocation: 'ホーム → もやもや整理 → Step 6（反証）→ 「💡 AIにヒントをもらう」',
+    callSite: 'generateCounterEvidenceHintsAI() → callGemini(AI_PROMPTS.cbt_counter_evidence_hints.systemPrompt, [user])',
+    model: 'gemini-2.5-flash',
+    temperature: 0.85,
+    maxTokens: 600,
+    outputFormat: 'JSON 配列（3〜5個の文字列・各40-80字の問いかけ）',
+    fallbackBehavior: 'API未設定/失敗/JSONパース失敗 → ヒント表示なし',
+    safetyChecks: [
+      'ユーザーの根拠を否定しない',
+      '「あなたは間違っている」というニュアンスは出さない',
+      '答えを押し付けず「問い」の形で提示する',
+    ],
+    systemPrompt: `あなたは認知行動療法（CBT）コラム法に基づいてサポートする経験豊富なセラピストです。
+22-28歳の若者が、ある自動思考について「根拠」を書き出した後、「反証（事実じゃないかもしれない別の証拠）」を考えるステップに来ています。
+反証を見つけるための**問いかけのヒント**を、3〜5個出してください。
+
+# 反証を引き出す視点（参考）
+- 過去の例外: 「逆のパターンが起きた経験はなかったか？」
+- 第三者視点: 「同じ状況の友人なら、何と声をかけるか？」
+- 部分肯定: 「100%そうだろうか？ 70%、50%だとしたら？」
+- 反対の証拠: 「逆を示す小さな事実はあるか？」
+- 時間軸: 「1年後の自分はこの状況をどう見るだろうか？」
+- 第3の解釈: 「今書いた根拠以外に、別の説明はできないか？」
+
+# 厳守
+- 答えを出さない。あくまで「問い」の形で投げかける
+- 根拠を「間違っている」と否定しない
+- 各ヒントは 40〜80 字の柔らかい口語
+- 必ず JSON 配列のみで出力（説明・コードブロック禁止）
+
+# 出力フォーマット
+["問いかけ1","問いかけ2","問いかけ3","問いかけ4"]`,
+    userTemplate: `# 相談状況
 - できごと: {eventText}
 - 主な感情: {emotion}
-- 強さ: {score}/10
+- 自動思考: {automaticThought}
+- ユーザーが書いた根拠: {evidence}
 
-上記について、別の見方を6つ {label, text} 形式の JSON 配列で出力してください。`,
-    lastUpdated: '2026-05-06',
-    changeNote: 'v0.9.34 で出力を {label, text} 形式に変更。CBT技法ラベル8種を導入し選択時の判断材料を増やす。',
+上記を踏まえ、ユーザーが「反証」を考えやすくなる問いかけを 3〜5 個、JSON 配列で出力してください。`,
+    lastUpdated: '2026-05-27',
+    changeNote: 'v0.9.80 初版（コラム法⑤反証ステップの AI ヒント）',
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
@@ -14883,17 +15132,72 @@ function handleAction(act, el, ev) {
     if (moyamoya.emotionScoreBefore == null) moyamoya.emotionScoreBefore = 5;
     moyamoya.step = 4; render(); return;
   }
-  if (act === 'moya-step4-more') {
+  // ── v0.9.80: Step 4 自動思考 ──
+  if (act === 'moya-step4-next') {
+    const v = (document.getElementById('moyaAutoThoughtInput') || {}).value || '';
+    if (!v.trim()) { toast('頭に浮かんだ考えを書いてみて'); return; }
+    moyamoya.automaticThought = v.trim();
+    moyamoya.step = 5;
+    render();
+    return;
+  }
+  // ── v0.9.80: Step 5 根拠 ──
+  if (act === 'moya-step5-next') {
+    const v = (document.getElementById('moyaEvidenceInput') || {}).value || '';
+    if (!v.trim()) { toast('「事実だと思う理由」を書いてみて'); return; }
+    moyamoya.evidence = v.trim();
+    moyamoya.step = 6;
+    render();
+    return;
+  }
+  // ── v0.9.80: Step 6 反証 + AIヒント ──
+  if (act === 'moya-step6-hint') {
+    if (!moyamoya || moyamoya.counterEvidenceHintsLoading) return;
+    // 反証 textarea の現在値を退避（再描画でクリアされないように）
+    const cur = (document.getElementById('moyaCounterEvidenceInput') || {}).value || '';
+    moyamoya.counterEvidence = cur;
+    moyamoya.counterEvidenceHintsLoading = true;
+    const sessionRef = moyamoya;
+    render();
+    generateCounterEvidenceHintsAI(
+      sessionRef.eventText,
+      sessionRef.emotion,
+      sessionRef.automaticThought,
+      sessionRef.evidence
+    ).then(hints => {
+      if (moyamoya !== sessionRef) return;
+      sessionRef.counterEvidenceHints = (hints && hints.length) ? hints : null;
+      sessionRef.counterEvidenceHintsLoading = false;
+      if (!sessionRef.counterEvidenceHints) toast('ヒントが取れなかったよ。自分の言葉で書いてみよう');
+      render();
+    }).catch(() => {
+      if (moyamoya !== sessionRef) return;
+      sessionRef.counterEvidenceHints = null;
+      sessionRef.counterEvidenceHintsLoading = false;
+      render();
+    });
+    return;
+  }
+  if (act === 'moya-step6-next') {
+    const v = (document.getElementById('moyaCounterEvidenceInput') || {}).value || '';
+    if (!v.trim()) { toast('反証を1つでもいいから書いてみて'); return; }
+    moyamoya.counterEvidence = v.trim();
+    moyamoya.step = 7;
+    render();
+    return;
+  }
+  // ── Step 7（旧 step4）：適応的思考 / 別の見方 ──
+  if (act === 'moya-step7-more') {
     moyamoya.alternativeViewsRevealed = Math.min(6, (moyamoya.alternativeViewsRevealed || 3) + 3);
     render();
     return;
   }
-  if (act === 'moya-step4-pick') {
+  if (act === 'moya-step7-pick') {
     moyamoya.alternativeViewSelectedIndex = parseInt(el.dataset.index, 10);
     render();
     return;
   }
-  if (act === 'moya-step4-next') {
+  if (act === 'moya-step7-next') {
     // 選択された1つの見方をレター用に保存（新形式 {label,text} / 旧形式 string 両対応）
     const idx = moyamoya.alternativeViewSelectedIndex;
     if (!Array.isArray(moyamoya.alternativeViews) || typeof idx !== 'number' || idx < 0 || idx >= (moyamoya.alternativeViewsRevealed || 0)) {
@@ -14903,13 +15207,14 @@ function handleAction(act, el, ev) {
     const picked = normalizeAltView(moyamoya.alternativeViews[idx]);
     moyamoya.alternativeView = picked.text;
     moyamoya.alternativeViewLabel = picked.label || '';
-    moyamoya.step = 5;
+    moyamoya.step = 8;
     render();
     return;
   }
-  if (act === 'moya-step5-next') {
+  // ── Step 8（旧 step5）：強さ再評価 → レター ──
+  if (act === 'moya-step8-next') {
     if (moyamoya.emotionScoreAfter == null) moyamoya.emotionScoreAfter = 5;
-    moyamoya.step = 6; render(); return;
+    moyamoya.step = 9; render(); return;
   }
   if (act === 'moya-save') {
     const r = saveMoyamoyaRecord();
@@ -15394,6 +15699,12 @@ function handleAction(act, el, ev) {
   if (act === 'kizuki-open-deepdive') {
     deepDive = ddSessionInit({ from: 'kizuki' });
     go('deepdive');
+    return;
+  }
+  // v0.9.80: きづきタブからコラム法（もやもや整理）を起動
+  if (act === 'kizuki-open-column-method') {
+    moyamoya = { step: 1 };
+    go('moyamoya');
     return;
   }
   // きづきタブ: ワーク一覧へ
