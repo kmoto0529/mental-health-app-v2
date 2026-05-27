@@ -6471,7 +6471,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.80-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.81-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7308,6 +7308,7 @@ function getRenderKey() {
   if (typeof moyamoya !== 'undefined' && moyamoya && moyamoya.step) k += ':moya' + moyamoya.step;
   if (typeof deepDive !== 'undefined' && deepDive && deepDive.step) k += ':dd' + deepDive.step;
   if (typeof behaviorExpSession !== 'undefined' && behaviorExpSession && behaviorExpSession.step) k += ':bx' + behaviorExpSession.step;
+  if (typeof stimulusSession !== 'undefined' && stimulusSession && stimulusSession.step) k += ':sc' + stimulusSession.step;
   return k;
 }
 
@@ -7343,6 +7344,7 @@ function render() {
     case 'kizuki-list':     html = viewKizukiList(); break;
     case 'kizuki-work':     html = viewKizukiWork(); break;
     case 'behavior-exp':    html = viewBehaviorExp(); break;
+    case 'stimulus':        html = viewStimulus(); break;
     case 'record':          html = viewRecord(); break;
     case 'day-detail':      html = viewDayDetail(); break;
     case 'kiroku-detail':       html = viewKirokuDetail(); break;
@@ -10614,8 +10616,8 @@ const KIZUKI_WORKS = [
     body: '気が散って集中できない、だらだらしてしまうなど、気持ちが安定しにくいとき',
     icon: '🚪', iconBg: '#E9E3FB',
     chipBg: '#E9E3FB', chipText: '#6E5BCE',
-    time: '7分', status: 'pending', action: 'kizuki-coming-soon',
-    cat: 'behavior', desc: '集中・睡眠に効く環境調整', section: '環境を整える',
+    time: '15分〜', status: 'available', action: 'kizuki-open-stimulus',
+    cat: 'behavior', desc: '5ステップで目標→AIプラン→実施→振り返り→次へ', section: '環境を整える',
   },
 ];
 
@@ -11497,9 +11499,834 @@ function viewBehaviorExpNextPlan() {
   `;
 }
 
-
 // ============================================================
-// 深掘り（下向き矢印法 9ステップ - v0.9.71）
+// 刺激統制フロー（9ステップ + ホーム + チェックイン）— v0.9.81
+//
+// 画面遷移:
+//   home → about(1) → goal-1〜goal-5(2) → analyzing(3) → plan-list(4)
+//        → plan-select(5) → do(6) → check(7) → act(8) → pdca(9)
+//
+// state:
+//   stimulusSession: in-memory（進行中の1サイクル）
+//   state.stimulusControlSessions[]: 完了済み履歴
+//
+// 画面: render() switch case 'stimulus'
+// ============================================================
+let stimulusSession = null;
+
+const SC_GOAL_CATEGORIES = [
+  { id: 'mental',  icon: '🧘', label: '気分・メンタル' },
+  { id: 'focus',   icon: '🎯', label: '集中・仕事・勉強' },
+  { id: 'sleep',   icon: '🌙', label: '睡眠' },
+  { id: 'body',    icon: '👟', label: '運動・身体活動' },
+  { id: 'habit',   icon: '📋', label: '習慣化したいこと' },
+  { id: 'other',   icon: '✨', label: 'その他（自由設定）' },
+];
+
+const SC_CHALLENGE_OPTIONS = [
+  'スマホ・SNSの通知',
+  'だらだら動画を見ること',
+  '疲労・眠気',
+  '周りの音・人の声',
+  'やることが多すぎる',
+  '気分の落ち込み・不安',
+  'その他',
+];
+
+const SC_ENVIRONMENT_OPTIONS = [
+  '物理的な環境（場所・モノ）',
+  'デジタル環境（スマホ・PC など）',
+  '時間の使い方・スケジュール',
+  '心の状態・気分',
+  '人との関わり',
+  'その他',
+];
+
+const SC_SMALL_STEP_EXAMPLES = [
+  'スマホの通知をオフにする',
+  '机の上を片付ける',
+  '集中する時間を決める（15分から）',
+  '寝る1時間前はスマホを見ない',
+  'やることを紙に書き出す',
+];
+
+const SC_PRIORITY_OPTIONS = [
+  { id: 'high', label: '高' },
+  { id: 'mid',  label: '中' },
+  { id: 'low',  label: '低' },
+];
+
+const SC_START_OPTIONS = [
+  { id: 'today',     label: '今日から' },
+  { id: 'this-week', label: '今週から' },
+  { id: 'next-week', label: '来週から' },
+];
+
+function startStimulus() {
+  stimulusSession = { step: 'home' };
+  go('stimulus');
+}
+
+function newStimulusSession() {
+  stimulusSession = {
+    id: 'sc-' + Date.now(),
+    createdAt: new Date().toISOString(),
+    step: 'about',
+    goal: { text: '', category: '' },
+    challenges: { selected: [], detail: '' },
+    environment: { selected: [], detail: '' },
+    smallStep: { selected: '', custom: '' },
+    priority: { level: 'mid', startDate: 'today' },
+    aiPlans: { candidates: [], loading: false },
+    customPlans: [], // ユーザー自作
+    selectedPlanIds: [], // 選んだ最大3つ
+    checkins: [],
+    nextAction: null, // 'continue'|'tweak'|'try-other'|'add-new'
+    nextActionMemo: '',
+    aiAdvice: '',
+  };
+  render();
+}
+
+function cancelStimulus() {
+  stimulusSession = null;
+  go('kizuki');
+}
+
+function backToStimulusHome() {
+  stimulusSession = { step: 'home' };
+  render();
+}
+
+function completeStimulus() {
+  if (!stimulusSession || !stimulusSession.id) return;
+  const completed = JSON.parse(JSON.stringify(stimulusSession));
+  completed.completedAt = new Date().toISOString();
+  completed.status = 'completed';
+  delete completed.step;
+  state.stimulusControlSessions = state.stimulusControlSessions || [];
+  const idx = state.stimulusControlSessions.findIndex(e => e.id === completed.id);
+  if (idx >= 0) state.stimulusControlSessions[idx] = completed;
+  else state.stimulusControlSessions.unshift(completed);
+  saveState();
+  stimulusSession = { step: 'home' };
+  render();
+}
+
+// ----- AI候補生成 -----
+async function generateStimulusPlansAI() {
+  if (!stimulusSession) return;
+  stimulusSession.aiPlans.loading = true;
+  stimulusSession.step = 'analyzing';
+  render();
+
+  const def = AI_PROMPTS.stimulus_control_plans;
+  let candidates = null;
+  if (def && getInviteCode()) {
+    const cat = (SC_GOAL_CATEGORIES.find(c => c.id === stimulusSession.goal.category) || {}).label || '未指定';
+    const priLbl = (SC_PRIORITY_OPTIONS.find(p => p.id === stimulusSession.priority.level) || {}).label || '中';
+    const startLbl = (SC_START_OPTIONS.find(s => s.id === stimulusSession.priority.startDate) || {}).label || '今日から';
+    const userMsg = [
+      '【目標】', stimulusSession.goal.text,
+      '【カテゴリ】', cat,
+      '【課題・きっかけ】', (stimulusSession.challenges.selected || []).join('、') || '（未選択）',
+      stimulusSession.challenges.detail ? `（補足）${stimulusSession.challenges.detail}` : '',
+      '【整えたい環境】', (stimulusSession.environment.selected || []).join('、') || '（未選択）',
+      stimulusSession.environment.detail ? `（補足）${stimulusSession.environment.detail}` : '',
+      '【小さな一歩】', stimulusSession.smallStep.custom || stimulusSession.smallStep.selected || '（未選択）',
+      '【優先度】', priLbl,
+      '【開始時期】', startLbl,
+      '',
+      '上記をふまえて、刺激統制の具体プラン候補を5個 JSON 配列で出力してください。',
+    ].filter(Boolean).join('\n');
+    try {
+      const text = await callGemini(def.systemPrompt, [{ role: 'user', content: userMsg }], {
+        temperature: def.temperature,
+        maxTokens: def.maxTokens,
+      });
+      candidates = parseStimulusPlansJson(text);
+    } catch (e) {
+      console.warn('[stimulus-plans]', e);
+    }
+  }
+  if (!candidates || candidates.length === 0) {
+    candidates = [
+      { id: 'p1', title: '集中できる環境をつくる', desc: '作業時間はスマホを別の部屋に置き、通知をオフにする', tags: ['環境を整える', '集中・仕事・勉強'] },
+      { id: 'p2', title: 'きっかけを変える（If-Thenプラン）', desc: '机に座ったら深呼吸をして、タイマーをセットして始める', tags: ['きっかけを変える', '集中・仕事・勉強'] },
+      { id: 'p3', title: 'スマホの使い方をルール化する', desc: '作業中はアプリをブロック、休憩は15分だけOKにする', tags: ['スマホを減らす', '気分・メンタル'] },
+      { id: 'p4', title: 'ごほうびを用意する', desc: '25分集中できたら、好きな飲み物を飲むなど小さなごほうびを用意する', tags: ['ごほうびを用意', 'やる気UP'] },
+      { id: 'p5', title: '夜ふかしを防ぐ仕組みをつくる', desc: '寝る1時間前はスマホをリビングに置くリラックスタイムを作る', tags: ['夜のルール', '睡眠・休息'] },
+    ];
+  }
+  if (stimulusSession && stimulusSession.aiPlans) {
+    stimulusSession.aiPlans.candidates = candidates;
+    stimulusSession.aiPlans.loading = false;
+    stimulusSession.step = 'plan-list';
+    render();
+  }
+}
+
+function parseStimulusPlansJson(text) {
+  if (!text) return null;
+  try {
+    const m = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+    const raw = m ? m[0] : text;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return null;
+    return arr.slice(0, 5).map((x, i) => ({
+      id: String(x.id || ('p' + (i + 1))),
+      title: String(x.title || ''),
+      desc: String(x.desc || ''),
+      tags: Array.isArray(x.tags) ? x.tags.slice(0, 3).map(String) : [],
+    })).filter(x => x.title);
+  } catch (e) {
+    return null;
+  }
+}
+
+async function generateStimulusAdviceAI() {
+  if (!stimulusSession) return;
+  const def = AI_PROMPTS.stimulus_control_advice;
+  const latest = (stimulusSession.checkins || [])[stimulusSession.checkins.length - 1];
+  if (!latest) return;
+  const sessionRef = stimulusSession;
+  const selectedPlans = getSelectedPlanObjects();
+  let advice = null;
+  if (def && getInviteCode()) {
+    const userMsg = [
+      '【刺激統制プラン】',
+      ...selectedPlans.map((p, i) => `${i+1}. ${p.title} — ${p.desc}`),
+      '',
+      '【今日のチェックイン】',
+      ...latest.planResults.map(r => {
+        const p = selectedPlans.find(p => p.id === r.planId);
+        const lbl = { good: 'できた', soso: 'まあまあ', bad: 'できなかった' }[r.result] || r.result;
+        return p ? `- ${p.title}: ${lbl}` : '';
+      }).filter(Boolean),
+      `全体の効果: ${latest.overallScore}/5`,
+      `気分: ${latest.moodAfter || '未記入'}`,
+      latest.focusMinutes ? `集中時間: 約${latest.focusMinutes}分` : '',
+      latest.memo ? `メモ: ${latest.memo}` : '',
+      '',
+      '上記を踏まえて、やさしく振り返り＋次の一歩を1つ提案してください。'
+    ].filter(Boolean).join('\n');
+    try {
+      advice = await callGemini(def.systemPrompt, [{ role: 'user', content: userMsg }], {
+        temperature: def.temperature,
+        maxTokens: def.maxTokens,
+      });
+    } catch (e) {
+      console.warn('[stimulus-advice]', e);
+    }
+  }
+  if (!advice) {
+    advice = 'よくできていましたね。続けやすかったプランを軸にしつつ、難しかったものは「もう少し小さくする」「時間や条件を変える」など、ちょっとした工夫で続けやすくなるかもしれません。';
+  }
+  if (stimulusSession === sessionRef) {
+    stimulusSession.aiAdvice = advice;
+    render();
+  }
+}
+
+function getSelectedPlanObjects() {
+  if (!stimulusSession) return [];
+  const all = [...(stimulusSession.aiPlans.candidates || []), ...(stimulusSession.customPlans || [])];
+  return (stimulusSession.selectedPlanIds || []).map(id => all.find(p => p.id === id)).filter(Boolean);
+}
+
+function scLevelColor(idx) {
+  const colors = ['#82B07F', '#7BA0C6', '#D78A6E', '#C77AB0', '#B89F62'];
+  return colors[idx % colors.length];
+}
+
+// ----- ビュー: ルート -----
+function viewStimulus() {
+  if (!stimulusSession) { go('kizuki'); return ''; }
+  const s = stimulusSession.step;
+  if (s === 'home')        return viewStimulusHome();
+  if (s === 'about')       return viewStimulusAbout();
+  if (s === 'goal-1')      return viewStimulusGoal1();
+  if (s === 'goal-2')      return viewStimulusGoal2();
+  if (s === 'goal-3')      return viewStimulusGoal3();
+  if (s === 'goal-4')      return viewStimulusGoal4();
+  if (s === 'goal-5')      return viewStimulusGoal5();
+  if (s === 'analyzing')   return viewStimulusAnalyzing();
+  if (s === 'plan-list')   return viewStimulusPlanList();
+  if (s === 'plan-select') return viewStimulusPlanSelect();
+  if (s === 'do')          return viewStimulusDo();
+  if (s === 'check')       return viewStimulusCheck();
+  if (s === 'act')         return viewStimulusAct();
+  if (s === 'pdca')        return viewStimulusPdca();
+  return viewStimulusHome();
+}
+
+function viewStimulusHeader(title, sub) {
+  return `
+    <div class="page-header">
+      <button class="page-back" data-act="stimulus-back-home">‹</button>
+      <h1 class="page-title">${escapeHtml(title)}</h1>
+      <span class="text-tiny text-muted" style="min-width:48px; text-align:right;">${escapeHtml(sub || '')}</span>
+    </div>
+  `;
+}
+
+// ----- ホーム -----
+function viewStimulusHome() {
+  const list = (state.stimulusControlSessions || []);
+  return `
+    <div class="screen active">
+      <div class="page-header">
+        <button class="page-back" data-act="stimulus-cancel">‹</button>
+        <h1 class="page-title">刺激統制</h1>
+        <span style="min-width:36px;"></span>
+      </div>
+
+      <div style="padding:16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:14px; margin:10px 0 18px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <span style="font-size:22px;">🚪</span>
+          <div style="font-weight:600;">環境を整えてラクになる</div>
+        </div>
+        <div style="font-size:13px; line-height:1.8;">
+          刺激統制は、行動と環境を整えることで、「やりたい行動」をサポートし、「やめたい行動」のきっかけ（刺激）を減らす方法です。
+        </div>
+        <div style="margin-top:12px; padding:10px 12px; background: var(--bg-soft); border-radius:8px; font-size:12px; line-height:1.7;">
+          💡 小さな工夫の積み重ねが、理想の自分に近づく力になります。
+        </div>
+      </div>
+
+      <h2 style="font-size:14px; margin:18px 0 10px; color: var(--text-muted);">あなたの取り組み履歴</h2>
+      ${list.length === 0
+        ? `<div style="padding:24px 16px; text-align:center; color: var(--text-muted); font-size:13px; line-height:1.7;">まだ取り組みはありません。<br>下のボタンから、最初の一歩を始めてみよう。</div>`
+        : list.map(e => renderStimulusHistoryCard(e)).join('')
+      }
+
+      <div style="margin-top:24px;">
+        <button class="btn btn-primary" data-act="stimulus-new" style="width:100%;">＋ 新しい取り組みを始める</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderStimulusHistoryCard(e) {
+  const dt = new Date(e.createdAt);
+  const dateStr = `${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;
+  const checkinsCount = (e.checkins || []).length;
+  return `
+    <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+      <div class="text-tiny text-muted">${dateStr}</div>
+      <div style="font-weight:600; margin-top:2px; line-height:1.5;">${escapeHtml((e.goal && e.goal.text) || '(目標未入力)')}</div>
+      <div class="text-tiny text-muted" style="margin-top:6px;">チェックイン ${checkinsCount} 回</div>
+    </div>
+  `;
+}
+
+// ----- 1. 刺激統制とは？ -----
+function viewStimulusAbout() {
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('刺激統制とは？', '1/9')}
+
+      <div style="padding:16px; background: var(--bg-soft); border-radius:12px; margin:10px 0 14px; line-height:1.8; font-size:13px;">
+        刺激統制は、行動と環境を整えることで、「やりたい行動」をサポートし、「やめたい行動」のきっかけ（刺激）を減らす方法です。
+      </div>
+
+      <h3 style="font-size:14px; margin:14px 0 8px;">期待できる効果</h3>
+      <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
+        ${[
+          { icon: '😊', text: '気分が安定する' },
+          { icon: '🎯', text: '集中しやすくなる' },
+          { icon: '🌱', text: '習慣が続きやすくなる' },
+          { icon: '🌊', text: 'ストレスや不安が軽くなる' },
+        ].map(x => `
+          <div style="padding:12px; background: var(--bg-card); border:1px solid var(--divider); border-radius:10px; text-align:center;">
+            <div style="font-size:22px;">${x.icon}</div>
+            <div style="font-size:12px; margin-top:4px; line-height:1.5;">${x.text}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <h3 style="font-size:14px; margin:18px 0 8px;">こんな場面で役立ちます</h3>
+      <div style="display:grid; gap:8px;">
+        ${[
+          { goal: '集中したい', act: 'スマホの通知をオフにする' },
+          { goal: '運動したい', act: 'ウェアを見える場所に置く' },
+          { goal: '夜ふかしをやめたい', act: '寝る前のスマホを別の部屋に置く' },
+        ].map(x => `
+          <div style="padding:12px 14px; background: var(--bg-card); border:1px solid var(--divider); border-radius:10px;">
+            <div class="text-tiny text-muted">${x.goal}</div>
+            <div style="font-weight:600; font-size:13px; margin-top:2px;">→ ${x.act}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="about" style="width:100%;">目標を入力する</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 2. 目標入力 5サブステップ -----
+function scSubstepHeader(n) {
+  const labels = ['目標を決める', '課題・きっかけ', '理想の環境', '小さな一歩', '優先順位と開始'];
+  return `<div style="display:flex; gap:6px; margin:6px 0 14px; flex-wrap:wrap;">
+    ${labels.map((lbl, i) => `
+      <div style="flex:1; min-width:60px; padding:6px 4px; text-align:center; background:${i+1 === n ? 'var(--accent, #6BA877)' : 'var(--bg-soft)'}; color:${i+1 === n ? '#fff' : 'var(--text-muted)'}; border-radius:8px; font-size:11px;">
+        ${i+1}. ${lbl}
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+function viewStimulusGoal1() {
+  const g = stimulusSession.goal;
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('目標を入力', '2/9 · Step 1/5')}
+      ${scSubstepHeader(1)}
+      <p class="text-small" style="margin:6px 0 12px;">どんな目標を達成したいですか？</p>
+      <textarea data-act="stimulus-input" data-key="goal.text" placeholder="例) 仕事の集中力を高めたい、夜ふかしをやめたい など" maxlength="50" style="width:100%; min-height:80px; padding:12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(g.text || '')}</textarea>
+      <div class="text-tiny text-muted" style="text-align:right; margin-top:4px;">最大50字</div>
+
+      <h3 style="font-size:13px; margin:18px 0 8px;">目標のカテゴリを選ぶ（任意）</h3>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+        ${SC_GOAL_CATEGORIES.map(c => `
+          <button data-act="stimulus-cat-pick" data-cat="${c.id}" style="padding:14px 8px; background: ${g.category === c.id ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${g.category === c.id ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:10px; cursor:pointer; text-align:center;">
+            <div style="font-size:22px;">${c.icon}</div>
+            <div style="font-size:11px; margin-top:4px; line-height:1.4;">${escapeHtml(c.label)}</div>
+          </button>
+        `).join('')}
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="goal-1" style="width:100%;">次へ</button>
+      </div>
+    </div>
+  `;
+}
+
+function viewStimulusGoal2() {
+  const c = stimulusSession.challenges;
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('目標を入力', '2/9 · Step 2/5')}
+      ${scSubstepHeader(2)}
+      <p class="text-small" style="margin:6px 0 12px;">うまくいかない原因やきっかけは何ですか？</p>
+      <h3 style="font-size:13px; margin:6px 0 8px; color: var(--text-muted);">よくあるきっかけ（複数選択OK）</h3>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        ${SC_CHALLENGE_OPTIONS.map(opt => {
+          const checked = c.selected.includes(opt);
+          return `
+            <button data-act="stimulus-chk-toggle" data-key="challenges" data-val="${escapeHtml(opt)}" style="padding:10px 14px; background: ${checked ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${checked ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:8px; text-align:left; cursor:pointer; display:flex; gap:10px; align-items:center;">
+              <span style="display:inline-block; width:18px; height:18px; border:2px solid ${checked ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:4px; background: ${checked ? 'var(--accent, #6BA877)' : 'transparent'}; flex-shrink:0; position:relative;">${checked ? '<span style="position:absolute; top:-2px; left:2px; color:#fff; font-size:14px;">✓</span>' : ''}</span>
+              <span style="font-size:13px;">${escapeHtml(opt)}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <h3 style="font-size:13px; margin:18px 0 6px; color: var(--text-muted);">具体的に書いてみよう（任意）</h3>
+      <textarea data-act="stimulus-input" data-key="challenges.detail" placeholder="例) 仕事の合間にスマホを見て時間を使ってしまう" maxlength="100" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(c.detail || '')}</textarea>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="goal-2" style="width:100%;">次へ</button>
+      </div>
+    </div>
+  `;
+}
+
+function viewStimulusGoal3() {
+  const e = stimulusSession.environment;
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('目標を入力', '2/9 · Step 3/5')}
+      ${scSubstepHeader(3)}
+      <p class="text-small" style="margin:6px 0 12px;">理想の環境や整えたいことは何ですか？</p>
+      <h3 style="font-size:13px; margin:6px 0 8px; color: var(--text-muted);">整えたい環境（複数選択OK）</h3>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        ${SC_ENVIRONMENT_OPTIONS.map(opt => {
+          const checked = e.selected.includes(opt);
+          return `
+            <button data-act="stimulus-chk-toggle" data-key="environment" data-val="${escapeHtml(opt)}" style="padding:10px 14px; background: ${checked ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${checked ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:8px; text-align:left; cursor:pointer; display:flex; gap:10px; align-items:center;">
+              <span style="display:inline-block; width:18px; height:18px; border:2px solid ${checked ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:4px; background: ${checked ? 'var(--accent, #6BA877)' : 'transparent'}; flex-shrink:0; position:relative;">${checked ? '<span style="position:absolute; top:-2px; left:2px; color:#fff; font-size:14px;">✓</span>' : ''}</span>
+              <span style="font-size:13px;">${escapeHtml(opt)}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <h3 style="font-size:13px; margin:18px 0 6px; color: var(--text-muted);">具体的に書いてみよう（任意）</h3>
+      <textarea data-act="stimulus-input" data-key="environment.detail" placeholder="例) スマホをリビングに置いて仕事部屋に持ち込まない" maxlength="100" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(e.detail || '')}</textarea>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="goal-3" style="width:100%;">次へ</button>
+      </div>
+    </div>
+  `;
+}
+
+function viewStimulusGoal4() {
+  const ss = stimulusSession.smallStep;
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('目標を入力', '2/9 · Step 4/5')}
+      ${scSubstepHeader(4)}
+      <p class="text-small" style="margin:6px 0 12px;">まずやってみたい小さな一歩は何ですか？</p>
+      <h3 style="font-size:13px; margin:6px 0 8px; color: var(--text-muted);">小さな一歩の例</h3>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        ${SC_SMALL_STEP_EXAMPLES.map(opt => {
+          const selected = ss.selected === opt;
+          return `
+            <button data-act="stimulus-smallstep-pick" data-val="${escapeHtml(opt)}" style="padding:10px 14px; background: ${selected ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${selected ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:8px; text-align:left; cursor:pointer; font-size:13px;">
+              ${escapeHtml(opt)}
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <h3 style="font-size:13px; margin:18px 0 6px; color: var(--text-muted);">自分のアイデアを入力（任意）</h3>
+      <textarea data-act="stimulus-input" data-key="smallStep.custom" placeholder="例) 朝イチでタスクを1つ終わらせる" maxlength="100" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(ss.custom || '')}</textarea>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="goal-4" style="width:100%;">次へ</button>
+      </div>
+    </div>
+  `;
+}
+
+function viewStimulusGoal5() {
+  const p = stimulusSession.priority;
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('目標を入力', '2/9 · Step 5/5')}
+      ${scSubstepHeader(5)}
+      <p class="text-small" style="margin:6px 0 12px;">優先順位と開始時期を決めましょう</p>
+
+      <h3 style="font-size:13px; margin:6px 0 8px; color: var(--text-muted);">優先度</h3>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+        ${SC_PRIORITY_OPTIONS.map(o => `
+          <button data-act="stimulus-priority-pick" data-key="level" data-val="${o.id}" style="padding:14px; background: ${p.level === o.id ? 'var(--accent, #6BA877)' : 'var(--bg-card)'}; color: ${p.level === o.id ? '#fff' : 'var(--text)'}; border:1px solid ${p.level === o.id ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:10px; cursor:pointer; font-size:14px; font-weight:600;">
+            ${escapeHtml(o.label)}
+          </button>
+        `).join('')}
+      </div>
+
+      <h3 style="font-size:13px; margin:18px 0 8px; color: var(--text-muted);">開始時期</h3>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+        ${SC_START_OPTIONS.map(o => `
+          <button data-act="stimulus-priority-pick" data-key="startDate" data-val="${o.id}" style="padding:14px; background: ${p.startDate === o.id ? 'var(--accent, #6BA877)' : 'var(--bg-card)'}; color: ${p.startDate === o.id ? '#fff' : 'var(--text)'}; border:1px solid ${p.startDate === o.id ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:10px; cursor:pointer; font-size:14px; font-weight:600;">
+            ${escapeHtml(o.label)}
+          </button>
+        `).join('')}
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="goal-5" style="width:100%;">AI分析へ進む</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 3. AI分析中 -----
+function viewStimulusAnalyzing() {
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('AIが分析', '3/9')}
+      <div style="padding:32px 16px; text-align:center;">
+        <div style="font-size:42px; margin-bottom:14px;">💭</div>
+        <div style="font-weight:600; margin-bottom:8px;">AIがあなたの情報を分析しています</div>
+        <div class="text-tiny text-muted">少しお待ちください…</div>
+      </div>
+
+      <div style="padding:14px 16px; background: var(--bg-soft); border-radius:12px; line-height:1.8; font-size:13px;">
+        <div style="font-weight:600; margin-bottom:6px;">分析のポイント</div>
+        <ul style="margin:0; padding-left:20px;">
+          <li>目標の理解</li>
+          <li>課題やつまずき要因の特定</li>
+          <li>環境・行動パターンの分析</li>
+          <li>行動のきっかけ（刺激）の整理</li>
+          <li>あなたに合った工夫の提案</li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 4. プラン一覧 -----
+function viewStimulusPlanList() {
+  const cands = stimulusSession.aiPlans.candidates || [];
+  const customs = stimulusSession.customPlans || [];
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('プラン一覧', '4/9')}
+      <p class="text-small" style="margin:6px 0 2px;">AIが提案したプラン（あなた専用）</p>
+      <p class="text-tiny text-muted" style="margin:0 0 14px;">気になるプランを次のステップで選びましょう</p>
+
+      ${cands.map((p, i) => `
+        <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+          <div style="display:flex; gap:10px; align-items:flex-start;">
+            <div style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background: ${scLevelColor(i)}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px;">${i+1}</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:600; font-size:14px;">${escapeHtml(p.title)}</div>
+              <div class="text-tiny text-muted" style="margin-top:4px; line-height:1.7;">${escapeHtml(p.desc)}</div>
+              ${(p.tags || []).length ? `<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${(p.tags||[]).map(t => `<span style="padding:2px 8px; background: var(--bg-soft); border-radius:8px; font-size:10px;">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+
+      ${customs.map((p, i) => `
+        <div style="padding:14px 16px; background: var(--bg-soft); border:1px solid var(--accent, #6BA877); border-radius:12px; margin-bottom:10px;">
+          <div class="text-tiny text-muted">自分で考えたプラン</div>
+          <div style="font-weight:600; font-size:14px; margin-top:2px;">${escapeHtml(p.title)}</div>
+          ${p.desc ? `<div class="text-tiny text-muted" style="margin-top:4px;">${escapeHtml(p.desc)}</div>` : ''}
+        </div>
+      `).join('')}
+
+      <div style="margin-top:20px; display:grid; gap:10px;">
+        <button class="btn-ghost" data-act="stimulus-add-custom" style="width:100%;">＋ 自分でプランを入力する</button>
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="plan-list" style="width:100%;">プランを選ぶ</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 5. プラン選択 -----
+function viewStimulusPlanSelect() {
+  const all = [...(stimulusSession.aiPlans.candidates || []), ...(stimulusSession.customPlans || [])];
+  const selectedIds = stimulusSession.selectedPlanIds || [];
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('プランを選択', '5/9')}
+      <p class="text-small" style="margin:6px 0 2px;">取り組むプランを選びましょう！</p>
+      <p class="text-tiny text-muted" style="margin:0 0 14px;">最大3つまで選択OK</p>
+
+      ${all.map(p => {
+        const selected = selectedIds.includes(p.id);
+        return `
+          <button data-act="stimulus-plan-toggle" data-id="${escapeHtml(p.id)}" style="width:100%; padding:14px 16px; background: ${selected ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${selected ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:12px; margin-bottom:10px; cursor:pointer; text-align:left; display:flex; gap:10px; align-items:center;">
+            <span style="display:inline-block; width:22px; height:22px; border:2px solid ${selected ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:50%; background: ${selected ? 'var(--accent, #6BA877)' : 'transparent'}; flex-shrink:0; position:relative;">${selected ? '<span style="position:absolute; top:-2px; left:3px; color:#fff; font-size:16px;">✓</span>' : ''}</span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:600; font-size:14px;">${escapeHtml(p.title)}</div>
+              <div class="text-tiny text-muted" style="margin-top:2px; line-height:1.6;">${escapeHtml(p.desc || '')}</div>
+            </div>
+          </button>
+        `;
+      }).join('')}
+
+      ${selectedIds.length ? `
+        <div style="margin-top:14px; padding:12px 14px; background: var(--bg-soft); border-radius:10px;">
+          <div class="text-tiny text-muted" style="margin-bottom:6px;">選んだプラン（いつでも変更できます）</div>
+          ${selectedIds.map((id, i) => {
+            const p = all.find(x => x.id === id);
+            return p ? `<div style="font-weight:600; font-size:13px; padding:2px 0;">${i+1}. ${escapeHtml(p.title)}</div>` : '';
+          }).join('')}
+        </div>
+      ` : ''}
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="plan-select" ${selectedIds.length === 0 ? 'disabled' : ''} style="width:100%; ${selectedIds.length === 0 ? 'opacity:0.5;' : ''}">決定する</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 6. 実施する（Do） -----
+function viewStimulusDo() {
+  const plans = getSelectedPlanObjects();
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('実施する（Do）', '6/9')}
+      <p class="text-small" style="margin:6px 0 14px;">選んだプランを実践しましょう！</p>
+
+      <h2 style="font-size:14px; margin:8px 0 10px;">今日の実施プラン</h2>
+      ${plans.map((p, i) => `
+        <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+            <div style="width:24px; height:24px; border-radius:50%; background: ${scLevelColor(i)}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:12px;">${i+1}</div>
+            <div style="font-weight:600; font-size:14px;">${escapeHtml(p.title)}</div>
+            <span style="margin-left:auto; padding:2px 8px; background: var(--bg-soft); color: var(--accent, #6BA877); border-radius:8px; font-size:10px; font-weight:600;">実施中</span>
+          </div>
+          <div class="text-tiny text-muted" style="line-height:1.7;">${escapeHtml(p.desc || '')}</div>
+        </div>
+      `).join('')}
+
+      <div style="margin-top:16px; padding:12px 14px; background: var(--bg-soft); border-radius:10px; font-size:12px; line-height:1.7;">
+        💡 記録をつけると、効果が見えるようになります！
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="do" style="width:100%;">実施を記録する</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 7. 振り返り・評価（Check） -----
+function viewStimulusCheck() {
+  const plans = getSelectedPlanObjects();
+  // 編集中のチェックイン（state.checkins に push 前のローカル）
+  if (!stimulusSession._draftCheckin) {
+    stimulusSession._draftCheckin = {
+      date: new Date().toISOString(),
+      planResults: plans.map(p => ({ planId: p.id, result: '' })),
+      overallScore: 0,
+      moodAfter: '',
+      focusMinutes: 0,
+      memo: '',
+    };
+  }
+  const d = stimulusSession._draftCheckin;
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('振り返り・評価', '7/9')}
+      <p class="text-small" style="margin:6px 0 14px;">今日の取り組みを振り返り、効果を評価しましょう</p>
+
+      <h3 style="font-size:14px; margin:14px 0 8px;">① プランごとの評価</h3>
+      ${plans.map((p, i) => {
+        const r = d.planResults[i] || { planId: p.id, result: '' };
+        return `
+          <div style="padding:12px 14px; background: var(--bg-card); border:1px solid var(--divider); border-radius:10px; margin-bottom:8px;">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+              <div style="width:22px; height:22px; border-radius:50%; background: ${scLevelColor(i)}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:11px;">${i+1}</div>
+              <div style="font-weight:600; font-size:13px;">${escapeHtml(p.title)}</div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
+              ${[
+                { id: 'good', icon: '😊', label: 'できた' },
+                { id: 'soso', icon: '🙂', label: 'まあまあ' },
+                { id: 'bad',  icon: '😐', label: 'できなかった' },
+              ].map(opt => `
+                <button data-act="stimulus-plan-result" data-idx="${i}" data-val="${opt.id}" style="padding:10px 4px; background: ${r.result === opt.id ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${r.result === opt.id ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:8px; cursor:pointer; text-align:center;">
+                  <div style="font-size:20px;">${opt.icon}</div>
+                  <div style="font-size:10px; margin-top:2px;">${opt.label}</div>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')}
+
+      <h3 style="font-size:14px; margin:18px 0 8px;">② 今日の効果を評価</h3>
+      <p class="text-tiny text-muted" style="margin:0 0 6px;">全体の効果はどうでしたか？</p>
+      <div style="display:flex; gap:6px; justify-content:center; padding:8px 0;">
+        ${[1,2,3,4,5].map(n => `
+          <button data-act="stimulus-overall-score" data-val="${n}" style="background:none; border:none; cursor:pointer; font-size:30px; color:${d.overallScore >= n ? '#E8B842' : '#ddd'};">★</button>
+        `).join('')}
+      </div>
+
+      <p class="text-tiny text-muted" style="margin:14px 0 6px;">気分（1日の平均）</p>
+      <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:6px;">
+        ${[
+          { id: 'great', icon: '😄', label: 'とても良い' },
+          { id: 'good',  icon: '😊', label: 'よかった' },
+          { id: 'soso',  icon: '😐', label: 'ふつう' },
+          { id: 'low',   icon: '😟', label: 'あまり' },
+          { id: 'bad',   icon: '😢', label: 'よくない' },
+        ].map(opt => `
+          <button data-act="stimulus-mood-pick" data-val="${opt.id}" style="padding:8px 4px; background: ${d.moodAfter === opt.id ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${d.moodAfter === opt.id ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:8px; cursor:pointer; text-align:center;">
+            <div style="font-size:20px;">${opt.icon}</div>
+            <div style="font-size:9px; margin-top:2px;">${opt.label}</div>
+          </button>
+        `).join('')}
+      </div>
+
+      <p class="text-tiny text-muted" style="margin:14px 0 6px;">集中できた時間（目安・任意）</p>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span class="text-tiny">約</span>
+        <input type="number" min="0" max="999" data-act="stimulus-focus-min" value="${d.focusMinutes || ''}" placeholder="0" style="flex:1; padding:8px 10px; border:1px solid var(--divider); border-radius:6px; font: inherit; background: var(--bg-card); color: var(--text); text-align:center; box-sizing: border-box;">
+        <span class="text-tiny">分</span>
+      </div>
+
+      <h3 style="font-size:14px; margin:18px 0 6px;">メモ（任意）</h3>
+      <textarea data-act="stimulus-checkin-memo" placeholder="今日の気づき・困ったことなど" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(d.memo || '')}</textarea>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="check" style="width:100%;">振り返りを保存する</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 8. 次のアクション（Act） -----
+function viewStimulusAct() {
+  const advice = stimulusSession.aiAdvice || '';
+  const nextAction = stimulusSession.nextAction || '';
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('次のアクション（Act）', '8/9')}
+      <p class="text-small" style="margin:6px 0 14px;">振り返りをもとに、次の一歩を決めましょう</p>
+
+      <div style="padding:14px 16px; background: var(--bg-soft); border-radius:12px; margin-bottom:18px;">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
+          <span style="font-size:18px;">💬</span>
+          <div style="font-weight:600; font-size:13px;">AIからのアドバイス（すぷらん）</div>
+        </div>
+        <div style="font-size:13px; line-height:1.8; white-space: pre-wrap;">
+          ${advice ? escapeHtml(advice) : '<span class="text-muted">考えています…</span>'}
+        </div>
+      </div>
+
+      <h3 style="font-size:14px; margin:14px 0 8px;">次のアクションを選択</h3>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${[
+          { id: 'continue',  label: 'このプランを続ける' },
+          { id: 'tweak',     label: '少し工夫して続ける（例：通知をオフにする、時間を延ばすなど）' },
+          { id: 'try-other', label: '別のプランを試す' },
+          { id: 'add-new',   label: '新しいプランを追加する' },
+        ].map((opt, i) => `
+          <button data-act="stimulus-next-action" data-val="${opt.id}" style="padding:12px 14px; background: ${nextAction === opt.id ? 'var(--bg-soft)' : 'var(--bg-card)'}; border:1px solid ${nextAction === opt.id ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:10px; cursor:pointer; text-align:left; display:flex; gap:10px; align-items:center;">
+            <span style="display:inline-block; width:20px; height:20px; border:2px solid ${nextAction === opt.id ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:50%; background: ${nextAction === opt.id ? 'var(--accent, #6BA877)' : 'transparent'}; flex-shrink:0; position:relative;">${nextAction === opt.id ? '<span style="position:absolute; top:-3px; left:2px; color:#fff; font-size:14px;">✓</span>' : ''}</span>
+            <span style="font-size:13px; line-height:1.6;">${i+1}. ${escapeHtml(opt.label)}</span>
+          </button>
+        `).join('')}
+      </div>
+
+      <h3 style="font-size:14px; margin:18px 0 6px;">メモ（次回に活かしたいこと）</h3>
+      <textarea data-act="stimulus-next-memo" placeholder="例) 通知オフ + 作業前に深呼吸をしてから始めるようにする！" style="width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(stimulusSession.nextActionMemo || '')}</textarea>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-next" data-from="act" style="width:100%;">次へ進む</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- 9. PDCAのループ -----
+function viewStimulusPdca() {
+  return `
+    <div class="screen active">
+      ${viewStimulusHeader('PDCAのループ', '9/9')}
+      <p class="text-small" style="margin:6px 0 14px;">小さく試して、見直して、より良くしていきましょう！</p>
+
+      <div style="padding:24px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:14px; margin-bottom:18px;">
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:14px;">
+          ${[
+            { icon: '💡', name: 'Plan', desc: 'プランを選ぶ（AIが提案）' },
+            { icon: '▶️', name: 'Do',   desc: '実践する' },
+            { icon: '📊', name: 'Check',desc: '振り返る・評価する' },
+            { icon: '✏️', name: 'Act',  desc: '改善して次へつなげる' },
+          ].map(x => `
+            <div style="padding:12px; background: var(--bg-soft); border-radius:10px; text-align:center;">
+              <div style="font-size:24px;">${x.icon}</div>
+              <div style="font-weight:600; font-size:13px; margin-top:6px;">${x.name}</div>
+              <div class="text-tiny text-muted" style="margin-top:2px; line-height:1.5;">${escapeHtml(x.desc)}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="text-align:center; margin-top:14px; color: var(--text-muted); font-size:18px;">↻</div>
+      </div>
+
+      <div style="padding:14px 16px; background: var(--bg-soft); border-radius:12px; line-height:1.8; font-size:13px;">
+        <div style="font-weight:600; margin-bottom:6px;">ポイント</div>
+        ◆ 完璧を目指さなくてOK！<br>
+        ◆ 小さな変化の積み重ねが、やがて大きな成果につながります。
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="stimulus-complete" style="width:100%;">取り組みを保存して終わる</button>
+      </div>
+    </div>
+  `;
+}
+
 //
 // 1: ワーク紹介          → 2: 出来事入力（カテゴリ）
 // 3: 自動思考入力（感情タグ・強さ） → 4: 下向き深掘り（3-5段）
@@ -12869,6 +13696,77 @@ const AI_PROMPTS = {
 ]`,
     lastUpdated: '2026-05-27',
     changeNote: 'v0.9.78 初版（5ステップ行動実験フロー）',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  // ----- v0.9.81: 刺激統制 5ステップ + AIプラン + 振り返りアドバイス -----
+  stimulus_control_plans: {
+    id: 'stimulus_control_plans',
+    title: 'きづき: 刺激統制 — プラン候補生成（Step 3-4 AI分析）',
+    purpose: '5ステップの目標入力（目標・課題・理想環境・小さな一歩・優先順位）から、刺激統制の具体プラン候補を5個 JSON 配列で生成',
+    triggerLocation: 'きづき → 刺激統制 → Step 3「AIが分析」→ Step 4「プラン一覧」',
+    callSite: 'generateStimulusPlansAI() → callGemini(...)',
+    model: 'gemini-2.5-flash',
+    temperature: 0.85,
+    maxTokens: 1200,
+    outputFormat: 'JSON配列（5件・id/title/desc/tags）',
+    fallbackBehavior: 'API未設定/失敗/JSONパース失敗 → 固定5候補',
+    safetyChecks: [
+      '目標を否定しない',
+      '実現困難な大規模変更を勧めない',
+      '医療的助言は出さない',
+      '自傷につながる行動は提案しない',
+    ],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。CBT-I（不眠症の認知行動療法）と行動療法の刺激統制（stimulus control）の考え方に基づいて、ユーザーが入力した目標・課題・理想環境・小さな一歩を踏まえ、具体的な実践プランを5個提案してください。
+
+【刺激統制の5つの視点】
+1. 環境を整える（場所・モノ・道具）
+2. きっかけ（刺激）を変える — If-Then プラン（「もし○○したら、必ず△△する」）
+3. ルール化する — 時間や頻度を決める
+4. ごほうびを用意する — やる気を維持する
+5. 仕組みをつくる — 自動的に続く環境設計
+
+【厳守】
+- 各プランは title（短いラベル・15-25字）と desc（具体内容・1〜2文・50-100字）と tags（2-3個のキーワード）で構成
+- 5つは異なる視点を組み合わせる（同じ視点が3つ以上にならない）
+- 「いつ・どこで・何を」を具体的に書く
+- 医療行為・診断・自傷行為につながる提案は禁止
+- 出力は **JSON配列のみ**。前後の説明文・コードフェンス禁止。
+
+【出力フォーマット（厳守）】
+[
+  {"id":"plan-1","title":"...","desc":"...","tags":["環境を整える","集中・仕事・勉強"]},
+  ... (5件)
+]`,
+    lastUpdated: '2026-05-27',
+    changeNote: 'v0.9.81 初版（刺激統制 5ステップフロー）',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  stimulus_control_advice: {
+    id: 'stimulus_control_advice',
+    title: 'きづき: 刺激統制 — 振り返りアドバイス（Step 8 Act）',
+    purpose: 'ユーザーのチェックイン記録（プラン評価・効果評価・メモ）を踏まえ、次の一歩を見つけるアドバイスを自然文で生成',
+    triggerLocation: 'きづき → 刺激統制 → Step 8「次のアクション」',
+    callSite: 'generateStimulusAdviceAI() → callGemini(...)',
+    model: 'gemini-2.5-flash',
+    temperature: 0.75,
+    maxTokens: 350,
+    outputFormat: '自然文（3〜5文・200字目安）',
+    fallbackBehavior: 'API未設定/失敗時はテンプレ',
+    safetyChecks: ['結果を評価しない', 'ハードルを上げすぎない', '「もっと頑張れ」と言わない'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが刺激統制のプランを1サイクル実施し、振り返りを行ったところ。やさしく振り返り＋次の小さな工夫を1つ提案する。
+
+【原則】
+- 「できなかった」プランを責めない。やってみたことを認める
+- 効果が高かったプランを1つピックして強化策を1つ提案
+- 効果が低かったプランは「ハードルを下げる」「条件を変える」など小さな工夫を提案
+- 3〜5文・200字以内・改行は2か所まで`,
+    lastUpdated: '2026-05-27',
+    changeNote: 'v0.9.81 初版',
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
@@ -15904,6 +16802,209 @@ function handleAction(act, el, ev) {
       render();
       generateBehaviorNextCandidates();
       return;
+    }
+    return;
+  }
+
+  // ───────── 刺激統制（9ステップ + ホーム）ハンドラ — v0.9.81 ─────────
+  if (act === 'kizuki-open-stimulus') {
+    startStimulus();
+    return;
+  }
+  if (act === 'stimulus-cancel') { cancelStimulus(); return; }
+  if (act === 'stimulus-new')    { newStimulusSession(); return; }
+  if (act === 'stimulus-back-home') {
+    if (stimulusSession && stimulusSession.step === 'home') return;
+    if (!confirm('入力中の内容は保存されません。一覧に戻りますか？')) return;
+    backToStimulusHome();
+    return;
+  }
+  if (act === 'stimulus-input') {
+    if (!stimulusSession) return;
+    const key = el.dataset.key || '';
+    const [k1, k2] = key.split('.');
+    if (k2) {
+      stimulusSession[k1] = stimulusSession[k1] || {};
+      stimulusSession[k1][k2] = el.value || '';
+    } else {
+      stimulusSession[k1] = el.value || '';
+    }
+    return; // re-render しない（カーソル位置維持）
+  }
+  if (act === 'stimulus-cat-pick') {
+    if (!stimulusSession) return;
+    stimulusSession.goal.category = el.dataset.cat;
+    render();
+    return;
+  }
+  if (act === 'stimulus-chk-toggle') {
+    if (!stimulusSession) return;
+    const key = el.dataset.key;
+    const val = el.dataset.val;
+    const arr = stimulusSession[key].selected || [];
+    const i = arr.indexOf(val);
+    if (i >= 0) arr.splice(i, 1);
+    else arr.push(val);
+    stimulusSession[key].selected = arr;
+    render();
+    return;
+  }
+  if (act === 'stimulus-smallstep-pick') {
+    if (!stimulusSession) return;
+    stimulusSession.smallStep.selected = el.dataset.val;
+    stimulusSession.smallStep.custom = '';
+    render();
+    return;
+  }
+  if (act === 'stimulus-priority-pick') {
+    if (!stimulusSession) return;
+    const k = el.dataset.key;
+    stimulusSession.priority[k] = el.dataset.val;
+    render();
+    return;
+  }
+  if (act === 'stimulus-add-custom') {
+    if (!stimulusSession) return;
+    const title = window.prompt('プランのタイトル（短く）');
+    if (!title || !title.trim()) return;
+    const desc = window.prompt('プランの具体内容（任意）') || '';
+    stimulusSession.customPlans = stimulusSession.customPlans || [];
+    stimulusSession.customPlans.push({
+      id: 'cp-' + Date.now(),
+      title: title.trim(),
+      desc: desc.trim(),
+      tags: ['カスタム'],
+    });
+    render();
+    return;
+  }
+  if (act === 'stimulus-plan-toggle') {
+    if (!stimulusSession) return;
+    const id = el.dataset.id;
+    const arr = stimulusSession.selectedPlanIds || [];
+    const i = arr.indexOf(id);
+    if (i >= 0) arr.splice(i, 1);
+    else {
+      if (arr.length >= 3) {
+        if (typeof toast === 'function') toast('最大3つまで選べるよ');
+        return;
+      }
+      arr.push(id);
+    }
+    stimulusSession.selectedPlanIds = arr;
+    render();
+    return;
+  }
+  if (act === 'stimulus-plan-result') {
+    if (!stimulusSession || !stimulusSession._draftCheckin) return;
+    const idx = Number(el.dataset.idx);
+    if (stimulusSession._draftCheckin.planResults[idx]) {
+      stimulusSession._draftCheckin.planResults[idx].result = el.dataset.val;
+    }
+    render();
+    return;
+  }
+  if (act === 'stimulus-overall-score') {
+    if (!stimulusSession || !stimulusSession._draftCheckin) return;
+    stimulusSession._draftCheckin.overallScore = Number(el.dataset.val);
+    render();
+    return;
+  }
+  if (act === 'stimulus-mood-pick') {
+    if (!stimulusSession || !stimulusSession._draftCheckin) return;
+    stimulusSession._draftCheckin.moodAfter = el.dataset.val;
+    render();
+    return;
+  }
+  if (act === 'stimulus-focus-min') {
+    if (!stimulusSession || !stimulusSession._draftCheckin) return;
+    stimulusSession._draftCheckin.focusMinutes = Number(el.value) || 0;
+    return; // re-renderしない（数値入力中）
+  }
+  if (act === 'stimulus-checkin-memo') {
+    if (!stimulusSession || !stimulusSession._draftCheckin) return;
+    stimulusSession._draftCheckin.memo = el.value || '';
+    return;
+  }
+  if (act === 'stimulus-next-action') {
+    if (!stimulusSession) return;
+    stimulusSession.nextAction = el.dataset.val;
+    render();
+    return;
+  }
+  if (act === 'stimulus-next-memo') {
+    if (!stimulusSession) return;
+    stimulusSession.nextActionMemo = el.value || '';
+    return;
+  }
+  if (act === 'stimulus-complete') { completeStimulus(); return; }
+  if (act === 'stimulus-next') {
+    if (!stimulusSession) return;
+    // input/textarea値をsessionに反映
+    document.querySelectorAll('[data-act="stimulus-input"]').forEach(el => {
+      const key = el.dataset.key || '';
+      const [k1, k2] = key.split('.');
+      if (k2) {
+        stimulusSession[k1] = stimulusSession[k1] || {};
+        stimulusSession[k1][k2] = el.value || '';
+      } else {
+        stimulusSession[k1] = el.value || '';
+      }
+    });
+    const focusEl = document.querySelector('[data-act="stimulus-focus-min"]');
+    if (focusEl && stimulusSession._draftCheckin) stimulusSession._draftCheckin.focusMinutes = Number(focusEl.value) || 0;
+    const memoEl = document.querySelector('[data-act="stimulus-checkin-memo"]');
+    if (memoEl && stimulusSession._draftCheckin) stimulusSession._draftCheckin.memo = memoEl.value || '';
+    const nextMemoEl = document.querySelector('[data-act="stimulus-next-memo"]');
+    if (nextMemoEl) stimulusSession.nextActionMemo = nextMemoEl.value || '';
+
+    const from = el.dataset.from;
+    if (from === 'about')     { stimulusSession.step = 'goal-1'; render(); return; }
+    if (from === 'goal-1') {
+      if (!(stimulusSession.goal.text || '').trim()) {
+        if (typeof toast === 'function') toast('目標を入れてね'); return;
+      }
+      stimulusSession.step = 'goal-2'; render(); return;
+    }
+    if (from === 'goal-2')    { stimulusSession.step = 'goal-3'; render(); return; }
+    if (from === 'goal-3')    { stimulusSession.step = 'goal-4'; render(); return; }
+    if (from === 'goal-4') {
+      const ss = stimulusSession.smallStep;
+      if (!(ss.selected || (ss.custom || '').trim())) {
+        if (typeof toast === 'function') toast('小さな一歩を選ぶか、入力してね'); return;
+      }
+      stimulusSession.step = 'goal-5'; render(); return;
+    }
+    if (from === 'goal-5') {
+      // AI分析へ
+      generateStimulusPlansAI();
+      return;
+    }
+    if (from === 'plan-list') { stimulusSession.step = 'plan-select'; render(); return; }
+    if (from === 'plan-select') {
+      if ((stimulusSession.selectedPlanIds || []).length === 0) {
+        if (typeof toast === 'function') toast('プランを1つ以上選んでね'); return;
+      }
+      stimulusSession.step = 'do'; render(); return;
+    }
+    if (from === 'do')        { stimulusSession.step = 'check'; render(); return; }
+    if (from === 'check') {
+      const d = stimulusSession._draftCheckin;
+      if (!d || d.planResults.some(r => !r.result)) {
+        if (typeof toast === 'function') toast('各プランの評価を選んでね'); return;
+      }
+      stimulusSession.checkins = stimulusSession.checkins || [];
+      stimulusSession.checkins.push(d);
+      delete stimulusSession._draftCheckin;
+      stimulusSession.step = 'act'; render();
+      generateStimulusAdviceAI();
+      return;
+    }
+    if (from === 'act') {
+      if (!stimulusSession.nextAction) {
+        if (typeof toast === 'function') toast('次のアクションを選んでね'); return;
+      }
+      stimulusSession.step = 'pdca'; render(); return;
     }
     return;
   }
