@@ -6459,7 +6459,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.70-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.78-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7295,6 +7295,7 @@ function getRenderKey() {
   if (typeof habitsCalView !== 'undefined' && habitsCalView) k += ':habitcal';
   if (typeof moyamoya !== 'undefined' && moyamoya && moyamoya.step) k += ':moya' + moyamoya.step;
   if (typeof deepDive !== 'undefined' && deepDive && deepDive.step) k += ':dd' + deepDive.step;
+  if (typeof behaviorExpSession !== 'undefined' && behaviorExpSession && behaviorExpSession.step) k += ':bx' + behaviorExpSession.step;
   return k;
 }
 
@@ -7329,6 +7330,7 @@ function render() {
     case 'kizuki':          html = viewKizuki(); break;
     case 'kizuki-list':     html = viewKizukiList(); break;
     case 'kizuki-work':     html = viewKizukiWork(); break;
+    case 'behavior-exp':    html = viewBehaviorExp(); break;
     case 'record':          html = viewRecord(); break;
     case 'day-detail':      html = viewDayDetail(); break;
     case 'kiroku-detail':       html = viewKirokuDetail(); break;
@@ -10862,6 +10864,458 @@ function viewKizukiWork() {
 }
 
 // ============================================================
+// 行動実験フロー（5ステップ + ホーム）— v0.9.78
+//
+// 画面遷移:
+//   home(履歴+CTA) → hypothesis(1/5) → plan(2/5 AI) → execute(3/5)
+//                  → verify(4/5)    → next-plan(5/5 AI) → complete
+//
+// state:
+//   behaviorExpSession: in-memory（進行中の1サイクル）
+//   state.behaviorExperiments[]: 完了済み履歴
+//
+// 画面: render() switch case 'behavior-exp'
+// ============================================================
+let behaviorExpSession = null;
+
+function startBehaviorExp() {
+  behaviorExpSession = { step: 'home' };
+  go('behavior-exp');
+}
+
+function newBehaviorExp() {
+  behaviorExpSession = {
+    id: 'be-' + Date.now(),
+    createdAt: new Date().toISOString(),
+    step: 'hypothesis',
+    hypothesis: { what: '', why: '' },
+    plan: { candidates: [], selected: null, custom: '', loading: false },
+    execute: { action: '', when: '', where: '', expected: '', anxiety: 5, started: false },
+    verify: { result: '', score: 5, insight: '' },
+    nextPlan: { candidates: [], selected: null, custom: '', loading: false },
+  };
+  render();
+}
+
+function backToBehaviorExpHome() {
+  behaviorExpSession = { step: 'home' };
+  render();
+}
+
+function cancelBehaviorExp() {
+  behaviorExpSession = null;
+  go('kizuki');
+}
+
+function completeBehaviorExp() {
+  if (!behaviorExpSession || !behaviorExpSession.id) return;
+  const completed = JSON.parse(JSON.stringify(behaviorExpSession));
+  completed.completedAt = new Date().toISOString();
+  completed.status = 'completed';
+  delete completed.step;
+  // 次の計画の選択を保存（あれば）
+  const n = completed.nextPlan || {};
+  if (n.selected != null && n.candidates && n.candidates[n.selected]) {
+    completed.nextActionHint = n.candidates[n.selected];
+  } else if ((n.custom || '').trim()) {
+    completed.nextActionHint = { level: 'カスタム', title: n.custom, desc: '' };
+  }
+  state.behaviorExperiments = state.behaviorExperiments || [];
+  const idx = state.behaviorExperiments.findIndex(e => e.id === completed.id);
+  if (idx >= 0) state.behaviorExperiments[idx] = completed;
+  else state.behaviorExperiments.unshift(completed);
+  saveState();
+  behaviorExpSession = { step: 'home' };
+  render();
+}
+
+// ----- AI候補生成 -----
+async function generateBehaviorPlanCandidates() {
+  if (!behaviorExpSession) return;
+  behaviorExpSession.plan.loading = true;
+  render();
+
+  const def = AI_PROMPTS.kizuki_behavior_plan_candidates;
+  let candidates = null;
+  if (def && getInviteCode()) {
+    const userMsg = [
+      '行動実験の仮説（思い込み）:',
+      behaviorExpSession.hypothesis.what,
+      behaviorExpSession.hypothesis.why ? '理由: ' + behaviorExpSession.hypothesis.why : '',
+      '',
+      '上記をふまえて、難易度別の行動候補を4つ JSON 配列で出力してください。',
+    ].filter(Boolean).join('\n');
+    try {
+      const text = await callGemini(def.systemPrompt, [{ role: 'user', content: userMsg }], {
+        temperature: def.temperature,
+        maxTokens: def.maxTokens,
+      });
+      candidates = parseBehaviorCandidatesJson(text, 4);
+    } catch (e) {
+      console.warn('[behavior-plan]', e);
+    }
+  }
+  if (!candidates || candidates.length === 0) {
+    candidates = [
+      { level: 'かんたん',   title: 'まずはイメージするだけ',     desc: '目を閉じて、その場面を想像してみる' },
+      { level: 'やさしい',   title: 'とても短い時間やってみる', desc: '1分だけ、やってみる' },
+      { level: 'ふつう',     title: '少しハードルを上げてみる', desc: '短い時間、実際にやってみる' },
+      { level: 'チャレンジ', title: 'いつもより少し頑張ってみる', desc: '少し長い時間やってみる' },
+    ];
+  }
+  if (behaviorExpSession && behaviorExpSession.plan) {
+    behaviorExpSession.plan.candidates = candidates;
+    behaviorExpSession.plan.loading = false;
+    render();
+  }
+}
+
+async function generateBehaviorNextCandidates() {
+  if (!behaviorExpSession) return;
+  behaviorExpSession.nextPlan.loading = true;
+  render();
+
+  const def = AI_PROMPTS.kizuki_behavior_next_candidates;
+  let candidates = null;
+  if (def && getInviteCode()) {
+    const userMsg = [
+      '直前に完了した行動実験:',
+      `仮説: ${behaviorExpSession.hypothesis.what}`,
+      `実験した行動: ${behaviorExpSession.execute.action}`,
+      `予想: ${behaviorExpSession.execute.expected}`,
+      `結果: ${behaviorExpSession.verify.result}`,
+      `仮説の当てはまり度: ${behaviorExpSession.verify.score}/10`,
+      `気づき: ${behaviorExpSession.verify.insight}`,
+      '',
+      '上記をふまえて、次の一歩の候補を3つ JSON 配列で出力してください。',
+    ].join('\n');
+    try {
+      const text = await callGemini(def.systemPrompt, [{ role: 'user', content: userMsg }], {
+        temperature: def.temperature,
+        maxTokens: def.maxTokens,
+      });
+      candidates = parseBehaviorCandidatesJson(text, 3);
+    } catch (e) {
+      console.warn('[behavior-next]', e);
+    }
+  }
+  if (!candidates || candidates.length === 0) {
+    candidates = [
+      { level: 'かんたん',   title: '同じ場面でもう一度試す',     desc: '今回と同じ状況で、もう一度同じ行動をやってみる' },
+      { level: 'ふつう',     title: '少し条件を広げて試す',       desc: '時間や場所、相手を少し変えて、同じことをやってみる' },
+      { level: 'チャレンジ', title: '一段ハードルを上げる',         desc: '人数・時間・難易度など条件を1つ難しくしてみる' },
+    ];
+  }
+  if (behaviorExpSession && behaviorExpSession.nextPlan) {
+    behaviorExpSession.nextPlan.candidates = candidates;
+    behaviorExpSession.nextPlan.loading = false;
+    render();
+  }
+}
+
+function parseBehaviorCandidatesJson(text, expectN) {
+  if (!text) return null;
+  try {
+    const m = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+    const raw = m ? m[0] : text;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return null;
+    return arr.slice(0, expectN).map(x => ({
+      level: String(x.level || ''),
+      title: String(x.title || ''),
+      desc: String(x.desc || ''),
+    })).filter(x => x.title);
+  } catch (e) {
+    return null;
+  }
+}
+
+function planLevelColor(level) {
+  if (level === 'かんたん')   return '#82B07F';
+  if (level === 'やさしい')   return '#D78A6E';
+  if (level === 'ふつう')     return '#7BA0C6';
+  if (level === 'チャレンジ') return '#C77AB0';
+  return '#888';
+}
+
+// ----- ビュー: ルート -----
+function viewBehaviorExp() {
+  if (!behaviorExpSession) { go('kizuki'); return ''; }
+  const s = behaviorExpSession.step;
+  if (s === 'home')       return viewBehaviorExpHome();
+  if (s === 'hypothesis') return viewBehaviorExpHypothesis();
+  if (s === 'plan')       return viewBehaviorExpPlan();
+  if (s === 'execute')    return viewBehaviorExpExecute();
+  if (s === 'verify')     return viewBehaviorExpVerify();
+  if (s === 'next-plan')  return viewBehaviorExpNextPlan();
+  return viewBehaviorExpHome();
+}
+
+function viewBehaviorExpHeader(title, step) {
+  return `
+    <div class="page-header">
+      <button class="page-back" data-act="behavior-exp-back-home">‹</button>
+      <h1 class="page-title">${escapeHtml(title)}</h1>
+      <span class="text-tiny text-muted" style="min-width:36px; text-align:right;">${step}/5</span>
+    </div>
+  `;
+}
+
+// ----- ビュー: ホーム（説明＋履歴＋CTA） -----
+function viewBehaviorExpHome() {
+  const list = (state.behaviorExperiments || []);
+  return `
+    <div class="screen active">
+      <div class="page-header">
+        <button class="page-back" data-act="behavior-exp-cancel">‹</button>
+        <h1 class="page-title">行動実験</h1>
+        <span style="min-width:36px;"></span>
+      </div>
+
+      <div style="padding:16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:14px; margin: 10px 0 18px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <span style="font-size:22px;">🧪</span>
+          <div style="font-weight:600;">行動実験とは？</div>
+        </div>
+        <div style="font-size:13px; line-height:1.8;">
+          心の中の「思い込み」や「不安」が本当に正しいのか、実際の行動を通して確かめる方法だよ。
+        </div>
+        <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+          ${['① 仮説を立てる','② 計画を立てる','③ 実験を行う','④ 検証する','⑤ 次の一歩へ'].map(s => `
+            <span style="display:inline-block; padding:4px 10px; background: var(--bg-soft); color: var(--text); border-radius:10px; font-size:11px;">${s}</span>
+          `).join('')}
+        </div>
+        <div style="margin-top:12px; padding:10px 12px; background: var(--bg-soft); border-radius:8px; font-size:12px; line-height:1.7;">
+          💡 少しずつ確かめることで、思い込みが変わり、自信につながっていきます。
+        </div>
+      </div>
+
+      <h2 style="font-size:14px; margin:18px 0 10px; color: var(--text-muted);">あなたの行動実験の履歴</h2>
+      ${list.length === 0
+        ? `<div style="padding:24px 16px; text-align:center; color: var(--text-muted); font-size:13px; line-height:1.7;">まだ実験はありません。<br>下のボタンから、最初の一歩を始めてみよう。</div>`
+        : list.map(e => renderBehaviorExpHistoryCard(e)).join('')
+      }
+
+      <div style="margin-top:24px;">
+        <button class="btn btn-primary" data-act="behavior-exp-new" style="width:100%;">＋ 新しい実験を始める</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderBehaviorExpHistoryCard(e) {
+  const dt = new Date(e.createdAt);
+  const dateStr = `${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;
+  const score = (e.verify && typeof e.verify.score === 'number') ? e.verify.score : null;
+  const what = (e.hypothesis && e.hypothesis.what) || '(仮説未入力)';
+  return `
+    <div style="padding:14px 16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:12px; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+        <div style="flex:1; min-width:0;">
+          <div class="text-tiny text-muted">${dateStr}</div>
+          <div style="font-weight:600; margin-top:2px; line-height:1.5;">${escapeHtml(what)}</div>
+          ${e.verify && e.verify.insight ? `<div class="text-tiny text-muted" style="margin-top:6px; line-height:1.7;">気づき: ${escapeHtml(e.verify.insight)}</div>` : ''}
+        </div>
+        ${score != null ? `
+          <div style="text-align:right; flex-shrink:0;">
+            <div class="text-tiny text-muted">検証スコア</div>
+            <div style="font-weight:600; font-size:18px; color: var(--text);">${score}/10</div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ----- ビュー: 1/5 仮説を立てる -----
+function viewBehaviorExpHypothesis() {
+  const h = behaviorExpSession.hypothesis;
+  return `
+    <div class="screen active">
+      ${viewBehaviorExpHeader('仮説を立てる', 1)}
+      <p class="text-small" style="margin:6px 0 18px;">今、確かめたいこと（思い込み）はなんですか？</p>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <textarea data-act="behavior-exp-input" data-key="hypothesis.what" placeholder='例) 「人前で話すと、失敗して笑われる」「電車に乗ると、気分が悪くなる」など' style="width:100%; min-height:110px; padding:12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(h.what || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">なぜそう思うのでしょうか？（任意）</label>
+          <textarea data-act="behavior-exp-input" data-key="hypothesis.why" placeholder="理由やきっかけを書いてみよう" style="width:100%; min-height:80px; padding:12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(h.why || '')}</textarea>
+        </div>
+      </div>
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="behavior-exp-next" data-from="hypothesis" style="width:100%;">保存して次へ</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ビュー: 2/5 行動計画を立てる（AIサポート） -----
+function viewBehaviorExpPlan() {
+  const p = behaviorExpSession.plan;
+  const hasSelection = (p.selected != null) || (p.custom || '').trim();
+  return `
+    <div class="screen active">
+      ${viewBehaviorExpHeader('行動計画を立てる', 2)}
+      <p class="text-small" style="margin:6px 0 2px;">（AIサポート）</p>
+      <p class="text-small text-muted" style="margin:0 0 14px;">AIが、あなたに合った行動の候補を提案します</p>
+
+      ${p.loading ? `
+        <div style="padding:32px 16px; text-align:center; color: var(--text-muted);">
+          <div style="font-size:22px;">💭</div>
+          <div style="margin-top:8px; font-size:13px;">候補を考えています…</div>
+        </div>
+      ` : `
+        <h2 style="font-size:13px; margin:8px 0 10px; color: var(--text-muted);">おすすめの行動候補</h2>
+        ${(p.candidates || []).map((c, i) => `
+          <div data-act="behavior-exp-plan-select" data-idx="${i}" style="padding:14px 16px; background: var(--bg-card); border:1px solid ${p.selected === i ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:12px; margin-bottom:10px; cursor:pointer; ${p.selected === i ? 'box-shadow: 0 0 0 1px var(--accent, #6BA877) inset;' : ''}">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+              <span style="display:inline-block; padding:2px 8px; background: ${planLevelColor(c.level)}; color:#fff; border-radius:10px; font-size:11px; font-weight:600;">${escapeHtml(c.level || '')}</span>
+              <div style="font-weight:600; font-size:14px;">${escapeHtml(c.title || '')}</div>
+            </div>
+            <div class="text-tiny text-muted" style="line-height:1.7;">${escapeHtml(c.desc || '')}</div>
+          </div>
+        `).join('')}
+        ${(p.custom || '').trim() ? `
+          <div style="padding:14px 16px; background: var(--bg-soft); border:1px solid var(--accent, #6BA877); border-radius:12px; margin-bottom:10px;">
+            <div class="text-tiny text-muted" style="margin-bottom:4px;">自分で考えた行動</div>
+            <div style="font-weight:600; font-size:14px; line-height:1.6;">${escapeHtml(p.custom)}</div>
+          </div>
+        ` : ''}
+      `}
+
+      <div style="margin-top:20px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="behavior-exp-next" data-from="plan" ${hasSelection ? '' : 'disabled'} style="width:100%; ${hasSelection ? '' : 'opacity:0.5;'}">この候補を選ぶ</button>
+        <button class="btn-ghost" data-act="behavior-exp-plan-custom" style="width:100%;">自分で考えた行動を入力</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ビュー: 3/5 実験を行う -----
+function viewBehaviorExpExecute() {
+  const e = behaviorExpSession.execute;
+  return `
+    <div class="screen active">
+      ${viewBehaviorExpHeader('実験を行う', 3)}
+      <p class="text-small text-muted" style="margin:6px 0 14px;">計画した行動を実際にやってみよう</p>
+
+      <div style="padding:14px 16px; background: var(--bg-soft); border-radius:12px; margin-bottom:18px;">
+        <div class="text-tiny text-muted" style="margin-bottom:4px;">今日の実験</div>
+        <div style="font-weight:600; line-height:1.6;">${escapeHtml(e.action || '')}</div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">📅 いつやる？</label>
+          <input type="text" data-act="behavior-exp-input" data-key="execute.when" placeholder="例) 2026/5/30 (金) 15:00ごろ" value="${escapeHtml(e.when || '')}" style="width:100%; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">📍 どこでやる？</label>
+          <input type="text" data-act="behavior-exp-input" data-key="execute.where" placeholder="例) いつものカフェ" value="${escapeHtml(e.where || '')}" style="width:100%; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">💭 予想していたこと</label>
+          <textarea data-act="behavior-exp-input" data-key="execute.expected" placeholder="例) 緊張してうまく話せないと思う" style="width:100%; min-height:60px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(e.expected || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">😟 不安・心配の度合い（0〜10）</label>
+          <p class="text-tiny text-muted" style="margin:0 0 8px;">実験の前の、今の不安の強さを10段階でつけてみよう</p>
+          <input type="range" min="0" max="10" step="1" data-act="behavior-exp-anxiety" value="${e.anxiety}" style="width:100%;">
+          <div style="text-align:center; font-weight:600; margin-top:4px;">${e.anxiety}</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="behavior-exp-next" data-from="execute" style="width:100%;">実験を始めた！</button>
+        <button class="btn-ghost" data-act="behavior-exp-execute-later" style="width:100%;">あとで記録する</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ビュー: 4/5 検証する -----
+function viewBehaviorExpVerify() {
+  const v = behaviorExpSession.verify;
+  return `
+    <div class="screen active">
+      ${viewBehaviorExpHeader('検証する', 4)}
+      <p class="text-small text-muted" style="margin:6px 0 14px;">結果を振り返り、仮説が正しかったか評価しましょう</p>
+
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">実験の結果</label>
+          <textarea data-act="behavior-exp-input" data-key="verify.result" placeholder="実際に起きたことをできるだけ具体的に書いてみよう" style="width:100%; min-height:90px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(v.result || '')}</textarea>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">仮説の検証</label>
+          <p class="text-tiny text-muted" style="margin:0 0 8px;">あなたの仮説は、どのくらい当てはまりましたか？</p>
+          <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); margin-bottom:4px;">
+            <span>まったく当てはまらない</span><span>とても当てはまる</span>
+          </div>
+          <input type="range" min="0" max="10" step="1" data-act="behavior-exp-verify-score" value="${v.score}" style="width:100%;">
+          <div style="text-align:center; font-weight:600; margin-top:4px;">${v.score}/10</div>
+        </div>
+        <div>
+          <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">気づき・学び</label>
+          <textarea data-act="behavior-exp-input" data-key="verify.insight" placeholder="新しくわかったこと、意外だったことなどを書いてみよう" style="width:100%; min-height:90px; padding:10px 12px; border:1px solid var(--divider); border-radius:8px; font: inherit; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;">${escapeHtml(v.insight || '')}</textarea>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" data-act="behavior-exp-next" data-from="verify" style="width:100%;">保存して次へ</button>
+      </div>
+    </div>
+  `;
+}
+
+// ----- ビュー: 5/5 次の計画を立てる（AIサポート） + 完了 -----
+function viewBehaviorExpNextPlan() {
+  const n = behaviorExpSession.nextPlan;
+  return `
+    <div class="screen active">
+      ${viewBehaviorExpHeader('次の計画を立てる', 5)}
+      <p class="text-small" style="margin:6px 0 2px;">（AIサポート）</p>
+      <p class="text-small text-muted" style="margin:0 0 14px;">AIが次の一歩を提案します</p>
+
+      ${n.loading ? `
+        <div style="padding:32px 16px; text-align:center; color: var(--text-muted);">
+          <div style="font-size:22px;">💭</div>
+          <div style="margin-top:8px; font-size:13px;">次の一歩を考えています…</div>
+        </div>
+      ` : `
+        <h2 style="font-size:13px; margin:8px 0 10px; color: var(--text-muted);">あなたへのおすすめ</h2>
+        ${(n.candidates || []).map((c, i) => `
+          <div data-act="behavior-exp-next-select" data-idx="${i}" style="padding:14px 16px; background: var(--bg-card); border:1px solid ${n.selected === i ? 'var(--accent, #6BA877)' : 'var(--divider)'}; border-radius:12px; margin-bottom:10px; cursor:pointer; ${n.selected === i ? 'box-shadow: 0 0 0 1px var(--accent, #6BA877) inset;' : ''}">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+              <span style="display:inline-block; padding:2px 8px; background: ${planLevelColor(c.level)}; color:#fff; border-radius:10px; font-size:11px; font-weight:600;">${escapeHtml(c.level || '')}</span>
+              <div style="font-weight:600; font-size:14px;">${escapeHtml(c.title || '')}</div>
+            </div>
+            <div class="text-tiny text-muted" style="line-height:1.7;">${escapeHtml(c.desc || '')}</div>
+          </div>
+        `).join('')}
+        ${(n.custom || '').trim() ? `
+          <div style="padding:14px 16px; background: var(--bg-soft); border:1px solid var(--accent, #6BA877); border-radius:12px; margin-bottom:10px;">
+            <div class="text-tiny text-muted" style="margin-bottom:4px;">自分で考えた次の計画</div>
+            <div style="font-weight:600; font-size:14px; line-height:1.6;">${escapeHtml(n.custom)}</div>
+          </div>
+        ` : ''}
+      `}
+
+      <div style="margin-top:20px; padding:14px 16px; background: var(--bg-soft); border-radius:12px; text-align:center; line-height:1.8;">
+        🌱 この実験を完了しました！<br>おつかれさまでした 😊
+      </div>
+
+      <div style="margin-top:16px; display:grid; gap:10px;">
+        <button class="btn-ghost" data-act="behavior-exp-next-custom" style="width:100%;">自分で考えた計画を入力</button>
+        <button class="btn btn-primary" data-act="behavior-exp-complete" style="width:100%;">実験の一覧に戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+
+// ============================================================
 // 深掘り（下向き矢印法 9ステップ - v0.9.71）
 //
 // 1: ワーク紹介          → 2: 出来事入力（カテゴリ）
@@ -12134,6 +12588,86 @@ const AI_PROMPTS = {
 - 3〜5文・180字以内。改行は2か所まで。`,
     lastUpdated: '2026-05-26',
     changeNote: 'v0.9.70 初版',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  // ----- v0.9.78: 5ステップ 行動実験フロー（AIサポート2箇所） -----
+  kizuki_behavior_plan_candidates: {
+    id: 'kizuki_behavior_plan_candidates',
+    title: 'きづき: 行動実験 — 行動候補生成（Step 2/5）',
+    purpose: 'ユーザーが立てた仮説をもとに、難易度別の小さな行動候補を4つ JSON 配列で生成',
+    triggerLocation: 'きづき → 行動実験 → Step 2「行動計画を立てる」',
+    callSite: 'generateBehaviorPlanCandidates() → callGemini(...)',
+    model: 'gemini-2.5-flash',
+    temperature: 0.8,
+    maxTokens: 600,
+    outputFormat: 'JSON配列（4件・level/title/desc）',
+    fallbackBehavior: 'API未設定/失敗/JSONパース失敗 → 固定4候補',
+    safetyChecks: ['仮説を否定しない', 'ハードルを上げすぎない', '医療的助言は出さない', '自傷につながる行動は提案しない'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが行動実験のために仮説（思い込み）を立てたところ。
+仮説を「確かめてみる」ための小さな行動候補を、難易度別に4つ提案してほしい。
+
+【難易度4段階】
+- かんたん: イメージするだけ・観察するだけ・1分以内
+- やさしい: 1〜3分で済む小さな具体行動
+- ふつう: 数分の実行を伴う具体行動
+- チャレンジ: 一段ハードルを上げた行動（無理しない範囲）
+
+【厳守】
+- 各候補は title（短いラベル・15字程度）と desc（具体的な行動内容・1〜2文・60字程度）で構成
+- 仮説（思い込み）を否定しない。「確かめる」姿勢を支える
+- 医療行為・診断・自傷行為につながる行動は絶対に出さない
+- 出力は **JSON配列のみ**。前後の説明文・コードフェンス禁止。
+
+【出力フォーマット（厳守）】
+[
+  {"level":"かんたん","title":"...","desc":"..."},
+  {"level":"やさしい","title":"...","desc":"..."},
+  {"level":"ふつう","title":"...","desc":"..."},
+  {"level":"チャレンジ","title":"...","desc":"..."}
+]`,
+    lastUpdated: '2026-05-27',
+    changeNote: 'v0.9.78 初版（5ステップ行動実験フロー）',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
+  kizuki_behavior_next_candidates: {
+    id: 'kizuki_behavior_next_candidates',
+    title: 'きづき: 行動実験 — 次の一歩生成（Step 5/5）',
+    purpose: '直前に完了した行動実験を踏まえ、次の一歩の候補を3つ JSON 配列で生成',
+    triggerLocation: 'きづき → 行動実験 → Step 5「次の計画を立てる」',
+    callSite: 'generateBehaviorNextCandidates() → callGemini(...)',
+    model: 'gemini-2.5-flash',
+    temperature: 0.8,
+    maxTokens: 500,
+    outputFormat: 'JSON配列（3件・level/title/desc）',
+    fallbackBehavior: 'API未設定/失敗/JSONパース失敗 → 固定3候補',
+    safetyChecks: ['結果を評価しない', 'ハードルを上げすぎない', '自傷につながる行動は提案しない'],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーが行動実験を1サイクル完了したところ。
+仮説の検証結果と気づきをふまえて、次の一歩の候補を3つ提案してほしい。
+
+【難易度3段階】
+- かんたん: 今回より少しだけ条件を変えた小さな繰り返し
+- ふつう: 状況・対象・時間を少し広げて試す
+- チャレンジ: 一段ハードルを上げる（無理しない範囲）
+
+【厳守】
+- 検証結果（仮説が当たった/外れた）を評価しない
+- 気づきを踏まえて、次に確かめる価値のある行動を提案する
+- 出力は **JSON配列のみ**。前後の説明文・コードフェンス禁止。
+
+【出力フォーマット（厳守）】
+[
+  {"level":"かんたん","title":"...","desc":"..."},
+  {"level":"ふつう","title":"...","desc":"..."},
+  {"level":"チャレンジ","title":"...","desc":"..."}
+]`,
+    lastUpdated: '2026-05-27',
+    changeNote: 'v0.9.78 初版（5ステップ行動実験フロー）',
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
@@ -14892,6 +15426,11 @@ function handleAction(act, el, ev) {
   if (act === 'kizuki-start-work') {
     const workId = el && el.dataset && el.dataset.work;
     if (!workId) return;
+    // v0.9.78: 行動実験は5ステップフローへ分岐
+    if (workId === 'behavior-experiment') {
+      startBehaviorExp();
+      return;
+    }
     startKizukiWork(workId);
     return;
   }
@@ -14937,6 +15476,137 @@ function handleAction(act, el, ev) {
     startKizukiWork(w);
     return;
   }
+
+  // ───────── 行動実験（5ステップ + ホーム）ハンドラ — v0.9.78 ─────────
+  if (act === 'behavior-exp-cancel') { cancelBehaviorExp(); return; }
+  if (act === 'behavior-exp-new')    { newBehaviorExp(); return; }
+  if (act === 'behavior-exp-back-home') { backToBehaviorExpHome(); return; }
+  if (act === 'behavior-exp-input') {
+    if (!behaviorExpSession) return;
+    const key = el.dataset.key || '';
+    const [k1, k2] = key.split('.');
+    if (k2) {
+      behaviorExpSession[k1] = behaviorExpSession[k1] || {};
+      behaviorExpSession[k1][k2] = el.value || '';
+    } else {
+      behaviorExpSession[k1] = el.value || '';
+    }
+    return; // re-render しない（入力中のカーソル位置維持）
+  }
+  if (act === 'behavior-exp-anxiety') {
+    if (!behaviorExpSession) return;
+    behaviorExpSession.execute.anxiety = Number(el.value);
+    render();
+    return;
+  }
+  if (act === 'behavior-exp-verify-score') {
+    if (!behaviorExpSession) return;
+    behaviorExpSession.verify.score = Number(el.value);
+    render();
+    return;
+  }
+  if (act === 'behavior-exp-plan-select') {
+    if (!behaviorExpSession) return;
+    behaviorExpSession.plan.selected = Number(el.dataset.idx);
+    behaviorExpSession.plan.custom = '';
+    render();
+    return;
+  }
+  if (act === 'behavior-exp-plan-custom') {
+    if (!behaviorExpSession) return;
+    const input = window.prompt('自分で考えた行動を入力してください', behaviorExpSession.plan.custom || '');
+    if (input != null && input.trim()) {
+      behaviorExpSession.plan.custom = input.trim();
+      behaviorExpSession.plan.selected = null;
+      render();
+    }
+    return;
+  }
+  if (act === 'behavior-exp-next-select') {
+    if (!behaviorExpSession) return;
+    behaviorExpSession.nextPlan.selected = Number(el.dataset.idx);
+    behaviorExpSession.nextPlan.custom = '';
+    render();
+    return;
+  }
+  if (act === 'behavior-exp-next-custom') {
+    if (!behaviorExpSession) return;
+    const input = window.prompt('自分で考えた次の計画を入力してください', behaviorExpSession.nextPlan.custom || '');
+    if (input != null && input.trim()) {
+      behaviorExpSession.nextPlan.custom = input.trim();
+      behaviorExpSession.nextPlan.selected = null;
+      render();
+    }
+    return;
+  }
+  if (act === 'behavior-exp-execute-later') {
+    if (typeof toast === 'function') toast('入力内容は保持されません。次のセッションでもう一度入力してね');
+    backToBehaviorExpHome();
+    return;
+  }
+  if (act === 'behavior-exp-complete') { completeBehaviorExp(); return; }
+  if (act === 'behavior-exp-next') {
+    if (!behaviorExpSession) return;
+    // 進行中の textarea/input 値を session に反映（input イベントの取りこぼし対策）
+    document.querySelectorAll('[data-act="behavior-exp-input"]').forEach(el => {
+      const key = el.dataset.key || '';
+      const [k1, k2] = key.split('.');
+      if (k2) {
+        behaviorExpSession[k1] = behaviorExpSession[k1] || {};
+        behaviorExpSession[k1][k2] = el.value || '';
+      } else {
+        behaviorExpSession[k1] = el.value || '';
+      }
+    });
+    const from = el.dataset.from;
+    if (from === 'hypothesis') {
+      if (!(behaviorExpSession.hypothesis.what || '').trim()) {
+        if (typeof toast === 'function') toast('確かめたいこと（思い込み）を入れてね');
+        return;
+      }
+      behaviorExpSession.step = 'plan';
+      render();
+      generateBehaviorPlanCandidates();
+      return;
+    }
+    if (from === 'plan') {
+      const p = behaviorExpSession.plan;
+      if (p.selected != null && p.candidates[p.selected]) {
+        const c = p.candidates[p.selected];
+        behaviorExpSession.execute.action = c.desc ? `${c.title} — ${c.desc}` : c.title;
+      } else if ((p.custom || '').trim()) {
+        behaviorExpSession.execute.action = p.custom;
+      } else {
+        if (typeof toast === 'function') toast('候補を選ぶか、自分で考えた行動を入れてね');
+        return;
+      }
+      behaviorExpSession.step = 'execute';
+      render();
+      return;
+    }
+    if (from === 'execute') {
+      if (!(behaviorExpSession.execute.action || '').trim()) {
+        if (typeof toast === 'function') toast('実験内容が空です');
+        return;
+      }
+      behaviorExpSession.execute.started = true;
+      behaviorExpSession.step = 'verify';
+      render();
+      return;
+    }
+    if (from === 'verify') {
+      if (!(behaviorExpSession.verify.result || '').trim()) {
+        if (typeof toast === 'function') toast('結果を書いてね');
+        return;
+      }
+      behaviorExpSession.step = 'next-plan';
+      render();
+      generateBehaviorNextCandidates();
+      return;
+    }
+    return;
+  }
+
   // ───────── 下向き矢印法（9ステップ）ハンドラ ─────────
   if (act === 'dd-cancel') {
     const backTo = (deepDive && deepDive.from) || 'kizuki';
