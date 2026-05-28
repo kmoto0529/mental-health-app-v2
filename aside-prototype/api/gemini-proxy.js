@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const { model, systemPrompt, messages, temperature, maxTokens, thinkingBudget } = body;
+  const { model, systemPrompt, messages, temperature, maxTokens, thinkingBudget, responseMimeType } = body;
   if (!Array.isArray(messages)) {
     res.status(400).json({ error: 'messages_must_be_array' });
     return;
@@ -67,6 +67,7 @@ module.exports = async (req, res) => {
       temperature: typeof temperature === 'number' ? temperature : 0.8,
       maxOutputTokens: typeof maxTokens === 'number' ? maxTokens : 512,
       thinkingConfig: { thinkingBudget: typeof thinkingBudget === 'number' ? thinkingBudget : 0 },
+      ...(responseMimeType ? { responseMimeType: String(responseMimeType) } : {}),
     },
   };
 
