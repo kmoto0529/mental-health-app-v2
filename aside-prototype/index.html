@@ -6471,7 +6471,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.83-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.84-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -14468,6 +14468,67 @@ Quick Replyも、
     psychologistReviewNote: '',
   },
 
+  // ----- v0.9.84: 思考のクセ分析 質的レイヤー（ハイブリッド・docs/distortion_analysis_logic_v1.md §13） -----
+  distortion_deep_analysis: {
+    id: 'distortion_deep_analysis',
+    title: '思考のクセ分析 — 質的サマリ生成（ハイブリッド）',
+    purpose: 'コードで算出した思考のクセ スコア・TOP3・根拠（本人が書いた記録のみ）を踏まえ、診断ではない「やさしい鏡」としての質的サマリ・根拠説明・ユーザー向けメッセージを生成する。スコアや判定数値は変更しない。',
+    triggerLocation: 'きろく → 思考のクセ分析 →（AI分析・UI未配線）',
+    callSite: 'analyzeDistortionsDeep() → callGemini(..., { responseMimeType: "application/json" })',
+    model: 'gemini-2.5-flash',
+    temperature: 0.7,
+    maxTokens: 1400,
+    outputFormat: 'JSON {summary:{title,mainMessage,suplanComment}, topInsights:[{id,userFriendlyMessage,basisExplanation}]}',
+    fallbackBehavior: 'API未設定/失敗/JSONパース失敗 → buildDistortionSkeleton のルールベース文言を使用',
+    safetyChecks: [
+      '診断・病名断定・「あなたは〇〇です」を禁止（§18）',
+      '「これは診断ではなく記録から見えた傾向」を必ず添える（§19）',
+      'コードが算出したスコア・判定・順位を変更しない',
+      'リスク検知時はオーケストレーター側でAIを呼ばず安全案内を優先（§17）',
+    ],
+    systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
+ユーザーの記録（本人が書いた自動思考・根拠・深掘り・自己評価のみ）から、コードが「思考のクセ」のスコアとTOP3を算出しました。
+あなたの役割は、この結果を **診断ではなく、ユーザーが自分をやさしく理解するための「鏡」** として、温かい質的サマリに翻訳することです。
+
+【絶対の前提】
+- これは医療行為・診断・心理検査ではない。もやの森は予防目的。
+- 渡されたスコア・判定・順位は**変更しない**。あなたは数値を作らず、言葉だけを担当する。
+- 22-28歳の若者に話す、少し年上の信頼できる友達のような自然な口語。
+
+【禁止表現（§18）】
+- 「あなたは〇〇です」「〇〇の認知の歪みがあります」
+- 「病的です」「治療が必要です」「うつ傾向です」「〇〇障害の可能性があります」
+- 「この考え方を直しましょう」「間違った考え方です」
+- ポエム調・スピリチュアル・過剰な励まし・不自然な比喩
+
+【推奨表現（§19）】
+- 「最近の記録では、〇〇に目が向きやすい場面がありました」
+- 「〇〇のように考えやすい時期かもしれません」
+- 「これは診断ではなく、記録から見えた傾向です」
+- 「少しだけ見方をゆるめるヒントとして使ってください」
+
+【書き方】
+- summary.title: 今のいちばんの傾向を、責めない言葉で1文（例「完璧を目指しやすい傾向が少し見られます」）
+- summary.mainMessage: 何の記録からそう見えたかを、断定せず2文以内で（例「できた部分よりも、足りなかった部分に目が向きやすい場面がありました」）
+- summary.suplanComment: すぷらんからの一言。やわらかい視点の提案を1つだけ
+- topInsights[].userFriendlyMessage: そのクセを責めずに言い換えた1文
+- topInsights[].basisExplanation: 渡された「本人の記録」を根拠に、なぜその傾向が見えたかを淡々と。本人の言葉を短く引用してよい。決めつけない
+
+【出力フォーマット（JSONのみ・前後の説明やコードフェンス禁止）】
+{
+  "summary": { "title": "...", "mainMessage": "...", "suplanComment": "..." },
+  "topInsights": [
+    { "id": "all_or_nothing", "userFriendlyMessage": "...", "basisExplanation": "..." }
+  ]
+}
+- topInsights の id は、渡された TOP の id（all_or_nothing / overgeneralization / labeling / mind_reading / should / personalization / disqualifying / fortune_telling）と完全一致させる。`,
+    userTemplate: 'daBuildAIUserMessage() がコード側で動的生成（TOP3 + 本人の根拠記録）',
+    lastUpdated: '2026-05-28',
+    changeNote: 'v0.9.84 初版（思考のクセ分析ハイブリッド・質的レイヤー。スコアはコード算出、言葉のみAI）',
+    psychologistReviewStatus: 'レビュー待ち',
+    psychologistReviewNote: '',
+  },
+
 };
 
 // 旧API互換: 既存の参照を残すための alias
@@ -14619,6 +14680,387 @@ function generateWeeklySuplanMessage() {
   if (ratio >= 0.15) return 'おだやかな日が増えてきてるね。今のペースを大事にしていこう。';
   return 'いい感じのリズムが続いてるよ。すこしずつ積み重なってる証拠だよ。';
 }
+
+// === DA_ENGINE_START ===
+// ============================================================
+// 思考のクセ分析エンジン v1（docs/distortion_analysis_logic_v1.md 準拠）
+//   ハイブリッド設計:
+//   - スコア計算/dataConfidence/リスク検知/TOP3/根拠/推移 はコードで決定的に算出
+//   - 文脈考慮の質的サマリ・根拠説明・ユーザー向けメッセージは Gemini
+//     （AI_PROMPTS.distortion_deep_analysis）で生成し、失敗時はルールベース文言にフォールバック
+//   - 本人が言語化した記録のみをスコア対象にする（AI生成の alternativeView / letterBody / AI返信は除外）
+//   - UI 未配線（画面遷移図 受領後に接続予定）。既存 analyzeDistortions 等は現UI用に温存。
+// ============================================================
+
+// 対象8種（表示名は仕様 v1: fortune_telling = 先読み思考）+ 文脈キーワード + 行動ヒント(§14)
+const DA_DISTORTIONS = [
+  { id:'all_or_nothing', name:'全か無か思考', short:'完璧か無価値かで考えやすい',
+    keywords:['全部','すべて','完璧','100点','0か','白黒','台無し','全然だめ','何もかも','全くダメ','無価値','全否定'],
+    actionHints:['0点/100点ではなく30点・50点・70点で見てみる','今日できた部分を1つだけ書く','「完璧ではないけど進んだこと」を探す'] },
+  { id:'overgeneralization', name:'過度の一般化', short:'一度を「いつも」に広げやすい',
+    keywords:['いつも','絶対','どうせ','永遠に','一度も','毎回','またダメ','二度と','いつもこう','結局いつも'],
+    actionHints:['「いつも」を「今回は」に言い換える','例外が1つでもなかったか探す','過去に少し違った場面を書き出す'] },
+  { id:'labeling', name:'レッテル貼り', short:'自分全体にダメの烙印を貼りやすい',
+    keywords:['私はダメ','自分はダメ','無能','使えない','価値ない','ダメ人間','最低','クズ','向いてない','才能ない'],
+    actionHints:['「私はダメ」ではなく「今回はここが難しかった」に変える','自分全体ではなく出来事の一部として見る','友達に同じことを言われたらどう返すか考える'] },
+  { id:'mind_reading', name:'心の読みすぎ', short:'相手の気持ちを決めつけやすい',
+    keywords:['嫌われ','呆れられ','冷たかった','うざいと思われ','迷惑だと思われ','見下され','どう思われ','嫌がられ','変に思われ'],
+    actionHints:['事実と想像を分けて書く','相手が実際に言ったことだけを取り出す','別の可能性を2つ書く'] },
+  { id:'should', name:'すべき思考', short:'「〜すべき」で自分を縛りやすい',
+    keywords:['すべき','しなきゃ','ねばならない','べきだった','ちゃんとしな','もっと頑張','普通は','当然','やらなきゃ','〜のはず'],
+    actionHints:['「すべき」を「できたらいい」に言い換える','そのルールは誰の声か考える','今の自分に現実的なラインを探す'] },
+  { id:'personalization', name:'自分への関連付け', short:'何でも自分のせいにしやすい',
+    keywords:['私のせい','自分のせい','私が悪い','私が原因','自分が悪い','迷惑かけた','申し訳ない','私さえ','自分のせいで'],
+    actionHints:['自分以外の要因を3つ書く','関わった人や環境要因を分けて見る','自分が担う範囲を少し狭める'] },
+  { id:'disqualifying', name:'マイナス思考', short:'良いことを打ち消しやすい',
+    keywords:['大したことない','気のせい','まぐれ','たまたま','するほどじゃない','甘えてる','みんな同じくらい','普通のこと','評価されるほどでは'],
+    actionHints:['小さく良かったことを1つ拾う','「大したことない」と思ったことも事実として残す','できたことを消さずに横に置いておく'] },
+  { id:'fortune_telling', name:'先読み思考', short:'未来を悲観的に決めやすい',
+    keywords:['どうせ無理','絶対上手くいかない','失敗する','もう手遅れ','将来真っ暗','未来ない','きっとダメ','うまくいくわけない','どうせ失敗','この先も'],
+    actionHints:['未来予想と今わかっている事実を分ける','最悪以外のシナリオを2つ書く','今日できる小さな一歩に戻す'] },
+];
+
+// ソース別フィールド重み（§9）
+const DA_FIELD_WEIGHTS = {
+  moyamoya: { thought:1.0, evidence:0.7, situation:0.4, counterEvidence:0.3 },
+  deepDive: { coreBelief:1.2, oldSchema:1.1, deeper:1.0, extractedBelief:1.0, firstThought:0.8 },
+  chat:     { userText:0.6, summary:0.4 },
+  moodLog:  { comment:0.5, category:0.3 },
+};
+// ソース別 最終合成重み（§8）
+const DA_SOURCE_WEIGHT = { moyamoya:0.35, deepDive:0.25, self:0.20, chat:0.10, moodLog:0.05 };
+const DA_CHAT_SCORE_CAP = 60; // §9.4 会話だけで強いラベルを出さない
+const DA_DAY = 24 * 60 * 60 * 1000;
+
+function daCountHits(text, keywords) {
+  const t = String(text || '').toLowerCase();
+  if (!t) return 0;
+  let n = 0;
+  for (const k of keywords) {
+    const kk = String(k).toLowerCase();
+    if (!kk) continue;
+    let idx = t.indexOf(kk);
+    while (idx !== -1) { n++; idx = t.indexOf(kk, idx + kk.length); }
+  }
+  return n;
+}
+function daTrim(text, max = 40) {
+  const s = String(text || '').replace(/\s+/g, ' ').trim();
+  return s.length > max ? s.slice(0, max - 1) + '…' : s;
+}
+
+// 期間 [fromTs, toTs) のレコードを AnalysisItem 群に正規化（§6）
+function daNormalize(state, fromTs, toTs) {
+  const inWin = (iso) => { const t = new Date(iso).getTime(); return t >= fromTs && t < toTs; };
+  const buckets = { moyamoya:[], deepDive:[], chat:[], moodLog:[], hasSelf:false, selfAnswers:null };
+
+  (state.moyamoyaRecords || []).forEach(r => {
+    if (!r.createdAt || !inWin(r.createdAt)) return;
+    buckets.moyamoya.push({
+      id:r.id, sourceType:'moyamoya', createdAt:r.createdAt,
+      textFields:{ situation:r.eventText||'', thought:r.automaticThought||'', evidence:r.evidence||'', counterEvidence:r.counterEvidence||'' },
+      emotion:{ label:r.emotion||'', before:r.emotionScoreBefore, after:r.emotionScoreAfter,
+        change:(r.emotionScoreBefore!=null && r.emotionScoreAfter!=null) ? (r.emotionScoreBefore - r.emotionScoreAfter) : null },
+    });
+  });
+  (state.deepDiveSessions || []).forEach(r => {
+    const ts = r.completedAt || r.startedAt;
+    if (!ts || !inWin(ts)) return;
+    buckets.deepDive.push({
+      id:r.id, sourceType:'deepDive', createdAt:ts,
+      textFields:{ firstThought:r.firstThought||'', deeper:Array.isArray(r.deeper)?r.deeper.join(' '):'',
+        coreBelief:r.coreBelief||'', oldSchema:r.oldSchema||'', extractedBelief:r.extractedBelief||'' },
+      emotion:{},
+    });
+  });
+  (state.aiChats || []).forEach(r => {
+    if (!r.createdAt || !inWin(r.createdAt)) return;
+    const userText = (r.messages || []).filter(m => m.role === 'user').map(m => m.content).join(' ');
+    buckets.chat.push({ id:r.id, sourceType:'chat', createdAt:r.createdAt,
+      textFields:{ summary:r.summary||'', userText }, emotion:{} });
+  });
+  (state.moodLogs || []).forEach(r => {
+    if (!r.createdAt || !inWin(r.createdAt)) return;
+    const cat = (r.categories || []).map(id => { const c = CATEGORIES.find(x => x.id === id); return c ? c.name : ''; }).join(' ');
+    buckets.moodLog.push({ id:r.id, sourceType:'moodLog', createdAt:r.createdAt,
+      textFields:{ comment:r.comment||'', category:cat }, emotion:{} });
+  });
+  // 自己評価はスナップショット。completedAt が窓内のときだけ採用（推移の過去窓への漏れ込み防止）
+  const distRes = state.kizukiResults && state.kizukiResults.distortion;
+  if (distRes && distRes.answers && distRes.completedAt && inWin(distRes.completedAt)) {
+    buckets.hasSelf = true; buckets.selfAnswers = distRes.answers;
+  }
+  return buckets;
+}
+
+// 1ソース内の 1歪み サブスコア（0-100）+ 根拠収集
+function daSubScore(items, fieldWeights, keywords) {
+  if (!items || !items.length) return { score:0, hitRecords:0, evidence:[] };
+  let recordsHit = 0, weighted = 0; const evidence = [];
+  for (const it of items) {
+    let itemW = 0, bestField = null, bestText = '';
+    for (const f in fieldWeights) {
+      const text = it.textFields[f];
+      if (!text) continue;
+      const hits = daCountHits(text, keywords);
+      if (hits > 0) { itemW += hits * fieldWeights[f]; if (!bestField) { bestField = f; bestText = text; } }
+    }
+    if (itemW > 0) {
+      recordsHit++; weighted += itemW;
+      evidence.push({ text:daTrim(bestText), sourceType:it.sourceType, date:String(it.createdAt||'').slice(0,10), sourceField:bestField });
+    }
+  }
+  const ratio = recordsHit / items.length;
+  const density = weighted / items.length;
+  const score = Math.min(100, Math.round(ratio * 70 + Math.min(30, density * 15)));
+  return { score, hitRecords:recordsHit, evidence };
+}
+
+// 感情強度・反復補正（§9.6・上限+10）
+function daCorrection(buckets, d) {
+  let c = 0;
+  const heHit = buckets.moyamoya.some(it => it.emotion && it.emotion.before >= 8 &&
+    (daCountHits(it.textFields.thought, d.keywords) + daCountHits(it.textFields.evidence, d.keywords)) > 0);
+  if (heHit) c += 4;
+  const totalHitRecs = [...buckets.moyamoya, ...buckets.deepDive].filter(it =>
+    Object.keys(it.textFields).some(f => daCountHits(it.textFields[f], d.keywords) > 0)).length;
+  if (totalHitRecs >= 3) c += 4;
+  const smallImprove = buckets.moyamoya.some(it => it.emotion && it.emotion.change != null && it.emotion.change <= 1 &&
+    daCountHits(it.textFields.thought, d.keywords) > 0);
+  if (smallImprove) c += 2;
+  return Math.min(10, c);
+}
+
+function daLevel(score) {
+  if (score >= 50) return { key:'やや強め', label:'最近少し出やすいかも', tone:'high' };
+  if (score >= 25) return { key:'ややあり', label:'ときどき見られる',     tone:'mid'  };
+  if (score >= 8)  return { key:'少しだけ', label:'少しだけ見られる',     tone:'low'  };
+  return { key:'ほぼなし', label:'今はあまり見られない', tone:'none' };
+}
+
+// 全8種のスコアを算出（§8-10）
+function daComputeScores(buckets, nowTs) {
+  const since14 = nowTs - 14 * DA_DAY;
+  return DA_DISTORTIONS.map(d => {
+    const mo = daSubScore(buckets.moyamoya, DA_FIELD_WEIGHTS.moyamoya, d.keywords);
+    const dd = daSubScore(buckets.deepDive, DA_FIELD_WEIGHTS.deepDive, d.keywords);
+    const ch = daSubScore(buckets.chat,     DA_FIELD_WEIGHTS.chat,     d.keywords);
+    const ml = daSubScore(buckets.moodLog,  DA_FIELD_WEIGHTS.moodLog,  d.keywords);
+    const selfRaw = buckets.selfAnswers && buckets.selfAnswers[d.id] != null ? buckets.selfAnswers[d.id] : null;
+    const selfScore = selfRaw != null ? (selfRaw / 2 * 100) : 0;
+    const chScore = Math.min(DA_CHAT_SCORE_CAP, ch.score);
+    const corr = daCorrection(buckets, d);
+
+    const base = mo.score * DA_SOURCE_WEIGHT.moyamoya
+               + dd.score * DA_SOURCE_WEIGHT.deepDive
+               + selfScore * DA_SOURCE_WEIGHT.self
+               + chScore * DA_SOURCE_WEIGHT.chat
+               + ml.score * DA_SOURCE_WEIGHT.moodLog;
+    const score = Math.min(100, Math.round(base + Math.min(10, corr)));
+
+    const evidence = [...dd.evidence, ...mo.evidence, ...ch.evidence, ...ml.evidence];
+    const recent14 = evidence.filter(e => e.date && new Date(e.date).getTime() >= since14).length;
+    const workHits = mo.hitRecords + dd.hitRecords;
+    const sourceBreakdown = {
+      moyamoya:mo.hitRecords, deepDive:dd.hitRecords,
+      selfAssessment:(selfRaw != null && selfRaw >= 1) ? 1 : 0,
+      chat:ch.hitRecords, moodLog:ml.hitRecords,
+    };
+    const anyNonChat = workHits + sourceBreakdown.selfAssessment + ml.hitRecords > 0;
+    return {
+      id:d.id, name:d.name, short:d.short, actionHints:d.actionHints,
+      score, level:daLevel(score), sourceBreakdown, evidence, recent14, workHits,
+      chatOnly: !anyNonChat && ch.hitRecords > 0,
+    };
+  });
+}
+
+// TOP3（§11）
+function daTop3(scored) {
+  const arr = [...scored].sort((a, b) =>
+    (b.score - a.score) || (b.recent14 - a.recent14) || (b.workHits - a.workHits));
+  if (arr.length >= 2 && arr[0].chatOnly && !arr[1].chatOnly) { const t = arr[0]; arr[0] = arr[1]; arr[1] = t; }
+  return arr.slice(0, 3);
+}
+
+// dataConfidence（§16）
+function daDataConfidence(buckets) {
+  const valid = buckets.moyamoya.length + buckets.deepDive.length;
+  const sources = [buckets.moyamoya.length > 0, buckets.deepDive.length > 0, buckets.hasSelf].filter(Boolean).length;
+  if (valid >= 10 && sources >= 2) return 'high';
+  if (valid >= 6) return 'medium';
+  return 'low';
+}
+function daConfidenceLabel(conf) {
+  return conf === 'high' ? '記録から見えた傾向' : conf === 'medium' ? '参考傾向' : 'まだ仮の分析';
+}
+
+// リスク検知（§17・既存 detectCrisis 流用）
+function daRisk(buckets) {
+  let sev = 0;
+  ['moyamoya', 'deepDive', 'chat', 'moodLog'].forEach(s =>
+    buckets[s].forEach(it => Object.values(it.textFields).forEach(v => { if (v) sev = Math.max(sev, detectCrisis(v)); })));
+  return sev >= 4
+    ? { riskDetected:true, message:'今は分析よりも、安全を優先してほしい状態かもしれません。ひとりで抱えず、信頼できる人や専門窓口につながることを検討してください。' }
+    : { riskDetected:false, message:'' };
+}
+
+// 推移（§20 trend・直近28日 vs その前28日）
+function daTrend(state, nowTs) {
+  const cur = daComputeScores(daNormalize(state, nowTs - 28 * DA_DAY, nowTs), nowTs);
+  const prevBuckets = daNormalize(state, nowTs - 56 * DA_DAY, nowTs - 28 * DA_DAY);
+  const prev = daComputeScores(prevBuckets, nowTs - 28 * DA_DAY);
+  return DA_DISTORTIONS.map(d => {
+    const c = cur.find(x => x.id === d.id) || { score:0 };
+    const p = prev.find(x => x.id === d.id) || { score:0 };
+    const delta = c.score - p.score;
+    const trendLabel = delta >= 10 ? '増えぎみ' : delta <= -10 ? '減りぎみ' : 'ほぼ横ばい';
+    return { id:d.id, name:d.name, previousScore:p.score, currentScore:c.score, delta, trendLabel };
+  }).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+}
+
+// 推奨ワーク（§15）
+function daRecommendWorks(buckets, top) {
+  const recs = [];
+  if (buckets.moyamoya.length < 3)
+    recs.push({ workId:'moyamoya', title:'もやもや整理', reason:'自動思考の記録を増やすと分析が安定します', priority:'high', estimatedMinutes:7, ctaText:'もやもや整理をやってみる' });
+  if (buckets.deepDive.length === 0 && top[0] && top[0].score >= 25)
+    recs.push({ workId:'deep-dive', title:'下向き矢印法', reason:'奥にある思い込み（スキーマ）まで整理しやすくなります', priority:'medium', estimatedMinutes:10, ctaText:'下向き矢印法をやってみる' });
+  if (!buckets.hasSelf)
+    recs.push({ workId:'distortion', title:'認知のゆがみセルフチェック', reason:'自分のクセを広く把握できます', priority:'medium', estimatedMinutes:5, ctaText:'セルフチェックをする' });
+  if (top[0] && (top[0].id === 'fortune_telling' || top[0].id === 'all_or_nothing'))
+    recs.push({ workId:'behavior-experiment', title:'行動実験', reason:'思い込みを小さく確かめて行動に落とせます', priority:'low', estimatedMinutes:5, ctaText:'行動実験をやってみる' });
+  return recs.slice(0, 3);
+}
+
+// 行動提案（§20 actionSuggestions）
+function daActionSuggestions(top) {
+  return top.filter(t => t.score >= 8).slice(0, 3).map(t => ({
+    title:t.actionHints[0], description:t.actionHints.slice(0, 2).join(' / '),
+    relatedDistortionId:t.id, difficulty:'easy', estimatedMinutes:3,
+  }));
+}
+
+// ルールベースのサマリ文言（AI失敗時フォールバック・§13/§19）
+function daRuleSummary(top) {
+  if (!top.length || top[0].score < 8) {
+    return {
+      title:'今はまだ大きなクセは見えていません',
+      mainMessage:'記録がもう少し増えると、考え方の傾向が見えてきます。',
+      suplanComment:'あせらず、少しずつでだいじょうぶ。',
+      cautionText:'これは記録から見えたセルフケア用の傾向メモです。診断ではありません。',
+    };
+  }
+  const t = top[0];
+  return {
+    title:`${t.name}が${t.level.label}`,
+    mainMessage:`最近の記録では、${t.short}場面が見られました。`,
+    suplanComment:t.actionHints[0],
+    cautionText:'これは記録から見えたセルフケア用の傾向メモです。診断ではありません。',
+  };
+}
+
+// 決定的スケルトン（§20 スキーマ・ルールベース層のみ）
+function buildDistortionSkeleton(state, nowTs) {
+  nowTs = nowTs || Date.now();
+  const buckets = daNormalize(state, nowTs - 28 * DA_DAY, nowTs);
+  const scored = daComputeScores(buckets, nowTs);
+  const top = daTop3(scored);
+  const conf = daDataConfidence(buckets);
+  const safety = daRisk(buckets);
+  const summary = daRuleSummary(top);
+  summary.dataConfidence = daConfidenceLabel(conf);
+
+  const basis = top.map(t => ({
+    id:t.id, name:t.name, evidenceCount:t.evidence.length,
+    sourceBreakdown:t.sourceBreakdown,
+    representativeEvidence:t.evidence.slice(0, 3),
+    explanation:`${t.name}に近い表現が${t.evidence.length}件の記録で見られたため`,
+    caution:'一部の記録から見えた傾向であり、診断ではありません',
+  }));
+
+  return {
+    generatedAt:new Date(nowTs).toISOString(),
+    period:{ from:new Date(nowTs - 28 * DA_DAY).toISOString(), to:new Date(nowTs).toISOString(), days:28 },
+    dataConfidence:conf,
+    summary,
+    topDistortions:top.map(t => ({
+      id:t.id, name:t.name, score:t.score, level:t.level.key,
+      shortDescription:t.short, userFriendlyMessage:`${t.short}傾向が少し見られます。`, actionHint:t.actionHints[0],
+    })),
+    chart:{
+      labels:DA_DISTORTIONS.map(d => d.name),
+      userScores:DA_DISTORTIONS.map(d => (scored.find(s => s.id === d.id) || { score:0 }).score),
+      // 母集団平均は β後に算出予定。現状は視覚比較用の中庸ベースライン（プレースホルダ）
+      averageScores:DA_DISTORTIONS.map(() => 15),
+    },
+    trend:daTrend(state, nowTs),
+    basis,
+    actionSuggestions:daActionSuggestions(top),
+    recommendedWorks:daRecommendWorks(buckets, top),
+    safety,
+    aiGenerated:false,
+  };
+}
+
+// AI（質的レイヤー）に渡すユーザーメッセージ — 本人が書いた根拠のみ提示
+function daBuildAIUserMessage(result) {
+  const lines = [];
+  lines.push(`# 分析データ（dataConfidence: ${result.dataConfidence} / 直近28日）`);
+  lines.push('');
+  lines.push('## 思考のクセ TOP（コード算出・スコアは変更しないこと）');
+  result.topDistortions.forEach((t, i) => {
+    lines.push(`${i + 1}. ${t.name}（score ${t.score} / ${t.level}）— ${t.shortDescription}`);
+    const b = result.basis.find(x => x.id === t.id);
+    if (b && b.representativeEvidence.length) {
+      b.representativeEvidence.forEach(e => lines.push(`   - 本人の記録「${e.text}」（${e.sourceType}・${e.sourceField}）`));
+    }
+  });
+  lines.push('');
+  lines.push('上記を踏まえ、診断ではない「やさしい鏡」としての質的サマリと、各クセの根拠説明・ユーザー向けメッセージを JSON で出力してください。');
+  return lines.join('\n');
+}
+
+// オーケストレーター（ハイブリッド）: スケルトン算出 → Gemini で質的レイヤーを上書き
+async function analyzeDistortionsDeep(state, nowTs) {
+  const result = buildDistortionSkeleton(state, nowTs);
+  if (result.safety.riskDetected) return result;        // 安全優先（§17）
+  if (!getInviteCode()) return result;                  // API未設定はルールベースのまま
+  const def = AI_PROMPTS.distortion_deep_analysis;
+  if (!def) return result;
+  try {
+    const raw = await callGemini(def.systemPrompt, [{ role:'user', content:daBuildAIUserMessage(result) }], {
+      temperature:def.temperature, maxTokens:def.maxTokens, responseMimeType:'application/json',
+    });
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.summary) {
+        if (parsed.summary.title)        result.summary.title = parsed.summary.title;
+        if (parsed.summary.mainMessage)  result.summary.mainMessage = parsed.summary.mainMessage;
+        if (parsed.summary.suplanComment) result.summary.suplanComment = parsed.summary.suplanComment;
+      }
+      if (Array.isArray(parsed.topInsights)) {
+        parsed.topInsights.forEach(ti => {
+          const t = result.topDistortions.find(x => x.id === ti.id);
+          if (t && ti.userFriendlyMessage) t.userFriendlyMessage = ti.userFriendlyMessage;
+          const b = result.basis.find(x => x.id === ti.id);
+          if (b && ti.basisExplanation) b.explanation = ti.basisExplanation;
+        });
+      }
+      result.aiGenerated = true;
+    }
+  } catch (e) {
+    console.warn('[distortion_deep_analysis] fallback to rule-based:', e);
+  }
+  return result;
+}
+
+// 画面遷移図 受領後の配線・コンソール検証用に公開
+if (typeof window !== 'undefined') {
+  window.analyzeDistortionsDeep = analyzeDistortionsDeep;
+  window.buildDistortionSkeleton = buildDistortionSkeleton;
+}
+// === DA_ENGINE_END ===
 
 // ============================================================
 // チャット共通
