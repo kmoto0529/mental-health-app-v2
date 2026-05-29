@@ -6471,7 +6471,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.85-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.86-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -14484,7 +14484,7 @@ Quick Replyも、
       '診断・病名断定・「あなたは〇〇です」を禁止（§18）',
       '「これは診断ではなく記録から見えた傾向」を必ず添える（§19）',
       'コードが算出したスコア・判定・順位を変更しない',
-      'リスク検知時はオーケストレーター側でAIを呼ばず安全案内を優先（§17）',
+      'リスク検知時も分析は通常通り出力する（社長指示 2026-05-29・§17の分析ブロックは無効化。クライシス対応は mood_chat 等の detectCrisis モーダルが担う）',
     ],
     systemPrompt: `あなたは「もやの森」のAI伴走者「すぷらん」。
 ユーザーの記録（本人が書いた自動思考・根拠・深掘り・自己評価のみ）から、コードが「思考のクセ」のスコアとTOP3を算出しました。
@@ -15070,7 +15070,6 @@ function daBuildAIUserMessage(result) {
 // オーケストレーター（ハイブリッド）: スケルトン算出 → Gemini で質的レイヤーを上書き
 async function analyzeDistortionsDeep(state, nowTs) {
   const result = buildDistortionSkeleton(state, nowTs);
-  if (result.safety.riskDetected) return result;        // 安全優先（§17）
   if (!getInviteCode()) return result;                  // API未設定はルールベースのまま
   const def = AI_PROMPTS.distortion_deep_analysis;
   if (!def) return result;
@@ -15975,7 +15974,7 @@ function ensureDistortionAnalysis() {
   if (!distortionView.selectedId && distortionAnalysis.topDistortions[0]) {
     distortionView.selectedId = distortionAnalysis.topDistortions[0].id;
   }
-  if (!distortionAnalysis.safety.riskDetected && getInviteCode()) {
+  if (getInviteCode()) {
     distortionAnalysisBusy = true;
     const sigAtCall = sig;
     analyzeDistortionsDeep(state).then(r => {
@@ -16041,18 +16040,6 @@ function daRadarSvg(axes) {
   const labels = axes.map((a, i) => { const p = point(i, 1.2).split(','); return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" font-size="10.5" fill="var(--text)">${a.name}</text>`; }).join('');
   const subs = axes.map((a, i) => { const p = point(i, 1.34).split(','); return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" font-size="9.5" fill="${daToneColor(a.level.tone)}">${a.level.key}</text>`; }).join('');
   return `<svg viewBox="0 0 300 320" style="width:100%; height:auto;" aria-label="思考のクセのバランス">${grid}${axisLines}<polygon points="${avgPts}" fill="rgba(120,120,120,0.08)" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 3"/><polygon points="${userPts}" fill="rgba(215,123,91,0.18)" stroke="#D77B5B" stroke-width="1.5"/>${dots}${labels}${subs}</svg>`;
-}
-
-function daViewSafety(a) {
-  return `
-    <div class="card" style="padding:26px 18px; text-align:center;">
-      <div style="font-size:30px;">🌱</div>
-      <p style="line-height:1.9; margin:12px 0 16px; font-size:14px;">${escapeHtml(a.safety.message)}</p>
-      <div style="display:grid; gap:10px;">
-        <a href="tel:0120279338" class="btn btn-sage" style="text-decoration:none;">よりそいホットライン<br><span style="font-size:12px; opacity:0.85;">0120-279-338（24時間・無料）</span></a>
-        <a href="tel:0570064556" class="btn btn-sage" style="text-decoration:none;">いのちの電話<br><span style="font-size:12px; opacity:0.85;">0570-064-556</span></a>
-      </div>
-    </div>`;
 }
 
 function daViewSummary(a) {
@@ -16263,7 +16250,7 @@ if (typeof window !== 'undefined') {
 function viewDistortionSection() {
   ensureDistortionAnalysis();
   const a = distortionAnalysis;
-  if (a && a.safety && a.safety.riskDetected) return daViewSafety(a);
+  // 社長指示 2026-05-29: リスク検知時も分析はブロックせず通常通り出力する（§17の分析ブロックは無効化）
   const tab = distortionView.tab || 'summary';
   const tabBtn = (key, label) => `<button data-act="da-tab" data-tab="${key}" style="flex:1; padding:9px 0; background:${tab === key ? 'var(--accent-soft)' : 'var(--bg-soft)'}; border:none; border-radius:999px; font-weight:600; font-size:13px; cursor:pointer; color:${tab === key ? 'var(--accent-deep)' : 'var(--text-soft)'};">${label}</button>`;
   return `
