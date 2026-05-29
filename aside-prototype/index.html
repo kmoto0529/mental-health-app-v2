@@ -6471,7 +6471,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.84-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.85-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -14692,32 +14692,73 @@ function generateWeeklySuplanMessage() {
 //   - UI 未配線（画面遷移図 受領後に接続予定）。既存 analyzeDistortions 等は現UI用に温存。
 // ============================================================
 
-// 対象8種（表示名は仕様 v1: fortune_telling = 先読み思考）+ 文脈キーワード + 行動ヒント(§14)
+// 対象8種（表示名は仕様 v1: fortune_telling = 先読み思考）
+//   keywords: 文脈キーワード / reframe: すぷらんの一言 / hints: 行動ヒント3種 / todayAction: 今日の小さな一歩
 const DA_DISTORTIONS = [
   { id:'all_or_nothing', name:'全か無か思考', short:'完璧か無価値かで考えやすい',
+    reframe:'「できた/できない」だけじゃなくて、その間にある"できたこと"にも目を向けていこうね。',
     keywords:['全部','すべて','完璧','100点','0か','白黒','台無し','全然だめ','何もかも','全くダメ','無価値','全否定'],
-    actionHints:['0点/100点ではなく30点・50点・70点で見てみる','今日できた部分を1つだけ書く','「完璧ではないけど進んだこと」を探す'] },
+    hints:[
+      { icon:'🎨', title:'グラデーションで見る練習', desc:'0か100ではなく、30点・50点・70点で物事を見てみる' },
+      { icon:'🌱', title:'できた部分を1つ拾う', desc:'完璧じゃなくても、小さく進んだことを意識的に見つける' },
+      { icon:'🔄', title:'言葉をやさしく言い換える', desc:'「〜すべき」を「〜できたらいい」に言い換えてみる' },
+    ], todayAction:'30点できた部分を1つ書き出してみる' },
   { id:'overgeneralization', name:'過度の一般化', short:'一度を「いつも」に広げやすい',
+    reframe:'「いつも」に見えても、よく探すと例外はあるよ。今回はどうだったか一緒に見てみよう。',
     keywords:['いつも','絶対','どうせ','永遠に','一度も','毎回','またダメ','二度と','いつもこう','結局いつも'],
-    actionHints:['「いつも」を「今回は」に言い換える','例外が1つでもなかったか探す','過去に少し違った場面を書き出す'] },
+    hints:[
+      { icon:'🔁', title:'「いつも」を「今回は」に', desc:'「いつもこう」を「今回はこうだった」と言い換えてみる' },
+      { icon:'🔍', title:'例外を1つ探す', desc:'1回でも違うパターンがなかったか思い出してみる' },
+      { icon:'📝', title:'違った場面を書く', desc:'過去に少し違った結果になった場面を1つ書き出す' },
+    ], todayAction:'「いつも」と思った場面の例外を1つ探してみる' },
   { id:'labeling', name:'レッテル貼り', short:'自分全体にダメの烙印を貼りやすい',
+    reframe:'うまくいかない部分があっても、それはあなたの一部。全部じゃないよ。',
     keywords:['私はダメ','自分はダメ','無能','使えない','価値ない','ダメ人間','最低','クズ','向いてない','才能ない'],
-    actionHints:['「私はダメ」ではなく「今回はここが難しかった」に変える','自分全体ではなく出来事の一部として見る','友達に同じことを言われたらどう返すか考える'] },
+    hints:[
+      { icon:'🏷', title:'出来事の一部として見る', desc:'「私はダメ」を「今回はここが難しかった」に変える' },
+      { icon:'💬', title:'友達ならどう言う？', desc:'同じことを友達に言われたら何と返すか考えてみる' },
+      { icon:'🌱', title:'できたことも並べる', desc:'うまくいった部分も1つ横に書いておく' },
+    ], todayAction:'「私はダメ」を「今回はここが難しかった」に書き換える' },
   { id:'mind_reading', name:'心の読みすぎ', short:'相手の気持ちを決めつけやすい',
+    reframe:'相手の気持ちは、確かめるまでは想像のままなんだ。決めつけなくて大丈夫。',
     keywords:['嫌われ','呆れられ','冷たかった','うざいと思われ','迷惑だと思われ','見下され','どう思われ','嫌がられ','変に思われ'],
-    actionHints:['事実と想像を分けて書く','相手が実際に言ったことだけを取り出す','別の可能性を2つ書く'] },
+    hints:[
+      { icon:'🔍', title:'事実と想像を分ける', desc:'相手が実際に言ったことだけを取り出してみる' },
+      { icon:'💭', title:'別の可能性を2つ', desc:'相手の態度に、他の理由がなかったか考えてみる' },
+      { icon:'🤝', title:'確かめる一歩', desc:'気になることを、軽く確認できそうか考えてみる' },
+    ], todayAction:'相手が実際に言った言葉だけを1つ書き出す' },
   { id:'should', name:'すべき思考', short:'「〜すべき」で自分を縛りやすい',
-    keywords:['すべき','しなきゃ','ねばならない','べきだった','ちゃんとしな','もっと頑張','普通は','当然','やらなきゃ','〜のはず'],
-    actionHints:['「すべき」を「できたらいい」に言い換える','そのルールは誰の声か考える','今の自分に現実的なラインを探す'] },
+    reframe:'「すべき」が増えると苦しくなるよね。「できたらいいな」くらいでも十分。',
+    keywords:['すべき','しなきゃ','ねばならない','べきだった','ちゃんとしな','もっと頑張','普通は','当然','やらなきゃ','のはず'],
+    hints:[
+      { icon:'🔄', title:'「すべき」を言い換える', desc:'「〜すべき」を「〜できたらいい」に変えてみる' },
+      { icon:'🗣', title:'誰の声か考える', desc:'そのルールは誰の声か、本当に自分の声か確かめる' },
+      { icon:'📏', title:'現実的なラインに', desc:'今の自分にとって無理のない基準を決めてみる' },
+    ], todayAction:'「〜すべき」を1つ「〜できたらいい」に言い換える' },
   { id:'personalization', name:'自分への関連付け', short:'何でも自分のせいにしやすい',
+    reframe:'ぜんぶ自分のせいに見えても、関わってる要素は意外と多いよ。',
     keywords:['私のせい','自分のせい','私が悪い','私が原因','自分が悪い','迷惑かけた','申し訳ない','私さえ','自分のせいで'],
-    actionHints:['自分以外の要因を3つ書く','関わった人や環境要因を分けて見る','自分が担う範囲を少し狭める'] },
+    hints:[
+      { icon:'⚖️', title:'自分以外の要因を3つ', desc:'その出来事に関わった人・環境を書き出してみる' },
+      { icon:'🧩', title:'責任を分けてみる', desc:'関係者で責任の割合を分けて見てみる' },
+      { icon:'🌱', title:'担う範囲を狭める', desc:'自分がコントロールできる部分だけに絞ってみる' },
+    ], todayAction:'その出来事の自分以外の要因を1つ書き出す' },
   { id:'disqualifying', name:'マイナス思考', short:'良いことを打ち消しやすい',
+    reframe:'できたことを「大したことない」で消さないで。ちゃんと残しておこう。',
     keywords:['大したことない','気のせい','まぐれ','たまたま','するほどじゃない','甘えてる','みんな同じくらい','普通のこと','評価されるほどでは'],
-    actionHints:['小さく良かったことを1つ拾う','「大したことない」と思ったことも事実として残す','できたことを消さずに横に置いておく'] },
+    hints:[
+      { icon:'✨', title:'良かったことを1つ拾う', desc:'今日「ちょっと良かった」を1つ書いてみる' },
+      { icon:'📌', title:'事実として残す', desc:'「大したことない」と思ったことも事実として記録する' },
+      { icon:'🌱', title:'できたことを消さない', desc:'できたことを打ち消さず、横に置いておく' },
+    ], todayAction:'今日できたことを1つ、消さずに書き留める' },
   { id:'fortune_telling', name:'先読み思考', short:'未来を悲観的に決めやすい',
+    reframe:'未来はまだ決まってない。いまわかってる事実から見てみよう。',
     keywords:['どうせ無理','絶対上手くいかない','失敗する','もう手遅れ','将来真っ暗','未来ない','きっとダメ','うまくいくわけない','どうせ失敗','この先も'],
-    actionHints:['未来予想と今わかっている事実を分ける','最悪以外のシナリオを2つ書く','今日できる小さな一歩に戻す'] },
+    hints:[
+      { icon:'🔮', title:'予想と事実を分ける', desc:'未来予想と、今わかっている事実を分けて書く' },
+      { icon:'🌤', title:'最悪以外のシナリオ', desc:'最悪以外の展開を2つ書き出してみる' },
+      { icon:'👣', title:'今日の一歩に戻す', desc:'今日できる小さな一歩に意識を戻す' },
+    ], todayAction:'最悪以外のシナリオを2つ書いてみる' },
 ];
 
 // ソース別フィールド重み（§9）
@@ -14807,7 +14848,7 @@ function daSubScore(items, fieldWeights, keywords) {
     }
     if (itemW > 0) {
       recordsHit++; weighted += itemW;
-      evidence.push({ text:daTrim(bestText), sourceType:it.sourceType, date:String(it.createdAt||'').slice(0,10), sourceField:bestField });
+      evidence.push({ text:daTrim(bestText), sourceType:it.sourceType, date:String(it.createdAt||'').slice(0,10), sourceField:bestField, strength:(it.emotion && it.emotion.before != null) ? it.emotion.before : null });
     }
   }
   const ratio = recordsHit / items.length;
@@ -14868,7 +14909,7 @@ function daComputeScores(buckets, nowTs) {
     };
     const anyNonChat = workHits + sourceBreakdown.selfAssessment + ml.hitRecords > 0;
     return {
-      id:d.id, name:d.name, short:d.short, actionHints:d.actionHints,
+      id:d.id, name:d.name, short:d.short, reframe:d.reframe, hints:d.hints, todayAction:d.todayAction,
       score, level:daLevel(score), sourceBreakdown, evidence, recent14, workHits,
       chatOnly: !anyNonChat && ch.hitRecords > 0,
     };
@@ -14936,7 +14977,7 @@ function daRecommendWorks(buckets, top) {
 // 行動提案（§20 actionSuggestions）
 function daActionSuggestions(top) {
   return top.filter(t => t.score >= 8).slice(0, 3).map(t => ({
-    title:t.actionHints[0], description:t.actionHints.slice(0, 2).join(' / '),
+    title:t.hints[0].title, description:t.hints[0].desc,
     relatedDistortionId:t.id, difficulty:'easy', estimatedMinutes:3,
   }));
 }
@@ -14953,9 +14994,9 @@ function daRuleSummary(top) {
   }
   const t = top[0];
   return {
-    title:`${t.name}が${t.level.label}`,
+    title:`最近は「${t.name}」が出やすいかもしれません`,
     mainMessage:`最近の記録では、${t.short}場面が見られました。`,
-    suplanComment:t.actionHints[0],
+    suplanComment:t.reframe,
     cautionText:'これは記録から見えたセルフケア用の傾向メモです。診断ではありません。',
   };
 }
@@ -14986,7 +15027,12 @@ function buildDistortionSkeleton(state, nowTs) {
     summary,
     topDistortions:top.map(t => ({
       id:t.id, name:t.name, score:t.score, level:t.level.key,
-      shortDescription:t.short, userFriendlyMessage:`${t.short}傾向が少し見られます。`, actionHint:t.actionHints[0],
+      shortDescription:t.short, userFriendlyMessage:`${t.short}傾向が少し見られます。`,
+      actionHint:t.todayAction, hints:t.hints,
+    })),
+    allDistortions:scored.map(s => ({
+      id:s.id, name:s.name, short:s.short, score:s.score, level:s.level.key,
+      sourceBreakdown:s.sourceBreakdown, evidence:s.evidence,
     })),
     chart:{
       labels:DA_DISTORTIONS.map(d => d.name),
@@ -15904,142 +15950,329 @@ function viewTrendSection() {
   return html;
 }
 
-// v0.9.74: 思考のクセ分析タブ - TOP3 + グラフで見る/バランスを確認する + 過去のきづきワーク履歴
-function viewDistortionSection() {
-  const records = state.moyamoyaRecords || [];
-  const top = analyzeDistortions(records, 28).slice(0, 3);
-  const totalRecs = Math.min(records.length, 28);
+// === DA_UI_START ===
+// 思考のクセ分析 UI（画面遷移図 2026-05-28 準拠 / 新エンジン analyzeDistortionsDeep に接続）
+//   サマリ ⇄ 詳細(全体像/推移/根拠/行動ヒント) + ワーク提案モーダル
+let distortionView = { tab:'summary', detailTab:'overview', selectedId:null, basisExpanded:false };
+let distortionAnalysis = null;
+let distortionAnalysisSig = '';
+let distortionAnalysisBusy = false;
 
-  let html = `
-    <div style="display:flex; align-items:flex-start; gap: 12px; margin: 4px 0 14px;">
-      <div>${suplan({ pose: 'bulb', size: 56 })}</div>
-      <div style="flex:1;">
-        <h2 style="margin: 0 0 4px; font-size: 18px; font-family:'Noto Serif JP', serif;">あなたによく見られる<br>思考のクセ TOP3</h2>
-        <div class="text-tiny text-muted">直近4週間（${totalRecs}件）の記録から分析しました</div>
-      </div>
-    </div>
-  `;
-
-  if (top.length === 0) {
-    html += `
-      <div class="card" style="padding:30px 20px; text-align:center; color:var(--text-soft);">
-        分析するための記録が足りないみたい。<br>もやもや整理を続けると、傾向が見えてきます。
-      </div>
-    `;
-  } else {
-    html += top.map((d, i) => `
-      <div class="kr-distort-card">
-        <div class="kr-distort-rank">${i + 1}</div>
-        <div>
-          <div class="kr-distort-name">${escapeHtml(d.name)}</div>
-          <div class="kr-distort-desc">${escapeHtml(d.desc)}</div>
-        </div>
-        <span class="kr-distort-badge ${d.level.tone}">${d.level.label}</span>
-      </div>
-    `).join('');
-
-    if (top[0].counter) {
-      html += `
-        <div class="ippo-do-card" style="margin-top: 14px;">
-          <div style="margin: 0 auto 6px;">${suplan({ stage: 'futaba', expression: 'happy', size: 48 })}</div>
-          <p style="margin: 4px 0; font-size: 13px; line-height: 1.85;">${escapeHtml(top[0].counter)}</p>
-        </div>
-      `;
-    }
-  }
-
-  html += `
-    <div style="display:grid; gap: 10px; margin-top: 16px;">
-      <button class="btn btn-primary" data-act="open-trend">グラフで詳しく見る</button>
-      <button class="btn btn-secondary" data-act="open-radar">バランスを確認する</button>
-    </div>
-  `;
-
-  // ---- 過去のきづきワーク履歴 ----
-  const kr = state.kizukiResults || {};
-  const dist = kr.distortion;
-  const beh = kr['behavior-experiment'];
-  const ddList = (state.deepDiveSessions || []).slice().reverse();
-
-  const hasHistory = !!dist || !!beh || ddList.length > 0;
-  if (hasHistory) {
-    html += `<h3 class="section-title" style="margin-top:24px;">過去のきづきワーク</h3>`;
-  }
-
-  if (dist) {
-    const apps = (dist.result?.applicable || []).slice(0, 3);
-    html += `
-      <div class="card" style="padding:14px; margin-bottom:10px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:20px;">🧠</span>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:600;">認知の歪みテスト</div>
-            <div class="text-tiny text-muted">${formatDate(dist.completedAt)} ・ 当てはまり ${dist.result?.totalCount || 0}/8</div>
-          </div>
-        </div>
-        ${apps.length > 0 ? `
-          <div class="dd-tag-list" style="margin-top:8px;">
-            ${apps.map(a => `<span class="dd-tag">#${escapeHtml(a.name)}</span>`).join('')}
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }
-
-  if (beh) {
-    html += `
-      <div class="card" style="padding:14px; margin-bottom:10px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:20px;">🧪</span>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:600;">行動実験の計画</div>
-            <div class="text-tiny text-muted">${formatDate(beh.completedAt)}</div>
-          </div>
-        </div>
-        ${beh.result?.hypothesis ? `
-          <div style="margin-top:6px; font-size:13px; line-height:1.6;">
-            <span class="text-tiny text-muted">仮説:</span> ${escapeHtml(beh.result.hypothesis)}
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }
-
-  ddList.slice(0, 5).forEach(d => {
-    const oldS = d.oldSchema || d.extractedBelief || d.coreBelief || '-';
-    const newS = d.newSchema || '';
-    html += `
-      <div class="card" style="padding:14px; margin-bottom:10px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:20px;">🔽</span>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:600;">下向き矢印法</div>
-            <div class="text-tiny text-muted">${formatDate(d.completedAt)}</div>
-          </div>
-        </div>
-        <div style="margin-top:6px; font-size:13px; line-height:1.7;">
-          <span class="text-tiny text-muted">古いスキーマ:</span> ${escapeHtml(oldS)}
-          ${newS ? `<br><span class="text-tiny text-muted">新しいスキーマ:</span> ${escapeHtml(newS)}` : ''}
-        </div>
-        ${d.tags && d.tags.length > 0 ? `
-          <div class="dd-tag-list" style="margin-top:8px;">
-            ${d.tags.map(t => `<span class="dd-tag">#${escapeHtml(t)}</span>`).join('')}
-          </div>
-        ` : ''}
-      </div>
-    `;
-  });
-
-  if (!hasHistory) {
-    html += `
-      <p class="text-tiny text-muted text-center" style="margin: 20px 0 10px;">
-        きづきタブのワークを試すと、ここに履歴が残ります 🌱
-      </p>
-    `;
-  }
-
-  return html;
+function daStateSignature() {
+  const m = state.moyamoyaRecords || [], d = state.deepDiveSessions || [];
+  const lastM = m.length ? m[m.length - 1].createdAt : '';
+  const lastD = d.length ? (d[d.length - 1].completedAt || d[d.length - 1].startedAt) : '';
+  const self = state.kizukiResults && state.kizukiResults.distortion ? state.kizukiResults.distortion.completedAt : '';
+  return `${m.length}|${d.length}|${(state.aiChats || []).length}|${(state.moodLogs || []).length}|${lastM}|${lastD}|${self}`;
 }
+
+function ensureDistortionAnalysis() {
+  const sig = daStateSignature();
+  if (distortionAnalysis && distortionAnalysisSig === sig) return;
+  distortionAnalysis = buildDistortionSkeleton(state);   // 即時ルールベース表示
+  distortionAnalysisSig = sig;
+  distortionAnalysisBusy = false;
+  if (!distortionView.selectedId && distortionAnalysis.topDistortions[0]) {
+    distortionView.selectedId = distortionAnalysis.topDistortions[0].id;
+  }
+  if (!distortionAnalysis.safety.riskDetected && getInviteCode()) {
+    distortionAnalysisBusy = true;
+    const sigAtCall = sig;
+    analyzeDistortionsDeep(state).then(r => {
+      distortionAnalysisBusy = false;
+      if (daStateSignature() === sigAtCall) {
+        distortionAnalysis = r;
+        if (currentScreen === 'record' && (state.ui.recordSubtab || 'calendar') === 'distortion') render();
+      }
+    }).catch(() => { distortionAnalysisBusy = false; });
+  }
+}
+
+function daToneOf(key) {
+  return key === 'やや強め' ? 'high' : key === 'ややあり' ? 'mid' : key === '少しだけ' ? 'low' : 'none';
+}
+function daToneColor(tone) {
+  return tone === 'high' ? '#D77B5B' : tone === 'mid' ? '#B07F2F' : tone === 'low' ? '#7BA876' : 'var(--text-muted)';
+}
+function daMmdd(iso) {
+  if (!iso) return '';
+  const p = String(iso).split('-');
+  return p.length >= 3 ? `${Number(p[1])}/${Number(p[2])}` : iso;
+}
+function daSourceTypeLabel(t) {
+  return { moyamoya:'もやもや整理', deepDive:'下向き矢印法', chat:'AI会話', moodLog:'気分ログ' }[t] || t;
+}
+function daSourceFieldLabel(f) {
+  return {
+    thought:'自動思考', evidence:'根拠', situation:'状況', counterEvidence:'反証',
+    coreBelief:'コアビリーフ', oldSchema:'古いスキーマ', deeper:'深掘り', firstThought:'最初の思考',
+    extractedBelief:'信念', summary:'会話の要約', userText:'会話', comment:'コメント', category:'カテゴリ',
+  }[f] || f;
+}
+function daNextBtn(dtab, label) {
+  return `<div style="margin-top:16px;"><button class="btn btn-primary" data-act="da-detail-tab" data-dtab="${dtab}" style="width:100%;">${label}</button></div>`;
+}
+function daWorkEntryCard(ctx) {
+  const note = ctx === 'summary'
+    ? 'ワークをやってみると、もっと自分のことがわかるよ。'
+    : 'もっと自分に合ったヒントが欲しいときは、ワークがおすすめ。';
+  return `
+    <div class="card" style="padding:14px 16px; margin-top:14px; background:var(--bg-soft);">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span style="font-size:18px;">📚</span>
+        <p style="margin:0; font-size:12px; line-height:1.7; flex:1;">${note}</p>
+      </div>
+      <button class="btn btn-secondary" data-act="da-open-works" style="width:100%; margin-top:10px;">ワークをみる</button>
+    </div>`;
+}
+
+function daRadarSvg(axes) {
+  const cx = 150, cy = 150, R = 110, N = axes.length;
+  const angle = (i) => -Math.PI / 2 + (2 * Math.PI * i / N);
+  const point = (i, frac) => `${cx + Math.cos(angle(i)) * R * frac},${cy + Math.sin(angle(i)) * R * frac}`;
+  const grid = [0.25, 0.5, 0.75, 1].map(f =>
+    `<polygon points="${Array.from({ length:N }, (_, i) => point(i, f)).join(' ')}" fill="none" stroke="var(--divider)" stroke-width="1"/>`).join('');
+  const axisLines = Array.from({ length:N }, (_, i) => {
+    const p = point(i, 1).split(','); return `<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="var(--divider)" stroke-width="1"/>`;
+  }).join('');
+  const avgPts = Array.from({ length:N }, (_, i) => point(i, 0.15)).join(' ');
+  const userPts = axes.map((a, i) => point(i, Math.min(1, a.score / 100))).join(' ');
+  const dots = axes.map((a, i) => { const p = point(i, Math.min(1, a.score / 100)).split(','); return `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#D77B5B"/>`; }).join('');
+  const labels = axes.map((a, i) => { const p = point(i, 1.2).split(','); return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" font-size="10.5" fill="var(--text)">${a.name}</text>`; }).join('');
+  const subs = axes.map((a, i) => { const p = point(i, 1.34).split(','); return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" font-size="9.5" fill="${daToneColor(a.level.tone)}">${a.level.key}</text>`; }).join('');
+  return `<svg viewBox="0 0 300 320" style="width:100%; height:auto;" aria-label="思考のクセのバランス">${grid}${axisLines}<polygon points="${avgPts}" fill="rgba(120,120,120,0.08)" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 3"/><polygon points="${userPts}" fill="rgba(215,123,91,0.18)" stroke="#D77B5B" stroke-width="1.5"/>${dots}${labels}${subs}</svg>`;
+}
+
+function daViewSafety(a) {
+  return `
+    <div class="card" style="padding:26px 18px; text-align:center;">
+      <div style="font-size:30px;">🌱</div>
+      <p style="line-height:1.9; margin:12px 0 16px; font-size:14px;">${escapeHtml(a.safety.message)}</p>
+      <div style="display:grid; gap:10px;">
+        <a href="tel:0120279338" class="btn btn-sage" style="text-decoration:none;">よりそいホットライン<br><span style="font-size:12px; opacity:0.85;">0120-279-338（24時間・無料）</span></a>
+        <a href="tel:0570064556" class="btn btn-sage" style="text-decoration:none;">いのちの電話<br><span style="font-size:12px; opacity:0.85;">0570-064-556</span></a>
+      </div>
+    </div>`;
+}
+
+function daViewSummary(a) {
+  const top = a.topDistortions || [];
+  const hasTrend = top.length && top[0].score >= 8;
+  return `
+    <div style="display:flex; gap:12px; align-items:flex-start; margin:4px 0 10px;">
+      <div>${suplan({ pose:'bulb', size:52 })}</div>
+      <div style="flex:1; min-width:0;">
+        <div class="text-tiny text-muted">あなたの傾向（サマリ）</div>
+        <h2 style="margin:2px 0 6px; font-size:18px; font-family:'Noto Serif JP', serif; line-height:1.5;">${escapeHtml(a.summary.title)}</h2>
+        <span class="kr-distort-badge ${a.dataConfidence === 'high' ? 'low' : a.dataConfidence === 'medium' ? 'mid' : 'none'}" style="font-size:11px;">${a.summary.dataConfidence}</span>
+      </div>
+    </div>
+    <p style="font-size:13px; line-height:1.85; color:var(--text-soft); margin:0 0 16px;">${escapeHtml(a.summary.mainMessage)}</p>
+    ${hasTrend ? `
+      <h3 class="section-title" style="margin-top:8px;">特に見られた思考のクセ TOP3</h3>
+      ${top.map((t, i) => `
+        <div class="kr-distort-card">
+          <div class="kr-distort-rank">${i + 1}</div>
+          <div style="flex:1; min-width:0;">
+            <div class="kr-distort-name">${escapeHtml(t.name)}</div>
+            <div class="kr-distort-desc">スコア ${t.score}/100</div>
+          </div>
+          <span class="kr-distort-badge ${daToneOf(t.level)}">${t.level}</span>
+        </div>
+      `).join('')}
+    ` : `
+      <div class="card" style="padding:24px 18px; text-align:center; color:var(--text-soft);">
+        まだ大きなクセは見えていません。<br>もやもや整理などのワークを続けると、傾向が見えてきます。
+      </div>
+    `}
+    ${a.summary.suplanComment ? `
+      <div class="ippo-do-card" style="margin-top:14px;">
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <div>${suplan({ stage:'futaba', expression:'happy', size:40 })}</div>
+          <div><div style="font-weight:600; font-size:13px; margin-bottom:2px;">すぷらんの一言</div>
+          <p style="margin:0; font-size:13px; line-height:1.8;">${escapeHtml(a.summary.suplanComment)}</p></div>
+        </div>
+      </div>` : ''}
+    ${hasTrend ? `
+      <div class="card" style="padding:14px 16px; margin-top:12px; display:flex; gap:10px; align-items:center;">
+        <span style="font-size:18px;">🌱</span>
+        <div><div class="text-tiny text-muted">今日の行動ヒント</div>
+        <div style="font-size:13px; font-weight:500;">${escapeHtml(top[0].actionHint)}</div></div>
+      </div>` : ''}
+    <div style="margin-top:18px;">
+      <button class="btn btn-primary" data-act="da-tab" data-tab="detail" style="width:100%;">詳細をみる</button>
+    </div>
+    ${daWorkEntryCard('summary')}`;
+}
+
+function daViewOverview(a) {
+  const RAD = ['overgeneralization', 'mind_reading', 'labeling', 'all_or_nothing', 'should'];
+  const axes = RAD.map(id => {
+    const d = (a.allDistortions || []).find(x => x.id === id) || { name:id, score:0 };
+    return { name:d.name, score:d.score, level:daLevel(d.score) };
+  });
+  return `
+    <div class="kr-radar-legend">
+      <div class="kr-radar-legend-item"><span class="kr-radar-legend-dot" style="background:#D77B5B;"></span>あなた</div>
+      <div class="kr-radar-legend-item"><span class="kr-radar-legend-dot" style="background:var(--text-muted);"></span>平均</div>
+    </div>
+    <div class="kr-radar-wrap">${daRadarSvg(axes)}</div>
+    <div class="ippo-do-card" style="margin-top:12px;">
+      <div style="display:flex; gap:8px; align-items:flex-start;">
+        <div>${suplan({ stage:'futaba', expression:'calm', size:40 })}</div>
+        <div><div style="font-weight:600; font-size:13px; margin-bottom:4px;">バランスの見方</div>
+        <p style="margin:0; font-size:12px; line-height:1.8;">オレンジの線が外側に行くほど、その思考のクセが強い傾向を示します。強く出ているクセほど、気づきのチャンス。バランスを知ることで、自分をラクにするヒントが見えてくるよ。</p></div>
+      </div>
+    </div>
+    ${daNextBtn('trend', '推移をみる')}`;
+}
+
+function daViewTrend(a) {
+  const trends = (a.trend || []).filter(t => t.currentScore > 0 || t.previousScore > 0).slice(0, 5);
+  const overall = (a.trend || []).reduce((s, t) => s + t.delta, 0);
+  if (!trends.length) {
+    return `<div class="card" style="padding:24px 18px; text-align:center; color:var(--text-soft);">推移を見るには、もう少し記録が必要です。<br>もやもや整理を続けてみよう。</div>${daNextBtn('basis', '根拠をみる')}`;
+  }
+  return `
+    <div class="text-tiny text-muted" style="margin-bottom:10px;">
+      <span style="display:inline-block; width:10px; height:10px; background:var(--text-muted); border-radius:50%; margin-right:4px;"></span>前の28日
+      <span style="display:inline-block; width:10px; height:10px; background:#6B8F71; border-radius:50%; margin:0 4px 0 12px;"></span>直近28日
+    </div>
+    ${trends.map(t => `
+      <div class="kr-trend-row">
+        <div class="kr-trend-name">${escapeHtml(t.name)}</div>
+        <div class="kr-trend-bars"><div class="kr-trend-label-old">前</div><div class="kr-trend-bar-bg"><div class="kr-trend-bar-fill" style="width:${t.previousScore}%;"></div></div><div class="kr-trend-pct">${t.previousScore}</div></div>
+        <div class="kr-trend-bars"><div class="kr-trend-label-new">今</div><div class="kr-trend-bar-bg"><div class="kr-trend-bar-fill new" style="width:${t.currentScore}%;"></div></div><div class="kr-trend-pct">${t.currentScore}</div></div>
+        <div class="kr-trend-delta ${t.delta < 0 ? 'improved' : t.delta > 0 ? 'worsened' : ''}">${t.delta === 0 ? '±0' : (t.delta < 0 ? t.delta : '+' + t.delta)}</div>
+      </div>
+    `).join('')}
+    <div class="ippo-do-card" style="margin-top:14px;">
+      <div style="margin:0 auto 6px;">${suplan({ stage:'futaba', expression:'happy', size:44 })}</div>
+      <p style="margin:4px 0; font-size:13px; line-height:1.85;">${overall <= -10 ? 'いい方向に動いてるね。気づくことが変化の第一歩だよ。' : overall >= 10 ? '波があるのは自然なこと。記録を続けると見えてくるよ。' : '今は落ち着いた時期。続けるとゆっくり変化していくよ。'}</p>
+    </div>
+    ${daNextBtn('basis', '根拠をみる')}`;
+}
+
+function daViewBasis(a) {
+  const list = a.allDistortions || [];
+  if (!list.length) return `<div class="card" style="padding:20px; text-align:center; color:var(--text-soft);">分析できる記録がまだありません。</div>`;
+  const sel = distortionView.selectedId || (a.topDistortions[0] && a.topDistortions[0].id) || list[0].id;
+  const d = list.find(x => x.id === sel) || list[0];
+  const evid = d.evidence || [];
+  const lim = distortionView.basisExpanded ? evid.length : 3;
+  const shown = evid.slice(0, lim);
+  return `
+    <div style="margin-bottom:12px;">
+      <div class="text-tiny text-muted" style="margin-bottom:6px;">思考のクセを選ぶ</div>
+      <select onchange="window.daSelectDistortion(this.value)" style="width:100%; padding:10px 12px; border:1px solid var(--divider); border-radius:10px; background:var(--bg-card); font-size:14px; color:var(--text);">
+        ${list.map(x => `<option value="${x.id}" ${x.id === sel ? 'selected' : ''}>${x.name}（${x.score}）</option>`).join('')}
+      </select>
+    </div>
+    <div style="font-size:13px; font-weight:600; margin:10px 0 8px;">この傾向はあなたの記録からこんな場面で見られました</div>
+    ${shown.length ? shown.map(e => `
+      <div class="card" style="padding:12px 14px; margin-bottom:8px;">
+        <div class="text-tiny text-muted">${daSourceTypeLabel(e.sourceType)}（${daMmdd(e.date)}）</div>
+        <div style="font-size:13px; margin:4px 0; line-height:1.6;">「${escapeHtml(e.text)}」</div>
+        <span class="dd-tag">${daSourceFieldLabel(e.sourceField)}</span>
+        ${e.strength != null ? `<span class="text-tiny text-muted" style="margin-left:8px;">強さ ${e.strength}/10</span>` : ''}
+      </div>
+    `).join('') : `<div class="card" style="padding:20px; text-align:center; color:var(--text-soft); font-size:13px;">この傾向の記録はまだ見つかっていません。<br>ワークを続けると見えてきます。</div>`}
+    ${evid.length > 3 && !distortionView.basisExpanded ? `<button class="btn btn-secondary" data-act="da-basis-more" style="width:100%; margin-top:4px;">もっと見る（あと${evid.length - 3}件）</button>` : ''}
+    <p class="text-tiny text-muted" style="margin-top:12px; line-height:1.7;">※ 記録をもとにあなたの傾向を分析したもので、診断ではありません。</p>
+    ${daNextBtn('action', '行動ヒントをみる')}`;
+}
+
+function daViewAction(a) {
+  const t = a.topDistortions[0];
+  if (!t || t.score < 8) {
+    return `<div class="card" style="padding:24px 18px; text-align:center; color:var(--text-soft);">まだ行動ヒントを出せるほどの傾向は見えていません。<br>もう少し記録を続けてみよう。</div>${daWorkEntryCard('action')}`;
+  }
+  const hints = t.hints || [];
+  return `
+    <div style="font-size:13px; font-weight:600; margin:4px 0 10px;">あなたにおすすめのこと</div>
+    ${hints.map(h => `
+      <div class="card" style="padding:14px; margin-bottom:10px; display:flex; gap:10px; align-items:flex-start;">
+        <span style="font-size:20px;">${h.icon}</span>
+        <div><div style="font-weight:600; font-size:13px;">${escapeHtml(h.title)}</div>
+        <div class="text-tiny text-muted" style="margin-top:2px; line-height:1.6;">${escapeHtml(h.desc)}</div></div>
+      </div>
+    `).join('')}
+    <div class="card" style="padding:14px 16px; margin-top:6px; background:var(--bg-soft);">
+      <div class="text-tiny text-muted">今日の小さな一歩</div>
+      <div style="font-size:13px; font-weight:500; margin:4px 0 8px;">${escapeHtml(t.actionHint)}</div>
+      <button class="btn-ghost" data-act="open-action" style="font-size:12px; padding:6px 0;">やってみたことを記録する ›</button>
+    </div>
+    ${daWorkEntryCard('action')}`;
+}
+
+function daViewDetail(a) {
+  const dt = distortionView.detailTab || 'overview';
+  const sub = (key, label) => `<button data-act="da-detail-tab" data-dtab="${key}" style="flex:1; padding:8px 0; background:${dt === key ? 'var(--accent-soft)' : 'var(--bg-soft)'}; border:none; border-radius:999px; font-weight:500; font-size:12px; cursor:pointer; color:${dt === key ? 'var(--accent-deep)' : 'var(--text-soft)'};">${label}</button>`;
+  return `
+    <div style="display:flex; gap:5px; margin:4px 0 14px;">
+      ${sub('overview', '全体像')}${sub('trend', '推移')}${sub('basis', '根拠')}${sub('action', '行動ヒント')}
+    </div>
+    ${dt === 'overview' ? daViewOverview(a) : dt === 'trend' ? daViewTrend(a) : dt === 'basis' ? daViewBasis(a) : daViewAction(a)}
+    <div style="margin-top:16px;"><button class="btn-ghost" data-act="da-tab" data-tab="summary">‹ サマリに戻る</button></div>`;
+}
+
+function openDistortionWorksModal() {
+  const a = distortionAnalysis || buildDistortionSkeleton(state);
+  const WORKS = {
+    'moyamoya':            { title:'もやもや整理（コラム法）',   icon:'📝', min:'約15分', desc:'自動思考を整理して、考え方のクセを見つけるのに最適です。' },
+    'deep-dive':           { title:'下向き矢印法',               icon:'🔽', min:'約15分', desc:'思考の奥にある信念（コアビリーフ）を探るワークです。' },
+    'distortion':          { title:'認知のゆがみセルフチェック', icon:'🧠', min:'約10分', desc:'自分の思考パターンを広く確認できます。' },
+    'behavior-experiment': { title:'行動実験',                   icon:'🧪', min:'約15分', desc:'考え方のクセを検証してみるワークです。' },
+    'stimulus':            { title:'刺激統制',                   icon:'🎯', min:'約15分', desc:'環境を整えて行動を続けやすくするワークです。' },
+  };
+  const recs = a.recommendedWorks || [];
+  const recIds = recs.map(r => r.workId);
+  const others = ['distortion', 'behavior-experiment'].filter(id => !recIds.includes(id));
+  const card = (id, reason) => {
+    const w = WORKS[id]; if (!w) return '';
+    return `
+      <div class="card" style="padding:14px; margin-bottom:10px;">
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          <span style="font-size:20px;">${w.icon}</span>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600; font-size:14px;">${w.title}</div>
+            <div class="text-tiny text-muted" style="margin:2px 0 6px; line-height:1.6;">${escapeHtml(reason || w.desc)}</div>
+            <div class="text-tiny text-muted">所要時間: ${w.min}</div>
+          </div>
+          <button class="btn btn-primary" data-act="da-start-work" data-work="${id}" style="padding:8px 14px; font-size:13px; white-space:nowrap; align-self:center;">はじめる</button>
+        </div>
+      </div>`;
+  };
+  const html = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h2 class="modal-title" style="margin:0; font-size:17px;">精度を高めるワークの提案</h2>
+      <button data-act="close-modal" style="border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-soft);">✕</button>
+    </div>
+    <p style="font-size:13px; color:var(--text-soft); line-height:1.7; margin:0 0 14px;">より自分に合った分析にするために、以下のワークに取り組んでみましょう。</p>
+    ${recs.length ? `<h3 class="section-title" style="margin-top:0;">特におすすめのワーク</h3>${recs.map(r => card(r.workId, r.reason)).join('')}` : ''}
+    ${others.length ? `<h3 class="section-title">今の他のワーク</h3>${others.map(id => card(id)).join('')}` : ''}
+    <button class="btn btn-secondary" data-act="close-modal" style="width:100%; margin-top:6px;">閉じる</button>`;
+  modal(html);
+}
+
+if (typeof window !== 'undefined') {
+  window.daSelectDistortion = function(id) { distortionView.selectedId = id; distortionView.basisExpanded = false; render(); };
+}
+
+// 思考のクセ分析タブ本体（きろく → 思考のクセ分析サブ）
+function viewDistortionSection() {
+  ensureDistortionAnalysis();
+  const a = distortionAnalysis;
+  if (a && a.safety && a.safety.riskDetected) return daViewSafety(a);
+  const tab = distortionView.tab || 'summary';
+  const tabBtn = (key, label) => `<button data-act="da-tab" data-tab="${key}" style="flex:1; padding:9px 0; background:${tab === key ? 'var(--accent-soft)' : 'var(--bg-soft)'}; border:none; border-radius:999px; font-weight:600; font-size:13px; cursor:pointer; color:${tab === key ? 'var(--accent-deep)' : 'var(--text-soft)'};">${label}</button>`;
+  return `
+    <div style="display:flex; gap:6px; margin:2px 0 14px;">${tabBtn('summary', 'サマリ')}${tabBtn('detail', '詳細')}</div>
+    ${tab === 'summary' ? daViewSummary(a) : daViewDetail(a)}
+    ${distortionAnalysisBusy && !a.aiGenerated ? '<p class="text-tiny text-muted text-center" style="margin-top:14px; opacity:0.7;">AIがより詳しい分析を準備しています…</p>' : ''}
+  `;
+}
+// === DA_UI_END ===
 
 // ============================================================
 // 気分の変化グラフセクション（日付別 / 時間帯別 / 曜日別）
@@ -17256,6 +17489,7 @@ function handleAction(act, el, ev) {
   // きろくサブタブ
   if (act === 'record-sub') {
     state.ui.recordSubtab = el.dataset.sub;
+    if (el.dataset.sub === 'distortion') distortionView.tab = 'summary';
     saveState();
     render();
     return;
@@ -17266,12 +17500,35 @@ function handleAction(act, el, ev) {
   if (act === 'view-kiroku-letter') { viewParams.recordId = el.dataset.recordId; go('kiroku-letter'); return; }
   if (act === 'kiroku-ippo')   { viewParams.ippoId  = el.dataset.ippoId;   go('kiroku-ippo');   return; }
   if (act === 'open-distortions') {
-    // v0.9.74: スタンドアロン画面は廃止し、きろくタブ「思考のクセ分析」サブへ集約
+    // きろくタブ「思考のクセ分析」サブへ集約
     state.ui.recordSubtab = 'distortion';
+    distortionView.tab = 'summary';
     saveState();
     go('record');
     return;
   }
+  // 思考のクセ分析（新エンジン UI / v0.9.85）
+  if (act === 'da-tab') { distortionView.tab = el.dataset.tab || 'summary'; render(); return; }
+  if (act === 'da-detail-tab') {
+    distortionView.tab = 'detail';
+    distortionView.detailTab = el.dataset.dtab || 'overview';
+    distortionView.basisExpanded = false;
+    render();
+    return;
+  }
+  if (act === 'da-basis-more') { distortionView.basisExpanded = true; render(); return; }
+  if (act === 'da-open-works') { openDistortionWorksModal(); return; }
+  if (act === 'da-start-work') {
+    const w = el.dataset.work;
+    closeModal();
+    if (w === 'moyamoya') { moyamoya = { step: 1 }; go('moyamoya'); }
+    else if (w === 'deep-dive') { deepDive = ddSessionInit({ from: 'record' }); go('deepdive'); }
+    else if (w === 'distortion') { startKizukiWork('distortion'); }
+    else if (w === 'behavior-experiment') { startBehaviorExp(); }
+    else if (w === 'stimulus') { startStimulus(); }
+    return;
+  }
+  // 旧スタンドアロン画面（superseded・直接遷移は残置）
   if (act === 'open-trend') { go('kiroku-trend'); return; }
   if (act === 'open-radar') { go('kiroku-radar'); return; }
   if (act === 'open-ai-analysis') { go('kiroku-ai-analysis'); return; }
