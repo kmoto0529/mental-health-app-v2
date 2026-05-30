@@ -2351,6 +2351,376 @@
 [data-theme="dark"] .dd-hint-icon { background: rgba(167,196,160,0.15); }
 /* ▲ P12.5 下向き矢印法リニューアル ▲ */
 
+/* ▼ P22 v0.9.88 下向き矢印法 リライト（8ステップ + サマリ） ▼ */
+
+/* すぷらん メッセージ汎用 */
+.dd-suplan-msg {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+  margin-top: 10px;
+}
+.dd-suplan-msg-icon { flex-shrink: 0; }
+.dd-suplan-msg-text { font-size: 12px; line-height: 1.7; color: var(--text); }
+
+/* Step 4: 進め方カード */
+.dd-howto-card {
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 10px 0;
+}
+.dd-howto-label { font-size: 12px; font-weight: 700; color: var(--text-strong); margin-bottom: 6px; }
+.dd-howto-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 12px; line-height: 1.7; color: var(--text);
+  counter-reset: ddhowto;
+}
+.dd-howto-list li {
+  padding-left: 22px; position: relative;
+  counter-increment: ddhowto;
+}
+.dd-howto-list li::before {
+  content: counter(ddhowto, decimal) ".";
+  position: absolute; left: 4px; top: 0;
+  font-weight: 700; color: #6B8F71;
+}
+
+/* これまでの流れ box */
+.dd-flow-box {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  font-size: 12px; line-height: 1.7;
+}
+[data-theme="dark"] .dd-flow-box { background: rgba(47,62,62,0.55); }
+.dd-flow-row { padding: 2px 0; }
+.dd-flow-label {
+  display: inline-block;
+  font-size: 10px; font-weight: 700;
+  color: var(--text-muted);
+  margin-right: 6px;
+  letter-spacing: 0.02em;
+}
+
+/* すぷらん 質問カード */
+.dd-suplan-q-card {
+  background: linear-gradient(135deg, #EAF1E6 0%, #F4F8F1 100%);
+  border-radius: 14px;
+  padding: 14px;
+  margin: 12px 0 10px;
+}
+[data-theme="dark"] .dd-suplan-q-card {
+  background: linear-gradient(135deg, rgba(167,196,160,0.18) 0%, rgba(167,196,160,0.08) 100%);
+}
+.dd-suplan-q-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.dd-suplan-q-icon { flex-shrink: 0; }
+.dd-suplan-q-tag {
+  font-size: 11px; font-weight: 700;
+  background: #6B8F71; color: #FFF;
+  padding: 3px 10px; border-radius: 999px;
+}
+.dd-suplan-q-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+.dd-suplan-q-body {
+  font-size: 12px; line-height: 1.7;
+  color: var(--text);
+}
+
+/* 参考例 chip */
+.dd-example-chip {
+  display: inline-block;
+  font-size: 11px;
+  padding: 4px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  color: var(--text-soft);
+  margin: 2px 4px 2px 0;
+}
+[data-theme="dark"] .dd-example-chip { background: rgba(47,62,62,0.55); }
+
+/* Step 4 振り返り */
+.dd-recap-list {
+  display: flex; flex-direction: column; gap: 8px;
+  margin: 10px 0;
+}
+.dd-recap-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+}
+[data-theme="dark"] .dd-recap-card { background: rgba(47,62,62,0.55); }
+.dd-recap-num {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 700;
+  color: #6B8F71;
+  background: rgba(123,168,118,0.18);
+  padding: 3px 10px; border-radius: 999px;
+}
+.dd-recap-text { font-size: 13px; line-height: 1.6; color: var(--text); }
+.dd-add-more-btn {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: 1px dashed #7BA876;
+  border-radius: 10px;
+  color: #6B8F71;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  margin: 8px 0;
+}
+
+/* すぷらんのまとめ */
+.dd-suplan-summary {
+  background: #FBF7EA;
+  border: 1px solid #E6D6A2;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 12px 0;
+}
+[data-theme="dark"] .dd-suplan-summary {
+  background: rgba(230,214,162,0.12);
+  border-color: rgba(230,214,162,0.35);
+}
+.dd-suplan-summary-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.dd-suplan-summary-icon { flex-shrink: 0; }
+.dd-suplan-summary-label {
+  font-size: 11px; font-weight: 700;
+  color: #A77F2A;
+}
+.dd-suplan-summary-body {
+  font-size: 12px; line-height: 1.7;
+  color: var(--text);
+}
+
+/* Step 6 チェックリスト */
+.dd-prosc-card {
+  border-radius: 14px;
+  padding: 14px;
+  margin: 12px 0;
+  border: 1.5px solid;
+}
+.dd-prosc-card.good {
+  background: rgba(123,168,118,0.08);
+  border-color: rgba(123,168,118,0.4);
+}
+.dd-prosc-card.bad {
+  background: rgba(200,90,90,0.06);
+  border-color: rgba(200,90,90,0.35);
+}
+.dd-prosc-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 10px;
+  line-height: 1.55;
+}
+.dd-prosc-sub {
+  font-weight: 400; color: var(--text-soft); font-size: 12px;
+}
+.dd-prosc-options { display: flex; flex-direction: column; gap: 8px; }
+.dd-prosc-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  cursor: pointer;
+}
+[data-theme="dark"] .dd-prosc-item { background: rgba(47,62,62,0.55); }
+.dd-prosc-item.selected { border-color: #7BA876; box-shadow: 0 0 0 1px rgba(123,168,118,0.2); }
+.dd-prosc-item.dd-prosc-other { border-style: dashed; }
+.dd-prosc-cb { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+.dd-prosc-text { font-size: 13px; line-height: 1.5; color: var(--text); }
+.dd-prosc-other-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  font: inherit; font-size: 13px;
+  background: var(--bg-card);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+/* Step 7 新スキーマカード（長文ラジオ） */
+.dd-newschema-list { display: flex; flex-direction: column; gap: 10px; }
+.dd-newschema-card {
+  display: flex; gap: 12px;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--divider);
+  border-radius: 12px;
+  cursor: pointer;
+}
+[data-theme="dark"] .dd-newschema-card { background: rgba(47,62,62,0.55); }
+.dd-newschema-card.selected { border-color: #7BA876; box-shadow: 0 0 0 1px rgba(123,168,118,0.25); }
+.dd-newschema-radio { margin-top: 3px; flex-shrink: 0; width: 18px; height: 18px; }
+.dd-newschema-body { flex: 1; min-width: 0; }
+.dd-newschema-label {
+  font-size: 11px; font-weight: 700;
+  color: #6B8F71;
+  margin-bottom: 4px;
+}
+.dd-newschema-text {
+  font-size: 13px; line-height: 1.75;
+  color: var(--text);
+}
+.dd-newschema-custom { margin-top: 10px; }
+.dd-newschema-custom-input {
+  width: 100%; margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  font: inherit; font-size: 13px;
+  background: var(--bg-card);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+/* Step 8: 感情強度の比較 */
+.dd-newschema-recall {
+  background: linear-gradient(135deg, #EAF1E6 0%, #F4F8F1 100%);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 10px 0;
+}
+.dd-newschema-recall-label { font-size: 11px; color: #6B8F71; font-weight: 700; margin-bottom: 4px; }
+.dd-newschema-recall-text { font-size: 13px; line-height: 1.6; color: var(--text-strong); font-weight: 600; }
+.dd-emo-compare-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  padding: 14px;
+  margin: 12px 0;
+}
+[data-theme="dark"] .dd-emo-compare-card { background: rgba(47,62,62,0.55); }
+.dd-emo-compare-row {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 8px; align-items: center;
+}
+.dd-emo-compare-side { text-align: center; }
+.dd-emo-compare-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.dd-emo-compare-emo { font-size: 12px; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+.dd-emo-compare-intensity {
+  font-size: 26px; font-weight: 700;
+  color: var(--text-strong);
+}
+.dd-emo-compare-intensity span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.dd-emo-compare-intensity.before { color: #C97F2A; }
+.dd-emo-compare-intensity.after { color: #6B8F71; }
+.dd-emo-compare-arrow {
+  font-size: 22px;
+  color: var(--text-muted);
+  padding: 0 6px;
+}
+
+/* サマリー画面 */
+.dd-summary-screen { padding-bottom: 100px; }
+.dd-sum-section-h {
+  display: inline-block;
+  font-size: 13px; font-weight: 700;
+  background: #6B8F71;
+  color: #FFF;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin: 20px 0 12px;
+}
+.dd-sum-schema-row {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 8px; align-items: center;
+  margin-bottom: 6px;
+}
+.dd-sum-schema-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+}
+[data-theme="dark"] .dd-sum-schema-card { background: rgba(47,62,62,0.55); }
+.dd-sum-schema-card.old { background: rgba(200,90,90,0.06); border-color: rgba(200,90,90,0.2); }
+.dd-sum-schema-card.new { background: rgba(123,168,118,0.08); border-color: rgba(123,168,118,0.3); }
+.dd-sum-schema-cap { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
+.dd-sum-schema-quote {
+  font-size: 13px; font-weight: 700; line-height: 1.5;
+  color: var(--text-strong);
+  margin-bottom: 6px;
+}
+.dd-sum-schema-tail { font-size: 10px; color: var(--text-soft); line-height: 1.5; }
+.dd-sum-schema-arrow { font-size: 18px; color: var(--text-muted); }
+
+.dd-sum-process-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.dd-sum-process-card {
+  padding: 8px 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  text-align: center;
+}
+[data-theme="dark"] .dd-sum-process-card { background: rgba(47,62,62,0.55); }
+.dd-sum-process-icon { font-size: 18px; line-height: 1; }
+.dd-sum-process-label {
+  font-size: 9px; font-weight: 700; color: var(--text-soft);
+  margin-top: 4px; line-height: 1.3;
+}
+.dd-sum-process-text {
+  font-size: 9px; color: var(--text);
+  margin-top: 4px; line-height: 1.4;
+  word-break: break-word;
+}
+
+.dd-sum-checklist {
+  list-style: none; padding: 0; margin: 8px 0 0;
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 12px; line-height: 1.6; color: var(--text);
+}
+
+.dd-sum-emo-row {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 12px; align-items: center;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+}
+[data-theme="dark"] .dd-sum-emo-row { background: rgba(47,62,62,0.55); }
+.dd-sum-emo-side { text-align: center; }
+.dd-sum-emo-icon { font-size: 38px; line-height: 1; margin-bottom: 4px; }
+.dd-sum-emo-num {
+  font-size: 24px; font-weight: 700;
+  color: var(--text-strong);
+}
+.dd-sum-emo-num span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.dd-sum-emo-arrow { font-size: 22px; color: var(--text-muted); }
+.dd-sum-emo-msg {
+  text-align: center;
+  font-size: 12px; color: var(--text-soft);
+  margin-top: 8px;
+}
+
+.dd-sum-encourage {
+  background: var(--bg-soft);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px; line-height: 1.85;
+  color: var(--text);
+}
+/* ▲ P22 v0.9.88 ▲ */
+
 /* 精度向上の見える化（仕様書 §7） */
 .acc-card {
   background: var(--bg-card);
@@ -6635,7 +7005,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.87-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.88-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -12654,12 +13024,33 @@ const DD_BELIEF_TAGS = [
   '完璧主義傾向', '他者比較しやすい', '助けを求めにくい', '過剰責任',
 ];
 
+// v0.9.88 P22: Step 4 ラウンドごとの参考例（静的）
+const DD_DEEPER_EXAMPLES = {
+  1: ['人に迷惑をかける人になる', 'ダメな人間になる', '評価されない人になる'],
+  2: ['何をやっても成果が出ない', 'いつも失敗してしまう', '頑張っても認められない'],
+  3: ['私は価値のない人間だ', '私は無能な人間だ', '私は必要とされない人間だ'],
+};
+
+// v0.9.88 P22: Step 6 チェックリスト固定オプション
+const DD_PROTECTED_DEFAULTS = [
+  '期待されても、がっかりしなくて済む',
+  '傷つくのを防げる',
+  '頑張りすぎず、気楽でいられる',
+  '挑戦しなくて済む',
+];
+const DD_TROUBLED_DEFAULTS = [
+  '自信をなくす',
+  '挑戦する機会を逃す',
+  '人と比べて落ち込みやすい',
+  '成長のチャンスを逃す',
+];
+
 // 次のいっぽヒント（汎用4種 - 画像のデザインに準拠）
 const DD_NEXT_ACTION_HINTS = [
-  { icon: '💌', text: '信頼できる人に思いを連絡する' },
-  { icon: '📝', text: '今日できたことを3つ書く' },
-  { icon: '🗒️', text: '反証メモを書いてみる' },
-  { icon: '🌳', text: '5分だけ外に出る' },
+  { icon: '📅', text: '今日できることを3つ書く' },
+  { icon: '👟', text: '小さな挑戦を1つやってみる' },
+  { icon: '💬', text: '信頼できる人に相談してみる' },
+  { icon: '🔍', text: '自分を客観的に見つめてみる' },
 ];
 
 function ddSessionInit(extra) {
@@ -12670,20 +13061,28 @@ function ddSessionInit(extra) {
     autoThought: '',
     emotionTags: [],
     emotionIntensity: null,
+    // Step 4: 3ラウンド固定の深掘り（最大5まで拡張可）
     deeper: ['', '', ''],
-    depthSlots: 3,           // 表示中のスロット数（最大5）
-    schemaCandidates: null,  // AI生成（null=未生成 / loading 中も判別）
+    deeperRound: 1,          // 1..N（今ユーザーが答えるラウンド）
+    deeperPhase: 'input',    // 'input' | 'recap'
+    depthSlots: 3,           // 互換維持（最大スロット数）
+    schemaCandidates: null,
     schemaCandidatesLoading: false,
     schemaSelected: '',
     schemaCustom: '',
-    meritDemerit: null,      // { merits[], demerits[] }
-    meritDemeritLoading: false,
+    // Step 6: チェックリスト（旧 AI 生成の meritDemerit を置き換え）
+    protectedItems: [],      // 守ってくれていたこと（選択された default 項目テキスト）
+    protectedCustom: '',
+    troubledItems: [],       // 困ってきたこと
+    troubledCustom: '',
+    meritDemerit: null,      // 互換維持（保存時に派生で詰める）
     newSchemaCandidates: null,
     newSchemaCandidatesLoading: false,
     newSchemaSelected: '',
     newSchemaCustom: '',
+    // Step 8: 感情強度の再評価
+    emotionIntensityAfter: null,
     aiUsedSchema: false,
-    aiUsedMeritDemerit: false,
     aiUsedNewSchema: false,
     startedAt: new Date().toISOString(),
   }, extra || {});
@@ -12698,15 +13097,15 @@ function viewDeepDive() {
     case 3: return viewDdAutoThought(s);
     case 4: return viewDdDownward(s);
     case 5: return viewDdSchemaIdentify(s);
-    case 6: return viewDdMeritDemerit(s);
+    case 6: return viewDdProsCons(s);
     case 7: return viewDdNewSchema(s);
-    case 8: return viewDdConfirmSchema(s);
-    case 9: return viewDdSaveActions(s);
+    case 8: return viewDdEmotionAfter(s);
+    case 9: return viewDdSummary(s); // 内部的に9番だがUI上は「サマリー」、step表示は8/8維持
     default: deepDive = null; return viewDdIntro(ddSessionInit());
   }
 }
 
-function ddHeader(stepNo, total = 9) {
+function ddHeader(stepNo, total = 8) {
   return `
     <div class="page-header">
       <button class="page-back" data-act="dd-cancel">‹</button>
@@ -12722,9 +13121,9 @@ function viewDdIntro() {
     <div class="screen active dd-screen">
       ${ddHeader(1)}
       <div class="dd-q">下向き矢印法とは？</div>
-      <p class="dd-q-sub">つらさの根っこにある「思い込み（スキーマ）」を見つけ、より自分を助ける新しい見方にアップデートするワークです。</p>
+      <p class="dd-q-sub">つらさの根っこにある「思い込み（スキーマ）」を見つけ、自分を助ける新しい見方にアップデートするワークです。</p>
 
-      <div class="dd-section-label" style="margin-top:14px;">これをやるとどうなるの？</div>
+      <div class="dd-section-label" style="margin-top:14px;">このワークでできること</div>
       <ul class="dd-intro-list">
         <li>自分のつらさのパターンに気づける</li>
         <li>思い込みの「良い面・つらい面」が整理できる</li>
@@ -12738,22 +13137,12 @@ function viewDdIntro() {
         ・考えすぎてしんどくなることが多い
       </div>
 
-      <div class="dd-intro-ba">
-        <div class="dd-section-label" style="margin:0 0 4px;">例えばこんな変化のイメージ</div>
-        <div class="dd-intro-ba-row">
-          <span class="dd-intro-ba-badge before">Before</span>
-          <span>「私は価値がない」（ふるい思い込み）</span>
-        </div>
-        <div class="dd-arrow-sep" style="padding:0;">↓</div>
-        <div class="dd-intro-ba-row">
-          <span class="dd-intro-ba-badge after">After</span>
-          <span>「私はまだ成長中で、できることからやってみよう」</span>
-        </div>
+      <div class="dd-suplan-msg">
+        <span class="dd-suplan-msg-icon">${suplan({ size: 36 })}</span>
+        <span class="dd-suplan-msg-text">すべての問いに答えなくても大丈夫だよ</span>
       </div>
 
-      <p class="text-tiny text-muted" style="margin:12px 0 12px;">※ すべての問いに答えなくても大丈夫です</p>
-
-      <div style="display:grid; gap:10px;">
+      <div style="display:grid; gap:10px; margin-top:14px;">
         <button class="btn btn-primary" data-act="dd-step1-start">はじめる</button>
         <button class="btn-ghost" data-act="dd-cancel">キャンセル</button>
       </div>
@@ -12829,45 +13218,138 @@ function viewDdAutoThought(s) {
   `;
 }
 
-// ───────── Step 4: 下向き深掘り ─────────
-function viewDdDownward(s) {
-  const slots = Math.max(1, Math.min(s.depthSlots || 3, 5));
-  const boxes = [];
-  for (let i = 0; i < slots; i++) {
-    boxes.push(`
-      <div class="dd-arrow-sep">↓</div>
-      <div class="dd-arrow-box">
-        <span class="dd-arrow-box-label">${i + 1}回目</span>
-        <input class="dd-arrow-input" type="text" id="ddDeeper${i}"
-          data-act="dd-step4-input" data-idx="${i}"
-          placeholder="${i === 0 ? '例: 大切にされていないのかも' : i === 1 ? '例: 自分には魅力がないのかも' : '例: 私は人から必要とされない…'}"
-          value="${escapeHtml((s.deeper && s.deeper[i]) || '')}">
-      </div>
-    `);
+// ───────── Step 4: 下向き深掘り（v0.9.88: 3ラウンド分割 + 振り返り）─────────
+// s.deeperPhase: 'input' = round 質問画面 / 'recap' = 振り返り画面
+// s.deeperRound: 1..N（現在のラウンド番号、3が基本、最大5）
+
+// ラウンドごとの AI 質問テンプレート
+function ddRoundQuestion(round, s) {
+  if (round === 1) {
+    return `もし「${s.autoThought || ''}」が本当だとしたら、あなたはどんな人になりそうですか？`;
   }
+  const prev = (s.deeper && s.deeper[round - 2]) || '';
+  if (round === 2) {
+    return `「${prev}」が本当だとしたら、あなたにとってどういう意味になりますか？`;
+  }
+  if (round === 3) {
+    return `もっと根っこの部分には、どんな思い込みがありそうだと思いますか？あなたの中の「当たり前」「ルール」を探してみましょう。`;
+  }
+  return `「${prev}」のさらに奥には、どんな思い込みがありそうですか？`;
+}
+
+function ddRoundShortQuestion(round) {
+  if (round === 1) return 'もしそれが本当なら？';
+  if (round === 2) return 'それはあなたにとってどういう意味？';
+  if (round === 3) return 'さらに根っこにはどんな思い込みがありそう？';
+  return `${round}回目の深掘り`;
+}
+
+function viewDdDownward(s) {
+  const phase = s.deeperPhase || 'input';
+  if (phase === 'recap') return viewDdDownwardRecap(s);
+  return viewDdDownwardRound(s);
+}
+
+function viewDdDownwardRound(s) {
+  const round = s.deeperRound || 1;
+  const isFirst = round === 1;
+  const currentVal = (s.deeper && s.deeper[round - 1]) || '';
+  const examples = DD_DEEPER_EXAMPLES[round] || DD_DEEPER_EXAMPLES[3];
+
+  // これまでの流れ box（2回目以降のみ）
+  const flowBox = !isFirst ? `
+    <div class="dd-flow-box">
+      <div class="dd-flow-row"><span class="dd-flow-label">出来事</span>→ ${escapeHtml((s.autoThought || '').slice(0, 60))}</div>
+      ${[1,2].map(i => (round > i && s.deeper[i-1]) ? `
+        <div class="dd-flow-row"><span class="dd-flow-label">${i}回目の答え</span>${escapeHtml(s.deeper[i-1])}</div>
+      ` : '').join('')}
+    </div>
+  ` : '';
+
   return `
     <div class="screen active dd-screen">
       ${ddHeader(4)}
-      <div class="dd-q">深掘り（下向き質問）</div>
-      <p class="dd-q-sub">それが本当だとしたら、自分にとってどういう意味がありますか？<br>考えが浮かんだら、書き出してみましょう。</p>
+      <div class="dd-q">深掘り（下向きの質問）</div>
+      <p class="dd-q-sub">それが本当だとしたら、あなたにとってどんな意味がありますか？<br>考えが浮かんだら、書き出してみましょう。</p>
 
-      <div class="dd-section-label" style="margin-top:8px;">きっかけの考え</div>
-      <div class="dd-arrow-prev">
-        <div class="dd-arrow-prev-label">最初に浮かんだこと</div>
-        ${escapeHtml(s.autoThought || '')}
+      ${isFirst ? `
+        <div class="dd-howto-card">
+          <div class="dd-howto-label">進め方</div>
+          <ol class="dd-howto-list">
+            <li>AIの問いに答える</li>
+            <li>答えた内容から、さらに深く考える</li>
+            <li>この流れを基本3回くり返します<span class="text-tiny text-muted">（もっと深掘りしたい場合は追加OK）</span></li>
+          </ol>
+        </div>
+
+        <div class="dd-flow-box">
+          <div class="dd-flow-row"><span class="dd-flow-label">最初の考え</span>${escapeHtml(s.autoThought || '')}</div>
+        </div>
+      ` : flowBox}
+
+      <div class="dd-suplan-q-card">
+        <div class="dd-suplan-q-header">
+          <span class="dd-suplan-q-icon">${suplan({ size: 36 })}</span>
+          <span class="dd-suplan-q-tag">${round}回目の質問</span>
+        </div>
+        <div class="dd-suplan-q-title">Q${round}. ${escapeHtml(ddRoundShortQuestion(round))}</div>
+        <div class="dd-suplan-q-body">${escapeHtml(ddRoundQuestion(round, s))}</div>
       </div>
 
-      <div class="dd-arrow-col">
-        ${boxes.join('')}
-      </div>
+      <textarea class="textarea-block" id="ddDeeperInput"
+        placeholder="あなたの考えを書きましょう（例：私は仕事ができない人だ）"
+        maxlength="200" rows="3">${escapeHtml(currentVal)}</textarea>
+      <div class="text-tiny text-muted" style="text-align:right; margin-top:2px;">最大200字</div>
 
-      <button class="dd-arrow-more" data-act="dd-step4-more" ${slots >= 5 ? 'disabled' : ''}>
-        + さらに深掘りする${slots >= 5 ? '（最大5回まで）' : ''}
-      </button>
+      <div class="dd-section-label" style="margin-top:14px;">参考になる考え方の例</div>
+      <div class="dd-chip-grid">
+        ${examples.map(t => `<span class="dd-example-chip">${escapeHtml(t)}</span>`).join('')}
+        <span class="dd-example-chip" style="background:transparent; border:none; color:var(--text-muted);">など</span>
+      </div>
 
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step4-next">次へ</button>
-        <button class="btn-ghost" data-act="dd-back" data-to="3">‹ 戻る</button>
+        <button class="btn btn-primary" data-act="dd-step4-round-next">次へ</button>
+        <button class="btn-ghost" data-act="dd-step4-round-back">‹ 戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+function viewDdDownwardRecap(s) {
+  const slots = (s.deeper || []).filter(d => (d || '').trim()).length;
+  const cards = (s.deeper || []).map((t, i) => (t || '').trim() ? `
+    <div class="dd-recap-card">
+      <span class="dd-recap-num">${i+1}回目</span>
+      <span class="dd-recap-text">${escapeHtml(t)}</span>
+    </div>
+  ` : '').join('');
+  const deepest = (s.deeper || []).filter(d => (d || '').trim()).slice(-1)[0] || '';
+  return `
+    <div class="screen active dd-screen">
+      ${ddHeader(4)}
+      <div class="dd-q">深掘りの流れ（基本3回）</div>
+      <p class="dd-q-sub">ここまでの流れをふりかえってみましょう。</p>
+
+      <div class="dd-recap-list">${cards}</div>
+
+      ${slots < 5 ? `
+        <button class="dd-add-more-btn" data-act="dd-step4-more">＋ さらに深掘りする（任意）</button>
+      ` : ''}
+
+      <div class="dd-suplan-summary">
+        <div class="dd-suplan-summary-header">
+          <span class="dd-suplan-summary-icon">${suplan({ size: 32 })}</span>
+          <span class="dd-suplan-summary-label">すぷらんのまとめ</span>
+        </div>
+        <div class="dd-suplan-summary-body">
+          「${escapeHtml(deepest.slice(0, 30) || '…')}」という思い込みがありそうだね。<br>
+          次のステップで整理していこう！
+        </div>
+      </div>
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step4-recap-next">次へ</button>
+        <button class="btn-ghost" data-act="dd-step4-recap-back">‹ 戻る</button>
       </div>
     </div>
   `;
@@ -12893,8 +13375,8 @@ function viewDdSchemaIdentify(s) {
   return `
     <div class="screen active dd-screen">
       ${ddHeader(5)}
-      <div class="dd-q">スキーマを特定</div>
-      <p class="dd-q-sub">根っこにある思い込み（スキーマ）はどれに近いですか？</p>
+      <div class="dd-q">根っこの思い込みを整理しよう</div>
+      <p class="dd-q-sub">あなたの回答から、次のような根っこ（スキーマ・思い込み）が考えられます。<br>一番しっくりくるものを選んでください。</p>
       <div class="text-tiny text-muted" style="margin-bottom:6px;">
         ${s.schemaCandidatesLoading ? '🌱 AIが候補を考えています…' : (s.aiUsedSchema ? '⚠️ AIが推定した参考情報です' : '※ 簡易ルールで抽出した候補です')}
       </div>
@@ -12921,6 +13403,17 @@ function viewDdSchemaIdentify(s) {
         ` : ''}
       `}
 
+      <div class="dd-suplan-summary" style="margin-top:18px;">
+        <div class="dd-suplan-summary-header">
+          <span class="dd-suplan-summary-icon">${suplan({ size: 32 })}</span>
+          <span class="dd-suplan-summary-label">すぷらんより</span>
+        </div>
+        <div class="dd-suplan-summary-body">
+          この思い込みは、あなたを守るために身につけてきた大切な考え方かもしれないね。<br>
+          次は、この考えの「良い面」と「つらい面」を一緒に整理していこう！
+        </div>
+      </div>
+
       <div style="margin-top:18px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="dd-step5-next" ${s.schemaCandidatesLoading ? 'disabled' : ''}>次へ</button>
         <button class="btn-ghost" data-act="dd-back" data-to="4">‹ 戻る</button>
@@ -12929,54 +13422,59 @@ function viewDdSchemaIdentify(s) {
   `;
 }
 
-// ───────── Step 6: メリット・デメリット比較 ─────────
-function viewDdMeritDemerit(s) {
-  if (s.meritDemerit == null && !s.meritDemeritLoading) {
-    s.meritDemeritLoading = true;
-    const ref = s;
-    (async () => {
-      const ai = await generateMeritDemeritAI(ref);
-      if (deepDive !== ref) return;
-      if (ai) { ref.meritDemerit = ai; ref.aiUsedMeritDemerit = true; }
-      else    { ref.meritDemerit = generateMeritDemeritRule(ref); ref.aiUsedMeritDemerit = false; }
-      ref.meritDemeritLoading = false;
-      ddPersistCurrentSafe();
-      render();
-    })();
-  }
-  const md = s.meritDemerit || { merits: [], demerits: [] };
+// ───────── Step 6: 良い面とつらい面（v0.9.88 チェックリスト版）─────────
+function viewDdProsCons(s) {
   const schemaText = ddCurrentOldSchema(s);
+  const protectedItems = s.protectedItems || [];
+  const troubledItems = s.troubledItems || [];
   return `
     <div class="screen active dd-screen">
       ${ddHeader(6)}
-      <div class="dd-q">メリット・デメリット比較</div>
-      <p class="dd-q-sub">このスキーマを持つことでのメリット・デメリットを比較してみましょう。</p>
-      <div class="text-tiny text-muted" style="margin-bottom:6px;">
-        ${s.meritDemeritLoading ? '🌱 AIが整理中です…' : (s.aiUsedMeritDemerit ? 'AIの例を参考にしています' : '簡易ルールでの参考例です')}
+      <div class="dd-q">この思い込みの良い面とつらい面を整理しよう</div>
+      <p class="dd-q-sub">対象のスキーマ（思い込み）：<br><strong>「${escapeHtml(schemaText || '—')}」</strong></p>
+
+      <!-- 守ってくれていたこと（緑） -->
+      <div class="dd-prosc-card good">
+        <div class="dd-prosc-title">✅ この思い込みが、あなたを守ってくれていたこと<br><span class="dd-prosc-sub">（得られていたもの）を選んでください</span></div>
+        <div class="dd-prosc-options">
+          ${DD_PROTECTED_DEFAULTS.map(t => `
+            <label class="dd-prosc-item ${protectedItems.includes(t) ? 'selected' : ''}">
+              <input type="checkbox" class="dd-prosc-cb" data-act="dd-step6-toggle-protected" data-val="${escapeHtml(t)}" ${protectedItems.includes(t) ? 'checked' : ''}>
+              <span class="dd-prosc-text">${escapeHtml(t)}</span>
+            </label>
+          `).join('')}
+          <label class="dd-prosc-item dd-prosc-other">
+            <input type="checkbox" class="dd-prosc-cb" data-act="dd-step6-toggle-protected-other" ${(s.protectedCustom || '').trim() ? 'checked' : ''}>
+            <span class="dd-prosc-text">その他（自分で入力する）</span>
+          </label>
+          <input class="dd-prosc-other-input" type="text" id="ddProtectedCustomInput"
+            placeholder="自由に入力してください" maxlength="60"
+            value="${escapeHtml(s.protectedCustom || '')}">
+        </div>
       </div>
 
-      <div class="dd-arrow-prev" style="margin-bottom:14px;">
-        <div class="dd-arrow-prev-label">対象のスキーマ</div>
-        ${escapeHtml(schemaText)}
+      <!-- 困ってきたこと（赤） -->
+      <div class="dd-prosc-card bad">
+        <div class="dd-prosc-title">⚠️ この思い込みで、あなたが困ってきたこと<br><span class="dd-prosc-sub">（失ってしまったもの）を選んでください</span></div>
+        <div class="dd-prosc-options">
+          ${DD_TROUBLED_DEFAULTS.map(t => `
+            <label class="dd-prosc-item ${troubledItems.includes(t) ? 'selected' : ''}">
+              <input type="checkbox" class="dd-prosc-cb" data-act="dd-step6-toggle-troubled" data-val="${escapeHtml(t)}" ${troubledItems.includes(t) ? 'checked' : ''}>
+              <span class="dd-prosc-text">${escapeHtml(t)}</span>
+            </label>
+          `).join('')}
+          <label class="dd-prosc-item dd-prosc-other">
+            <input type="checkbox" class="dd-prosc-cb" data-act="dd-step6-toggle-troubled-other" ${(s.troubledCustom || '').trim() ? 'checked' : ''}>
+            <span class="dd-prosc-text">その他（自分で入力する）</span>
+          </label>
+          <input class="dd-prosc-other-input" type="text" id="ddTroubledCustomInput"
+            placeholder="自由に入力してください" maxlength="60"
+            value="${escapeHtml(s.troubledCustom || '')}">
+        </div>
       </div>
-
-      ${s.meritDemeritLoading ? `<div class="dd-opt-loading">メリット・デメリットを準備中…</div>` : `
-        <div class="dd-md-card merit">
-          <div class="dd-md-card-title">メリット（得られるもの）</div>
-          <ul class="dd-md-list">
-            ${(md.merits || []).map(t => `<li>${escapeHtml(t)}</li>`).join('') || '<li>—</li>'}
-          </ul>
-        </div>
-        <div class="dd-md-card demerit">
-          <div class="dd-md-card-title">デメリット（つらくなるもの）</div>
-          <ul class="dd-md-list">
-            ${(md.demerits || []).map(t => `<li>${escapeHtml(t)}</li>`).join('') || '<li>—</li>'}
-          </ul>
-        </div>
-      `}
 
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step6-next" ${s.meritDemeritLoading ? 'disabled' : ''}>次へ</button>
+        <button class="btn btn-primary" data-act="dd-step6-next">次へ</button>
         <button class="btn-ghost" data-act="dd-back" data-to="5">‹ 戻る</button>
       </div>
     </div>
@@ -13002,80 +13500,215 @@ function viewDdNewSchema(s) {
   return `
     <div class="screen active dd-screen">
       ${ddHeader(7)}
-      <div class="dd-q">新しいスキーマを検討</div>
-      <p class="dd-q-sub">より自分を助けてくれる新しいスキーマを考えてみましょう。</p>
-      <div class="text-tiny text-muted" style="margin-bottom:6px;">
+      <div class="dd-q">新しいスキーマ（思い込み）の候補を見てみよう</div>
+      <p class="dd-q-sub">今までの内容を踏まえて、すぷらんから新しい考え方の候補を提案します。<br>しっくりくるものを選んでみてね。</p>
+      <div class="text-tiny text-muted" style="margin-bottom:10px;">
         ${s.newSchemaCandidatesLoading ? '🌱 AIが提案を考えています…' : (s.aiUsedNewSchema ? 'AIからの提案例' : '簡易ルールでの提案例')}
       </div>
 
       ${s.newSchemaCandidatesLoading ? `<div class="dd-opt-loading">提案を準備中…</div>` : `
-        <div class="dd-opt-list">
-          ${cands.map(c => `
-            <button class="dd-opt ${s.newSchemaSelected === c ? 'selected' : ''}"
-              data-act="dd-step7-pick" data-val="${escapeHtml(c)}">
-              <span class="dd-opt-radio"></span>
-              <span>${escapeHtml(c)}</span>
-            </button>
+        <div class="dd-newschema-list">
+          ${cands.map((c, i) => `
+            <label class="dd-newschema-card ${s.newSchemaSelected === c ? 'selected' : ''}">
+              <input type="radio" name="ddNewSchema" class="dd-newschema-radio"
+                data-act="dd-step7-pick" data-val="${escapeHtml(c)}" ${s.newSchemaSelected === c ? 'checked' : ''}>
+              <div class="dd-newschema-body">
+                <div class="dd-newschema-label">候補${'①②③④'[i] || (i+1)}</div>
+                <div class="dd-newschema-text">${escapeHtml(c)}</div>
+              </div>
+            </label>
           `).join('')}
-          <button class="dd-opt ${s.newSchemaSelected === '__custom__' ? 'selected' : ''}"
-            data-act="dd-step7-pick" data-val="__custom__">
-            <span class="dd-opt-radio"></span>
-            <span>自分で考えて入力する</span>
-          </button>
         </div>
-        ${s.newSchemaSelected === '__custom__' ? `
-          <textarea class="textarea-block" id="ddNewSchemaCustomInput"
-            placeholder="例: 私は自分のペースで進めればOK"
-            maxlength="60" rows="2"
-            style="margin-top:10px;">${escapeHtml(s.newSchemaCustom || '')}</textarea>
-        ` : ''}
+        <div class="dd-newschema-custom">
+          <label class="dd-newschema-card ${s.newSchemaSelected === '__custom__' ? 'selected' : ''}">
+            <input type="radio" name="ddNewSchema" class="dd-newschema-radio"
+              data-act="dd-step7-pick" data-val="__custom__" ${s.newSchemaSelected === '__custom__' ? 'checked' : ''}>
+            <div class="dd-newschema-body">
+              <div class="dd-newschema-label">自分で新しいスキーマを考えて入力する</div>
+              <input class="dd-newschema-custom-input" type="text" id="ddNewSchemaCustomInput"
+                placeholder="自由に入力してください" maxlength="200"
+                value="${escapeHtml(s.newSchemaCustom || '')}">
+            </div>
+          </label>
+        </div>
       `}
 
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step7-next" ${s.newSchemaCandidatesLoading ? 'disabled' : ''}>次へ</button>
+        <button class="btn btn-primary" data-act="dd-step7-next" ${s.newSchemaCandidatesLoading ? 'disabled' : ''}>このスキーマを採用してみる</button>
         <button class="btn-ghost" data-act="dd-back" data-to="6">‹ 戻る</button>
       </div>
     </div>
   `;
 }
 
-// ───────── Step 8: 新しいスキーマを選択 ─────────
-function viewDdConfirmSchema(s) {
+// ───────── Step 8: 感情強度の再評価（v0.9.88 新規）─────────
+function viewDdEmotionAfter(s) {
+  const intensity = s.emotionIntensityAfter == null ? (s.emotionIntensity || 5) : s.emotionIntensityAfter;
   const newSchema = ddCurrentNewSchema(s);
+  const tags = s.emotionTags || [];
+  const beforeIntensity = s.emotionIntensity == null ? '—' : s.emotionIntensity;
+  // 選んだ感情のラベル一覧
+  const emoLabels = tags.map(id => {
+    const t = DD_EMOTION_TAGS.find(e => e.id === id);
+    return t ? `${t.icon} ${t.name}` : '';
+  }).filter(Boolean).join(' / ') || '—';
   return `
     <div class="screen active dd-screen">
       ${ddHeader(8)}
-      <div class="dd-q">この新しいスキーマにしますか？</div>
-      <p class="dd-q-sub">この考え方を日常で意識してみると、心がやすらかになるかもしれません。<br>小さないっぽから試してみましょう。</p>
+      <div class="dd-q">気持ちはどう変わった？</div>
+      <p class="dd-q-sub">新しいスキーマ（思い込み）を意識してみたとき、今の気持ちの強さはどれくらい？</p>
 
-      <div style="text-align:center; margin: 18px 0 8px;">
-        <div style="margin: 0 auto 6px;">${suplan({ expression: 'excited', size: 80 })}</div>
-        <div class="dd-highlight-label">新しいスキーマ</div>
+      <div class="dd-newschema-recall">
+        <div class="dd-newschema-recall-label">新しいスキーマ（思い込み）</div>
+        <div class="dd-newschema-recall-text">「${escapeHtml(newSchema || '—')}」</div>
       </div>
-      <div class="dd-highlight-schema">「${escapeHtml(newSchema || '—')}」</div>
 
-      <div style="margin-top:10px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step8-confirm">このスキーマにする</button>
-        <button class="btn btn-secondary" data-act="dd-step8-other">他の候補にする</button>
-        <button class="btn-ghost" data-act="dd-back" data-to="7">‹ もう少し考える</button>
+      <div class="dd-emo-compare-card">
+        <div class="dd-emo-compare-row">
+          <div class="dd-emo-compare-side">
+            <div class="dd-emo-compare-label">最初に選んだ気持ち</div>
+            <div class="dd-emo-compare-emo">${escapeHtml(emoLabels)}</div>
+            <div class="dd-emo-compare-intensity before">${beforeIntensity}<span>/10</span></div>
+          </div>
+          <div class="dd-emo-compare-arrow">→</div>
+          <div class="dd-emo-compare-side">
+            <div class="dd-emo-compare-label">いまの強さ</div>
+            <div class="dd-emo-compare-emo">${escapeHtml(emoLabels)}</div>
+            <div class="dd-emo-compare-intensity after">${intensity}<span>/10</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dd-section-label">気持ちの強さ（0〜10）</div>
+      <div class="moya-scale-row">
+        ${Array.from({length: 11}, (_, n) => `
+          <button class="moya-scale-btn ${intensity === n ? 'selected' : ''}"
+            data-act="dd-step8-intensity" data-score="${n}">${n}</button>
+        `).join('')}
+      </div>
+      <div class="text-tiny text-muted" style="text-align:center; margin-top:4px;">0 ← 弱い ／ 強い → 10</div>
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn btn-primary" data-act="dd-step8-next">サマリーを見る</button>
+        <button class="btn-ghost" data-act="dd-back" data-to="7">‹ 戻る</button>
       </div>
     </div>
   `;
 }
 
-// ───────── Step 9: 保存 + 次のいっぽヒント ─────────
-function viewDdSaveActions(s) {
-  return `
-    <div class="screen active dd-screen">
-      ${ddHeader(9)}
-      <div class="dd-q">次のいっぽを選びましょう</div>
-      <p class="dd-q-sub">あなたの新しいスキーマに合わせた行動のヒントです。<br>気になるものから試してみましょう。</p>
+// ───────── サマリー画面（v0.9.88 新規 / step:9 内部）─────────
+function viewDdSummary(s) {
+  const oldSchema = ddCurrentOldSchema(s);
+  const newSchema = ddCurrentNewSchema(s);
+  const before = s.emotionIntensity == null ? null : s.emotionIntensity;
+  const after = s.emotionIntensityAfter == null ? null : s.emotionIntensityAfter;
+  const change = (before != null && after != null) ? (before - after) : 0;
 
-      <div class="dd-arrow-prev" style="margin: 8px 0 14px;">
-        <div class="dd-arrow-prev-label">新しいスキーマ</div>
-        ${escapeHtml(ddCurrentNewSchema(s))}
+  // 第一感情アイコン（複数選択時は先頭）
+  const firstEmo = (s.emotionTags || [])[0];
+  const firstEmoT = DD_EMOTION_TAGS.find(e => e.id === firstEmo);
+  const beforeIcon = firstEmoT ? firstEmoT.icon : '😢';
+  const afterIcon = (change >= 3) ? '😊' : (change >= 1) ? '🙂' : (change <= -1) ? '😟' : (firstEmoT ? firstEmoT.icon : '😐');
+
+  const protectedAll = [...(s.protectedItems || []), ...((s.protectedCustom || '').trim() ? [s.protectedCustom.trim()] : [])];
+  const troubledAll = [...(s.troubledItems || []), ...((s.troubledCustom || '').trim() ? [s.troubledCustom.trim()] : [])];
+
+  const changeMsg = (change >= 3) ? '素敵な変化だね🌱' : (change >= 1) ? '少し心が軽くなったね' : (change === 0) ? 'まずは気づけたことに意味があるよ' : 'またゆっくり整理していこう';
+
+  return `
+    <div class="screen active dd-screen dd-summary-screen">
+      <div class="page-header">
+        <button class="page-back" data-act="dd-back" data-to="8">‹</button>
+        <span class="page-title">あなたの変化のサマリー</span>
+        <span class="text-tiny text-muted">Step 8 / 8</span>
       </div>
 
+      <div class="dd-suplan-msg" style="margin-top:8px;">
+        <span class="dd-suplan-msg-icon">${suplan({ expression: 'excited', size: 40 })}</span>
+        <span class="dd-suplan-msg-text">よくここまで取り組んだね！<br>あなたの中で、大きな変化が起きているよ。スキーマ（思い込み）の変化を一緒に見てみよう。</span>
+      </div>
+
+      <!-- 1) スキーマの変化 -->
+      <div class="dd-sum-section-h">あなたのスキーマ（思い込み）は、こう変わりました</div>
+      <div class="dd-sum-schema-row">
+        <div class="dd-sum-schema-card old">
+          <div class="dd-sum-schema-cap">これまでの見方（古いスキーマ）</div>
+          <div class="dd-sum-schema-quote">「${escapeHtml(oldSchema || '—')}」</div>
+          <div class="dd-sum-schema-tail">自分を責め、挑戦を避けて、苦しさが続いていた見方</div>
+        </div>
+        <div class="dd-sum-schema-arrow">→</div>
+        <div class="dd-sum-schema-card new">
+          <div class="dd-sum-schema-cap">これからの見方（新しいスキーマ）</div>
+          <div class="dd-sum-schema-quote">「${escapeHtml(newSchema || '—')}」</div>
+          <div class="dd-sum-schema-tail">自分を受け入れ、行動できる自分へ</div>
+        </div>
+      </div>
+
+      <!-- 2) 変化のプロセス -->
+      <div class="dd-sum-section-h">変化のプロセスをふりかえろう</div>
+      <div class="dd-sum-process-grid">
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">📅</div>
+          <div class="dd-sum-process-label">出来事</div>
+          <div class="dd-sum-process-text">${escapeHtml((s.event || '').slice(0, 28))}</div>
+        </div>
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">💭</div>
+          <div class="dd-sum-process-label">最初に浮かんだ考え</div>
+          <div class="dd-sum-process-text">${escapeHtml((s.autoThought || '').slice(0, 28))}</div>
+        </div>
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">🌱</div>
+          <div class="dd-sum-process-label">根っこの思い込み<br><span class="text-tiny text-muted">（スキーマ）</span></div>
+          <div class="dd-sum-process-text">${escapeHtml((oldSchema || '').slice(0, 28))}</div>
+        </div>
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">❤️</div>
+          <div class="dd-sum-process-label">新しい思い込み</div>
+          <div class="dd-sum-process-text">${escapeHtml((newSchema || '').slice(0, 28))}</div>
+        </div>
+      </div>
+
+      <!-- 3) この思い込みがもたらしていた影響 -->
+      <div class="dd-sum-section-h">この思い込みがもたらしていた影響</div>
+      <div class="dd-prosc-card good" style="margin-bottom:10px;">
+        <div class="dd-prosc-title">守ってくれていたこと（得られていたもの）</div>
+        <ul class="dd-sum-checklist">
+          ${protectedAll.length === 0 ? '<li class="text-muted">（選択なし）</li>' : protectedAll.map(t => `<li>✅ ${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="dd-prosc-card bad">
+        <div class="dd-prosc-title">困っていたこと（失っていたもの）</div>
+        <ul class="dd-sum-checklist">
+          ${troubledAll.length === 0 ? '<li class="text-muted">（選択なし）</li>' : troubledAll.map(t => `<li>⚠️ ${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>
+
+      <!-- 4) 気持ちの変化 -->
+      <div class="dd-sum-section-h">気持ちの変化（再評価してみよう）</div>
+      <div class="dd-sum-emo-row">
+        <div class="dd-sum-emo-side">
+          <div class="dd-sum-emo-icon">${beforeIcon}</div>
+          <div class="dd-sum-emo-num">${before == null ? '—' : before}<span>/10</span></div>
+        </div>
+        <div class="dd-sum-emo-arrow">→</div>
+        <div class="dd-sum-emo-side">
+          <div class="dd-sum-emo-icon">${afterIcon}</div>
+          <div class="dd-sum-emo-num">${after == null ? '—' : after}<span>/10</span></div>
+        </div>
+      </div>
+      <div class="dd-sum-emo-msg">${escapeHtml(changeMsg)}</div>
+
+      <!-- 5) これからのあなたへ -->
+      <div class="dd-sum-section-h">これからのあなたへ</div>
+      <div class="dd-sum-encourage">
+        新しいスキーマは、すぐに完璧に身につくものではないよ。<br>
+        繰り返し練習することで、少しずつ自分の中に育っていくんだ。<br>
+        今日の気づきを、これからの自分で試してみてね。
+      </div>
+
+      <!-- 6) 次のいっぽ -->
+      <div class="dd-sum-section-h">次のいっぽ（行動のヒント）</div>
       <div class="dd-hint-list">
         ${DD_NEXT_ACTION_HINTS.map(h => `
           <div class="dd-hint-card">
@@ -13085,9 +13718,9 @@ function viewDdSaveActions(s) {
         `).join('')}
       </div>
 
-      <div style="display:grid; gap:10px;">
+      <div style="margin-top:18px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="dd-save">保存して完了</button>
-        <button class="btn-ghost" data-act="dd-save-and-ippo">いっぽ一覧へ進む</button>
+        <button class="btn-ghost" data-act="dd-save-later">あとで見返す（マイページへ）</button>
       </div>
     </div>
   `;
@@ -13097,11 +13730,14 @@ function viewDdSaveActions(s) {
 // 下向き矢印法 - ヘルパー / AI / フォールバック
 // ============================================================
 function ddCollectDeeperInputs() {
+  // v0.9.88: Step 4 はラウンドごとに1つのテキストエリア（ddDeeperInput）に変更
   if (!deepDive) return;
-  const slots = deepDive.depthSlots || 3;
-  for (let i = 0; i < slots; i++) {
-    const inp = document.getElementById('ddDeeper' + i);
-    if (inp) deepDive.deeper[i] = (inp.value || '').trim();
+  const inp = document.getElementById('ddDeeperInput');
+  if (inp) {
+    const round = deepDive.deeperRound || 1;
+    deepDive.deeper = deepDive.deeper || [];
+    while (deepDive.deeper.length < round) deepDive.deeper.push('');
+    deepDive.deeper[round - 1] = (inp.value || '').trim();
   }
 }
 function ddPersistCurrent() {
@@ -13115,6 +13751,10 @@ function ddPersistCurrent() {
   if (schemaInp) deepDive.schemaCustom = (schemaInp.value || '').trim();
   const newInp = document.getElementById('ddNewSchemaCustomInput');
   if (newInp) deepDive.newSchemaCustom = (newInp.value || '').trim();
+  const pInp = document.getElementById('ddProtectedCustomInput');
+  if (pInp) deepDive.protectedCustom = (pInp.value || '').trim();
+  const tInp = document.getElementById('ddTroubledCustomInput');
+  if (tInp) deepDive.troubledCustom = (tInp.value || '').trim();
 }
 function ddPersistCurrentSafe() { try { ddPersistCurrent(); } catch (e) {} }
 
@@ -13228,11 +13868,11 @@ async function generateMeritDemeritAI(s) {
 
 // Step 7: 新しいスキーマ候補 - ルールベース
 function generateNewSchemaCandidatesRule(s) {
+  // v0.9.88: 候補を「芯+補強2-3文」の長文3本に変更（image 1 Panel 8 準拠）
   return [
-    '私は価値があり、必要とされる存在だ',
-    '完璧じゃなくても、人は私を受け入れてくれる',
-    '私は人とつながり、支え合うことができる',
-    '失敗しても、私は成長していける',
+    '私は完璧でなくても、学びながら前に進める存在だ。完璧じゃないことが、人を立体的にし、成長や深みを生む。失敗してもそこから学べる、大切な存在であると言える。',
+    '今日は今日できることをやればよい。完璧を目指さない自分も、認められる存在として大切。挑戦してありのまま、人と比べるのではなく、自分の歩むペースで進めていけば、それで十分価値ある自分。',
+    '今日からよくなっていくんだろうか、と私自身が信じきれない気持ちもあるけれど、誠実に取り組みながら自分の良いところに目を向けてあげる。人と比べるのではなく、自分の歩み続ける道を信じよう。',
   ];
 }
 
@@ -13253,7 +13893,7 @@ async function generateNewSchemaCandidatesAI(s) {
     if (sIdx < 0 || eIdx <= sIdx) return null;
     const parsed = JSON.parse(cleaned.slice(sIdx, eIdx + 1));
     if (!Array.isArray(parsed)) return null;
-    return parsed.filter(t => typeof t === 'string' && t.trim()).slice(0, 4);
+    return parsed.filter(t => typeof t === 'string' && t.trim()).slice(0, 3);
   } catch (e) { console.warn('[DD-newschema] failed', e); return null; }
 }
 
@@ -14495,40 +15135,43 @@ Quick Replyも、
 
   dd_new_schema: {
     id: 'dd_new_schema',
-    title: '下向き矢印法 - 新しいスキーマ候補（Step7）',
-    purpose: '今のスキーマよりも自分を助けてくれる代替スキーマを4つ提示する。',
-    triggerLocation: '下向き矢印法 Step 7（新しいスキーマを検討）',
+    title: '下向き矢印法 - 新しいスキーマ（思い込み）候補（Step7）',
+    purpose: 'ふるいスキーマを置き換える「現実的で温かい」新しいスキーマ候補を3つ提示する（多面的・1文目に芯、2-3文で補強）',
+    triggerLocation: '下向き矢印法 Step 7（新しいスキーマの候補を見てみよう）',
     callSite: 'generateNewSchemaCandidatesAI() → callGemini(AI_PROMPTS.dd_new_schema.systemPrompt, [user])',
     model: 'gemini-2.5-flash',
     temperature: 0.85,
-    maxTokens: 600,
-    outputFormat: 'JSON 配列（4つの短文）',
+    maxTokens: 1200,
+    outputFormat: 'JSON 配列（3つの本文・各60〜140字の複数文）',
     fallbackBehavior: 'API未設定 / 失敗時は generateNewSchemaCandidatesRule の汎用候補にフォールバック',
     safetyChecks: [
       'JSON抽出失敗時はルールへフォールバック',
       '無理にポジティブにしすぎず「やわらかく現実的」な代替案を出す',
+      '断定・診断・指示にならない（〜です/〜してね で穏やかに）',
     ],
     systemPrompt: `あなたは認知行動療法（CBT）のセラピストです。
-クライエントが特定した「ふるいスキーマ」を、より自分を助ける新しいスキーマに置き換える候補を4つ提示してください。
+クライエントが特定した「ふるいスキーマ（思い込み）」を、より自分を助ける新しいスキーマに置き換える候補を3つ提示してください。
 
 # 出力ルール
 - 必ず JSON 配列のみで出力（説明・コードブロック・前置き不要）
-- 4要素。各 14〜34字の「私は〜」「〜してもいい」など1人称の短文
+- 3要素。各候補は 60〜140 字の複数文。
+  - 1文目: 新しいスキーマの「芯」（〜だ / 〜である）
+  - 2-3文目: その芯を支える具体的なニュアンス（受容・成長・関係性・現実認識など）
 - 過剰にポジティブな全肯定にしない。「完璧でなくてもいい」「失敗しても成長できる」など現実的・条件付きで温かい
 - ふるいスキーマと真逆ではなく、ニュアンスをやさしく解きほぐす
-- 4候補は少しずつ角度を変える（自己肯定 / 受容 / 関係性 / 成長 など）
+- 3候補は少しずつ角度を変える（自己受容 / 成長プロセス / 他者との比較を手放す など）
 - 22-28歳の若者に伝わる自然な口語
 
 # 出力フォーマット
-["候補1","候補2","候補3","候補4"]`,
+["候補1の本文","候補2の本文","候補3の本文"]`,
     userTemplate: `# 入力
 - ふるいスキーマ: {oldSchema}
 - 自動思考: {autoThought}
 - きっかけの出来事: {event}
 
-上記をふまえて、新しいスキーマ候補を4つ JSON 配列で出力してください。`,
-    lastUpdated: '2026-05-26',
-    changeNote: 'v0.9.71 初版',
+上記をふまえて、新しいスキーマ候補を3つ JSON 配列で出力してください。`,
+    lastUpdated: '2026-05-30',
+    changeNote: 'v0.9.88: 候補数 4→3、各候補を長文（60〜140字）に変更',
     psychologistReviewStatus: 'レビュー待ち',
     psychologistReviewNote: '',
   },
@@ -18700,24 +19343,65 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  if (act === 'dd-step4-input') {
-    // input 都度の保持はしない（次へ時にまとめて取得）。再レンダーは不要
+  // v0.9.88 Step 4 ラウンド進行（3ラウンド分割 + 振り返り）
+  if (act === 'dd-step4-round-next') {
+    if (!deepDive) return;
+    const round = deepDive.deeperRound || 1;
+    const inp = document.getElementById('ddDeeperInput');
+    const v = inp ? (inp.value || '').trim() : '';
+    if (!v) { toast(`${round}回目の答えを書いてみよう`); return; }
+    deepDive.deeper = deepDive.deeper || ['', '', ''];
+    while (deepDive.deeper.length < round) deepDive.deeper.push('');
+    deepDive.deeper[round - 1] = v;
+    if (round >= 3) {
+      // 3回完了 → 振り返り画面へ
+      deepDive.deeperPhase = 'recap';
+    } else {
+      deepDive.deeperRound = round + 1;
+      deepDive.deeperPhase = 'input';
+    }
+    render();
+    return;
+  }
+  if (act === 'dd-step4-round-back') {
+    if (!deepDive) return;
+    const round = deepDive.deeperRound || 1;
+    const inp = document.getElementById('ddDeeperInput');
+    if (inp && deepDive.deeper) deepDive.deeper[round - 1] = (inp.value || '').trim();
+    if (round <= 1) {
+      deepDive.step = 3;
+    } else {
+      deepDive.deeperRound = round - 1;
+      deepDive.deeperPhase = 'input';
+    }
+    render();
+    return;
+  }
+  if (act === 'dd-step4-recap-next') {
+    if (!deepDive) return;
+    const filled = (deepDive.deeper || []).filter(t => (t || '').trim());
+    if (filled.length === 0) { toast('深掘りの答えがまだ書かれていないよ'); return; }
+    deepDive.step = 5;
+    render();
+    return;
+  }
+  if (act === 'dd-step4-recap-back') {
+    if (!deepDive) return;
+    // 直近の入力済みラウンドへ戻る
+    const filled = (deepDive.deeper || []).filter(t => (t || '').trim()).length;
+    deepDive.deeperRound = Math.max(1, filled);
+    deepDive.deeperPhase = 'input';
+    render();
     return;
   }
   if (act === 'dd-step4-more') {
     if (!deepDive) return;
-    ddCollectDeeperInputs();
-    if (deepDive.depthSlots < 5) deepDive.depthSlots += 1;
-    render();
-    return;
-  }
-  if (act === 'dd-step4-next') {
-    if (!deepDive) return;
-    ddCollectDeeperInputs();
-    const filled = (deepDive.deeper || []).filter(t => (t || '').trim());
-    if (filled.length === 0) { toast('1段だけでも書いてみよう'); return; }
-    deepDive.step = 5;
-    // 候補を再生成させたいときは null にする（戻ってきても再利用）
+    const filled = (deepDive.deeper || []).filter(t => (t || '').trim()).length;
+    if (filled >= 5) { toast('深掘りは5回までだよ'); return; }
+    deepDive.deeperRound = filled + 1;
+    deepDive.deeperPhase = 'input';
+    deepDive.deeper = deepDive.deeper || [];
+    while (deepDive.deeper.length < deepDive.deeperRound) deepDive.deeper.push('');
     render();
     return;
   }
@@ -18742,8 +19426,44 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  // v0.9.88 Step 6 チェックリスト
+  if (act === 'dd-step6-toggle-protected') {
+    if (!deepDive) return;
+    const v = el.dataset.val || '';
+    deepDive.protectedItems = deepDive.protectedItems || [];
+    const i = deepDive.protectedItems.indexOf(v);
+    if (i >= 0) deepDive.protectedItems.splice(i, 1); else deepDive.protectedItems.push(v);
+    render();
+    return;
+  }
+  if (act === 'dd-step6-toggle-troubled') {
+    if (!deepDive) return;
+    const v = el.dataset.val || '';
+    deepDive.troubledItems = deepDive.troubledItems || [];
+    const i = deepDive.troubledItems.indexOf(v);
+    if (i >= 0) deepDive.troubledItems.splice(i, 1); else deepDive.troubledItems.push(v);
+    render();
+    return;
+  }
+  if (act === 'dd-step6-toggle-protected-other') {
+    if (!deepDive) return;
+    if (!el.checked) deepDive.protectedCustom = '';
+    return;
+  }
+  if (act === 'dd-step6-toggle-troubled-other') {
+    if (!deepDive) return;
+    if (!el.checked) deepDive.troubledCustom = '';
+    return;
+  }
   if (act === 'dd-step6-next') {
     if (!deepDive) return;
+    const pInp = document.getElementById('ddProtectedCustomInput');
+    const tInp = document.getElementById('ddTroubledCustomInput');
+    if (pInp) deepDive.protectedCustom = (pInp.value || '').trim();
+    if (tInp) deepDive.troubledCustom = (tInp.value || '').trim();
+    const hasP = (deepDive.protectedItems || []).length > 0 || (deepDive.protectedCustom || '').trim();
+    const hasT = (deepDive.troubledItems || []).length > 0 || (deepDive.troubledCustom || '').trim();
+    if (!hasP && !hasT) { toast('1つだけでも選んでみよう'); return; }
     deepDive.step = 7;
     render();
     return;
@@ -18767,28 +19487,49 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  if (act === 'dd-step8-confirm') {
-    if (deepDive) { deepDive.step = 9; render(); }
+  // v0.9.88 Step 8: 感情強度の再評価
+  if (act === 'dd-step8-intensity') {
+    if (deepDive) deepDive.emotionIntensityAfter = parseInt(el.dataset.score, 10);
+    render();
     return;
   }
-  if (act === 'dd-step8-other') {
-    if (deepDive) { deepDive.step = 7; render(); }
+  if (act === 'dd-step8-next') {
+    if (!deepDive) return;
+    if (deepDive.emotionIntensityAfter == null) { toast('今の気持ちの強さを選んでね'); return; }
+    deepDive.step = 9; // 内部: サマリー画面
+    render();
     return;
   }
-  if (act === 'dd-save' || act === 'dd-save-and-ippo') {
+  // 旧: dd-step8-confirm / dd-step8-other は v0.9.88 で廃止
+  if (act === 'dd-save' || act === 'dd-save-and-ippo' || act === 'dd-save-later') {
     if (!deepDive) return;
     const oldSchema = ddCurrentOldSchema(deepDive);
     const newSchema = ddCurrentNewSchema(deepDive);
     const tags = extractCoreBeliefRule(deepDive);
+    // v0.9.88: protectedItems/troubledItems から meritDemerit 互換も詰める
+    const protectedAll = [
+      ...((deepDive.protectedItems || []).map(t => t)),
+      ...(((deepDive.protectedCustom || '').trim()) ? [deepDive.protectedCustom.trim()] : []),
+    ];
+    const troubledAll = [
+      ...((deepDive.troubledItems || []).map(t => t)),
+      ...(((deepDive.troubledCustom || '').trim()) ? [deepDive.troubledCustom.trim()] : []),
+    ];
     state.deepDiveSessions.push({
       id: uid(),
       // 新フィールド
       eventCategory: deepDive.eventCategory || '',
       emotionTags: deepDive.emotionTags || [],
       emotionIntensity: deepDive.emotionIntensity,
+      emotionIntensityAfter: deepDive.emotionIntensityAfter,
       autoThought: deepDive.autoThought || '',
       oldSchema, newSchema,
-      meritDemerit: deepDive.meritDemerit || null,
+      // v0.9.88 P22: 良い面/つらい面（チェックリスト方式）
+      protectedItems: deepDive.protectedItems || [],
+      protectedCustom: deepDive.protectedCustom || '',
+      troubledItems: deepDive.troubledItems || [],
+      troubledCustom: deepDive.troubledCustom || '',
+      meritDemerit: { merits: protectedAll, demerits: troubledAll }, // 互換維持
       // 旧フィールド（互換維持）
       event: deepDive.event,
       firstThought: deepDive.autoThought,
@@ -18797,7 +19538,7 @@ function handleAction(act, el, ev) {
       extractedBelief: oldSchema,
       tags,
       gentleReflection: '',
-      aiUsed: !!(deepDive.aiUsedSchema || deepDive.aiUsedMeritDemerit || deepDive.aiUsedNewSchema),
+      aiUsed: !!(deepDive.aiUsedSchema || deepDive.aiUsedNewSchema),
       startedAt: deepDive.startedAt,
       completedAt: new Date().toISOString(),
     });
@@ -18818,7 +19559,7 @@ function handleAction(act, el, ev) {
     const fromTab = deepDive.from || 'kizuki';
     deepDive = null;
     toast('深掘りを保存しました');
-    go(act === 'dd-save-and-ippo' ? 'ippo' : fromTab);
+    go(act === 'dd-save-and-ippo' ? 'ippo' : (act === 'dd-save-later' ? 'record' : fromTab));
     return;
   }
 
