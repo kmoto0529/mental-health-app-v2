@@ -6405,6 +6405,170 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 /* ▲ P12.6 きづきワーク刷新カード ▲ */
 
+/* ▼ P21 v0.9.87 きづきタブ チュートリアル画面 + 最近のきろく ▼ */
+.kizuki-tutorial-screen { padding-bottom: 90px; }
+.kizuki-tutorial-hero {
+  background: linear-gradient(135deg, #EAF1E6 0%, #DDE9DC 100%);
+  border-radius: 16px;
+  padding: 24px 18px 22px;
+  text-align: center;
+  margin: 4px 0 16px;
+}
+[data-theme="dark"] .kizuki-tutorial-hero {
+  background: linear-gradient(135deg, rgba(167,196,160,0.15) 0%, rgba(167,196,160,0.08) 100%);
+}
+.kizuki-tutorial-hero-icon { font-size: 36px; line-height: 1; margin-bottom: 6px; }
+.kizuki-tutorial-hero-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px; font-weight: 700;
+  margin: 0 0 12px;
+  color: var(--text-strong);
+  line-height: 1.55;
+}
+.kizuki-tutorial-hero-desc {
+  font-size: 12px; color: var(--text-soft);
+  line-height: 1.8;
+  margin: 0;
+}
+.kizuki-tutorial-list-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  padding: 22px 18px;
+  margin-bottom: 18px;
+}
+[data-theme="dark"] .kizuki-tutorial-list-card { background: rgba(47, 62, 62, 0.55); }
+.kizuki-tutorial-list-h {
+  font-size: 14px; font-weight: 700;
+  color: var(--text-strong);
+  text-align: center;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #A8C49E;
+  width: max-content;
+  margin: 0 auto 18px;
+}
+.kizuki-tutorial-items {
+  display: flex; flex-direction: column;
+  gap: 16px;
+}
+.kizuki-tutorial-item {
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.kizuki-tutorial-item-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.kizuki-tutorial-item-icon .kizuki-rev-icon-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+.kizuki-tutorial-item-icon .kizuki-rev-icon-emoji {
+  font-size: 20px; line-height: 1;
+}
+.kizuki-tutorial-item-body { flex: 1; min-width: 0; }
+.kizuki-tutorial-item-h {
+  font-size: 13px; font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 3px;
+  line-height: 1.5;
+}
+.kizuki-tutorial-item-d {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.7;
+}
+.kizuki-tutorial-cta {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px; font-weight: 700;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+.kizuki-tutorial-hint {
+  font-size: 11px; color: var(--text-muted);
+  text-align: center;
+  margin: 10px 0 0;
+}
+
+/* 最近のきろく（通常画面下部） */
+.kizuki-recent-section { margin-top: 22px; }
+.kizuki-recent-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+.kizuki-recent-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--text-strong);
+}
+.kizuki-recent-all-link {
+  background: none; border: none;
+  font-size: 12px; font-weight: 600;
+  color: #4A8CC8;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.kizuki-recent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  overflow: hidden;
+}
+[data-theme="dark"] .kizuki-recent-card { background: rgba(47, 62, 62, 0.55); }
+.kizuki-recent-row {
+  display: flex; gap: 12px;
+  padding: 14px 14px;
+  border-bottom: 1px solid var(--divider);
+  align-items: flex-start;
+}
+.kizuki-recent-row:last-child { border-bottom: none; }
+.kizuki-recent-date {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.4;
+  min-width: 52px;
+  font-weight: 500;
+}
+.kizuki-recent-content { flex: 1; min-width: 0; }
+.kizuki-recent-chip {
+  display: inline-block;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.kizuki-recent-text {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.kizuki-recent-empty {
+  padding: 16px 14px;
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--bg-soft);
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.kizuki-recent-footer-hint {
+  margin-top: 10px;
+  padding: 10px 14px;
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--bg-soft);
+  border-radius: 999px;
+  font-size: 11px;
+}
+/* ▲ P21 v0.9.87 ▲ */
+
 /* いつやるのがおすすめ Tip */
 .kizuki-tip-card {
   margin-top: 18px;
@@ -6471,7 +6635,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.86-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.87-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7031,6 +7195,8 @@ const defaultState = () => ({
     profileDone: false, // プロフィール画面完了
     // v0.9.46 P8: 習慣化機能 — 習慣としてマークした行動IDの配列
     habitActionIds: [],
+    // v0.9.87 P21: きづきタブ初回チュートリアル既読フラグ
+    kizukiTutorialSeen: false,
   },
   initialDone: false,   // 旧 mood-input フラグ (互換のため残すが新導線では使わない)
   guidedShown: false,   // 使い方ガイド表示済み
@@ -10726,8 +10892,134 @@ window.kizukiIconFail = function(img, emoji) {
   img.replaceWith(span);
 };
 
+// === きづきタブ 初回チュートリアル画面（v0.9.87 P21）===
+// 「できること」4項目（KIZUKI_WORKS と同順・同アイコン・色）。
+// 文言は work タイトルとは別の「ベネフィット表現」として固定。
+const KIZUKI_TUTORIAL_BENEFITS = {
+  'downward-arrow':     { h: 'モヤモヤの原因を深掘りできる',         d: 'なぜそう感じるのかを探って、根本の原因に気づけます。' },
+  'behavior-experiment':{ h: '考えを整理して、別の見方を見つけられる', d: '思い込みや偏った考えに気づき、別の見方や選択肢を見つけられます。' },
+  'column-method':      { h: '実際に試して、自分に合う一歩がわかる',   d: '小さく試すことで、納得できる行動や自分に合った一歩が見えてきます。' },
+  'stimulus-control':   { h: '環境を整えて、気持ちをラクにしやすくなる', d: '自分に合った環境を整えることで、気持ちが安定しやすくなります。' },
+};
+
+function viewKizukiTutorial() {
+  return `
+    <div class="screen active kizuki-tutorial-screen">
+      <div class="page-header">
+        <span style="width:36px;"></span>
+        <button class="feature-help-icon-btn" data-act="feature-help" data-feature="kizuki" aria-label="きづきについて">ⓘ</button>
+      </div>
+
+      <div class="kizuki-tutorial-hero">
+        <div class="kizuki-tutorial-hero-icon">💡</div>
+        <h2 class="kizuki-tutorial-hero-title">きづきで、<br>自分の考え方を少し整理する</h2>
+        <p class="kizuki-tutorial-hero-desc">もやもやした気持ちの背景にある<br>「考え方のクセ」や「繰り返しやすいパターン」に<br>気づくためのワークです。</p>
+      </div>
+
+      <div class="kizuki-tutorial-list-card">
+        <div class="kizuki-tutorial-list-h">できること</div>
+        <div class="kizuki-tutorial-items">
+          ${KIZUKI_WORKS.map(w => {
+            const b = KIZUKI_TUTORIAL_BENEFITS[w.id] || { h: w.title, d: w.body };
+            const safeEmoji = String(w.icon || '').replace(/[<>"&]/g, '');
+            return `
+              <div class="kizuki-tutorial-item">
+                <span class="kizuki-tutorial-item-icon" style="background:${w.iconBg || '#EEEEEE'};">
+                  <img src="./assets/kizuki/${w.id}.png" alt="" class="kizuki-rev-icon-img"
+                    onerror="window.kizukiIconFail && window.kizukiIconFail(this, '${safeEmoji}')">
+                </span>
+                <div class="kizuki-tutorial-item-body">
+                  <div class="kizuki-tutorial-item-h">${escapeHtml(b.h)}</div>
+                  <div class="kizuki-tutorial-item-d">${escapeHtml(b.d)}</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <button class="btn btn-primary kizuki-tutorial-cta" data-act="kizuki-tutorial-start">はじめてみる</button>
+      <p class="kizuki-tutorial-hint">いつでも自分のペースで取り組めます 🌱</p>
+    </div>
+  `;
+}
+
+// === きづきタブ：最近のきろく（4ワーク横断・直近N件）===
+function getKizukiRecentRecords(limit = 3) {
+  const items = [];
+  (state.deepDiveSessions || []).forEach(s => {
+    const t = s.completedAt || s.startedAt;
+    if (t) items.push({ kind: 'downward-arrow', t, data: s });
+  });
+  (state.behaviorExperiments || []).forEach(s => {
+    const t = s.createdAt || s.completedAt;
+    if (t) items.push({ kind: 'behavior-experiment', t, data: s });
+  });
+  (state.moyamoyaRecords || []).forEach(r => {
+    if (r.createdAt) items.push({ kind: 'column-method', t: r.createdAt, data: r });
+  });
+  (state.stimulusControlSessions || []).forEach(s => {
+    const t = s.createdAt || s.completedAt;
+    if (t) items.push({ kind: 'stimulus-control', t, data: s });
+  });
+  items.sort((a, b) => new Date(b.t) - new Date(a.t));
+  return items.slice(0, limit);
+}
+
+function summarizeKizukiRecord(kind, data) {
+  let line1 = '';
+  let line2 = '';
+  if (kind === 'downward-arrow') {
+    line1 = (data.event || data.firstThought || '').trim();
+    line2 = (data.newSchema || data.coreBelief || '').trim();
+  } else if (kind === 'behavior-experiment') {
+    line1 = ((data.hypothesis && data.hypothesis.what) || '').trim();
+    line2 = ((data.verify && data.verify.insight) || '').trim();
+  } else if (kind === 'column-method') {
+    line1 = (data.eventText || data.letterTitle || '').trim();
+    line2 = (data.alternativeView || '').trim();
+  } else if (kind === 'stimulus-control') {
+    line1 = ((data.goal && data.goal.text) || '').trim();
+    const n = (data.checkins || []).length;
+    line2 = n > 0 ? `チェックイン ${n} 回` : '';
+  }
+  return { line1, line2 };
+}
+
+function formatKizukiRecentDate(iso) {
+  const d = new Date(iso);
+  const days = ['日','月','火','水','木','金','土'];
+  return `${d.getMonth()+1}月${d.getDate()}日<br>(${days[d.getDay()]})`;
+}
+
+function renderKizukiRecentRow(item) {
+  const w = KIZUKI_WORKS.find(x => x.id === item.kind);
+  if (!w) return '';
+  const sum = summarizeKizukiRecord(item.kind, item.data);
+  const safeL1 = escapeHtml((sum.line1 || '').slice(0, 60));
+  const safeL2 = escapeHtml((sum.line2 || '').slice(0, 60));
+  return `
+    <div class="kizuki-recent-row">
+      <div class="kizuki-recent-date">${formatKizukiRecentDate(item.t)}</div>
+      <div class="kizuki-recent-content">
+        <span class="kizuki-recent-chip" style="background:${w.chipBg || 'var(--bg-soft)'}; color:${w.chipText || 'var(--text-soft)'};">${escapeHtml(w.subtitle || w.title)}</span>
+        <div class="kizuki-recent-text">
+          ${safeL1 || '<span class="text-muted">（未入力）</span>'}
+          ${safeL2 ? `<br>→ ${safeL2}` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // === きづきタブ トップ画面 ===
 function viewKizuki() {
+  // v0.9.87 P21: 初回はチュートリアル画面
+  if (!state.user || !state.user.kizukiTutorialSeen) {
+    return viewKizukiTutorial();
+  }
+
+  const recent = getKizukiRecentRecords(3);
   return `
     <div class="screen active kizuki-top-screen">
       <div class="page-header">
@@ -10735,49 +11027,27 @@ function viewKizuki() {
         <button class="feature-help-icon-btn" data-act="feature-help" data-feature="kizuki" aria-label="きづきについて">ⓘ</button>
       </div>
 
-      <!-- ヒーロー: 価値訴求 -->
-      <div class="kizuki-hero-card">
-        <div class="kizuki-hero-icon">💡</div>
-        <h2 class="kizuki-hero-title">自分を知ると、<br>「効く一歩」がさらに見つかる</h2>
-      </div>
-
-      <!-- 3つのメリット -->
-      <div class="kizuki-benefit-list">
-        <div class="kizuki-benefit-item">
-          <span class="kizuki-benefit-icon">🧠</span>
-          <div>
-            <div class="kizuki-benefit-h">思考のクセやパターンがわかる</div>
-            <div class="kizuki-benefit-d">なぜつらくなるのかの背景が見える</div>
-          </div>
-        </div>
-        <div class="kizuki-benefit-item">
-          <span class="kizuki-benefit-icon">🎯</span>
-          <div>
-            <div class="kizuki-benefit-h">自分に合う行動提案の精度がUP</div>
-            <div class="kizuki-benefit-d">効果の高い一歩が提案されやすくなる</div>
-          </div>
-        </div>
-        <div class="kizuki-benefit-item">
-          <span class="kizuki-benefit-icon">✨</span>
-          <div>
-            <div class="kizuki-benefit-h">根本原因にアプローチできる</div>
-            <div class="kizuki-benefit-d">再発しにくく、長期的に楽になりやすい</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ワーク一覧（5種類・解説リッチカード）-->
+      <!-- ワーク一覧（4種類・解説リッチカード）-->
       <div class="kizuki-rev-list">
         ${KIZUKI_WORKS.map(w => renderKizukiRevCard(w)).join('')}
       </div>
 
-      <!-- いつやるのがおすすめ -->
-      <div class="kizuki-tip-card">
-        <div class="kizuki-tip-h">いつやるのがおすすめ？</div>
-        <p class="kizuki-tip-d">
-          気分が安定しているときや、時間に余裕があるときに使うのがおすすめ。<br>
-          1日1つ、少しずつ進めていきましょう 🌱
-        </p>
+      <!-- 最近のきろく -->
+      <div class="kizuki-recent-section">
+        <div class="kizuki-recent-header">
+          <div class="kizuki-recent-title">最近のきろく</div>
+          <button class="kizuki-recent-all-link" data-act="kizuki-recent-all">すべて見る ›</button>
+        </div>
+        ${recent.length === 0 ? `
+          <div class="kizuki-recent-empty">
+            🌱 きづきのワークを行うと、ここに履歴が残ります
+          </div>
+        ` : `
+          <div class="kizuki-recent-card">
+            ${recent.map(renderKizukiRecentRow).join('')}
+          </div>
+          <div class="kizuki-recent-footer-hint">🌱 きづきのワークを行うと、ここに履歴が残ります</div>
+        `}
       </div>
     </div>
   `;
@@ -17963,6 +18233,22 @@ function handleAction(act, el, ev) {
   // きづきタブ: 未実装ワーク (Phase 3 で実装予定 / フォールバック用に残置)
   if (act === 'kizuki-coming-soon') {
     toast('このワークはまもなく実装予定です 🌱');
+    return;
+  }
+  // v0.9.87 P21: チュートリアル「はじめてみる」→ 通常画面へ
+  if (act === 'kizuki-tutorial-start') {
+    state.user = state.user || {};
+    state.user.kizukiTutorialSeen = true;
+    saveState();
+    render();
+    return;
+  }
+  // v0.9.87 P21: 最近のきろく「すべて見る」→ きろくタブへ
+  if (act === 'kizuki-recent-all') {
+    state.ui = state.ui || {};
+    state.ui.currentTab = 'record';
+    saveState();
+    go('record');
     return;
   }
 
