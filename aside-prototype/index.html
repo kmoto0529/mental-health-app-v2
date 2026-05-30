@@ -2588,14 +2588,21 @@
 }
 
 /* Step 8: 感情強度の比較 */
+/* ★ ルール ★ 固定のライト系背景を使うカードは必ず [data-theme="dark"] のオーバーライドを併設し、
+   ダークモードで暗背景＋ライト文字、ライトモードでライト背景＋ダーク文字 という関係を維持すること。
+   テキスト色は var(--text*) を使い、背景側でテーマ追従させる。 */
 .dd-newschema-recall {
   background: linear-gradient(135deg, #EAF1E6 0%, #F4F8F1 100%);
   border-radius: 12px;
   padding: 12px 14px;
   margin: 10px 0;
 }
+[data-theme="dark"] .dd-newschema-recall {
+  background: linear-gradient(135deg, rgba(167,196,160,0.18) 0%, rgba(167,196,160,0.08) 100%);
+}
 .dd-newschema-recall-label { font-size: 11px; color: #6B8F71; font-weight: 700; margin-bottom: 4px; }
-.dd-newschema-recall-text { font-size: 13px; line-height: 1.6; color: var(--text-strong); font-weight: 600; }
+[data-theme="dark"] .dd-newschema-recall-label { color: #A7C4A0; }
+.dd-newschema-recall-text { font-size: 13px; line-height: 1.6; color: var(--text); font-weight: 600; }
 .dd-emo-compare-card {
   background: var(--bg-card);
   border: 1px solid var(--divider);
@@ -2635,29 +2642,34 @@
   border-radius: 999px;
   margin: 20px 0 12px;
 }
-.dd-sum-schema-row {
-  display: grid; grid-template-columns: 1fr auto 1fr;
-  gap: 8px; align-items: center;
+/* v0.9.89: 縦並びレイアウトに変更 */
+.dd-sum-schema-col {
+  display: flex; flex-direction: column;
+  gap: 6px;
   margin-bottom: 6px;
 }
 .dd-sum-schema-card {
   background: var(--bg-card);
   border: 1px solid var(--divider);
   border-radius: 12px;
-  padding: 12px 10px;
+  padding: 14px 16px;
   text-align: center;
 }
 [data-theme="dark"] .dd-sum-schema-card { background: rgba(47,62,62,0.55); }
 .dd-sum-schema-card.old { background: rgba(200,90,90,0.06); border-color: rgba(200,90,90,0.2); }
 .dd-sum-schema-card.new { background: rgba(123,168,118,0.08); border-color: rgba(123,168,118,0.3); }
-.dd-sum-schema-cap { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
+.dd-sum-schema-cap { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
 .dd-sum-schema-quote {
-  font-size: 13px; font-weight: 700; line-height: 1.5;
-  color: var(--text-strong);
+  font-size: 14px; font-weight: 700; line-height: 1.5;
+  color: var(--text);
   margin-bottom: 6px;
 }
-.dd-sum-schema-tail { font-size: 10px; color: var(--text-soft); line-height: 1.5; }
-.dd-sum-schema-arrow { font-size: 18px; color: var(--text-muted); }
+.dd-sum-schema-tail { font-size: 11px; color: var(--text-soft); line-height: 1.5; }
+.dd-sum-schema-arrow-v {
+  font-size: 22px; color: var(--text-muted);
+  text-align: center;
+  padding: 2px 0;
+}
 
 .dd-sum-process-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
@@ -6894,11 +6906,24 @@ body.keyboard-open .mood-chat-bottom .input-row {
 [data-theme="dark"] .kizuki-recent-card { background: rgba(47, 62, 62, 0.55); }
 .kizuki-recent-row {
   display: flex; gap: 12px;
+  width: 100%;
   padding: 14px 14px;
+  border: none;
   border-bottom: 1px solid var(--divider);
+  background: transparent;
   align-items: flex-start;
+  text-align: left;
+  font: inherit; color: inherit;
+  cursor: pointer;
 }
 .kizuki-recent-row:last-child { border-bottom: none; }
+.kizuki-recent-row:active { background: var(--bg-soft); }
+.kizuki-recent-arrow {
+  align-self: center;
+  color: var(--text-muted);
+  font-size: 18px;
+  flex-shrink: 0;
+}
 .kizuki-recent-date {
   flex-shrink: 0;
   font-size: 11px;
@@ -6940,6 +6965,36 @@ body.keyboard-open .mood-chat-bottom .input-row {
   font-size: 11px;
 }
 /* ▲ P21 v0.9.87 ▲ */
+
+/* ▼ P23 v0.9.89 すべてのきろく画面（4+1タブ）▼ */
+.kizuki-records-screen { padding-bottom: 90px; }
+.kizuki-records-tabs {
+  display: flex; gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+  margin-bottom: 6px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.kizuki-records-tabs::-webkit-scrollbar { display: none; }
+.kizuki-records-tab {
+  flex-shrink: 0;
+  font-size: 12px; font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--divider);
+  color: var(--text-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+[data-theme="dark"] .kizuki-records-tab { background: rgba(47,62,62,0.55); }
+.kizuki-records-tab.selected {
+  background: #6B8F71;
+  border-color: #6B8F71;
+  color: #FFF;
+}
+/* ▲ P23 v0.9.89 ▲ */
 
 /* いつやるのがおすすめ Tip */
 .kizuki-tip-card {
@@ -7007,7 +7062,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.88-beta.2';
+window.MOYANOMORI_VERSION = 'v0.9.89-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7881,6 +7936,8 @@ function render() {
     case 'kizuki':          html = viewKizuki(); break;
     case 'kizuki-list':     html = viewKizukiList(); break;
     case 'kizuki-work':     html = viewKizukiWork(); break;
+    case 'kizuki-all-records': html = viewKizukiAllRecords(); break;
+    case 'kizuki-record-detail': html = viewKizukiRecordDetail(); break;
     case 'behavior-exp':    html = viewBehaviorExp(); break;
     case 'stimulus':        html = viewStimulus(); break;
     case 'record':          html = viewRecord(); break;
@@ -8841,6 +8898,7 @@ function viewMoyamoya() {
   const stepLabel = `Step ${s.step} / 8`;
 
   if (s.step === 1) {
+    const recent = (typeof getKizukiAllRecords === 'function') ? getKizukiAllRecords('column-method', 3) : [];
     return moyamoyaScreen(stepLabel, '何があったのかを教えてください', `
       <p class="text-soft mb-3">うまくまとまっていなくても大丈夫。<br>事実だけを、淡々と書いてみよう。</p>
       <textarea class="textarea-block" id="moyaInput" placeholder="例：上司に「資料の質が低い」と強く注意された" rows="4">${escapeHtml(s.eventText || '')}</textarea>
@@ -8848,6 +8906,16 @@ function viewMoyamoya() {
         <button class="btn btn-primary" data-act="moya-step1-next">つづける</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
       </div>
+      ${recent.length > 0 ? `
+        <div class="kizuki-recent-section" style="margin-top:24px;">
+          <div class="kizuki-recent-header">
+            <div class="kizuki-recent-title">このワークの最近のきろく</div>
+          </div>
+          <div class="kizuki-recent-card">
+            ${recent.map(renderKizukiRecentRow).join('')}
+          </div>
+        </div>
+      ` : ''}
     `);
   }
   if (s.step === 2) {
@@ -11370,8 +11438,9 @@ function renderKizukiRecentRow(item) {
   const sum = summarizeKizukiRecord(item.kind, item.data);
   const safeL1 = escapeHtml((sum.line1 || '').slice(0, 60));
   const safeL2 = escapeHtml((sum.line2 || '').slice(0, 60));
+  const recId = (item.data && item.data.id) || '';
   return `
-    <div class="kizuki-recent-row">
+    <button class="kizuki-recent-row" data-act="kizuki-recent-row" data-kind="${item.kind}" data-record-id="${escapeHtml(recId)}">
       <div class="kizuki-recent-date">${formatKizukiRecentDate(item.t)}</div>
       <div class="kizuki-recent-content">
         <span class="kizuki-recent-chip" style="background:${w.chipBg || 'var(--bg-soft)'}; color:${w.chipText || 'var(--text-soft)'};">${escapeHtml(w.subtitle || w.title)}</span>
@@ -11380,7 +11449,8 @@ function renderKizukiRecentRow(item) {
           ${safeL2 ? `<br>→ ${safeL2}` : ''}
         </div>
       </div>
-    </div>
+      <span class="kizuki-recent-arrow">›</span>
+    </button>
   `;
 }
 
@@ -11423,6 +11493,100 @@ function viewKizuki() {
       </div>
     </div>
   `;
+}
+
+// === v0.9.89 P23: すべてのきろく画面（4+1タブ）===
+let kizukiRecordsFilter = 'all'; // 'all' | 'downward-arrow' | 'behavior-experiment' | 'column-method' | 'stimulus-control'
+
+function getKizukiAllRecords(kind = 'all', limit = 100) {
+  const items = [];
+  if (kind === 'all' || kind === 'downward-arrow') {
+    (state.deepDiveSessions || []).forEach(s => {
+      const t = s.completedAt || s.startedAt;
+      if (t) items.push({ kind: 'downward-arrow', t, data: s });
+    });
+  }
+  if (kind === 'all' || kind === 'behavior-experiment') {
+    (state.behaviorExperiments || []).forEach(s => {
+      const t = s.createdAt || s.completedAt;
+      if (t) items.push({ kind: 'behavior-experiment', t, data: s });
+    });
+  }
+  if (kind === 'all' || kind === 'column-method') {
+    (state.moyamoyaRecords || []).forEach(r => {
+      if (r.createdAt) items.push({ kind: 'column-method', t: r.createdAt, data: r });
+    });
+  }
+  if (kind === 'all' || kind === 'stimulus-control') {
+    (state.stimulusControlSessions || []).forEach(s => {
+      const t = s.createdAt || s.completedAt;
+      if (t) items.push({ kind: 'stimulus-control', t, data: s });
+    });
+  }
+  items.sort((a, b) => new Date(b.t) - new Date(a.t));
+  return items.slice(0, limit);
+}
+
+function viewKizukiAllRecords() {
+  const filter = kizukiRecordsFilter || 'all';
+  const items = getKizukiAllRecords(filter, 200);
+  const tabs = [
+    { id: 'all', label: 'すべて' },
+    ...KIZUKI_WORKS.map(w => ({ id: w.id, label: w.subtitle || w.title })),
+  ];
+  return `
+    <div class="screen active kizuki-records-screen">
+      <div class="page-header">
+        <button class="page-back" data-act="kizuki-records-back">‹</button>
+        <h1 class="page-title">きづきの記録</h1>
+        <span style="width:36px;"></span>
+      </div>
+
+      <div class="kizuki-records-tabs">
+        ${tabs.map(t => `
+          <button class="kizuki-records-tab ${filter === t.id ? 'selected' : ''}"
+            data-act="kizuki-records-filter" data-filter="${t.id}">${escapeHtml(t.label)}</button>
+        `).join('')}
+      </div>
+
+      ${items.length === 0 ? `
+        <div class="kizuki-recent-empty" style="margin-top:14px;">
+          🌱 まだ記録がありません
+        </div>
+      ` : `
+        <div class="kizuki-recent-card" style="margin-top:8px;">
+          ${items.map(renderKizukiRecentRow).join('')}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// === v0.9.89 P23: 記録詳細画面（ディスパッチャ）===
+function viewKizukiRecordDetail() {
+  const kind = viewParams.recordKind || '';
+  const id = viewParams.recordId || '';
+  if (kind === 'downward-arrow') {
+    const rec = (state.deepDiveSessions || []).find(r => r.id === id);
+    if (!rec) { setTimeout(() => go('kizuki'), 0); return ''; }
+    return viewDdReport(rec);
+  }
+  if (kind === 'behavior-experiment') {
+    const rec = (state.behaviorExperiments || []).find(r => r.id === id);
+    if (!rec) { setTimeout(() => go('kizuki'), 0); return ''; }
+    return viewBeReport(rec);
+  }
+  if (kind === 'column-method') {
+    // 既存の viewKirokuDetail を流用（recordId は viewParams 経由で渡される）
+    return viewKirokuDetail();
+  }
+  if (kind === 'stimulus-control') {
+    const rec = (state.stimulusControlSessions || []).find(r => r.id === id);
+    if (!rec) { setTimeout(() => go('kizuki'), 0); return ''; }
+    return viewScReport(rec);
+  }
+  setTimeout(() => go('kizuki'), 0);
+  return '';
 }
 
 // === ワーク一覧画面 ===
@@ -13119,6 +13283,7 @@ function ddHeader(stepNo, total = 8) {
 
 // ───────── Step 1: ワーク紹介 ─────────
 function viewDdIntro() {
+  const recent = getKizukiAllRecords('downward-arrow', 3);
   return `
     <div class="screen active dd-screen">
       ${ddHeader(1)}
@@ -13148,6 +13313,17 @@ function viewDdIntro() {
         <button class="btn btn-primary" data-act="dd-step1-start">はじめる</button>
         <button class="btn-ghost" data-act="dd-cancel">キャンセル</button>
       </div>
+
+      ${recent.length > 0 ? `
+        <div class="kizuki-recent-section" style="margin-top:24px;">
+          <div class="kizuki-recent-header">
+            <div class="kizuki-recent-title">このワークの最近のきろく</div>
+          </div>
+          <div class="kizuki-recent-card">
+            ${recent.map(renderKizukiRecentRow).join('')}
+          </div>
+        </div>
+      ` : ''}
     </div>
   `;
 }
@@ -13294,7 +13470,7 @@ function viewDdDownwardRound(s) {
           <span class="dd-suplan-q-icon">${suplan({ size: 36 })}</span>
           <span class="dd-suplan-q-tag">${round}回目の質問</span>
         </div>
-        <div class="dd-suplan-q-title">Q${round}. ${escapeHtml(ddRoundShortQuestion(round))}</div>
+        <div class="dd-suplan-q-title">${escapeHtml(ddRoundShortQuestion(round))}</div>
         <div class="dd-suplan-q-body">${escapeHtml(ddRoundQuestion(round, s))}</div>
       </div>
 
@@ -13591,7 +13767,7 @@ function viewDdEmotionAfter(s) {
       <div class="text-tiny text-muted" style="text-align:center; margin-top:4px;">0 ← 弱い ／ 強い → 10</div>
 
       <div style="margin-top:18px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="dd-step8-next">サマリーを見る</button>
+        <button class="btn btn-primary" data-act="dd-step8-next">サマリを見る</button>
         <button class="btn-ghost" data-act="dd-back" data-to="7">‹ 戻る</button>
       </div>
     </div>
@@ -13621,7 +13797,7 @@ function viewDdSummary(s) {
     <div class="screen active dd-screen dd-summary-screen">
       <div class="page-header">
         <button class="page-back" data-act="dd-back" data-to="8">‹</button>
-        <span class="page-title">あなたの変化のサマリー</span>
+        <span class="page-title">あなたの変化のサマリ</span>
         <span class="text-tiny text-muted">Step 8 / 8</span>
       </div>
 
@@ -13630,15 +13806,15 @@ function viewDdSummary(s) {
         <span class="dd-suplan-msg-text">よくここまで取り組んだね！<br>あなたの中で、大きな変化が起きているよ。スキーマ（思い込み）の変化を一緒に見てみよう。</span>
       </div>
 
-      <!-- 1) スキーマの変化 -->
+      <!-- 1) スキーマの変化（縦並び）-->
       <div class="dd-sum-section-h">あなたのスキーマ（思い込み）は、こう変わりました</div>
-      <div class="dd-sum-schema-row">
+      <div class="dd-sum-schema-col">
         <div class="dd-sum-schema-card old">
           <div class="dd-sum-schema-cap">これまでの見方（古いスキーマ）</div>
           <div class="dd-sum-schema-quote">「${escapeHtml(oldSchema || '—')}」</div>
           <div class="dd-sum-schema-tail">自分を責め、挑戦を避けて、苦しさが続いていた見方</div>
         </div>
-        <div class="dd-sum-schema-arrow">→</div>
+        <div class="dd-sum-schema-arrow-v">↓</div>
         <div class="dd-sum-schema-card new">
           <div class="dd-sum-schema-cap">これからの見方（新しいスキーマ）</div>
           <div class="dd-sum-schema-quote">「${escapeHtml(newSchema || '—')}」</div>
@@ -13722,7 +13898,185 @@ function viewDdSummary(s) {
 
       <div style="margin-top:18px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="dd-save">保存して完了</button>
-        <button class="btn-ghost" data-act="dd-save-later">あとで見返す（マイページへ）</button>
+      </div>
+    </div>
+  `;
+}
+
+// === v0.9.89 P23: 下向き矢印法 保存済みレポート（読み取り専用サマリ）===
+function viewDdReport(rec) {
+  const oldSchema = rec.oldSchema || rec.coreBelief || rec.extractedBelief || '';
+  const newSchema = rec.newSchema || '';
+  const before = rec.emotionIntensity == null ? null : rec.emotionIntensity;
+  const after = rec.emotionIntensityAfter == null ? null : rec.emotionIntensityAfter;
+  const change = (before != null && after != null) ? (before - after) : 0;
+  const firstEmo = (rec.emotionTags || [])[0];
+  const firstEmoT = DD_EMOTION_TAGS.find(e => e.id === firstEmo);
+  const beforeIcon = firstEmoT ? firstEmoT.icon : '😢';
+  const afterIcon = (change >= 3) ? '😊' : (change >= 1) ? '🙂' : (change <= -1) ? '😟' : (firstEmoT ? firstEmoT.icon : '😐');
+  // 保存済み: protectedItems/troubledItems を優先、なければ meritDemerit fallback
+  const protectedAll = (rec.protectedItems && rec.protectedItems.length || rec.protectedCustom)
+    ? [...(rec.protectedItems || []), ...(((rec.protectedCustom || '').trim()) ? [rec.protectedCustom.trim()] : [])]
+    : ((rec.meritDemerit && rec.meritDemerit.merits) || []);
+  const troubledAll = (rec.troubledItems && rec.troubledItems.length || rec.troubledCustom)
+    ? [...(rec.troubledItems || []), ...(((rec.troubledCustom || '').trim()) ? [rec.troubledCustom.trim()] : [])]
+    : ((rec.meritDemerit && rec.meritDemerit.demerits) || []);
+  const dateStr = formatDate(rec.completedAt || rec.startedAt);
+
+  return `
+    <div class="screen active dd-screen dd-summary-screen">
+      <div class="page-header">
+        <button class="page-back" data-act="kizuki-record-back">‹</button>
+        <span class="page-title">下向き矢印法 のレポート</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div class="text-tiny text-muted" style="margin: 4px 0 14px;">${dateStr}</div>
+
+      <div class="dd-sum-section-h">あなたのスキーマ（思い込み）は、こう変わりました</div>
+      <div class="dd-sum-schema-col">
+        <div class="dd-sum-schema-card old">
+          <div class="dd-sum-schema-cap">これまでの見方（古いスキーマ）</div>
+          <div class="dd-sum-schema-quote">「${escapeHtml(oldSchema || '—')}」</div>
+        </div>
+        <div class="dd-sum-schema-arrow-v">↓</div>
+        <div class="dd-sum-schema-card new">
+          <div class="dd-sum-schema-cap">これからの見方（新しいスキーマ）</div>
+          <div class="dd-sum-schema-quote">「${escapeHtml(newSchema || '—')}」</div>
+        </div>
+      </div>
+
+      <div class="dd-sum-section-h">変化のプロセス</div>
+      <div class="dd-sum-process-grid">
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">📅</div>
+          <div class="dd-sum-process-label">出来事</div>
+          <div class="dd-sum-process-text">${escapeHtml((rec.event || '').slice(0, 28))}</div>
+        </div>
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">💭</div>
+          <div class="dd-sum-process-label">最初に浮かんだ考え</div>
+          <div class="dd-sum-process-text">${escapeHtml((rec.autoThought || rec.firstThought || '').slice(0, 28))}</div>
+        </div>
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">🌱</div>
+          <div class="dd-sum-process-label">根っこの思い込み<br><span class="text-tiny text-muted">（スキーマ）</span></div>
+          <div class="dd-sum-process-text">${escapeHtml((oldSchema || '').slice(0, 28))}</div>
+        </div>
+        <div class="dd-sum-process-card">
+          <div class="dd-sum-process-icon">❤️</div>
+          <div class="dd-sum-process-label">新しい思い込み</div>
+          <div class="dd-sum-process-text">${escapeHtml((newSchema || '').slice(0, 28))}</div>
+        </div>
+      </div>
+
+      <div class="dd-sum-section-h">この思い込みがもたらしていた影響</div>
+      <div class="dd-prosc-card good" style="margin-bottom:10px;">
+        <div class="dd-prosc-title">守ってくれていたこと</div>
+        <ul class="dd-sum-checklist">
+          ${protectedAll.length === 0 ? '<li class="text-muted">（記録なし）</li>' : protectedAll.map(t => `<li>✅ ${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="dd-prosc-card bad">
+        <div class="dd-prosc-title">困っていたこと</div>
+        <ul class="dd-sum-checklist">
+          ${troubledAll.length === 0 ? '<li class="text-muted">（記録なし）</li>' : troubledAll.map(t => `<li>⚠️ ${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div class="dd-sum-section-h">気持ちの変化</div>
+      <div class="dd-sum-emo-row">
+        <div class="dd-sum-emo-side">
+          <div class="dd-sum-emo-icon">${beforeIcon}</div>
+          <div class="dd-sum-emo-num">${before == null ? '—' : before}<span>/10</span></div>
+        </div>
+        <div class="dd-sum-emo-arrow">→</div>
+        <div class="dd-sum-emo-side">
+          <div class="dd-sum-emo-icon">${afterIcon}</div>
+          <div class="dd-sum-emo-num">${after == null ? '—' : after}<span>/10</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn-ghost" data-act="kizuki-record-back">‹ きづきへ戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// === v0.9.89 P23: 行動実験 保存済みレポート ===
+function viewBeReport(rec) {
+  const dateStr = formatDate(rec.createdAt || rec.completedAt);
+  const hyp = (rec.hypothesis && rec.hypothesis.what) || '(仮説未入力)';
+  const plan = (rec.plan && rec.plan.action) || '';
+  const verify = rec.verify || {};
+  return `
+    <div class="screen active dd-screen">
+      <div class="page-header">
+        <button class="page-back" data-act="kizuki-record-back">‹</button>
+        <span class="page-title">行動実験 のレポート</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div class="text-tiny text-muted" style="margin: 4px 0 14px;">${dateStr}</div>
+
+      <div class="dd-sum-section-h">確かめたかった仮説</div>
+      <div class="dd-sum-schema-card" style="text-align:left;">${escapeHtml(hyp)}</div>
+
+      ${plan ? `
+        <div class="dd-sum-section-h">立てた計画</div>
+        <div class="dd-sum-schema-card" style="text-align:left;">${escapeHtml(plan)}</div>
+      ` : ''}
+
+      ${verify.score != null ? `
+        <div class="dd-sum-section-h">検証スコア</div>
+        <div class="dd-sum-schema-card" style="text-align:center; font-size:28px; font-weight:700; color: var(--text);">${verify.score}<span style="font-size:13px; color: var(--text-muted); font-weight:500;">/10</span></div>
+      ` : ''}
+
+      ${verify.insight ? `
+        <div class="dd-sum-section-h">気づき</div>
+        <div class="dd-sum-schema-card" style="text-align:left;">${escapeHtml(verify.insight)}</div>
+      ` : ''}
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn-ghost" data-act="kizuki-record-back">‹ きづきへ戻る</button>
+      </div>
+    </div>
+  `;
+}
+
+// === v0.9.89 P23: 刺激統制 保存済みレポート ===
+function viewScReport(rec) {
+  const dateStr = formatDate(rec.createdAt || rec.completedAt);
+  const goal = (rec.goal && rec.goal.text) || '(目標未入力)';
+  const smallStep = (rec.smallStep && (rec.smallStep.selected || rec.smallStep.custom)) || '';
+  const checkinsCount = (rec.checkins || []).length;
+  const next = rec.nextAction || '';
+  return `
+    <div class="screen active dd-screen">
+      <div class="page-header">
+        <button class="page-back" data-act="kizuki-record-back">‹</button>
+        <span class="page-title">刺激統制 のレポート</span>
+        <span style="width:36px;"></span>
+      </div>
+      <div class="text-tiny text-muted" style="margin: 4px 0 14px;">${dateStr}</div>
+
+      <div class="dd-sum-section-h">目標</div>
+      <div class="dd-sum-schema-card" style="text-align:left;">${escapeHtml(goal)}</div>
+
+      ${smallStep ? `
+        <div class="dd-sum-section-h">小さな一歩</div>
+        <div class="dd-sum-schema-card" style="text-align:left;">${escapeHtml(smallStep)}</div>
+      ` : ''}
+
+      <div class="dd-sum-section-h">チェックイン</div>
+      <div class="dd-sum-schema-card" style="text-align:center; font-size:22px; font-weight:700;">${checkinsCount} <span style="font-size:13px; color: var(--text-muted); font-weight:500;">回</span></div>
+
+      ${next ? `
+        <div class="dd-sum-section-h">次のアクション</div>
+        <div class="dd-sum-schema-card" style="text-align:left;">${escapeHtml(next)}</div>
+      ` : ''}
+
+      <div style="margin-top:18px; display:grid; gap:10px;">
+        <button class="btn-ghost" data-act="kizuki-record-back">‹ きづきへ戻る</button>
       </div>
     </div>
   `;
@@ -18888,12 +19242,35 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
-  // v0.9.87 P21: 最近のきろく「すべて見る」→ きろくタブへ
+  // v0.9.89 P23: 最近のきろく「すべて見る」→ きづき記録画面（4+1タブ）へ
   if (act === 'kizuki-recent-all') {
-    state.ui = state.ui || {};
-    state.ui.currentTab = 'record';
-    saveState();
-    go('record');
+    kizukiRecordsFilter = 'all';
+    go('kizuki-all-records');
+    return;
+  }
+  // v0.9.89 P23: 最近のきろく行 → 記録詳細
+  if (act === 'kizuki-recent-row') {
+    viewParams.recordKind = el.dataset.kind || '';
+    viewParams.recordId = el.dataset.recordId || '';
+    go('kizuki-record-detail');
+    return;
+  }
+  // v0.9.89 P23: 全きろく画面のタブ切替
+  if (act === 'kizuki-records-filter') {
+    kizukiRecordsFilter = el.dataset.filter || 'all';
+    render();
+    return;
+  }
+  // v0.9.89 P23: 全きろく画面の戻る
+  if (act === 'kizuki-records-back') {
+    go('kizuki');
+    return;
+  }
+  // v0.9.89 P23: 記録詳細の戻る（全きろく画面 or きづきタブ）
+  if (act === 'kizuki-record-back') {
+    // viewParams を消してきづきタブへ
+    viewParams = {};
+    go('kizuki');
     return;
   }
 
