@@ -6996,6 +6996,94 @@ body.keyboard-open .mood-chat-bottom .input-row {
 }
 /* ▲ P23 v0.9.89 ▲ */
 
+/* ▼ P24 v0.9.90 各ワーク 統一 intro レイアウト ▼ */
+.kizuki-intro-screen { padding: 14px 16px 90px; }
+.kizuki-intro-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 0 12px;
+}
+.kizuki-intro-chip {
+  flex: 1; text-align: center;
+  font-size: 12px; font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  max-width: max-content;
+  margin: 0 auto;
+}
+.kizuki-intro-hero {
+  display: flex; gap: 14px;
+  align-items: flex-start;
+  margin: 6px 0 18px;
+}
+.kizuki-intro-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.kizuki-intro-icon .kizuki-rev-icon-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+.kizuki-intro-icon .kizuki-rev-icon-emoji {
+  font-size: 32px; line-height: 1;
+  color: #2D3A2F;
+}
+.kizuki-intro-hero-body { flex: 1; min-width: 0; }
+.kizuki-intro-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px; font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-strong);
+  margin: 0 0 6px;
+}
+.kizuki-intro-desc {
+  font-size: 12px; color: var(--text-soft);
+  line-height: 1.7;
+  margin: 0;
+}
+.kizuki-intro-section-label {
+  font-size: 12px; font-weight: 700;
+  color: var(--text-strong);
+  margin: 18px 0 8px;
+}
+.kizuki-intro-can-do {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.kizuki-intro-can-do li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+.kizuki-intro-check {
+  display: inline-block;
+  flex-shrink: 0;
+  color: #6BA877;
+  font-weight: 700;
+  width: 16px; text-align: center;
+}
+.kizuki-intro-callout {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+}
+.kizuki-intro-callout-label {
+  font-size: 12px; font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 8px;
+}
+.kizuki-intro-callout-item {
+  font-size: 12px; color: var(--text);
+  line-height: 1.7;
+  padding: 2px 0;
+}
+/* ▲ P24 v0.9.90 ▲ */
+
 /* いつやるのがおすすめ Tip */
 .kizuki-tip-card {
   margin-top: 18px;
@@ -7062,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.89-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.90-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -8892,13 +8980,21 @@ function endMoodChat() {
 let moyamoya = null;
 
 function viewMoyamoya() {
-  if (!moyamoya) moyamoya = { step: 1 };
+  if (!moyamoya) moyamoya = { step: 'intro' };
   const s = moyamoya;
+
+  // v0.9.90 P24: 'intro' = ワーク紹介画面（統一intro）
+  if (s.step === 'intro') {
+    return renderKizukiWorkIntro('column-method', {
+      backAct: 'moya-cancel',
+      startAct: 'moya-intro-start',
+    });
+  }
+
   // step 9 はレターでステップ表示しない。1-8 のみ "Step X / 8"
   const stepLabel = `Step ${s.step} / 8`;
 
   if (s.step === 1) {
-    const recent = (typeof getKizukiAllRecords === 'function') ? getKizukiAllRecords('column-method', 3) : [];
     return moyamoyaScreen(stepLabel, '何があったのかを教えてください', `
       <p class="text-soft mb-3">うまくまとまっていなくても大丈夫。<br>事実だけを、淡々と書いてみよう。</p>
       <textarea class="textarea-block" id="moyaInput" placeholder="例：上司に「資料の質が低い」と強く注意された" rows="4">${escapeHtml(s.eventText || '')}</textarea>
@@ -8906,16 +9002,6 @@ function viewMoyamoya() {
         <button class="btn btn-primary" data-act="moya-step1-next">つづける</button>
         <button class="btn-ghost" data-act="moya-cancel">キャンセル</button>
       </div>
-      ${recent.length > 0 ? `
-        <div class="kizuki-recent-section" style="margin-top:24px;">
-          <div class="kizuki-recent-header">
-            <div class="kizuki-recent-title">このワークの最近のきろく</div>
-          </div>
-          <div class="kizuki-recent-card">
-            ${recent.map(renderKizukiRecentRow).join('')}
-          </div>
-        </div>
-      ` : ''}
     `);
   }
   if (s.step === 2) {
@@ -9121,12 +9207,16 @@ function viewMoyamoya() {
 }
 
 function moyamoyaScreen(stepLabel, title, body) {
+  // v0.9.90 P24: chip + Step表示の統一スタイル
+  const w = (typeof KIZUKI_WORKS !== 'undefined') ? KIZUKI_WORKS.find(x => x.id === 'column-method') : null;
+  const chipBg = w ? (w.chipBg || 'var(--bg-soft)') : 'var(--bg-soft)';
+  const chipText = w ? (w.chipText || 'var(--text)') : 'var(--text)';
   return `
     <div class="screen active">
-      <div class="page-header">
+      <div class="page-header kizuki-intro-header">
         <button class="page-back" data-act="moya-back-step" aria-label="前へ">‹</button>
-        <span class="page-title">もやもや整理</span>
-        <span class="text-tiny text-muted">${stepLabel}</span>
+        <span class="kizuki-intro-chip" style="background:${chipBg}; color:${chipText};">${escapeHtml(w ? (w.subtitle || w.title) : 'もやもや整理')}</span>
+        <span class="text-tiny text-muted" style="min-width:60px; text-align:right;">${stepLabel}</span>
       </div>
       <h2 class="mb-3">${title}</h2>
       ${body}
@@ -11414,7 +11504,11 @@ function summarizeKizukiRecord(kind, data) {
     line2 = (data.newSchema || data.coreBelief || '').trim();
   } else if (kind === 'behavior-experiment') {
     line1 = ((data.hypothesis && data.hypothesis.what) || '').trim();
-    line2 = ((data.verify && data.verify.insight) || '').trim();
+    if (data.status === 'pending') {
+      line2 = '⏳ あとで実施する予定 — タップして続ける';
+    } else {
+      line2 = ((data.verify && data.verify.insight) || '').trim();
+    }
   } else if (kind === 'column-method') {
     line1 = (data.eventText || data.letterTitle || '').trim();
     line2 = (data.alternativeView || '').trim();
@@ -12072,55 +12166,25 @@ function viewBehaviorExp() {
 }
 
 function viewBehaviorExpHeader(title, step) {
+  // v0.9.90 P24: 下向き矢印法と同じスタイル（chip + Step X/5）
+  const w = KIZUKI_WORKS.find(x => x.id === 'behavior-experiment');
+  const chipBg = w ? (w.chipBg || 'var(--bg-soft)') : 'var(--bg-soft)';
+  const chipText = w ? (w.chipText || 'var(--text)') : 'var(--text)';
   return `
-    <div class="page-header">
+    <div class="page-header kizuki-intro-header">
       <button class="page-back" data-act="behavior-exp-back-home">‹</button>
-      <h1 class="page-title">${escapeHtml(title)}</h1>
-      <span class="text-tiny text-muted" style="min-width:36px; text-align:right;">${step}/5</span>
+      <span class="kizuki-intro-chip" style="background:${chipBg}; color:${chipText};">${escapeHtml(w ? (w.subtitle || w.title) : '行動実験')}</span>
+      <span class="text-tiny text-muted" style="min-width:60px; text-align:right;">Step ${step} / 5</span>
     </div>
   `;
 }
 
-// ----- ビュー: ホーム（説明＋履歴＋CTA） -----
+// ----- ビュー: ホーム（v0.9.90 P24: 統一 intro レイアウト + 履歴は内部）-----
 function viewBehaviorExpHome() {
-  const list = (state.behaviorExperiments || []);
-  return `
-    <div class="screen active">
-      <div class="page-header">
-        <button class="page-back" data-act="behavior-exp-cancel">‹</button>
-        <h1 class="page-title">行動実験</h1>
-        <span style="min-width:36px;"></span>
-      </div>
-
-      <div style="padding:16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:14px; margin: 10px 0 18px;">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-          <span style="font-size:22px;">🧪</span>
-          <div style="font-weight:600;">行動実験とは？</div>
-        </div>
-        <div style="font-size:13px; line-height:1.8;">
-          心の中の「思い込み」や「不安」が本当に正しいのか、実際の行動を通して確かめる方法だよ。
-        </div>
-        <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
-          ${['① 仮説を立てる','② 計画を立てる','③ 実験を行う','④ 検証する','⑤ 次の一歩へ'].map(s => `
-            <span style="display:inline-block; padding:4px 10px; background: var(--bg-soft); color: var(--text); border-radius:10px; font-size:11px;">${s}</span>
-          `).join('')}
-        </div>
-        <div style="margin-top:12px; padding:10px 12px; background: var(--bg-soft); border-radius:8px; font-size:12px; line-height:1.7;">
-          💡 少しずつ確かめることで、思い込みが変わり、自信につながっていきます。
-        </div>
-      </div>
-
-      <h2 style="font-size:14px; margin:18px 0 10px; color: var(--text-muted);">あなたの行動実験の履歴</h2>
-      ${list.length === 0
-        ? `<div style="padding:24px 16px; text-align:center; color: var(--text-muted); font-size:13px; line-height:1.7;">まだ実験はありません。<br>下のボタンから、最初の一歩を始めてみよう。</div>`
-        : list.map(e => renderBehaviorExpHistoryCard(e)).join('')
-      }
-
-      <div style="margin-top:24px;">
-        <button class="btn btn-primary" data-act="behavior-exp-new" style="width:100%;">＋ 新しい実験を始める</button>
-      </div>
-    </div>
-  `;
+  return renderKizukiWorkIntro('behavior-experiment', {
+    backAct: 'behavior-exp-cancel',
+    startAct: 'behavior-exp-new',
+  });
 }
 
 function renderBehaviorExpHistoryCard(e) {
@@ -12247,8 +12311,8 @@ function viewBehaviorExpExecute() {
       </div>
 
       <div style="margin-top:20px; display:grid; gap:10px;">
-        <button class="btn btn-primary" data-act="behavior-exp-next" data-from="execute" style="width:100%;">実験を始めた！</button>
-        <button class="btn-ghost" data-act="behavior-exp-execute-later" style="width:100%;">あとで記録する</button>
+        <button class="btn btn-primary" data-act="behavior-exp-next" data-from="execute" style="width:100%;">実験した！</button>
+        <button class="btn-secondary" data-act="behavior-exp-execute-later" style="width:100%;">あとで実施する！</button>
       </div>
     </div>
   `;
@@ -12596,50 +12660,26 @@ function viewStimulus() {
 }
 
 function viewStimulusHeader(title, sub) {
+  // v0.9.90 P24: chip + Step表示の統一スタイル
+  const w = KIZUKI_WORKS.find(x => x.id === 'stimulus-control');
+  const chipBg = w ? (w.chipBg || 'var(--bg-soft)') : 'var(--bg-soft)';
+  const chipText = w ? (w.chipText || 'var(--text)') : 'var(--text)';
   return `
-    <div class="page-header">
+    <div class="page-header kizuki-intro-header">
       <button class="page-back" data-act="stimulus-back-home">‹</button>
-      <h1 class="page-title">${escapeHtml(title)}</h1>
-      <span class="text-tiny text-muted" style="min-width:48px; text-align:right;">${escapeHtml(sub || '')}</span>
+      <span class="kizuki-intro-chip" style="background:${chipBg}; color:${chipText};">${escapeHtml(w ? (w.subtitle || w.title) : '刺激統制')}</span>
+      <span class="text-tiny text-muted" style="min-width:60px; text-align:right;">${escapeHtml(sub || '')}</span>
     </div>
   `;
 }
 
 // ----- ホーム -----
 function viewStimulusHome() {
-  const list = (state.stimulusControlSessions || []);
-  return `
-    <div class="screen active">
-      <div class="page-header">
-        <button class="page-back" data-act="stimulus-cancel">‹</button>
-        <h1 class="page-title">刺激統制</h1>
-        <span style="min-width:36px;"></span>
-      </div>
-
-      <div style="padding:16px; background: var(--bg-card); border:1px solid var(--divider); border-radius:14px; margin:10px 0 18px;">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-          <span style="font-size:22px;">🚪</span>
-          <div style="font-weight:600;">環境を整えてラクになる</div>
-        </div>
-        <div style="font-size:13px; line-height:1.8;">
-          刺激統制は、行動と環境を整えることで、「やりたい行動」をサポートし、「やめたい行動」のきっかけ（刺激）を減らす方法です。
-        </div>
-        <div style="margin-top:12px; padding:10px 12px; background: var(--bg-soft); border-radius:8px; font-size:12px; line-height:1.7;">
-          💡 小さな工夫の積み重ねが、理想の自分に近づく力になります。
-        </div>
-      </div>
-
-      <h2 style="font-size:14px; margin:18px 0 10px; color: var(--text-muted);">あなたの取り組み履歴</h2>
-      ${list.length === 0
-        ? `<div style="padding:24px 16px; text-align:center; color: var(--text-muted); font-size:13px; line-height:1.7;">まだ取り組みはありません。<br>下のボタンから、最初の一歩を始めてみよう。</div>`
-        : list.map(e => renderStimulusHistoryCard(e)).join('')
-      }
-
-      <div style="margin-top:24px;">
-        <button class="btn btn-primary" data-act="stimulus-new" style="width:100%;">＋ 新しい取り組みを始める</button>
-      </div>
-    </div>
-  `;
+  // v0.9.90 P24: 統一 intro レイアウトを使用
+  return renderKizukiWorkIntro('stimulus-control', {
+    backAct: 'stimulus-cancel',
+    startAct: 'stimulus-new',
+  });
 }
 
 function renderStimulusHistoryCard(e) {
@@ -13190,6 +13230,129 @@ const DD_BELIEF_TAGS = [
   '完璧主義傾向', '他者比較しやすい', '助けを求めにくい', '過剰責任',
 ];
 
+// v0.9.90 P24: 各ワーク intro 共通コンテンツ
+const KIZUKI_WORK_INTRO = {
+  'downward-arrow': {
+    description: '「なぜそう感じるのだろう？」と考えがぐるぐるして、原因をはっきりさせたいときに使うワークです。',
+    canDo: [
+      'モヤモヤの根っこにある原因を見つけられる',
+      '自分でも気づいていなかった本音に気づける',
+      '考えを整理して、気持ちを軽くできる',
+    ],
+    recommended: [
+      'モヤモヤの正体がわからず、頭の中がぐるぐるしてしまう',
+      '同じことで悩んでしまう',
+      '原因をはっきりさせて、スッキリしたい',
+    ],
+    totalSteps: 8,
+  },
+  'behavior-experiment': {
+    description: '「こうに違いない」と決めつけてしまうことが多く、実際に試して確かめたいときに使うワークです。',
+    canDo: [
+      '思い込みや決めつけを手放せる',
+      '実際に試すことで、考えが変わることを体験できる',
+      '自信を持って行動できるようになる',
+    ],
+    recommended: [
+      'ネガティブな思い込みが強い',
+      '考えを確かめる前に諦めてしまう',
+      '新しい一歩を踏み出したいけど不安がある',
+    ],
+    totalSteps: 5,
+  },
+  'column-method': {
+    description: '考えや感情がまとまらず、頭の中をすっきりさせてバランスの取れた考え方を見つけたいときに使うワークです。',
+    canDo: [
+      '頭の中の情報を整理して、全体を見渡せるようになる',
+      '偏った考えに気づき、バランスの取れた視点を持てる',
+      '感情に振り回されにくくなる',
+    ],
+    recommended: [
+      '考えや感情がごちゃごちゃして整理できない',
+      'ネガティブな考えに引っ張られがち',
+      '冷静に物事を見つめ直したい',
+    ],
+    totalSteps: 8,
+  },
+  'stimulus-control': {
+    description: '気が散って集中できない、だらだらしてしまうなど、気持ちが安定しにくいときに使うワークです。',
+    canDo: [
+      '集中を妨げる刺激に気づける',
+      '自分に合った環境を整えられる',
+      '心が落ち着き、やるべきことに取り組みやすくなる',
+    ],
+    recommended: [
+      '集中力が続かない',
+      'ついスマホや他のことに気を取られてしまう',
+      '気持ちを安定させて、やることに取り組みたい',
+    ],
+    totalSteps: 9,
+  },
+};
+
+// v0.9.90 P24: ワーク intro 統一レンダラ
+function renderKizukiWorkIntro(workId, opts) {
+  opts = opts || {};
+  const w = KIZUKI_WORKS.find(x => x.id === workId);
+  const c = KIZUKI_WORK_INTRO[workId];
+  if (!w || !c) return '';
+  const backAct = opts.backAct || 'kizuki-intro-back';
+  const startAct = opts.startAct || 'kizuki-intro-start';
+  const safeEmoji = String(w.icon || '').replace(/[<>"&]/g, '');
+  const recent = (typeof getKizukiAllRecords === 'function') ? getKizukiAllRecords(workId, 3) : [];
+  return `
+    <div class="screen active kizuki-intro-screen">
+      <div class="page-header kizuki-intro-header">
+        <button class="page-back" data-act="${backAct}">‹</button>
+        <span class="kizuki-intro-chip" style="background:${w.chipBg || 'var(--bg-soft)'}; color:${w.chipText || 'var(--text)'};">${escapeHtml(w.subtitle || w.title)}</span>
+        <span class="text-tiny text-muted" style="min-width:60px; text-align:right;">Step 1 / ${c.totalSteps}</span>
+      </div>
+
+      <div class="kizuki-intro-hero">
+        <span class="kizuki-intro-icon" style="background:${w.iconBg || '#EEEEEE'};">
+          <img src="./assets/kizuki/${w.id}.png" alt="" class="kizuki-rev-icon-img"
+            onerror="window.kizukiIconFail && window.kizukiIconFail(this, '${safeEmoji}')">
+        </span>
+        <div class="kizuki-intro-hero-body">
+          <h1 class="kizuki-intro-title">${escapeHtml(w.title)}</h1>
+          <p class="kizuki-intro-desc">${escapeHtml(c.description)}</p>
+        </div>
+      </div>
+
+      <div class="kizuki-intro-section-label">このワークでできること</div>
+      <ul class="kizuki-intro-can-do">
+        ${c.canDo.map(t => `<li><span class="kizuki-intro-check">✓</span>${escapeHtml(t)}</li>`).join('')}
+      </ul>
+
+      <div class="kizuki-intro-callout">
+        <div class="kizuki-intro-callout-label">こんな人におすすめ</div>
+        ${c.recommended.map(t => `<div class="kizuki-intro-callout-item">・${escapeHtml(t)}</div>`).join('')}
+      </div>
+
+      <div class="dd-suplan-msg" style="margin-top:14px;">
+        <span class="dd-suplan-msg-icon">${suplan({ size: 36 })}</span>
+        <span class="dd-suplan-msg-text">すべての問いに答えなくても大丈夫だよ</span>
+      </div>
+
+      <div style="display:grid; gap:10px; margin-top:14px;">
+        <button class="btn btn-primary" data-act="${startAct}">はじめる</button>
+        <button class="btn-ghost" data-act="${backAct}">キャンセル</button>
+      </div>
+
+      ${recent.length > 0 ? `
+        <div class="kizuki-recent-section" style="margin-top:24px;">
+          <div class="kizuki-recent-header">
+            <div class="kizuki-recent-title">このワークの最近のきろく</div>
+          </div>
+          <div class="kizuki-recent-card">
+            ${recent.map(renderKizukiRecentRow).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
 // v0.9.88 P22: Step 4 ラウンドごとの参考例（静的）
 const DD_DEEPER_EXAMPLES = {
   1: ['人に迷惑をかける人になる', 'ダメな人間になる', '評価されない人になる'],
@@ -13281,51 +13444,12 @@ function ddHeader(stepNo, total = 8) {
   `;
 }
 
-// ───────── Step 1: ワーク紹介 ─────────
+// ───────── Step 1: ワーク紹介（v0.9.90 P24: 統一intro レンダラを使用）─────────
 function viewDdIntro() {
-  const recent = getKizukiAllRecords('downward-arrow', 3);
-  return `
-    <div class="screen active dd-screen">
-      ${ddHeader(1)}
-      <div class="dd-q">下向き矢印法とは？</div>
-      <p class="dd-q-sub">つらさの根っこにある「思い込み（スキーマ）」を見つけ、自分を助ける新しい見方にアップデートするワークです。</p>
-
-      <div class="dd-section-label" style="margin-top:14px;">このワークでできること</div>
-      <ul class="dd-intro-list">
-        <li>自分のつらさのパターンに気づける</li>
-        <li>思い込みの「良い面・つらい面」が整理できる</li>
-        <li>自分を助ける新しい考え方を見つけられる</li>
-      </ul>
-
-      <div class="dd-intro-callout">
-        <div class="dd-intro-callout-label">こんな人におすすめ</div>
-        ・同じことでいつも落ち込んでしまう<br>
-        ・自分を責めやすい<br>
-        ・考えすぎてしんどくなることが多い
-      </div>
-
-      <div class="dd-suplan-msg">
-        <span class="dd-suplan-msg-icon">${suplan({ size: 36 })}</span>
-        <span class="dd-suplan-msg-text">すべての問いに答えなくても大丈夫だよ</span>
-      </div>
-
-      <div style="display:grid; gap:10px; margin-top:14px;">
-        <button class="btn btn-primary" data-act="dd-step1-start">はじめる</button>
-        <button class="btn-ghost" data-act="dd-cancel">キャンセル</button>
-      </div>
-
-      ${recent.length > 0 ? `
-        <div class="kizuki-recent-section" style="margin-top:24px;">
-          <div class="kizuki-recent-header">
-            <div class="kizuki-recent-title">このワークの最近のきろく</div>
-          </div>
-          <div class="kizuki-recent-card">
-            ${recent.map(renderKizukiRecentRow).join('')}
-          </div>
-        </div>
-      ` : ''}
-    </div>
-  `;
+  return renderKizukiWorkIntro('downward-arrow', {
+    backAct: 'dd-cancel',
+    startAct: 'dd-step1-start',
+  });
 }
 
 // ───────── Step 2: 出来事入力 ─────────
@@ -19213,10 +19337,18 @@ function handleAction(act, el, ev) {
     go('deepdive');
     return;
   }
-  // v0.9.80: きづきタブからコラム法（もやもや整理）を起動
+  // v0.9.80: きづきタブからコラム法（もやもや整理）を起動 / v0.9.90: intro 経由
   if (act === 'kizuki-open-column-method') {
-    moyamoya = { step: 1 };
+    moyamoya = { step: 'intro' };
     go('moyamoya');
+    return;
+  }
+  // v0.9.90: コラム法 intro の「はじめる」→ step 1 へ
+  if (act === 'moya-intro-start') {
+    if (moyamoya) {
+      moyamoya.step = 1;
+      render();
+    }
     return;
   }
   // きづきタブ: ワーク一覧へ
@@ -19248,10 +19380,22 @@ function handleAction(act, el, ev) {
     go('kizuki-all-records');
     return;
   }
-  // v0.9.89 P23: 最近のきろく行 → 記録詳細
+  // v0.9.89 P23: 最近のきろく行 → 記録詳細（pending な行動実験は Step 3 から再開）
   if (act === 'kizuki-recent-row') {
-    viewParams.recordKind = el.dataset.kind || '';
-    viewParams.recordId = el.dataset.recordId || '';
+    const kind = el.dataset.kind || '';
+    const id = el.dataset.recordId || '';
+    if (kind === 'behavior-experiment') {
+      const rec = (state.behaviorExperiments || []).find(r => r.id === id);
+      if (rec && rec.status === 'pending') {
+        // pending → Step 3 (execute) で再開
+        behaviorExpSession = JSON.parse(JSON.stringify(rec));
+        behaviorExpSession.step = 'execute';
+        go('behavior-exp');
+        return;
+      }
+    }
+    viewParams.recordKind = kind;
+    viewParams.recordId = id;
     go('kizuki-record-detail');
     return;
   }
@@ -19392,8 +19536,32 @@ function handleAction(act, el, ev) {
     return;
   }
   if (act === 'behavior-exp-execute-later') {
-    if (typeof toast === 'function') toast('入力内容は保持されません。次のセッションでもう一度入力してね');
-    backToBehaviorExpHome();
+    // v0.9.90 P24: 「あとで実施する」→ pending として保存し、きづきタブへ戻る
+    // 後で「最近のきろく」からタップすると Step 3 (execute) から再開できる
+    if (!behaviorExpSession) return;
+    // 進行中の input 値を session に反映
+    document.querySelectorAll('[data-act="behavior-exp-input"]').forEach(el => {
+      const key = el.dataset.key || '';
+      const [k1, k2] = key.split('.');
+      if (k2) {
+        behaviorExpSession[k1] = behaviorExpSession[k1] || {};
+        behaviorExpSession[k1][k2] = el.value || '';
+      } else {
+        behaviorExpSession[k1] = el.value || '';
+      }
+    });
+    const pending = JSON.parse(JSON.stringify(behaviorExpSession));
+    pending.status = 'pending';
+    pending.pendingAt = new Date().toISOString();
+    delete pending.step;
+    state.behaviorExperiments = state.behaviorExperiments || [];
+    const idx = state.behaviorExperiments.findIndex(e => e.id === pending.id);
+    if (idx >= 0) state.behaviorExperiments[idx] = pending;
+    else state.behaviorExperiments.unshift(pending);
+    saveState();
+    behaviorExpSession = null;
+    if (typeof toast === 'function') toast('実験予定として保存しました。最近のきろくから再開できます');
+    go('kizuki');
     return;
   }
   if (act === 'behavior-exp-complete') { completeBehaviorExp(); return; }
