@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.90-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.91-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -17404,20 +17404,6 @@ function daSourceFieldLabel(f) {
 function daNextBtn(dtab, label) {
   return `<div style="margin-top:16px;"><button class="btn btn-primary" data-act="da-detail-tab" data-dtab="${dtab}" style="width:100%;">${label}</button></div>`;
 }
-function daWorkEntryCard(ctx) {
-  const note = ctx === 'summary'
-    ? 'ワークをやってみると、もっと自分のことがわかるよ。'
-    : 'もっと自分に合ったヒントが欲しいときは、ワークがおすすめ。';
-  return `
-    <div class="card" style="padding:14px 16px; margin-top:14px; background:var(--bg-soft);">
-      <div style="display:flex; gap:8px; align-items:center;">
-        <span style="font-size:18px;">📚</span>
-        <p style="margin:0; font-size:12px; line-height:1.7; flex:1;">${note}</p>
-      </div>
-      <button class="btn btn-secondary" data-act="da-open-works" style="width:100%; margin-top:10px;">ワークをみる</button>
-    </div>`;
-}
-
 function daRadarSvg(axes) {
   const cx = 150, cy = 150, R = 110, N = axes.length;
   const angle = (i) => -Math.PI / 2 + (2 * Math.PI * i / N);
@@ -17481,8 +17467,7 @@ function daViewSummary(a) {
       </div>` : ''}
     <div style="margin-top:18px;">
       <button class="btn btn-primary" data-act="da-tab" data-tab="detail" style="width:100%;">詳細をみる</button>
-    </div>
-    ${daWorkEntryCard('summary')}`;
+    </div>`;
 }
 
 function daViewOverview(a) {
@@ -17565,7 +17550,7 @@ function daViewBasis(a) {
 function daViewAction(a) {
   const t = a.topDistortions[0];
   if (!t || t.score < 8) {
-    return `<div class="card" style="padding:24px 18px; text-align:center; color:var(--text-soft);">まだ行動ヒントを出せるほどの傾向は見えていません。<br>もう少し記録を続けてみよう。</div>${daWorkEntryCard('action')}`;
+    return `<div class="card" style="padding:24px 18px; text-align:center; color:var(--text-soft);">まだ行動ヒントを出せるほどの傾向は見えていません。<br>もう少し記録を続けてみよう。</div>`;
   }
   const hints = t.hints || [];
   return `
@@ -17581,8 +17566,7 @@ function daViewAction(a) {
       <div class="text-tiny text-muted">今日の小さな一歩</div>
       <div style="font-size:13px; font-weight:500; margin:4px 0 8px;">${escapeHtml(t.actionHint)}</div>
       <button class="btn-ghost" data-act="open-action" style="font-size:12px; padding:6px 0;">やってみたことを記録する ›</button>
-    </div>
-    ${daWorkEntryCard('action')}`;
+    </div>`;
 }
 
 function daViewDetail(a) {
