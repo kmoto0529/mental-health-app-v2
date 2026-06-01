@@ -263,6 +263,19 @@
       return !!localStorage.getItem(LS_KEY.CONSENT);
     },
 
+    // プロフィールを user row に紐づけて保存（オンボーディングのプロフィール確定時に呼ぶ）
+    // 渡されたキーのみ更新（部分更新可）。空文字は null として保存する。
+    setProfile: function (profile) {
+      if (!initialized || !cfg || !profile) return;
+      const body = {};
+      if ('nickname'   in profile) body.nickname   = profile.nickname   || null;
+      if ('occupation' in profile) body.occupation = profile.occupation || null;
+      if ('ageRange'   in profile) body.age_range  = profile.ageRange   || null;
+      if ('gender'     in profile) body.gender     = profile.gender     || null;
+      if (Object.keys(body).length === 0) return;
+      supabaseRequest('PATCH', 'users', body, 'user_id=eq.' + cfg.userId);
+    },
+
     // 明示的に新セッションを開始したい場合（例: 長時間戻ってきた時）
     startNewSession: function (opts) {
       if (!initialized) return null;

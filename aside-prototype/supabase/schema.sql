@@ -20,6 +20,11 @@ create table public.users (
   created_at              timestamptz not null default now(),
   consent_at              timestamptz,
   consent_version         text,
+  -- プロフィール（オンボーディングで取得。匿名IDに紐づけてモニタリング表示する）
+  nickname                text,          -- ニックネーム（呼び名・任意）
+  occupation              text,          -- 立場: 'student' | 'worker' | 'other'
+  age_range               text,          -- 年代: '10s' | '20s' | '30s' | '40s' | '50s' | '60plus'
+  gender                  text,          -- 性別: 'female' | 'male' | 'other' | 'no_answer'
   first_seen_app_version  text,
   first_seen_platform     text,
   first_seen_user_agent   text
@@ -177,9 +182,11 @@ alter table public.app_events              enable row level security;
 alter table public.ai_sessions             enable row level security;
 alter table public.recommendation_feedback enable row level security;
 
--- users
+-- users: INSERT（user row 作成）/ UPDATE（consent_at・プロフィール紐づけ更新）
 create policy anon_insert_users on public.users
   for insert to anon with check (true);
+create policy anon_update_users on public.users
+  for update to anon using (true) with check (true);
 
 -- sessions: INSERT / ended_at・mood_after 更新のため UPDATE も許可
 create policy anon_insert_sessions on public.sessions

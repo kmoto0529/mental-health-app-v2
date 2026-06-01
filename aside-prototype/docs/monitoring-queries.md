@@ -10,10 +10,11 @@
 
 ## 🔥 日々の確認ルーティン（まずこれを見る）
 
-### Q1. 今日アプリを触った人の一覧
+### Q1. 今日アプリを触った人の一覧（ニックネーム付き）
 
 ```sql
 select
+  coalesce(nullif(u.nickname, ''), '(未設定)') as nickname,
   u.user_id,
   u.first_seen_platform,
   max(s.started_at) as last_opened_at,
@@ -21,7 +22,7 @@ select
 from public.users u
 join public.sessions s on s.user_id = u.user_id
 where s.started_at::date = current_date
-group by u.user_id, u.first_seen_platform
+group by u.user_id, u.nickname, u.first_seen_platform
 order by last_opened_at desc;
 ```
 
@@ -54,6 +55,63 @@ select *
 from public.v_error_events
 where created_at >= now() - interval '24 hours'
 order by created_at desc;
+```
+
+---
+
+## 👥 参加者プロフィール一覧（匿名ID × ニックネーム × 立場 × 年代 × 性別）
+
+### Q4. 全参加者のプロフィールを日本語ラベルで一覧
+
+匿名IDに紐づくニックネーム・立場・年代・性別を、登録の新しい順に表示します。
+
+```sql
+select
+  coalesce(nullif(u.nickname, ''), '(未設定)') as ニックネーム,
+  case u.occupation
+    when 'student' then '学生'
+    when 'worker'  then '社会人'
+    when 'other'   then 'その他'
+    else '(未設定)'
+  end as 立場,
+  case u.age_range
+    when '10s' then '10代' when '20s' then '20代' when '30s' then '30代'
+    when '40s' then '40代' when '50s' then '50代' when '60plus' then '60代以上'
+    else '(未設定)'
+  end as 年代,
+  case u.gender
+    when 'female'    then '女性'
+    when 'male'      then '男性'
+    when 'other'     then 'その他'
+    when 'no_answer' then '回答しない'
+    else '(未設定)'
+  end as 性別,
+  u.first_seen_platform as 端末,
+  u.consent_at          as 同意日時,
+  u.user_id             as 匿名ID
+from public.users u
+order by u.created_at desc;
+```
+
+### Q5. プロフィール × 利用状況（誰がどれだけ使っているか）
+
+プロフィールに、セッション数・最終利用日・行動完了数を結合します。
+
+```sql
+select
+  coalesce(nullif(u.nickname, ''), '(未設定)') as ニックネーム,
+  case u.occupation when 'student' then '学生' when 'worker' then '社会人' when 'other' then 'その他' else '-' end as 立場,
+  case u.age_range when '10s' then '10代' when '20s' then '20代' when '30s' then '30代' when '40s' then '40代' when '50s' then '50代' when '60plus' then '60代以上' else '-' end as 年代,
+  case u.gender when 'female' then '女性' when 'male' then '男性' when 'other' then 'その他' when 'no_answer' then '回答しない' else '-' end as 性別,
+  count(distinct s.session_id)                              as セッション数,
+  max(s.started_at)                                         as 最終利用,
+  count(distinct a.id) filter (where a.status = 'done')     as 行動完了数,
+  u.user_id                                                 as 匿名ID
+from public.users u
+left join public.sessions   s on s.user_id = u.user_id
+left join public.action_log a on a.user_id = u.user_id
+group by u.user_id, u.nickname, u.occupation, u.age_range, u.gender
+order by 最終利用 desc nulls last;
 ```
 
 ---

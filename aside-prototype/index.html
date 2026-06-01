@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.92-beta.2';
+window.MOYANOMORI_VERSION = 'v0.9.93-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -18777,6 +18777,13 @@ function handleAction(act, el, ev) {
       profileDone: true,
     });
     saveState();
+    // 匿名IDにプロフィールを紐づけて Supabase users へ送信（ニックネームは直前ステップで確定済み）
+    if (window.MoyaLogger) MoyaLogger.setProfile({
+      nickname:   state.user.nickname || '',
+      occupation: d.occupation,
+      ageRange:   d.ageRange,
+      gender:     d.gender,
+    });
     profileDraft = null;
     go('guide');
     return;
