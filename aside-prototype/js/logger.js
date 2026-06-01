@@ -66,13 +66,13 @@
 
   function nowISO() { return new Date().toISOString(); }
 
-  // fire-and-forget REST call to Supabase
-  // POST/PATCH on tables other than 'users' waits for user row を保証する Promise
+  // fire-and-forget REST call to Supabase（INSERT専用。更新系は supabaseRpc を使う）
+  // POST on tables other than 'users' waits for user row を保証する Promise
   function supabaseRequest(method, path, body, params) {
     if (!cfg || !active) return Promise.resolve();
 
     // POST /users 自身は待たない（それが user 作成本体だから）
-    // それ以外は userReadyPromise 完了まで待つ（PATCH /users の同意記録含む）
+    // それ以外は userReadyPromise 完了まで待つ（FK制約のため user row が先に必要）
     const waitForUser = !(method === 'POST' && path === 'users');
 
     const doRequest = () => {
@@ -100,6 +100,33 @@
     };
 
     return waitForUser ? userReadyPromise.then(doRequest) : doRequest();
+  }
+
+  // fire-and-forget RPC call to Supabase（SECURITY DEFINER 関数経由でRLSバイパス更新）
+  // anon は users/sessions/action_log を直接 UPDATE できない（SELECTポリシー無し→0行更新）ため、
+  // 更新系は必ずこの RPC を通す。user row 作成を待ってから呼ぶ。
+  function supabaseRpc(fnName, params) {
+    if (!cfg || !active) return Promise.resolve();
+    const doRequest = () => {
+      return fetch(cfg.supabaseUrl + '/rest/v1/rpc/' + fnName, {
+        method: 'POST',
+        headers: {
+          'apikey':        cfg.supabaseAnonKey,
+          'Authorization': 'Bearer ' + cfg.supabaseAnonKey,
+          'Content-Type':  'application/json',
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify(params || {}),
+        keepalive: true
+      }).then((res) => {
+        if (!res.ok) console.warn('[MoyaLogger] rpc', fnName, res.status, res.statusText);
+        return null;
+      }).catch((err) => {
+        console.warn('[MoyaLogger] rpc network error:', err && err.message);
+        return null;
+      });
+    };
+    return userReadyPromise.then(doRequest);
   }
 
   function commonFields() {
@@ -163,10 +190,10 @@
     opts = opts || {};
     const sessionId = getSessionId();
     if (!sessionId) return;
-    supabaseRequest('PATCH', 'sessions', {
-      ended_at:   nowISO(),
-      mood_after: opts.moodAfter == null ? null : opts.moodAfter
-    }, 'session_id=eq.' + sessionId);
+    supabaseRpc('end_session', {
+      p_session_id: sessionId,
+      p_mood_after: opts.moodAfter == null ? null : opts.moodAfter
+    });
   }
 
   function ensureActiveSession() {
@@ -252,10 +279,10 @@
       activate(); // user / session row を作成 & 以降の送信を有効化
       // 少し遅延して consent_at を埋める（user row 作成完了後）
       setTimeout(function () {
-        supabaseRequest('PATCH', 'users', {
-          consent_at:      nowISO(),
-          consent_version: cfg.consentVersion
-        }, 'user_id=eq.' + cfg.userId);
+        supabaseRpc('record_consent', {
+          p_user_id:         cfg.userId,
+          p_consent_version: cfg.consentVersion
+        });
         api.event('consent_given', { version: cfg.consentVersion });
       }, 400);
     },
@@ -267,13 +294,13 @@
     // 渡されたキーのみ更新（部分更新可）。空文字は null として保存する。
     setProfile: function (profile) {
       if (!initialized || !cfg || !profile) return;
-      const body = {};
-      if ('nickname'   in profile) body.nickname   = profile.nickname   || null;
-      if ('occupation' in profile) body.occupation = profile.occupation || null;
-      if ('ageRange'   in profile) body.age_range  = profile.ageRange   || null;
-      if ('gender'     in profile) body.gender     = profile.gender     || null;
-      if (Object.keys(body).length === 0) return;
-      supabaseRequest('PATCH', 'users', body, 'user_id=eq.' + cfg.userId);
+      supabaseRpc('set_user_profile', {
+        p_user_id:    cfg.userId,
+        p_nickname:   ('nickname'   in profile) ? (profile.nickname   || null) : null,
+        p_occupation: ('occupation' in profile) ? (profile.occupation || null) : null,
+        p_age_range:  ('ageRange'   in profile) ? (profile.ageRange   || null) : null,
+        p_gender:     ('gender'     in profile) ? (profile.gender     || null) : null
+      });
     },
 
     // 明示的に新セッションを開始したい場合（例: 長時間戻ってきた時）
@@ -288,12 +315,12 @@
     setSessionMoodBefore: function (level) {
       const sid = getSessionId();
       if (!sid) return;
-      supabaseRequest('PATCH', 'sessions', { mood_before: level }, 'session_id=eq.' + sid);
+      supabaseRpc('set_session_mood', { p_session_id: sid, p_mood_before: level });
     },
     setSessionMoodAfter: function (level) {
       const sid = getSessionId();
       if (!sid) return;
-      supabaseRequest('PATCH', 'sessions', { mood_after: level }, 'session_id=eq.' + sid);
+      supabaseRpc('set_session_mood', { p_session_id: sid, p_mood_after: level });
     },
 
     // 気持ちチェック記録
@@ -332,20 +359,20 @@
     completeAction: function (actionLogId, args) {
       if (!initialized || !actionLogId) return;
       args = args || {};
-      supabaseRequest('PATCH', 'action_log', {
-        status:         args.status || 'done',
-        memo_text:      args.memoText || null,
-        selected_value: args.selectedValue || null,
-        ai_session_id:  args.aiSessionId || null,
-        reaction:       args.reaction || null,
-        completed_at:   nowISO()
-      }, 'id=eq.' + actionLogId);
+      supabaseRpc('complete_action', {
+        p_id:             actionLogId,
+        p_status:         args.status || 'done',
+        p_memo_text:      args.memoText || null,
+        p_selected_value: args.selectedValue || null,
+        p_ai_session_id:  args.aiSessionId || null,
+        p_reaction:       args.reaction || null
+      });
     },
 
     // 行動後リアクション（完了後、別画面で取得する場合）
     setActionReaction: function (actionLogId, reaction) {
       if (!initialized || !actionLogId) return;
-      supabaseRequest('PATCH', 'action_log', { reaction: reaction }, 'id=eq.' + actionLogId);
+      supabaseRpc('set_action_reaction', { p_id: actionLogId, p_reaction: reaction });
     },
 
     // 汎用イベント（画面遷移・ボタン押下・任意のログ）
