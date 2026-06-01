@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.92-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.92-beta.2';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -12564,8 +12564,9 @@ function scPlan(track, id) { return scPlans(track).find(p => p.id === id); }
 function scTrack() { return (stimulusSession && stimulusSession.track) || 'sleep'; }
 function scMeta(track) { return SC_TRACK_META[track] || SC_TRACK_META.sleep; }
 
+// ワーク開始：最初の画面（Step 0 系統選択）へ直接遷移
 function startStimulus() {
-  stimulusSession = { step: 'home' };
+  newStimulusSession();   // step:'about'（不眠/スマホ 選択画面）でセッション生成
   go('stimulus');
 }
 
@@ -12591,11 +12592,6 @@ function newStimulusSession() {
 function cancelStimulus() {
   stimulusSession = null;
   go('kizuki');
-}
-
-function backToStimulusHome() {
-  stimulusSession = { step: 'home' };
-  render();
 }
 
 // 進行中セッションを state に upsert（§6 取り組み中ワーク表示のため active を永続化）
@@ -12627,8 +12623,8 @@ function completeStimulus() {
   stimulusSession.completedAt = new Date().toISOString();
   stimulusSession.status = 'completed';
   persistStimulusSession();
-  stimulusSession = { step: 'home' };
-  render();
+  stimulusSession = null;
+  go('kizuki');   // 完了後はきづきタブへ（最近のきろくに反映）
 }
 
 // 既存 active セッションを読み込んで再訪フローを開始（§6カードから）
@@ -12789,8 +12785,7 @@ function viewStimulus() {
   const s = stimulusSession.step;
   const track = scTrack();
   // 共通
-  if (s === 'home')        return viewStimulusHome();
-  if (s === 'about')       return viewStimulusAbout();   // Step 0：2択分岐
+  if (s === 'about')       return viewStimulusAbout();   // Step 0：不眠/スマホ 選択（最初の画面）
   if (s === 'analyzing')   return viewStimulusAnalyzing();
   if (s === 'plan-list')   return viewStimulusPlanList();
   if (s === 'plan-select') return viewStimulusPlanSelect();
@@ -12806,11 +12801,8 @@ function viewStimulus() {
   if (s === 'r-do')        return viewStimulusDo(true);
   if (s === 'r-morning2')  return viewScMorning(true);
   if (s === 'r-review')    return viewScReview();
-  return viewStimulusHome();
+  return viewStimulusAbout();
 }
-
-// 共通ステップヘッダ（Step n/7 などを表示）
-function scStepLabel(n, total) { return `Step ${n}/${total || 7}`; }
 
 // 系統アクセントを反映したステップヘッダ
 function viewStimulusHeader(sub, backAct) {
@@ -12829,19 +12821,11 @@ function viewStimulusHeader(sub, backAct) {
   `;
 }
 
-// ----- ホーム（ワーク紹介・統一 intro レイアウト） -----
-function viewStimulusHome() {
-  return renderKizukiWorkIntro('stimulus-control', {
-    backAct: 'stimulus-cancel',
-    startAct: 'stimulus-new',
-  });
-}
-
-// ===== Step 0：刺激統制とは？ ＋ 2系統の選択（設計 §1）=====
+// ===== Step 0（最初の画面）：刺激統制とは？ ＋ 不眠/スマホ の選択（設計 §1）=====
 function viewStimulusAbout() {
   return `
     <div class="screen active">
-      ${viewStimulusHeader('Step 1/7', 'stimulus-cancel')}
+      ${viewStimulusHeader('', 'stimulus-cancel')}
 
       <h1 style="font-size:20px; margin:8px 0 6px;">環境を整えてラクになる</h1>
       <p class="text-small" style="margin:0 0 16px; line-height:1.8;">頑張るのではなく、環境を整えることで自然に行動しやすくするワークです。</p>
@@ -19841,10 +19825,9 @@ function handleAction(act, el, ev) {
   // ───────── 刺激統制 2系統（睡眠/スマホ）ハンドラ — v0.9.92 P25 ─────────
   if (act === 'kizuki-open-stimulus') { startStimulus(); return; }
   if (act === 'stimulus-cancel') { cancelStimulus(); return; }
-  if (act === 'stimulus-new')    { newStimulusSession(); return; }
   if (act === 'stimulus-resume') { resumeStimulusSession(el.dataset.id); return; }
   if (act === 'stimulus-back-home') {
-    if (stimulusSession && stimulusSession.step === 'home') { cancelStimulus(); return; }
+    if (!stimulusSession || stimulusSession.step === 'about') { cancelStimulus(); return; }
     if (!confirm('入力中の内容は保存されません。前の画面に戻りますか？')) return;
     cancelStimulus();
     return;
