@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.95-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.95-beta.2';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -10036,7 +10036,9 @@ function viewAction() {
   if (!ippoToday) {
     const hasIppoHist = (state.ippoSessions || []).length > 0;
     const hasHabit = getAllHabitIds().length > 0;
-    if (!hasIppoHist && !hasHabit) return viewIppoOnboarding();
+    // v0.9.95: 「あとで実施予定」を1つでも入れたら初回オンボは出さず2回目以降画面へ
+    const hasLater = (state.ippoLaterActions || []).length > 0;
+    if (!hasIppoHist && !hasHabit && !hasLater) return viewIppoOnboarding();
     return viewIppoBase(ippoCompletedToday() || null);
   }
   // 進行中: ステップ別画面 (Step 2 → 35 → 4 → 完了 → ベース) v0.9.52 〜
@@ -10524,6 +10526,7 @@ function viewIppoTimer(s) {
           : `<button id="ippoTimerPauseBtn" class="ippo-tk-pause ippo-tk-pause-soft" data-act="ippo-timer-pause">${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}</button>`}
       </div>
       <div style="display:grid; gap:10px; margin-top:18px;">
+        <button class="btn btn-secondary" data-act="ippo-later">あとで実施する</button>
         <button class="btn btn-primary" data-act="ippo-timer-done">終了する</button>
         <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
       </div>
