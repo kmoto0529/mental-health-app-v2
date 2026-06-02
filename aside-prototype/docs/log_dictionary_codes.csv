@@ -1,0 +1,21 @@
+﻿項目,コード値,意味
+気分 (emotion_level/mood_before/mood_after/score),1,つらい
+気分,2,いまいち
+気分,3,ふつう
+気分,4,まあいい
+気分,5,とてもいい
+実行形式 (type/action_execution_type),instant_done,その場で完了（ワンタップ）
+実行形式,memo_done,メモを記入して完了
+実行形式,ai_assist,AI対話を挟んで完了
+実行形式,choice_done,選択肢から選んで完了
+難易度 (difficulty),easy,かんたん
+難易度,normal,ふつう
+難易度,bold,少し前進（チャレンジ）
+体感 (reaction),better,少し楽になった
+体感,same,変わらない
+体感,hard,むずかしかった
+状態 (status),started,開始
+状態,done,完了
+状態,abandoned,中断
+起動経路 (entry_point),direct,直接起動
+起動経路,resumed,再開（バックグラウンド復帰）

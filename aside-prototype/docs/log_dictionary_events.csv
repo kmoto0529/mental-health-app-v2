@@ -1,0 +1,16 @@
+﻿種別(event),アプリでの行動,記録タイミング,内容(details)の主なフィールド
+session_start,アプリ起動（セッション開始）,起動時/30分無操作後の再開,entry_point=起動経路 / mood_before=起動時の気分(1-5)
+session_end,セッション終了,30分無操作 or 明示終了,mood_after=終了時の気分(1-5)
+emotion_check,気持ちチェックを記録,気分を記録した時,emotion_level=気分(1-5) / note=ひとことメモ
+action_start,いっぽ（行動）を開始,行動を始めた時,action_id=行動ID / type=実行形式 / difficulty=難易度
+action_done,いっぽを完了,行動をやり切った時,action_id / reaction=やった後の体感 / memo=メモ
+action_abandoned,いっぽを中断/放棄,途中でやめた時,action_id
+screen_view,画面を表示,各画面に遷移するたび,screen=画面名
+mood_logged,ホームで気分を記録,ホームの気分入力を保存,score=気分(1-5) / categories=カテゴリ配列
+moyamoya_saved,もやもや整理（コラム法）を保存,もやもや整理ワーク完了,emotion=感情 / deltaScore=整理前後の気分改善幅
+ippo_completed,いっぽセッション完了（サマリ）,振り返りまで完了,changeValue=気分変化 / actionId / directionIds=なりたい方向
+deepdive_saved,下向き矢印法を保存,深掘りワーク完了,oldSchema=古い思い込み / newSchema=新しい捉え方 / tags
+crisis_shown,専門窓口（クライシス）を表示,リスクワード検知時,severity=重大度（4以上で表示）
+feedback,アプリ内フィードバック送信,設定から送信,category=種別 / text=本文 / screen=送信元
+consent_given,利用同意,オンボで同意,version=同意したポリシー版
+error,JSエラー（自動捕捉）,アプリ内でエラー発生,message=エラー内容 / screen=発生画面 / stack
