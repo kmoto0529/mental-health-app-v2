@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.95-beta.2';
+window.MOYANOMORI_VERSION = 'v0.9.95-beta.3';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -18951,6 +18951,7 @@ function handleAction(act, el, ev) {
       delete state.preferences.geminiApiKey;
       state.initialDone = true;
       saveState();
+      if (window.MoyaLogger) MoyaLogger.setInviteCode(trimmed); // 配布コードを匿名IDに紐づけ
       go('home');
     })();
     return;
@@ -20630,6 +20631,7 @@ function handleAction(act, el, ev) {
       state.preferences.inviteCode = trimmed;
       delete state.preferences.geminiApiKey; // 旧形式があれば破棄
       saveState();
+      if (window.MoyaLogger) MoyaLogger.setInviteCode(trimmed); // 配布コードを匿名IDに紐づけ
       toast('招待コードを保存しました');
       closeModal();
       setTimeout(() => modal(viewSettingsModal()), 50);

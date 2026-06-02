@@ -303,6 +303,12 @@
       });
     },
 
+    // 招待コード（配布コード）を匿名IDに紐づけて保存 — 配布ルート分析用
+    setInviteCode: function (code) {
+      if (!initialized || !cfg || !code) return;
+      supabaseRpc('set_invite_code', { p_user_id: cfg.userId, p_invite_code: String(code) });
+    },
+
     // ----- コンテンツ進捗（どのコンテンツを選び・どこまで進めたか） -----
     // app_events に INSERT（更新系ではないので確実に飛ぶ）。
     contentOpen: function (content, tab) {

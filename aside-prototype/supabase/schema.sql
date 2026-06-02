@@ -25,6 +25,7 @@ create table public.users (
   occupation              text,          -- 立場: 'student' | 'worker' | 'other'
   age_range               text,          -- 年代: '10s' | '20s' | '30s' | '40s' | '50s' | '60plus'
   gender                  text,          -- 性別: 'female' | 'male' | 'other' | 'no_answer'
+  invite_code             text,          -- 入力された招待コード（配布ルート分析用）
   first_seen_app_version  text,
   first_seen_platform     text,
   first_seen_user_agent   text
