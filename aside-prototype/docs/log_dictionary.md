@@ -24,6 +24,26 @@
 | `feedback` | アプリ内フィードバック送信 | 設定から送信 | `category`=種別, `text`=本文, `screen`=送信元 |
 | `consent_given` | 利用同意 | オンボで同意 | `version`=同意したポリシー版 |
 | `error` | JSエラー（自動捕捉） | アプリ内でエラー発生 | `message`=エラー内容, `screen`=発生画面, `stack` |
+| `content_open` | コンテンツを選択/開いた | 各コンテンツに入った時 | `tab`, `content`=コンテンツキー |
+| `content_step` | コンテンツのステップ進行 | ステップが進むたび | `tab`, `content`, `step`=到達ステップ, `total`=全ステップ, `label`=ステップ名 |
+| `content_done` | コンテンツを完了 | ワークを完了した時 | `tab`, `content` |
+
+### コンテンツキー（`content`）一覧
+
+| タブ | content | 表示名 |
+|---|---|---|
+| home | `mood_check` | 今の気持ち |
+| home | `moyamoya` | もやもや整理（コラム法・ホーム入口） |
+| ippo | `ippo_action` | 行動実施 |
+| kizuki | `downward_arrow` | 下向き矢印法 |
+| kizuki | `behavior_experiment` | 行動実験 |
+| kizuki | `column_method` | コラム法（きづき入口） |
+| kizuki | `stimulus_control` | 刺激統制 |
+| record | `calendar` | カレンダー（閲覧） |
+| record | `trend` | 傾向分析（閲覧） |
+| record | `distortion` | 思考のクセ分析（閲覧） |
+
+→ 集計は `v_content_engagement` ビュー（誰が・どのコンテンツを・到達ステップ・完了回数・最終実施）。
 
 ---
 

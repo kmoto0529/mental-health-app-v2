@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.93-beta.2';
+window.MOYANOMORI_VERSION = 'v0.9.94-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -8041,6 +8041,9 @@ function render() {
   }
   document.getElementById('main').innerHTML = html;
 
+  // コンテンツ進捗ログ（どのコンテンツを・どこまで進めたか）
+  trackContentProgress();
+
   // 論理ビューが切り替わった時にスクロールを最上部に戻す (v0.9.59 〜)
   // 同じビュー内の再描画 (タイマー一時停止トグル等) では維持。
   // mood-chat / kiroku-chat は visualViewport で独自管理するため除外。
@@ -8054,6 +8057,73 @@ function render() {
   // chat-screen をレンダー直後に viewport にフィットさせる
   if (typeof window.fitChatScreenToViewport === 'function') {
     requestAnimationFrame(window.fitChatScreenToViewport);
+  }
+}
+
+// ============================================================
+// コンテンツ進捗ロギング（render() から呼ばれ、コンテンツ/ステップが
+// 変わった時だけ app_events に content_open / content_step を送信）
+// ============================================================
+let _lastContentName = null;   // 直近に open したコンテンツ
+let _lastContentKey  = null;   // 'content#step'
+function currentContentProgress() {
+  const sc = currentScreen;
+  // ホーム: 今の気持ち
+  if (sc === 'mood-full') return { content:'mood_check', tab:'home', step:1, total:2, label:'気分を選ぶ' };
+  if (sc === 'mood-chat') return { content:'mood_check', tab:'home', step:2, total:2, label:'AIと対話' };
+  // もやもや整理 / コラム法（同一エンジン。入口で _content/_tab を刻む）
+  if (sc === 'moyamoya' && typeof moyamoya !== 'undefined' && moyamoya) {
+    const M = {intro:[0,'はじめに'],1:[1,'状況'],2:[2,'気分'],3:[3,'気分の強さ'],4:[4,'自動思考'],5:[5,'根拠'],6:[6,'反証'],7:[7,'適応的思考'],8:[8,'再評価'],9:[9,'レター']};
+    const m = M[moyamoya.step]; if (!m) return null;
+    return { content: moyamoya._content || 'moyamoya', tab: moyamoya._tab || 'home', step:m[0], total:9, label:m[1] };
+  }
+  // いっぽ: 行動実施
+  if (sc === 'action' && typeof ippoToday !== 'undefined' && ippoToday) {
+    const M = {2:[1,'行動を選ぶ'],35:[2,'実施（タイマー）'],4:[3,'振り返り'],99:[1,'カタログから選ぶ']};
+    const m = M[ippoToday.step]; if (!m) return null;
+    return { content:'ippo_action', tab:'ippo', step:m[0], total:3, label:m[1] };
+  }
+  // きづき: 下向き矢印法
+  if (sc === 'deepdive' && typeof deepDive !== 'undefined' && deepDive) {
+    const M = {1:[1,'はじめに'],2:[2,'出来事'],3:[3,'自動思考'],4:[4,'掘り下げ'],5:[5,'スキーマ特定'],6:[6,'メリデメ'],7:[7,'新しい捉え方'],8:[8,'再評価'],9:[9,'まとめ']};
+    const m = M[deepDive.step]; if (!m) return null;
+    return { content:'downward_arrow', tab:'kizuki', step:m[0], total:9, label:m[1] };
+  }
+  // きづき: 行動実験
+  if (sc === 'behavior-exp' && typeof behaviorExpSession !== 'undefined' && behaviorExpSession) {
+    const M = {home:[0,'はじめに'],hypothesis:[1,'仮説'],plan:[2,'行動候補'],execute:[3,'実施設定'],verify:[4,'結果検証'],'next-plan':[5,'次の一歩']};
+    const m = M[behaviorExpSession.step]; if (!m) return null;
+    return { content:'behavior_experiment', tab:'kizuki', step:m[0], total:5, label:m[1] };
+  }
+  // きづき: 刺激統制
+  if (sc === 'stimulus' && typeof stimulusSession !== 'undefined' && stimulusSession) {
+    const M = {about:[1,'はじめに/系統選択'],check:[2,'チェックイン'],loop:[3,'ループ理解'],analyzing:[4,'AI生成'],'plan-list':[5,'プラン一覧'],'plan-select':[6,'プラン選択'],do:[7,'実施'],morning:[8,'翌朝チェック'],weekly:[9,'週次振り返り']};
+    const m = M[stimulusSession.step]; if (!m) return null;
+    return { content:'stimulus_control', tab:'kizuki', step:m[0], total:9, label:m[1] };
+  }
+  // きろく: サブタブ（閲覧）
+  if (sc === 'record') {
+    const sub = (state.ui && state.ui.recordSubtab) || 'calendar';
+    const M = {calendar:['calendar','カレンダー'],report:['trend','傾向分析'],trend:['trend','傾向分析'],distortion:['distortion','思考のクセ分析']};
+    const m = M[sub]; if (!m) return null;
+    return { content:m[0], tab:'record', step:1, total:1, label:'閲覧' };
+  }
+  return null;
+}
+function trackContentProgress() {
+  if (!window.MoyaLogger) return;
+  let cp = null;
+  try { cp = currentContentProgress(); } catch (e) { return; }
+  if (!cp) { _lastContentName = null; _lastContentKey = null; return; }
+  if (cp.content !== _lastContentName) {
+    MoyaLogger.contentOpen(cp.content, cp.tab);
+    _lastContentName = cp.content;
+    _lastContentKey = null;
+  }
+  const key = cp.content + '#' + cp.step;
+  if (key !== _lastContentKey) {
+    MoyaLogger.contentStep(cp.content, cp.tab, cp.step, cp.total, cp.label);
+    _lastContentKey = key;
   }
 }
 
@@ -9739,6 +9809,7 @@ function saveMoyamoyaRecord() {
   state.moyamoyaRecords.push(r);
   saveState();
   if (window.MoyaLogger) MoyaLogger.event('moyamoya_saved', { emotion: r.emotion, deltaScore: (r.emotionScoreBefore - r.emotionScoreAfter) });
+  if (window.MoyaLogger) MoyaLogger.contentDone((moyamoya && moyamoya._content) || 'moyamoya', (moyamoya && moyamoya._tab) || 'home');
   return r;
 }
 
@@ -12111,6 +12182,7 @@ function cancelBehaviorExp() {
 
 function completeBehaviorExp() {
   if (!behaviorExpSession || !behaviorExpSession.id) return;
+  if (window.MoyaLogger) MoyaLogger.contentDone('behavior_experiment', 'kizuki');
   const completed = JSON.parse(JSON.stringify(behaviorExpSession));
   completed.completedAt = new Date().toISOString();
   completed.status = 'completed';
@@ -12620,6 +12692,7 @@ function selectStimulusTrack(track) {
 // 完了（週次レポート → 完了）
 function completeStimulus() {
   if (!stimulusSession || !stimulusSession.id) return;
+  if (window.MoyaLogger) MoyaLogger.contentDone('stimulus_control', 'kizuki');
   stimulusSession.completedAt = new Date().toISOString();
   stimulusSession.status = 'completed';
   persistStimulusSession();
@@ -19087,7 +19160,7 @@ function handleAction(act, el, ev) {
   if (act === 'da-start-work') {
     const w = el.dataset.work;
     closeModal();
-    if (w === 'moyamoya') { moyamoya = { step: 1 }; go('moyamoya'); }
+    if (w === 'moyamoya') { moyamoya = { step: 1, _content: 'column_method', _tab: 'kizuki' }; go('moyamoya'); }
     else if (w === 'deep-dive') { deepDive = ddSessionInit({ from: 'record' }); go('deepdive'); }
     else if (w === 'distortion') { startKizukiWork('distortion'); }
     else if (w === 'behavior-experiment') { startBehaviorExp(); }
@@ -19492,6 +19565,7 @@ function handleAction(act, el, ev) {
         actionId: ippoToday.selectedActionId,
         directionIds: sessionDirIds,
       });
+      if (window.MoyaLogger) MoyaLogger.contentDone('ippo_action', 'ippo');
       ippoToday.savedAtSummary = true;
     }
     // セッション保存後はベース画面 (viewIppoTodayDone) を直接表示
@@ -19525,7 +19599,7 @@ function handleAction(act, el, ev) {
   }
   // v0.9.80: きづきタブからコラム法（もやもや整理）を起動 / v0.9.90: intro 経由
   if (act === 'kizuki-open-column-method') {
-    moyamoya = { step: 'intro' };
+    moyamoya = { step: 'intro', _content: 'column_method', _tab: 'kizuki' };
     go('moyamoya');
     return;
   }
@@ -20251,6 +20325,7 @@ function handleAction(act, el, ev) {
     });
     saveState();
     if (window.MoyaLogger) MoyaLogger.event('deepdive_saved', { tags, oldSchema, newSchema });
+    if (window.MoyaLogger) MoyaLogger.contentDone('downward_arrow', 'kizuki');
     const fromTab = deepDive.from || 'kizuki';
     deepDive = null;
     toast('深掘りを保存しました');
@@ -20314,6 +20389,7 @@ function handleAction(act, el, ev) {
       actionId: ippoToday.selectedActionId,
       directionIds: sessionDirIds,
     });
+    if (window.MoyaLogger) MoyaLogger.contentDone('ippo_action', 'ippo');
     ippoToday = null;
     toast('いっぽを記録しました');
     go('home');

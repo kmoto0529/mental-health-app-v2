@@ -303,6 +303,18 @@
       });
     },
 
+    // ----- コンテンツ進捗（どのコンテンツを選び・どこまで進めたか） -----
+    // app_events に INSERT（更新系ではないので確実に飛ぶ）。
+    contentOpen: function (content, tab) {
+      api.event('content_open', { content: content, tab: tab });
+    },
+    contentStep: function (content, tab, step, total, label) {
+      api.event('content_step', { content: content, tab: tab, step: step, total: total, label: label });
+    },
+    contentDone: function (content, tab) {
+      api.event('content_done', { content: content, tab: tab });
+    },
+
     // 明示的に新セッションを開始したい場合（例: 長時間戻ってきた時）
     startNewSession: function (opts) {
       if (!initialized) return null;
