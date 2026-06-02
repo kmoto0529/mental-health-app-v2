@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.94-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.95-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -7591,8 +7591,36 @@ function generateActionReasons(action, score, ctx) {
   return reasons.slice(0, 3);
 }
 
+// 初回提示用：先頭3つ固定（深呼吸→肩→呼吸瞑想）。すぐできて準備不要なもの。
+const FIRST_VISIT_FIXED_IDS = ['A002', 'A013', 'A031'];
+// 初回のその他も「準備不要・すぐできる」行動に限定（道具・場所・外出が不要なもの）
+const QUICK_PREP_FREE_IDS = [
+  'A002', 'A013', 'A031',          // 固定の3つ
+  'A029', 'A034', 'A039', 'A040',  // 感情ラベリング/1分聴く/呼吸を数える/今ここ
+  'A036', 'A004', 'A033', 'A032',  // やさしさの言葉/ストレッチ/5-4-3-2-1/身体スキャン
+  'A047',                          // 相手の立場を1分想像
+];
+
 // 上位 N 件の推薦
 function getTopRecommendations(ctx, n = 5) {
+  // 初回訪問（いっぽ履歴ゼロ）は、すぐできる準備不要な行動を固定提示する
+  const isFirstVisit = !ctx || !ctx.history || ctx.history.length === 0;
+  if (isFirstVisit) {
+    const orderedIds = [
+      ...FIRST_VISIT_FIXED_IDS,
+      ...QUICK_PREP_FREE_IDS.filter(id => !FIRST_VISIT_FIXED_IDS.includes(id)),
+    ];
+    const picked = orderedIds.map(id => ACTIONS.find(a => a.id === id)).filter(Boolean);
+    // 準備不要リストを使い切って n に満たない場合のみ、残りの行動で補完
+    if (picked.length < n) {
+      const have = new Set(picked.map(a => a.id));
+      ACTIONS.forEach(a => { if (!have.has(a.id)) picked.push(a); });
+    }
+    return picked.slice(0, n).map(a => {
+      const score = scoreAction(a, ctx);
+      return { action: a, score, reasons: generateActionReasons(a, score, ctx) };
+    });
+  }
   const allScored = ACTIONS.map(a => ({
     action: a,
     score: scoreAction(a, ctx),
@@ -7724,6 +7752,7 @@ const defaultState = () => ({
   // === きょうのいっぽ（v0.9.0 仕様書 §6 データモデル準拠 簡易版） ===
   ippoSessions: [],      // {id, moodLabel, moodIntensity, actionId, score, beforeIntensity, afterIntensity, changeValue, completedAt}
   // (旧 ippoPending 「あとでやる」保留機能は v0.9.58 で削除)
+  ippoLaterActions: [],  // v0.9.95: 実施画面「あとで実施する」で記録した行動 {actionId, addedAt}
 
   // === 習慣化機能（v0.9.47 P8.1〜） ===
   customHabits: [],      // ユーザー作成の習慣 {id, name, icon, duration, timing, createdAt}
@@ -10425,6 +10454,7 @@ function viewIppoTimer(s) {
           </div>
         </div>
         <div style="display:grid; gap:10px; margin-top:18px;">
+          <button class="btn btn-secondary" data-act="ippo-later">あとで実施する</button>
           <button class="btn btn-primary" data-act="ippo-timer-done">${doneLabel}</button>
           <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
         </div>
@@ -10465,6 +10495,7 @@ function viewIppoTimer(s) {
             : `<button id="ippoTimerPauseBtn" class="ippo-tk-pause" data-act="ippo-timer-pause">${s.timerPaused ? '▶ 再開' : '❚❚ 一時停止'}</button>`}
         </div>
         <div style="display:grid; gap:10px; margin-top:18px;">
+          <button class="btn btn-secondary" data-act="ippo-later">あとで実施する</button>
           <button class="btn btn-primary" data-act="ippo-timer-done">終了する</button>
           <button class="btn-ghost" data-act="ippo-back" data-to="2">‹ 戻る</button>
         </div>
@@ -10848,6 +10879,27 @@ function viewIppoBase(session) {
 
       ${!isDone ? `
         <button class="btn btn-primary ippo-base-start-cta" data-act="ippo-do-another">おすすめのいっぽを見る</button>
+      ` : ''}
+
+      <!-- あとで実施予定のいっぽ (v0.9.95: 実施画面「あとで実施する」で記録したもの) -->
+      ${(state.ippoLaterActions && state.ippoLaterActions.length) ? `
+        <div class="ippo-base-section-row">
+          <div class="ippo-base-section-h">あとで実施予定のいっぽ</div>
+        </div>
+        ${state.ippoLaterActions.map(item => {
+          const a = ACTIONS.find(x => x.id === item.actionId);
+          if (!a) return '';
+          return `
+            <button class="ippo-base-rec-card" data-act="ippo-later-do" data-action-id="${a.id}">
+              <span class="ippo-base-rec-icon">${a.icon}</span>
+              <div class="ippo-base-rec-body">
+                <div class="ippo-base-rec-title">${escapeHtml(a.title)}<span class="ippo-base-rec-time">（${a.time}）</span></div>
+                <div class="ippo-base-rec-desc">${escapeHtml(a.desc || a.technique || '')}</div>
+              </div>
+              <span class="ippo-base-rec-cta">やってみる</span>
+            </button>
+          `;
+        }).join('')}
       ` : ''}
 
       <!-- 今日のおすすめのいっぽ -->
@@ -19512,6 +19564,23 @@ function handleAction(act, el, ev) {
     render();
     return;
   }
+  // 実施画面「あとで実施する」: 行動を「あとで実施予定」に記録してベースへ戻る (v0.9.95)
+  if (act === 'ippo-later') {
+    if (!ippoToday) return;
+    const aid = ippoToday.selectedActionId || ippoToday.preselectedActionId;
+    stopIppoTimerLoop();
+    if (aid) {
+      state.ippoLaterActions = state.ippoLaterActions || [];
+      if (!state.ippoLaterActions.some(x => x.actionId === aid)) {
+        state.ippoLaterActions.push({ actionId: aid, addedAt: new Date().toISOString() });
+      }
+      saveState();
+    }
+    ippoToday = null;
+    toast('「あとで実施予定」に追加しました');
+    go('action');
+    return;
+  }
   // (旧 Step 3 「あとでやる」ハンドラ削除 v0.9.58 — 保留機能廃止)
   // Step 4: 5択定性評価 (v0.9.42 〜)
   if (act === 'ippo-step4-eval') {
@@ -19578,6 +19647,16 @@ function handleAction(act, el, ev) {
   if (act === 'ippo-base-do-rec') {
     const actionId = el.dataset.actionId;
     if (!actionId) return;
+    ippoToday = { step: 35, startedAt: new Date().toISOString(), preselectedActionId: actionId };
+    render();
+    return;
+  }
+  // 「あとで実施予定のいっぽ」から起動（リストから除外して実施画面へ）v0.9.95
+  if (act === 'ippo-later-do') {
+    const actionId = el.dataset.actionId;
+    if (!actionId) return;
+    state.ippoLaterActions = (state.ippoLaterActions || []).filter(x => x.actionId !== actionId);
+    saveState();
     ippoToday = { step: 35, startedAt: new Date().toISOString(), preselectedActionId: actionId };
     render();
     return;
