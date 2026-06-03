@@ -20,8 +20,10 @@ end; $$;
 revoke all on function public.set_invite_code(uuid,text) from public;
 grant execute on function public.set_invite_code(uuid,text) to anon;
 
--- 3) 参加者一覧ビューに「配布コード」を追加（v_customer_list を再作成）
-create or replace view public.v_customer_list as
+-- 3) 参加者一覧ビューに「配布コード」を追加（列を中間挿入するため drop→create）
+--    ※ create or replace は列の順番変更不可（42P16）になるため drop が必要
+drop view if exists public.v_customer_list;
+create view public.v_customer_list as
 select
   coalesce(nullif(u.nickname,''),'(未設定)') as "ニックネーム",
   coalesce(nullif(u.invite_code,''),'(なし)') as "配布コード",
@@ -44,7 +46,8 @@ group by u.user_id;
 revoke all on public.v_customer_list from anon, authenticated, public;
 
 -- 4) 配布ルート別 集計ビュー（コードごとの人数・アクティブ）
-create or replace view public.v_invite_channel as
+drop view if exists public.v_invite_channel;
+create view public.v_invite_channel as
 select
   coalesce(nullif(u.invite_code,''),'(なし)')          as "配布コード",
   count(*)                                             as "登録人数",
