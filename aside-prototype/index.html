@@ -9090,8 +9090,18 @@ function viewMoyamoya() {
     });
   }
 
-  // step 9 はレターでステップ表示しない。1-8 のみ "Step X / 8"
-  const stepLabel = `Step ${s.step} / 8`;
+  // v0.9.95: きづきのコラム法（_content==='column_method'）はフル8ステップ。
+  //   ホームの「もやもや整理」は初期の6ステップに戻す（自動思考/根拠/反証=step4-6 をスキップし 3→7 へ）。
+  const isColumn = s._content === 'column_method';
+  // step 9/6 はレターでステップ表示しない。
+  let stepLabel;
+  if (isColumn) {
+    stepLabel = `Step ${s.step} / 8`;
+  } else {
+    // ホーム表示用ステップ番号（実step 1,2,3,7,8 → 表示 1,2,3,4,5 / 全5）
+    const homeNo = { 1: 1, 2: 2, 3: 3, 7: 4, 8: 5 }[s.step] || s.step;
+    stepLabel = `Step ${homeNo} / 5`;
+  }
 
   if (s.step === 1) {
     return moyamoyaScreen(stepLabel, '何があったのかを教えてください', `
@@ -9236,7 +9246,7 @@ function viewMoyamoya() {
       return moyamoyaScreen(stepLabel, '別の見方を考えています...', `
         <div class="moya-loading">
           <div class="moya-loading-spinner"></div>
-          <p class="moya-loading-text">あなたの根拠と反証をふまえて、<br>AIが認知行動療法の観点から考え中です。</p>
+          <p class="moya-loading-text">${isColumn ? 'あなたの根拠と反証をふまえて、' : 'あなたのできごとに合わせて、'}<br>AIが認知行動療法の観点から考え中です。</p>
         </div>
         <div style="margin-top:8px;">
           <button class="btn-ghost" data-act="moya-cancel" style="width:100%;">キャンセル</button>
@@ -9248,7 +9258,7 @@ function viewMoyamoya() {
     const canMore = s.alternativeViewsRevealed < s.alternativeViews.length;
     const selectedIdx = s.alternativeViewSelectedIndex;
     const hasSelection = typeof selectedIdx === 'number' && selectedIdx >= 0 && selectedIdx < s.alternativeViewsRevealed;
-    return moyamoyaScreen(stepLabel, 'バランスのとれた別の見方', `
+    return moyamoyaScreen(stepLabel, isColumn ? 'バランスのとれた別の見方' : '別の見方を考えてみました', `
       <p class="text-tiny text-muted mb-3">⚠️ AIが推定した参考情報です。納得できるものを1つ選んでください。</p>
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${visible.map((rawV, i) => {
@@ -9307,14 +9317,17 @@ function viewMoyamoya() {
 
 function moyamoyaScreen(stepLabel, title, body) {
   // v0.9.90 P24: chip + Step表示の統一スタイル
+  // v0.9.95: きづきのコラム法はコラム法チップ、ホームのもやもや整理は「もやもや整理」チップに分岐
+  const isColumn = moyamoya && moyamoya._content === 'column_method';
   const w = (typeof KIZUKI_WORKS !== 'undefined') ? KIZUKI_WORKS.find(x => x.id === 'column-method') : null;
-  const chipBg = w ? (w.chipBg || 'var(--bg-soft)') : 'var(--bg-soft)';
-  const chipText = w ? (w.chipText || 'var(--text)') : 'var(--text)';
+  const chipBg = (isColumn && w) ? (w.chipBg || 'var(--bg-soft)') : 'var(--bg-soft)';
+  const chipText = (isColumn && w) ? (w.chipText || 'var(--text)') : 'var(--text)';
+  const chipLabel = isColumn ? (w ? (w.subtitle || w.title) : 'コラム法') : 'もやもや整理';
   return `
     <div class="screen active">
       <div class="page-header kizuki-intro-header">
         <button class="page-back" data-act="moya-back-step" aria-label="前へ">‹</button>
-        <span class="kizuki-intro-chip" style="background:${chipBg}; color:${chipText};">${escapeHtml(w ? (w.subtitle || w.title) : 'もやもや整理')}</span>
+        <span class="kizuki-intro-chip" style="background:${chipBg}; color:${chipText};">${escapeHtml(chipLabel)}</span>
         <span class="text-tiny text-muted" style="min-width:60px; text-align:right;">${stepLabel}</span>
       </div>
       <h2 class="mb-3">${title}</h2>
@@ -19035,7 +19048,12 @@ function handleAction(act, el, ev) {
     // step6 (レター) → step5 に戻ると「いま、気持ちの強さ」を選び直せる。
     // step4 (別の見方候補) に戻ると候補が再表示される（生成済みなら再生成しない）。
     if (!moyamoya || (moyamoya.step || 1) <= 1) { moyamoya = null; go('home'); return; }
-    moyamoya.step = (moyamoya.step || 1) - 1;
+    // v0.9.95: ホームのもやもや整理は 3→7 を飛ばしているので 7→3 に戻す（きづきコラム法は通常の-1）
+    if (moyamoya._content !== 'column_method' && moyamoya.step === 7) {
+      moyamoya.step = 3;
+    } else {
+      moyamoya.step = (moyamoya.step || 1) - 1;
+    }
     render();
     return;
   }
@@ -19064,7 +19082,9 @@ function handleAction(act, el, ev) {
   }
   if (act === 'moya-step3-next') {
     if (moyamoya.emotionScoreBefore == null) moyamoya.emotionScoreBefore = 5;
-    moyamoya.step = 4; render(); return;
+    // v0.9.95: きづきのコラム法は step4（自動思考）へ。ホームのもやもや整理は step7（別の見方）へ直行（4-6スキップ）。
+    moyamoya.step = (moyamoya._content === 'column_method') ? 4 : 7;
+    render(); return;
   }
   // ── v0.9.80: Step 4 自動思考 ──
   if (act === 'moya-step4-next') {
