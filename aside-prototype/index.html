@@ -12520,14 +12520,21 @@ function viewBehaviorExpExecute() {
         <div>
           <label class="text-tiny text-muted" style="display:block; margin-bottom:4px;">😟 不安・心配の度合い（0〜10）</label>
           <p class="text-tiny text-muted" style="margin:0 0 8px;">実験の前の、今の不安の強さを10段階でつけてみよう</p>
-          <input type="range" min="0" max="10" step="1" data-act="behavior-exp-anxiety" value="${e.anxiety}" style="width:100%;">
-          <div style="text-align:center; font-weight:600; margin-top:4px;">${e.anxiety}</div>
+          <div style="text-align:center; margin: 6px 0 12px;">
+            <div style="font-size:48px; font-weight:600; font-family:'Noto Serif JP', serif; color: var(--primary, #6B8F71); line-height:1;">${e.anxiety}</div>
+            <div class="text-tiny text-muted" style="margin-top:4px;">0=ほぼ感じない / 10=最大</div>
+          </div>
+          <div class="moya-scale-row">
+            ${Array.from({length: 11}, (_, n) => `
+              <button class="moya-scale-btn ${e.anxiety === n ? 'selected' : ''}" data-act="behavior-exp-anxiety" data-score="${n}">${n}</button>
+            `).join('')}
+          </div>
         </div>
       </div>
 
       <div style="margin-top:20px; display:grid; gap:10px;">
         <button class="btn btn-primary" data-act="behavior-exp-next" data-from="execute" style="width:100%;">実験した！</button>
-        <button class="btn-secondary" data-act="behavior-exp-execute-later" style="width:100%;">あとで実施する！</button>
+        <button class="btn btn-secondary" data-act="behavior-exp-execute-later" style="width:100%;">あとで実施する！</button>
       </div>
     </div>
   `;
@@ -19850,7 +19857,7 @@ function handleAction(act, el, ev) {
   }
   if (act === 'behavior-exp-anxiety') {
     if (!behaviorExpSession) return;
-    behaviorExpSession.execute.anxiety = Number(el.value);
+    behaviorExpSession.execute.anxiety = Number(el.dataset.score);
     render();
     return;
   }
