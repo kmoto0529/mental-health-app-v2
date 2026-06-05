@@ -1,7 +1,11 @@
 // もやの森β: 招待コード検証
 // オンボーディングで入力時に有効/無効を即時判定するための軽量エンドポイント。
 
-const ALLOWED_CODES = (process.env.INVITE_CODES || '')
+// 招待コードは複数の環境変数に分割して保持できる（INVITE_CODES が Sensitive で
+// 追記しづらいため、追加分は INVITE_CODES_2 に入れて両方をマージする）。
+const ALLOWED_CODES = [process.env.INVITE_CODES, process.env.INVITE_CODES_2]
+  .filter(Boolean)
+  .join(',')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);

@@ -6,9 +6,14 @@
 //   INVITE_CODES        β招待コードをカンマ区切りで列挙（例: abc123,xyz789,...）
 //
 // 任意:
+//   INVITE_CODES_2        追加の招待コード（INVITE_CODES が Sensitive で追記しづらい場合の増設枠。両方マージされる）
 //   GEMINI_DEFAULT_MODEL  デフォルトモデル（未指定なら gemini-2.5-flash）
 
-const ALLOWED_CODES = (process.env.INVITE_CODES || '')
+// 招待コードは INVITE_CODES と INVITE_CODES_2 の両方から読み込む（追加分は
+// Sensitive な INVITE_CODES を触らずに INVITE_CODES_2 へ足せるようにするため）。
+const ALLOWED_CODES = [process.env.INVITE_CODES, process.env.INVITE_CODES_2]
+  .filter(Boolean)
+  .join(',')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
