@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#F4F0E5">
+<title>すぷらん｜心の地図</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================================
+   すぷらん — オンボーディング & ホーム
+   Claude Design ハンドオフ（2026-08-02）の実装。
+   デザイントークンはハンドオフの値をそのまま変数化している。数値を直書きせず
+   必ず変数を経由すること（後からトークンが変わっても1箇所で追従できる）。
+   ========================================================================= */
+:root{
+  /* --- 地 --- */
+  --app-bg:#F4F0E5;
+  --page-1:#EFEADC; --page-2:#E4DECE; --body-bg:#E9E4D6;
+  /* --- 面 --- */
+  --card:#FFFFFF;
+  --line:#ECE7D8; --line-input:#E1DCCB; --line-soft:#EAE4D4;
+  --input-bg:#FCFBF6;
+  /* --- 緑 --- */
+  --cta-grad:linear-gradient(160deg,#5C7A45,#455E33);
+  --cta-ink:#FCFBF4;
+  --g1:#6E8A54; --g2:#5E7B49; --g3:#8AA36A; --g4:#7FA05F;
+  --g-pale-1:#EAF0E1; --g-pale-2:#EEF2E5; --g-pale-3:#F5F7EE; --g-pale-4:#EEF4E2;
+  --g-pale-line-1:#DCE6CC; --g-pale-line-2:#DDE7CA;
+  /* --- 文字 --- */
+  --ink-1:#3B4A38; --ink-2:#5D6657; --ink-3:#6C7562;
+  --sub-1:#8A9179; --sub-2:#9AA089; --sub-3:#A7AE96; --sub-4:#B4BAA6;
+  /* --- 気分 --- */
+  --mood-anx:#5A7C9A; --mood-dep:#B4685A;
+  /* --- 橙 --- */
+  --amber-bg:#F5E9D4; --amber-ink:#B08535; --dot-unread:#D98B6A;
+  --cheer-grad:linear-gradient(120deg,#F7EFDF,#F3E7D0);
+  --cheer-line:#EBDCBE; --cheer-ink:#7A5E33; --cheer-sub:#A08B5E;
+  /* --- リンク --- */
+  --link:#5E7B49; --link-hover:#445A34;
+  /* --- 角丸 --- */
+  --r-frame-out:56px; --r-frame-in:46px;
+  --r-card-l:24px; --r-card-m:16px; --r-btn:17px; --r-chip:14px; --r-pill:999px; --r-round:11px;
+  /* --- 影 --- */
+  --sh-card:0 8px 22px -16px rgba(90,100,60,.45);
+  --sh-card-lift:0 16px 34px -20px rgba(90,100,60,.45);
+  --sh-cta:0 14px 26px -14px rgba(70,90,45,.8);
+  --sh-frame:0 40px 90px -30px rgba(60,66,48,.55);
+  /* --- 書体 --- */
+  --jp:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Hiragino Sans',system-ui,sans-serif;
+  --num:'Nunito','Zen Maru Gothic',system-ui,sans-serif;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0;
+  background:radial-gradient(120% 90% at 50% 0%,var(--page-1),var(--page-2)) fixed,var(--body-bg);
+  font-family:var(--jp); color:var(--ink-2);
+  font-size:14px; font-weight:500; line-height:1.8;
+  display:flex; align-items:center; justify-content:center;
+}
+button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+textarea,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--g3); outline-offset:2px}
+
+/* ---------- 端末フレーム（PCではiPhone枠、実機では全画面） ---------- */
+.device{
+  width:393px; height:852px; flex:none; position:relative;
+  background:#F1ECDE; border-radius:var(--r-frame-out); padding:9px;
+  box-shadow:var(--sh-frame);
+}
+.screen-host{
+  position:relative; width:100%; height:100%; overflow:hidden;
+  border-radius:var(--r-frame-in); background:var(--app-bg);
+}
+@media(max-width:520px),(display-mode:standalone){
+  body{display:block}
+  .device{width:100%;height:100dvh;border-radius:0;padding:0;box-shadow:none;background:var(--app-bg)}
+  .screen-host{border-radius:0}
+}
+
+/* ---------- 画面切替 ---------- */
+.screen{position:absolute;inset:0;display:none;flex-direction:column}
+.screen.on{display:flex}
+
+/* 画面遷移アニメ。ハンドオフ指定 = opacity 0→1 + translateY 8→0 / 0.4s */
+@keyframes sp-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sp-in{animation:sp-in .4s ease both}
+@keyframes sp-float{0%,100%{transform:translateY(-4px)}50%{transform:translateY(5px)}}
+.float{animation:sp-float 4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){
+  .sp-in,.float{animation:none}
+  *{transition-duration:.01ms !important}
+}
+
+/* =========================================================================
+   オンボーディング
+   ========================================================================= */
+/* --- 進捗トップバー --- */
+.topbar{
+  flex:none; display:grid; grid-template-columns:34px 1fr 44px; align-items:center; gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 18px) 22px 8px;
+}
+.topbar[hidden]{display:none}
+.icon-btn{
+  width:34px;height:34px;border-radius:var(--r-round);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);box-shadow:var(--sh-card);color:var(--ink-2);
+  transition:opacity .2s,transform .2s;
+}
+.icon-btn:active{transform:scale(.94)}
+.icon-btn[disabled]{opacity:0;pointer-events:none}
+.dots{display:flex;align-items:center;justify-content:center;gap:6px}
+.dots i{
+  width:6px;height:6px;border-radius:var(--r-pill);background:#DAD4C2;
+  transition:width .3s ease,background .3s ease;
+}
+.dots i.done{background:var(--g4)}
+.dots i.now{width:18px;background:var(--g1)}
+.skip{
+  font-size:12px;color:var(--sub-1);font-weight:500;text-align:right;
+  padding:6px 0; transition:opacity .2s;
+}
+.skip[hidden]{visibility:hidden}
+
+/* --- 本文 --- */
+.body{flex:1;overflow-y:auto;padding:6px 24px 12px;-webkit-overflow-scrolling:touch}
+.body::-webkit-scrollbar{width:0}
+.step{display:none;flex-direction:column;gap:16px;padding-bottom:6px}
+.step.on{display:flex}
+
+/* --- 吹き出し（マスコットの問いかけ） --- */
+.ask{display:grid;grid-template-columns:44px 1fr;gap:11px;align-items:start;margin-top:6px}
+.ask .av{
+  width:44px;height:44px;border-radius:var(--r-pill);background:var(--g-pale-3);
+  border:1px solid var(--g-pale-line-1);overflow:hidden;flex:none;
+}
+.ask .av img{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.bubble{
+  background:var(--card);border:1px solid var(--line);border-radius:6px var(--r-card-m) var(--r-card-m) var(--r-card-m);
+  padding:13px 16px;box-shadow:var(--sh-card);position:relative;
+}
+.bubble h2{
+  margin:0;font-size:16.5px;font-weight:700;color:var(--ink-1);line-height:1.7;
+  text-wrap:balance;letter-spacing:.01em;
+}
+.bubble p{margin:7px 0 0;font-size:12.5px;color:var(--sub-1);line-height:1.75}
+
+/* --- チップ --- */
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{
+  border-radius:var(--r-chip);padding:10px 15px;font-size:13.5px;font-weight:500;
+  background:var(--input-bg);border:1px solid var(--line-input);color:var(--ink-2);
+  transition:background .18s,border-color .18s,color .18s,transform .12s;
+}
+.chip:active{transform:scale(.97)}
+.chip[aria-pressed="true"]{background:var(--g-pale-1);border-color:var(--g3);color:#4E6B41;font-weight:700}
+
+/* --- 入力 --- */
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:12px;font-weight:700;color:var(--ink-1);letter-spacing:.02em}
+.hint{font-size:11.5px;color:var(--sub-2);line-height:1.7}
+textarea,select,input[type=text]{
+  width:100%;background:var(--input-bg);border:1px solid var(--line-input);
+  border-radius:var(--r-chip);padding:12px 14px;font-size:13.5px;line-height:1.85;
+  color:var(--ink-2);resize:none;transition:border-color .2s,box-shadow .2s;
+}
+textarea::placeholder,input::placeholder{color:var(--sub-4)}
+textarea:focus,select:focus,input:focus{outline:none;border-color:var(--g3);box-shadow:0 0 0 3px var(--g-pale-2)}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--sub-1) 50%),linear-gradient(135deg,var(--sub-1) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+
+/* --- スライダー --- */
+.slider-row{display:flex;flex-direction:column;gap:9px}
+.slider-head{display:flex;align-items:baseline;justify-content:space-between}
+.slider-head span{font-size:13px;font-weight:700;color:var(--ink-1)}
+.slider-head b{font-family:var(--num);font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.s-anx b{color:var(--mood-anx)} .s-dep b{color:var(--mood-dep)}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:var(--r-pill);
+  background:#E6E1D1;outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:24px;height:24px;border-radius:50%;
+  background:var(--card);border:2px solid currentColor;box-shadow:var(--sh-card);cursor:grab;
+}
+input[type=range]::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;background:var(--card);
+  border:2px solid currentColor;box-shadow:var(--sh-card);cursor:grab;
+}
+.s-anx input[type=range]{color:var(--mood-anx)}
+.s-dep input[type=range]{color:var(--mood-dep)}
+.scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--sub-3)}
+
+/* --- 下部CTA --- */
+.foot{
+  flex:none;padding:10px 24px calc(env(safe-area-inset-bottom,0px) + 22px);
+  display:flex;flex-direction:column;gap:9px;
+  background:linear-gradient(to top,var(--app-bg) 62%,transparent);
+}
+.cta{
+  width:100%;background:var(--cta-grad);color:var(--cta-ink);
+  border-radius:var(--r-btn);padding:15px 18px;font-size:15.5px;font-weight:700;
+  box-shadow:var(--sh-cta);letter-spacing:.02em;transition:transform .14s,opacity .2s;
+}
+.cta:active{transform:scale(.985)}
+.cta.ghost{background:none;color:var(--link);box-shadow:none;font-size:13.5px;font-weight:700;padding:9px}
+.cta.ghost:hover{color:var(--link-hover)}
+.foot .note{text-align:center;font-size:11.5px;color:var(--sub-2)}
+
+/* --- Welcome (step0) --- */
+.welcome{align-items:center;text-align:center;gap:14px;padding-top:34px}
+.welcome .hero{width:150px;height:150px;flex:none}
+.welcome .hero img{width:100%;height:100%;object-fit:contain}
+.welcome h1{
+  margin:6px 0 0;font-size:22px;font-weight:700;color:var(--ink-1);
+  line-height:1.65;text-wrap:balance;letter-spacing:.01em;
+}
+.welcome p{margin:0;font-size:13.5px;color:var(--ink-3);line-height:1.9;max-width:30ch}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;background:var(--g-pale-1);
+  border:1px solid var(--g-pale-line-2);color:var(--g2);border-radius:var(--r-pill);
+  padding:7px 14px;font-size:12px;font-weight:700;
+}
+
+/* --- 心の地図(仮) step6 --- */
+.map-wrap{position:relative;border-radius:var(--r-card-l);overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:var(--sh-card)}
+.map-bg{position:absolute;inset:0;background:url(assets/suplan/opt/moyanomori.jpg) center/cover no-repeat;opacity:.16}
+.map-inner{position:relative;padding:16px}
+.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mcell{background:rgba(255,255,255,.92);border:1px solid var(--line-soft);border-radius:var(--r-card-m);padding:11px 12px;min-height:74px;display:flex;flex-direction:column;gap:5px}
+.mcell dt{font-size:10.5px;font-weight:700;color:var(--g2);letter-spacing:.04em}
+.mcell dd{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.7;word-break:break-word}
+.mcell dd.empty{color:var(--sub-4)}
+.mnote{margin-top:9px;background:var(--g-pale-3);border:1px solid var(--g-pale-line-1);border-radius:var(--r-card-m);padding:12px 13px;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}
+.mnote img{width:34px;height:34px;object-fit:contain}
+.mnote p{margin:0;font-size:12.5px;color:var(--ink-3);line-height:1.8}
+
+/* --- 実験カード step7 --- */
+.exp-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card-l);padding:17px;box-shadow:var(--sh-card);display:flex;flex-direction:column;gap:11px}
+.exp-head{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center}
+.exp-head img{width:52px;height:52px;object-fit:contain}
+.tag{display:inline-flex;align-self:flex-start;background:var(--g-pale-4);border:1px solid var(--g-pale-line-2);color:var(--g2);border-radius:var(--r-pill);padding:4px 11px;font-size:10.5px;font-weight:700}
+.exp-title{font-size:17px;font-weight:700;color:var(--ink-1);line-height:1.6;text-wrap:balance}
+.exp-desc{font-size:13px;color:var(--ink-3);line-height:1.85}
+.how{background:var(--g-pale-3);border:1px solid var(--g-pale-line-1);border-radius:var(--r-card-m);padding:12px 14px}
+.how b{display:block;font-size:11.5px;color:var(--g2);margin-bottom:5px;letter-spacing:.04em}
+.how ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.how li{font-size:12.5px;color:var(--ink-3);line-height:1.75}
+.time-chip{display:inline-flex;align-items:center;gap:5px;background:var(--amber-bg);color:var(--amber-ink);border-radius:var(--r-pill);padding:5px 12px;font-size:11px;font-weight:700}
+.time-chip b{font-family:var(--num);font-weight:800}
+
+/* --- 完成 step8 --- */
+.done-wrap{align-items:center;text-align:center;gap:13px;padding-top:20px}
+.done-wrap .hero{width:150px;height:150px}
+.done-wrap .hero img{width:100%;height:100%;object-fit:contain}
+.done-wrap h1{margin:0;font-size:21px;font-weight:700;color:var(--ink-1);line-height:1.65}
+.badge{
+  display:flex;align-items:center;gap:9px;background:var(--g-pale-1);
+  border:1px solid var(--g-pale-line-2);border-radius:var(--r-card-m);padding:13px 16px;width:100%;
+}
+.badge .k{font-size:10.5px;color:var(--g2);font-weight:700;letter-spacing:.04em}
+.badge .v{font-size:14px;color:var(--ink-1);font-weight:700}
+
+/* =========================================================================
+   ホーム
+   ========================================================================= */
+.home-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.home-scroll::-webkit-scrollbar{width:0}
+.apphead{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(env(safe-area-inset-top,0px) + 20px) 24px 6px;
+}
+.logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:var(--ink-1);letter-spacing:.06em}
+.logo span{width:26px;height:26px;border-radius:8px;background:var(--g-pale-1);border:1px solid var(--g-pale-line-2);display:flex;align-items:center;justify-content:center}
+.logo span img{width:20px;height:20px;object-fit:contain}
+.bell{position:relative;width:34px;height:34px;border-radius:var(--r-round);background:var(--card);box-shadow:var(--sh-card);display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+.bell::after{content:"";position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--dot-unread);border:1.5px solid var(--card)}
+
+.home-pad{padding:0 24px calc(env(safe-area-inset-bottom,0px) + 96px);display:flex;flex-direction:column;gap:14px}
+.date{font-family:var(--num);font-size:11.5px;font-weight:700;color:var(--sub-2);letter-spacing:.08em}
+.greet{display:grid;grid-template-columns:1fr 58px;gap:10px;align-items:center}
+.greet h1{margin:0;font-size:20px;font-weight:700;color:var(--ink-1);line-height:1.6;text-wrap:balance}
+.greet .mascot{width:58px;height:58px}
+.greet .mascot img{width:100%;height:100%;object-fit:contain}
+
+.streak{
+  background:linear-gradient(120deg,#6E8A54,#55743F);color:#FCFBF4;
+  border-radius:var(--r-card-m);padding:13px 16px;display:flex;align-items:center;gap:10px;
+  box-shadow:var(--sh-card);
+}
+.streak .n{font-family:var(--num);font-size:19px;font-weight:800}
+.streak p{margin:0;font-size:12.5px;font-weight:700;letter-spacing:.02em}
+.streak small{display:block;font-weight:500;opacity:.86;font-size:11px}
+
+/* --- 今日やること --- */
+.today{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card-l);overflow:hidden;box-shadow:var(--sh-card-lift)}
+.today .visual{position:relative;height:132px;background:url(assets/suplan/opt/moyanomori.jpg) center 40%/cover no-repeat}
+.today .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.86))}
+.today .visual img{
+  position:absolute;right:16px;bottom:-6px;width:88px;height:88px;object-fit:contain;z-index:2;
+  filter:drop-shadow(0 8px 14px rgba(90,100,60,.28));
+}
+.today .inner{padding:14px 17px 17px;display:flex;flex-direction:column;gap:10px}
+.today h3{margin:0;font-size:17.5px;font-weight:700;color:var(--ink-1);line-height:1.6;text-wrap:balance}
+.today .desc{font-size:13px;color:var(--ink-3);line-height:1.85}
+.today .row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.tip{background:var(--g-pale-3);border:1px solid var(--g-pale-line-1);border-radius:var(--r-card-m);padding:11px 13px;font-size:12px;color:var(--ink-3);line-height:1.8}
+.tip b{color:var(--g2);font-weight:700}
+.btn-row{display:flex;gap:9px;align-items:center}
+.btn-row .cta{flex:1;padding:13px 16px;font-size:15px}
+.btn-sub{
+  flex:none;padding:13px 15px;border-radius:var(--r-btn);font-size:12.5px;font-weight:700;
+  background:var(--input-bg);border:1px solid var(--line-input);color:var(--ink-2);white-space:nowrap;
+}
+.today.finished .cta{opacity:.7}
+
+/* --- ふり返り --- */
+.review{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card-l);padding:16px 17px;box-shadow:var(--sh-card);display:flex;flex-direction:column;gap:13px}
+.review-head{display:grid;grid-template-columns:62px 1fr;gap:13px;align-items:center}
+.ring{width:62px;height:62px;position:relative;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .val{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:var(--num);font-weight:800;font-size:17px;color:var(--g2);line-height:1;
+}
+.ring .val small{font-family:var(--jp);font-size:8.5px;font-weight:700;color:var(--sub-2);margin-top:2px}
+.review h3{margin:0;font-size:15.5px;font-weight:700;color:var(--ink-1)}
+.review .sub{font-size:12px;color:var(--sub-1);line-height:1.7;margin-top:3px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day{display:flex;flex-direction:column;align-items:center;gap:5px}
+.day span{font-size:10px;color:var(--sub-3);font-weight:700}
+.day i{
+  width:100%;aspect-ratio:1;border-radius:9px;background:var(--input-bg);
+  border:1px solid var(--line-input);display:flex;align-items:center;justify-content:center;
+  font-family:var(--num);font-size:11px;font-weight:700;color:var(--sub-3);font-style:normal;
+}
+.day.hit i{background:var(--g-pale-1);border-color:var(--g-pale-line-2);color:var(--g2)}
+.day.now i{border-color:var(--g3);box-shadow:0 0 0 2px var(--g-pale-2)}
+
+/* --- 2カラム --- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.duo a{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-card-m);
+  padding:14px;display:flex;flex-direction:column;gap:7px;text-decoration:none;box-shadow:var(--sh-card);
+  transition:transform .14s;
+}
+.duo a:active{transform:scale(.985)}
+.duo img{width:38px;height:38px;object-fit:contain}
+.duo b{font-size:13.5px;color:var(--ink-1);font-weight:700}
+.duo small{font-size:11px;color:var(--sub-2);line-height:1.65}
+
+/* --- 応援バナー --- */
+.cheer{
+  background:var(--cheer-grad);border:1px solid var(--cheer-line);border-radius:var(--r-card-l);
+  padding:14px 16px;display:grid;grid-template-columns:1fr 62px;gap:11px;align-items:center;
+}
+.cheer p{margin:0;font-size:13px;font-weight:700;color:var(--cheer-ink);line-height:1.75;text-wrap:balance}
+.cheer small{display:block;font-weight:500;color:var(--cheer-sub);font-size:11.5px;margin-top:4px}
+.cheer img{width:62px;height:62px;object-fit:contain}
+
+/* --- ホーム空状態 --- */
+.empty-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:0 24px}
+.empty-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-card-l);
+  padding:30px 24px 26px;box-shadow:var(--sh-card-lift);text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:13px;width:100%;
+}
+.empty-card .hero{width:132px;height:132px}
+.empty-card .hero img{width:100%;height:100%;object-fit:contain}
+.empty-card h2{margin:0;font-size:19px;font-weight:700;color:var(--ink-1);line-height:1.65;text-wrap:balance}
+.empty-card p{margin:0;font-size:13px;color:var(--ink-3);line-height:1.85}
+
+/* --- ボトムタブ --- */
+.tabbar{
+  position:absolute;left:0;right:0;bottom:0;z-index:20;
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding:9px 8px calc(env(safe-area-inset-bottom,0px) + 10px);
+  background:rgba(250,247,238,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--line);
+}
+.tabbar[hidden]{display:none}
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--sub-2);transition:color .2s}
+.tabbar button b{font-size:9.5px;font-weight:700;letter-spacing:.02em}
+.tabbar button[aria-current="page"]{color:var(--g2)}
+
+/* --- トースト --- */
+.toast{
+  position:absolute;left:20px;right:20px;bottom:96px;z-index:40;
+  background:#3D4A38;color:#F6F3E9;border-radius:var(--r-card-m);
+  padding:13px 16px;font-size:12.5px;font-weight:500;line-height:1.7;
+  box-shadow:0 18px 34px -18px rgba(40,50,30,.8);
+  opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .3s,transform .3s;
+}
+.toast.on{opacity:1;transform:none}
+
+/* --- PC用の切替バー（実機では出さない） --- */
+.devbar{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:60;
+  display:flex;gap:6px;background:rgba(255,255,255,.9);border:1px solid var(--line);
+  border-radius:var(--r-pill);padding:5px;box-shadow:var(--sh-card);
+}
+.devbar button{font-size:11px;font-weight:700;color:var(--sub-1);padding:6px 13px;border-radius:var(--r-pill)}
+.devbar button.on{background:var(--g-pale-1);color:var(--g2)}
+@media(max-width:520px),(display-mode:standalone){.devbar{display:none}}
+</style>
+</head>
+
+<body>
+<div class="device">
+  <div class="screen-host">
+
+    <!-- ===================== オンボーディング ===================== -->
+    <section class="screen" id="scr-onb" aria-label="心の地図をつくる">
+      <div class="topbar" id="topbar">
+        <button class="icon-btn" id="btn-back" aria-label="前へ戻る">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="dots" id="dots" role="progressbar" aria-label="進捗"></div>
+        <button class="skip" id="btn-skip">スキップ</button>
+      </div>
+
+      <div class="body" id="onb-body">
+
+        <!-- step0 Welcome -->
+        <div class="step welcome" data-step="0">
+          <div class="hero float"><img src="assets/suplan/opt/base.png" alt="マスコットのすぷらん"></div>
+          <h1>すぷらんと一緒に、<br>心の地図を育てる旅へ</h1>
+          <p>認知行動療法（CBT）の考え方をもとに、あなたの「困りごと・考え・気持ち・行動」を少しずつ整理していきます。うまく話せなくても大丈夫です。</p>
+          <span class="pill">CBTベースで、やさしく実践できる</span>
+        </div>
+
+        <!-- step1 主訴 -->
+        <div class="step" data-step="1">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/base.png" alt=""></div>
+            <div class="bubble">
+              <h2>今のあなたに、いちばん近いものはどれですか？</h2>
+              <p>いくつ選んでも大丈夫。あとから変えられます。</p>
+            </div>
+          </div>
+          <div class="chips" data-chipset="concern">
+            <button class="chip" aria-pressed="false">不安が強い</button>
+            <button class="chip" aria-pressed="false">気分が落ち込む</button>
+            <button class="chip" aria-pressed="false">よく眠れない</button>
+            <button class="chip" aria-pressed="false">仕事に行くのがつらい</button>
+            <button class="chip" aria-pressed="false">人間関係がしんどい</button>
+            <button class="chip" aria-pressed="false">自分を責めてしまう</button>
+            <button class="chip" aria-pressed="false">やる気が出ない</button>
+          </div>
+          <div class="field">
+            <label for="concern-free">ほかにあれば、自由に書いてください</label>
+            <input type="text" id="concern-free" data-save="concernFree" placeholder="例：朝になると気持ちが重い">
+          </div>
+        </div>
+
+        <!-- step2 出来事 -->
+        <div class="step" data-step="2">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/thinking.png" alt=""></div>
+            <div class="bubble">
+              <h2>最近、つらい気持ちになった出来事はありますか？</h2>
+              <p>思い出せる範囲で構いません。書けそうになければスキップできます。</p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="event">出来事</label>
+            <textarea id="event" rows="5" data-save="event" placeholder="例：会議で発言したあと、誰も反応してくれなかった"></textarea>
+            <p class="hint">いつ・どこで・誰と・何があったか、が書けると地図が描きやすくなります。</p>
+          </div>
+        </div>
+
+        <!-- step3 考え -->
+        <div class="step" data-step="3">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/thinking.png" alt=""></div>
+            <div class="bubble">
+              <h2>その時、どんなことを考えていましたか？</h2>
+              <p>頭に浮かんだ言葉を、そのまま書いてもらえたら十分です。</p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="thought">その時の考え</label>
+            <textarea id="thought" rows="5" data-save="thought" placeholder="例：やっぱり自分は場違いなんだ"></textarea>
+          </div>
+        </div>
+
+        <!-- step4 気分・行動 -->
+        <div class="step" data-step="4">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/relieved.png" alt=""></div>
+            <div class="bubble">
+              <h2>その時の気持ちの強さは、どのくらいでしたか？</h2>
+              <p>だいたいで大丈夫です。</p>
+            </div>
+          </div>
+          <div class="slider-row s-anx">
+            <div class="slider-head"><span>不安</span><b id="v-anx">40</b></div>
+            <input type="range" id="anx" min="0" max="100" value="40" data-save="anxiety" aria-label="不安の強さ">
+            <div class="scale"><span>ぜんぜん</span><span>とても強い</span></div>
+          </div>
+          <div class="slider-row s-dep">
+            <div class="slider-head"><span>落ち込み</span><b id="v-dep">40</b></div>
+            <input type="range" id="dep" min="0" max="100" value="40" data-save="depress" aria-label="落ち込みの強さ">
+            <div class="scale"><span>ぜんぜん</span><span>とても強い</span></div>
+          </div>
+          <div class="field">
+            <label for="behavior">その時、どうしましたか？</label>
+            <textarea id="behavior" rows="3" data-save="behavior" placeholder="例：何も言えずに黙ってしまった／早退した"></textarea>
+          </div>
+        </div>
+
+        <!-- step5 なりたい -->
+        <div class="step" data-step="5">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/happy.png" alt=""></div>
+            <div class="bubble">
+              <h2>どんな自分になりたいですか？</h2>
+              <p>大きな目標でなくて大丈夫。いくつ選んでも構いません。</p>
+            </div>
+          </div>
+          <div class="chips" data-chipset="goal">
+            <button class="chip" aria-pressed="false">気持ちが楽になりたい</button>
+            <button class="chip" aria-pressed="false">ちゃんと眠りたい</button>
+            <button class="chip" aria-pressed="false">自分を責めずにいたい</button>
+            <button class="chip" aria-pressed="false">少しずつ動けるようになりたい</button>
+            <button class="chip" aria-pressed="false">人と話せるようになりたい</button>
+            <button class="chip" aria-pressed="false">仕事に戻りたい</button>
+            <button class="chip" aria-pressed="false">自分らしく過ごしたい</button>
+          </div>
+          <div class="field">
+            <label for="goal-free">ほかにあれば、自由に書いてください</label>
+            <input type="text" id="goal-free" data-save="goalFree" placeholder="例：休みの日に出かけられるようになりたい">
+          </div>
+        </div>
+
+        <!-- step6 心の地図(仮) -->
+        <div class="step" data-step="6">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/thinking.png" alt=""></div>
+            <div class="bubble">
+              <h2>いま話してくれたことを、地図にしてみました。</h2>
+              <p>これは「仮」の地図です。これから一緒に、少しずつ直していきます。</p>
+            </div>
+          </div>
+          <div class="map-wrap">
+            <div class="map-bg" aria-hidden="true"></div>
+            <div class="map-inner">
+              <dl class="map-grid">
+                <div class="mcell"><dt>いまの困りごと</dt><dd data-map="concern" class="empty">—</dd></div>
+                <div class="mcell"><dt>なりたい姿</dt><dd data-map="goal" class="empty">—</dd></div>
+                <div class="mcell"><dt>つらくなった場面</dt><dd data-map="event" class="empty">—</dd></div>
+                <div class="mcell"><dt>その時の考え</dt><dd data-map="thought" class="empty">—</dd></div>
+                <div class="mcell"><dt>気持ちの強さ</dt><dd data-map="mood" class="empty">—</dd></div>
+                <div class="mcell"><dt>とった行動</dt><dd data-map="behavior" class="empty">—</dd></div>
+              </dl>
+              <div class="mnote">
+                <img src="assets/suplan/opt/relieved.png" alt="">
+                <p id="map-note">出来事のあとに浮かんだ考えが、気持ちと行動につながっているみたいです。この流れをほどいていきましょう。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- step7 小さな実験 -->
+        <div class="step" data-step="7">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/bulb.png" alt=""></div>
+            <div class="bubble">
+              <h2>まずは、小さな実験からはじめませんか？</h2>
+              <p>うまくいかなくても大丈夫。試したこと自体が地図の材料になります。</p>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-head">
+              <img src="assets/suplan/opt/bulb.png" alt="">
+              <div>
+                <span class="tag">小さな実験（行動）</span>
+                <div class="exp-title">考えを書き出してみる</div>
+              </div>
+            </div>
+            <p class="exp-desc">頭の中でぐるぐるしている考えを、いったん外に出してみます。書くだけで、考えと自分のあいだに少し距離ができます。</p>
+            <div class="how">
+              <b>やり方</b>
+              <ol>
+                <li>紙かスマホのメモを開く</li>
+                <li>浮かんでいることを、そのまま3行書く</li>
+                <li>読み返さずに、いったん閉じる</li>
+              </ol>
+            </div>
+            <div class="row"><span class="time-chip">⏱ <b>5</b>分</span></div>
+            <div class="field">
+              <label for="when">いつやる？</label>
+              <select id="when" data-save="when">
+                <option>今すぐ</option><option selected>今日の夜</option><option>明日</option><option>週末に</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- step8 完成 -->
+        <div class="step done-wrap" data-step="8">
+          <div class="hero float"><img src="assets/suplan/opt/excited.png" alt=""></div>
+          <h1>最初の地図ができたね。</h1>
+          <p style="margin:0;font-size:13.5px;color:var(--ink-3);line-height:1.9">ここからは毎日ホームに、その日の小さな一歩が出てきます。<br>地図は使うほど、あなたに合ったものになっていきます。</p>
+          <div class="badge">
+            <img src="assets/suplan/opt/bulb.png" alt="" style="width:36px;height:36px;object-fit:contain">
+            <div><div class="k">今日の実験</div><div class="v">考えを書き出してみる</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <button class="cta" id="btn-next">はじめる</button>
+        <p class="note" id="foot-note">約10〜15分でできます</p>
+        <button class="cta ghost" id="btn-alt" hidden>別の実験をみる</button>
+      </div>
+    </section>
+
+    <!-- ===================== ホーム ===================== -->
+    <section class="screen" id="scr-home" aria-label="ホーム">
+
+      <!-- 空状態 -->
+      <div id="home-empty" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div class="apphead">
+          <div class="logo"><span><img src="assets/suplan/opt/base.png" alt=""></span>すぷらん</div>
+        </div>
+        <div style="padding:0 24px"><div class="date" id="date-empty"></div>
+          <h1 style="margin:4px 0 0;font-size:20px;font-weight:700;color:var(--ink-1)">はじめまして、みなとさん</h1>
+        </div>
+        <div class="empty-wrap">
+          <div class="empty-card">
+            <div class="hero float"><img src="assets/suplan/opt/watering.png" alt=""></div>
+            <h2>まずは、心の地図を<br>一緒に作ろう</h2>
+            <p>いまの気持ちや状況を、すこしずつ整理していきます。</p>
+            <span class="pill">約10分・いつでも中断OK</span>
+            <button class="cta" id="btn-start-map" style="margin-top:4px">心の地図を作る</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- アクティブ状態 -->
+      <div id="home-active" class="home-scroll" hidden>
+        <div class="apphead">
+          <div class="logo"><span><img src="assets/suplan/opt/base.png" alt=""></span>すぷらん</div>
+          <button class="bell" aria-label="お知らせ（未読あり）">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </button>
+        </div>
+
+        <div class="home-pad">
+          <div>
+            <div class="date" id="date-active"></div>
+            <div class="greet">
+              <h1 id="greet-text">おはようございます、みなとさん</h1>
+              <div class="mascot float"><img src="assets/suplan/opt/happy.png" alt=""></div>
+            </div>
+          </div>
+
+          <div class="streak">
+            <span class="n">3</span>
+            <p>連続記録 3日目！<small>すこしずつ、続いています</small></p>
+          </div>
+
+          <!-- 今日やること -->
+          <div class="today" id="today-card">
+            <div class="visual"><img id="exp-img" src="assets/suplan/opt/bulb.png" alt=""></div>
+            <div class="inner">
+              <span class="tag" id="exp-tag">小さな実験（行動）</span>
+              <h3 id="exp-title">考えを書き出してみる</h3>
+              <p class="desc" id="exp-desc">頭の中でぐるぐるしている考えを、いったん外に出してみます。書くだけで、考えと自分のあいだに少し距離ができます。</p>
+              <div class="row"><span class="time-chip">⏱ <b id="exp-min">5</b>分</span></div>
+              <div class="tip"><b>ヒント：</b><span id="exp-tip">うまく書けなくて大丈夫です。単語だけでも、地図の材料になります。</span></div>
+              <div class="btn-row">
+                <button class="cta" id="btn-do">やってみる！</button>
+                <button class="btn-sub" id="btn-other">他の行動をみる</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 週1回のふり返り -->
+          <div class="review">
+            <div class="review-head">
+              <div class="ring">
+                <svg width="62" height="62" viewBox="0 0 62 62">
+                  <circle cx="31" cy="31" r="26" fill="none" stroke="#EBE6D6" stroke-width="6"/>
+                  <circle cx="31" cy="31" r="26" fill="none" stroke="#7FA05F" stroke-width="6" stroke-linecap="round"
+                          stroke-dasharray="163.4" stroke-dashoffset="46.7"/>
+                </svg>
+                <div class="val">2<small>日後</small></div>
+              </div>
+              <div>
+                <h3>週1回のふり返り</h3>
+                <p class="sub">この1週間の気持ちの動きを、すぷらんと一緒に見わたします。</p>
+              </div>
+            </div>
+            <div class="week" id="week"></div>
+            <button class="cta" style="padding:13px">ふり返りをはじめる</button>
+          </div>
+
+          <!-- 2カラム -->
+          <div class="duo">
+            <a href="#map"><img src="assets/suplan/opt/thinking.png" alt=""><b>仮の心の地図</b><small>6つの項目が埋まりました</small></a>
+            <a href="#log"><img src="assets/suplan/opt/thanks.png" alt=""><b>きろく</b><small>これまでの歩みを見る</small></a>
+          </div>
+
+          <!-- 応援 -->
+          <div class="cheer">
+            <p>今日はここまでで十分です。<small>できた日も、できなかった日も、記録になります。</small></p>
+            <img src="assets/suplan/opt/watering.png" alt="">
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast">いいね。あとで「きろく」でふり返れるよ。</div>
+    </section>
+
+    <!-- ボトムタブ -->
+    <nav class="tabbar" id="tabbar" hidden aria-label="メインナビゲーション">
+      <button aria-current="page">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.6V20h14V9.6"/></svg><b>ホーム</b>
+      </button>
+      <button>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 7 9 4z"/><path d="M9 4v13M15 7v12.5"/></svg><b>心の地図</b>
+      </button>
+      <button>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h10l4 4v14H6z"/><path d="M9 9h7M9 13h7M9 17h4"/></svg><b>きろく</b>
+      </button>
+      <button>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.5a8 8 0 0 1-8.5 8 8.4 8.4 0 0 1-3.8-.9L3 20.5l1.9-5.2A8 8 0 1 1 20.5 11.5z"/></svg><b>サポート</b>
+      </button>
+      <button>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.3 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 13.9H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7.3l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9.3A1.6 1.6 0 0 0 10.3 3.4V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1a1.6 1.6 0 0 0 1.5 1h.1a2 2 0 1 1 0 4H21a1.6 1.6 0 0 0-1.6 1z"/></svg><b>設定</b>
+      </button>
+    </nav>
+
+  </div>
+</div>
+
+<div class="devbar" role="group" aria-label="表示切替（確認用）">
+  <button data-go="onb">オンボーディング</button>
+  <button data-go="empty">ホーム（未作成）</button>
+  <button data-go="active">ホーム（作成後）</button>
+</div>
+
+<script>
+'use strict';
+/* =========================================================================
+   状態
+   ========================================================================= */
+var KEY = 'suplan.v1';
+var state = {
+  step: 0,
+  concern: [], goal: [],
+  concernFree: '', goalFree: '',
+  event: '', thought: '', behavior: '',
+  anxiety: 40, depress: 40,
+  when: '今日の夜',
+  mapDone: false,
+  exp: 0, done: false
+};
+try {
+  var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (saved) { for (var k in saved) { if (k in state) state[k] = saved[k]; } }
+} catch (e) { /* 壊れていたら初期値で進む */ }
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+var $  = function (s) { return document.querySelector(s); };
+var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+/* =========================================================================
+   小さな実験（3種。ホームで巡回する）
+   ========================================================================= */
+var EXPERIMENTS = [
+  { tag:'小さな実験（行動）', title:'考えを書き出してみる', min:5,
+    img:'assets/suplan/opt/bulb.png',
+    desc:'頭の中でぐるぐるしている考えを、いったん外に出してみます。書くだけで、考えと自分のあいだに少し距離ができます。',
+    tip:'うまく書けなくて大丈夫です。単語だけでも、地図の材料になります。' },
+  { tag:'小さな実験（からだ）', title:'5分だけ外の空気を吸う', min:10,
+    img:'assets/suplan/opt/relieved.png',
+    desc:'玄関の外やベランダで、5分だけ立ってみます。気分を変えようとしなくて大丈夫。ただ空気にあたるだけで十分です。',
+    tip:'できそうになければ、窓を開けるだけでも一歩です。' },
+  { tag:'小さな実験（つながり）', title:'誰かに「ありがとう」を伝える', min:3,
+    img:'assets/suplan/opt/heart.png',
+    desc:'家族でも同僚でも、店員さんでも構いません。ひとことだけ、感謝を言葉にしてみます。',
+    tip:'直接でなくても、メッセージでも大丈夫です。' }
+];
+
+/* =========================================================================
+   画面切替
+   ========================================================================= */
+function show(screen) {
+  $$('.screen').forEach(function (s) { s.classList.remove('on'); });
+  var el = screen === 'onb' ? $('#scr-onb') : $('#scr-home');
+  el.classList.add('on');
+  $('#tabbar').hidden = (screen !== 'home');
+}
+
+function goHome(mode) {
+  var active = (mode === 'active');
+  $('#home-empty').hidden = active;
+  $('#home-empty').style.display = active ? 'none' : 'flex';
+  $('#home-active').hidden = !active;
+  if (active) { renderHome(); }
+  show('home');
+  var host = active ? $('#home-active') : $('#home-empty');
+  host.classList.remove('sp-in'); void host.offsetWidth; host.classList.add('sp-in');
+  $$('.devbar button').forEach(function (b) { b.classList.toggle('on', b.dataset.go === mode); });
+}
+
+/* =========================================================================
+   オンボーディング
+   ========================================================================= */
+var LAST = 8;
+var SKIPPABLE = [2, 3, 4];          // スキップを出すのは STEP2/3/4 のみ（ハンドオフ指定）
+var CTA_LABEL = {
+  0:'はじめる', 1:'つぎへ', 2:'つぎへ', 3:'つぎへ', 4:'つぎへ',
+  5:'仮の心の地図をつくる', 6:'小さな実験を提案してもらう', 7:'やってみる！', 8:'ホームへ'
+};
+var CTA_NOTE = { 0:'約10〜15分でできます' };
+
+function renderDots() {
+  var d = $('#dots');
+  d.innerHTML = '';
+  // ドットは STEP1〜7 の7つ。Welcome(0) と 完成(8) は範囲外。
+  for (var i = 1; i <= 7; i++) {
+    var el = document.createElement('i');
+    if (state.step === i) el.className = 'now';
+    else if (state.step > i) el.className = 'done';
+    d.appendChild(el);
+  }
+  d.setAttribute('aria-valuenow', Math.min(Math.max(state.step, 1), 7));
+  d.setAttribute('aria-valuemin', '1');
+  d.setAttribute('aria-valuemax', '7');
+}
+
+function renderStep() {
+  $$('.step').forEach(function (s) {
+    var on = Number(s.dataset.step) === state.step;
+    s.classList.toggle('on', on);
+    if (on) { s.classList.remove('sp-in'); void s.offsetWidth; s.classList.add('sp-in'); }
+  });
+
+  $('#topbar').hidden = (state.step === 0);
+  $('#btn-back').disabled = (state.step <= 1);
+  $('#btn-skip').hidden = (SKIPPABLE.indexOf(state.step) === -1);
+  $('#btn-next').textContent = CTA_LABEL[state.step];
+  var note = CTA_NOTE[state.step];
+  $('#foot-note').textContent = note || '';
+  $('#foot-note').hidden = !note;
+  // 「別の実験をみる」は実験提案(7)と完成(8)だけ。文言は画面で変える。
+  var alt = $('#btn-alt');
+  alt.hidden = (state.step !== 7 && state.step !== 8);
+  alt.textContent = (state.step === 8) ? 'もう一度はじめから見る' : '別の実験をみる';
+
+  if (state.step === 6) renderMap();
+  $('#onb-body').scrollTop = 0;
+  renderDots();
+  save();
+}
+
+function setStep(n) {
+  state.step = Math.max(0, Math.min(LAST, n));
+  renderStep();
+}
+
+/* --- 仮の心の地図 --- */
+function renderMap() {
+  var concern = state.concern.slice();
+  if (state.concernFree) concern.push(state.concernFree);
+  var goal = state.goal.slice();
+  if (state.goalFree) goal.push(state.goalFree);
+
+  var vals = {
+    concern:  concern.join('、'),
+    goal:     goal.join('、'),
+    event:    state.event,
+    thought:  state.thought,
+    behavior: state.behavior,
+    mood:     '不安 ' + state.anxiety + '／落ち込み ' + state.depress
+  };
+  $$('[data-map]').forEach(function (el) {
+    var v = vals[el.dataset.map];
+    el.textContent = v && String(v).trim() ? v : 'まだ書いていません';
+    el.classList.toggle('empty', !(v && String(v).trim()));
+  });
+
+  // 見立ての文はテンプレート。実装フェーズでAI生成（map_hypothesis_propose）に差し替える。
+  var note;
+  if (state.thought && state.behavior) {
+    note = '「' + trim(state.thought, 18) + '」という考えが浮かんだあと、行動にもつながっているようです。この流れをほどいていきましょう。';
+  } else if (concern.length) {
+    note = '「' + trim(concern[0], 14) + '」が、いまのあなたの真ん中にありそうです。ここから一緒に見ていきましょう。';
+  } else {
+    note = 'まだ空欄が多くても大丈夫。使いながら、少しずつ埋めていけます。';
+  }
+  $('#map-note').textContent = note;
+}
+function trim(s, n) { s = String(s).trim(); return s.length > n ? s.slice(0, n) + '…' : s; }
+
+/* --- チップ --- */
+$$('[data-chipset]').forEach(function (set) {
+  var key = set.dataset.chipset;
+  Array.prototype.forEach.call(set.children, function (chip) {
+    if (state[key].indexOf(chip.textContent) !== -1) chip.setAttribute('aria-pressed', 'true');
+    chip.addEventListener('click', function () {
+      var on = chip.getAttribute('aria-pressed') === 'true';
+      chip.setAttribute('aria-pressed', on ? 'false' : 'true');
+      var i = state[key].indexOf(chip.textContent);
+      if (on) { if (i !== -1) state[key].splice(i, 1); }
+      else if (i === -1) { state[key].push(chip.textContent); }
+      save();
+    });
+  });
+});
+
+/* --- 入力の保存 --- */
+$$('[data-save]').forEach(function (el) {
+  var key = el.dataset.save;
+  if (state[key] !== undefined && state[key] !== '') el.value = state[key];
+  var ev = (el.type === 'range') ? 'input' : 'change';
+  el.addEventListener(ev, function () {
+    state[key] = (el.type === 'range') ? Number(el.value) : el.value;
+    save();
+  });
+});
+
+/* --- スライダーの数値をライブ更新 --- */
+function bindSlider(id, out) {
+  var el = $(id), o = $(out);
+  o.textContent = el.value;
+  el.addEventListener('input', function () { o.textContent = el.value; });
+}
+bindSlider('#anx', '#v-anx');
+bindSlider('#dep', '#v-dep');
+
+/* --- ナビゲーション --- */
+$('#btn-next').addEventListener('click', function () {
+  if (state.step === LAST) { state.mapDone = true; save(); goHome('active'); return; }
+  setStep(state.step + 1);
+});
+$('#btn-back').addEventListener('click', function () { setStep(state.step - 1); });
+$('#btn-skip').addEventListener('click', function () { setStep(state.step + 1); });
+$('#btn-alt').addEventListener('click', function () {
+  if (state.step === 8) { setStep(0); return; }
+  state.exp = (state.exp + 1) % EXPERIMENTS.length;
+  save();
+  setStep(8);   // 別の実験を選んだら完成画面へ（提案は1周で決める）
+});
+
+/* =========================================================================
+   ホーム
+   ========================================================================= */
+var WD = ['日', '月', '火', '水', '木', '金', '土'];
+
+function renderDate() {
+  var d = new Date();
+  var t = d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' +
+          String(d.getDate()).padStart(2, '0') + ' ' + WD[d.getDay()];
+  $('#date-active').textContent = t;
+  $('#date-empty').textContent = t;
+}
+
+function renderGreeting() {
+  var h = new Date().getHours();
+  var g = (h < 4) ? 'こんばんは' : (h < 11) ? 'おはようございます' : (h < 18) ? 'こんにちは' : 'こんばんは';
+  $('#greet-text').textContent = g + '、みなとさん';
+}
+
+function renderWeek() {
+  var host = $('#week');
+  host.innerHTML = '';
+  var today = new Date();
+  var mondayOffset = (today.getDay() + 6) % 7;      // 月曜はじまり
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() - mondayOffset + i);
+    var cell = document.createElement('div');
+    cell.className = 'day' + (i < mondayOffset ? ' hit' : '') + (i === mondayOffset ? ' now' : '');
+    cell.innerHTML = '<span>' + WD[d.getDay()] + '</span><i>' + d.getDate() + '</i>';
+    host.appendChild(cell);
+  }
+}
+
+function renderExperiment() {
+  var e = EXPERIMENTS[state.exp];
+  $('#exp-tag').textContent = e.tag;
+  $('#exp-title').textContent = e.title;
+  $('#exp-desc').textContent = e.desc;
+  $('#exp-min').textContent = e.min;
+  $('#exp-tip').textContent = e.tip;
+  $('#exp-img').src = e.img;
+  var card = $('#today-card'), btn = $('#btn-do');
+  card.classList.toggle('finished', state.done);
+  btn.textContent = state.done ? 'やってみた ✓' : 'やってみる！';
+}
+
+function renderHome() {
+  renderDate(); renderGreeting(); renderWeek(); renderExperiment();
+}
+
+var toastTimer = null;
+$('#btn-do').addEventListener('click', function () {
+  if (state.done) return;
+  state.done = true; save();
+  renderExperiment();
+  var t = $('#toast');
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.classList.remove('on'); }, 3200);
+});
+
+$('#btn-other').addEventListener('click', function () {
+  state.exp = (state.exp + 1) % EXPERIMENTS.length;
+  state.done = false;                 // 実験を切り替えたら完了状態はリセット
+  save();
+  renderExperiment();
+  var card = $('#today-card');
+  card.classList.remove('sp-in'); void card.offsetWidth; card.classList.add('sp-in');
+});
+
+$('#btn-start-map').addEventListener('click', function () { setStep(0); show('onb'); });
+
+/* =========================================================================
+   起動
+   ========================================================================= */
+$$('.devbar button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (b.dataset.go === 'onb') { setStep(0); show('onb'); $$('.devbar button').forEach(function (x) { x.classList.toggle('on', x === b); }); }
+    else goHome(b.dataset.go);
+  });
+});
+
+(function boot() {
+  renderDate();
+  var hash = location.hash.replace('#', '');
+  if (hash === 'active') { goHome('active'); return; }
+  if (hash === 'empty')  { goHome('empty');  return; }
+  if (state.mapDone) { goHome('active'); return; }
+  setStep(state.step || 0);
+  show('onb');
+})();
+</script>
+</body>
+</html>
