@@ -159,6 +159,26 @@ textarea,select,input{font:inherit;color:inherit}
 }
 .chip:active{transform:scale(.97)}
 .chip[aria-pressed="true"]{background:var(--g-pale-1);border-color:var(--g3);color:#4E6B41;font-weight:700}
+/* 単一選択（安全確認）は縦積み。押し間違いを減らすため1行1択にする。 */
+.chips.col{flex-direction:column;align-items:stretch}
+.chips.col .chip{text-align:left}
+
+/* --- 安全確認の相談先ブロック --- */
+.safety-box{
+  display:flex;flex-direction:column;gap:9px;margin-top:2px;
+  background:var(--amber-bg);border-radius:var(--r-card);padding:15px 16px;
+}
+.sb-head{display:flex;align-items:center;gap:7px;color:var(--amber-ink)}
+.sb-head b{font-size:13.5px}
+.safety-box p{margin:0;font-size:12.5px;line-height:1.85;color:var(--ink-2)}
+.sb-line{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;
+  background:var(--card);border-radius:12px;padding:11px 13px;
+}
+.sb-name{font-size:12px;font-weight:700;color:var(--ink-1)}
+.sb-num{font-size:16px;font-weight:700;color:var(--amber-ink);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.sb-note{font-size:11px;color:var(--sub-2)}
+.sb-foot{font-size:11px;color:var(--sub-3)}
 
 /* --- 入力 --- */
 .field{display:flex;flex-direction:column;gap:7px}
@@ -405,7 +425,19 @@ input[type=range]::-moz-range-thumb{
 }
 .devbar button{font-size:11px;font-weight:700;color:var(--sub-1);padding:6px 13px;border-radius:var(--r-pill)}
 .devbar button.on{background:var(--g-pale-1);color:var(--g2)}
-@media(max-width:520px),(display-mode:standalone){.devbar{display:none}}
+/* 監修レビュー用の切替なので、スマホ実機でも出す（インストール済みPWAでだけ隠す） */
+@media(display-mode:standalone){.devbar{display:none}}
+@media(max-width:520px){.devbar button{font-size:10px;padding:6px 9px}}
+
+/* 現在どのフローを見ているかの表示（レビュー用） */
+.flowtag{
+  position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:60;
+  font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:4px 11px;
+  border-radius:var(--r-pill);background:rgba(255,255,255,.92);border:1px solid var(--line);
+  color:var(--sub-1);box-shadow:var(--sh-card);
+}
+.flowtag.lite{background:var(--g-pale-1);border-color:var(--g3);color:var(--g2)}
+@media(display-mode:standalone){.flowtag{display:none}}
 </style>
 </head>
 
@@ -611,6 +643,36 @@ input[type=range]::-moz-range-thumb{
             <div><div class="k">今日の実験</div><div class="v">考えを書き出してみる</div></div>
           </div>
         </div>
+
+        <!-- step9 安全確認（軽量版フローでのみ通る） -->
+        <div class="step" data-step="9">
+          <div class="ask">
+            <div class="av"><img src="assets/suplan/opt/base.png" alt=""></div>
+            <div class="bubble">
+              <h2>ひとつだけ、確認させてください。</h2>
+              <p>答えたくなければ、そのまま進んで大丈夫です。</p>
+            </div>
+          </div>
+          <div class="chips col" data-radioset="safety">
+            <button class="chip" aria-pressed="false">つらいけれど、日常は送れている</button>
+            <button class="chip" aria-pressed="false">つらくて、生活に支障が出ている</button>
+            <button class="chip" aria-pressed="false">消えてしまいたいと思うことがある</button>
+            <button class="chip" aria-pressed="false">答えたくない</button>
+          </div>
+          <div class="safety-box" id="safety-box" hidden>
+            <div class="sb-head">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5"/><path d="M12 16.5v.01"/><circle cx="12" cy="12" r="9"/></svg>
+              <b>話してくれて、ありがとう。</b>
+            </div>
+            <p>ここから先は、アプリだけで抱えないほうがいい話だと思います。いまつらい気持ちを、人に聞いてもらうことができます。</p>
+            <div class="sb-line">
+              <span class="sb-name">よりそいホットライン</span>
+              <span class="sb-num">0120-279-338</span>
+              <span class="sb-note">24時間・通話無料</span>
+            </div>
+            <p class="sb-foot">※ 掲載する相談先と案内の文面は、監修で確定させる箇所です。</p>
+          </div>
+        </div>
       </div>
 
       <div class="foot">
@@ -740,8 +802,11 @@ input[type=range]::-moz-range-thumb{
   </div>
 </div>
 
+<div class="flowtag" id="flowtag" hidden>現行フロー／設問8問</div>
+
 <div class="devbar" role="group" aria-label="表示切替（確認用）">
-  <button data-go="onb">オンボーディング</button>
+  <button data-go="onb">現行（8問）</button>
+  <button data-go="lite">軽量版（3問）</button>
   <button data-go="empty">ホーム（未作成）</button>
   <button data-go="active">ホーム（作成後）</button>
 </div>
@@ -759,6 +824,7 @@ var state = {
   event: '', thought: '', behavior: '',
   anxiety: 40, depress: 40,
   when: '今日の夜',
+  safety: '',
   mapDone: false,
   exp: 0, done: false
 };
@@ -818,26 +884,57 @@ function goHome(mode) {
    オンボーディング
    ========================================================================= */
 var LAST = 8;
-var SKIPPABLE = [2, 3, 4];          // スキップを出すのは STEP2/3/4 のみ（ハンドオフ指定）
+
+/* --- フロー定義 ---------------------------------------------------------
+   FULL = 2026-08-02 実装の現行フロー（設問8問）。
+   LITE = 2026-09-01 方針案B＋D。設問を「主訴／安全確認／なりたい状態」の3問に絞り、
+          コラム法にあたる STEP2-4（出来事→考え→気分の強さ）を初回から外す。
+          β実測でコラム法の完了率が0%だったため、最初の関門に置かない。
+          外した3問は2回目以降のセッションへ分散する想定（未実装）。
+   step番号そのものは変えず、通す順番だけを配列で持つ。
+   ------------------------------------------------------------------------ */
+var FLOW_FULL = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+var FLOW_LITE = [0, 1, 9, 5, 6, 7, 8];
+var flow = FLOW_FULL;
+
+var SKIPPABLE_FULL = [2, 3, 4];     // スキップを出すのは STEP2/3/4 のみ（ハンドオフ指定）
+var SKIPPABLE_LITE = [1, 5];        // 安全確認(9)はスキップを出さず「答えたくない」を選択肢に持たせる
 var CTA_LABEL = {
   0:'はじめる', 1:'つぎへ', 2:'つぎへ', 3:'つぎへ', 4:'つぎへ',
-  5:'仮の心の地図をつくる', 6:'小さな実験を提案してもらう', 7:'やってみる！', 8:'ホームへ'
+  5:'仮の心の地図をつくる', 6:'小さな実験を提案してもらう', 7:'やってみる！', 8:'ホームへ',
+  9:'つぎへ'
 };
 var CTA_NOTE = { 0:'約10〜15分でできます' };
+var CTA_NOTE_LITE = { 0:'約3分でできます' };
+
+function isLite() { return flow === FLOW_LITE; }
+function flowPos() { var i = flow.indexOf(state.step); return i === -1 ? 0 : i; }
+function stepBy(delta) {
+  var i = Math.max(0, Math.min(flow.length - 1, flowPos() + delta));
+  setStep(flow[i]);
+}
+function setFlow(f) {
+  flow = f;
+  $('#flowtag').hidden = false;
+  $('#flowtag').textContent = isLite() ? '軽量版フロー／設問3問' : '現行フロー／設問8問';
+  $('#flowtag').classList.toggle('lite', isLite());
+}
 
 function renderDots() {
   var d = $('#dots');
   d.innerHTML = '';
-  // ドットは STEP1〜7 の7つ。Welcome(0) と 完成(8) は範囲外。
-  for (var i = 1; i <= 7; i++) {
+  // ドットは Welcome(先頭) と 完成(末尾) を除いた中間ステップぶん。
+  var n = flow.length - 2;
+  var pos = flowPos();
+  for (var i = 1; i <= n; i++) {
     var el = document.createElement('i');
-    if (state.step === i) el.className = 'now';
-    else if (state.step > i) el.className = 'done';
+    if (pos === i) el.className = 'now';
+    else if (pos > i) el.className = 'done';
     d.appendChild(el);
   }
-  d.setAttribute('aria-valuenow', Math.min(Math.max(state.step, 1), 7));
+  d.setAttribute('aria-valuenow', Math.min(Math.max(pos, 1), n));
   d.setAttribute('aria-valuemin', '1');
-  d.setAttribute('aria-valuemax', '7');
+  d.setAttribute('aria-valuemax', String(n));
 }
 
 function renderStep() {
@@ -848,10 +945,11 @@ function renderStep() {
   });
 
   $('#topbar').hidden = (state.step === 0);
-  $('#btn-back').disabled = (state.step <= 1);
-  $('#btn-skip').hidden = (SKIPPABLE.indexOf(state.step) === -1);
+  $('#btn-back').disabled = (flowPos() <= 1);
+  var skippable = isLite() ? SKIPPABLE_LITE : SKIPPABLE_FULL;
+  $('#btn-skip').hidden = (skippable.indexOf(state.step) === -1);
   $('#btn-next').textContent = CTA_LABEL[state.step];
-  var note = CTA_NOTE[state.step];
+  var note = (isLite() ? CTA_NOTE_LITE : CTA_NOTE)[state.step];
   $('#foot-note').textContent = note || '';
   $('#foot-note').hidden = !note;
   // 「別の実験をみる」は実験提案(7)と完成(8)だけ。文言は画面で変える。
@@ -866,7 +964,8 @@ function renderStep() {
 }
 
 function setStep(n) {
-  state.step = Math.max(0, Math.min(LAST, n));
+  // 現在のフローに無いステップ（例：現行フローでの安全確認9）へは飛ばさない
+  state.step = (flow.indexOf(n) === -1) ? flow[0] : n;
   renderStep();
 }
 
@@ -920,6 +1019,29 @@ $$('[data-chipset]').forEach(function (set) {
   });
 });
 
+/* --- 単一選択（安全確認） --- */
+$$('[data-radioset]').forEach(function (set) {
+  var key = set.dataset.radioset;
+  Array.prototype.forEach.call(set.children, function (chip) {
+    if (state[key] === chip.textContent) chip.setAttribute('aria-pressed', 'true');
+    chip.addEventListener('click', function () {
+      Array.prototype.forEach.call(set.children, function (c) { c.setAttribute('aria-pressed', 'false'); });
+      chip.setAttribute('aria-pressed', 'true');
+      state[key] = chip.textContent;
+      save();
+      renderSafety();
+    });
+  });
+});
+
+// リスクに該当する選択のときだけ相談先を出す。通常ワークより安全対応を優先する（正本§20）。
+var SAFETY_ALERT = ['消えてしまいたいと思うことがある'];
+function renderSafety() {
+  var box = $('#safety-box');
+  if (box) box.hidden = (SAFETY_ALERT.indexOf(state.safety) === -1);
+}
+renderSafety();
+
 /* --- 入力の保存 --- */
 $$('[data-save]').forEach(function (el) {
   var key = el.dataset.save;
@@ -943,10 +1065,10 @@ bindSlider('#dep', '#v-dep');
 /* --- ナビゲーション --- */
 $('#btn-next').addEventListener('click', function () {
   if (state.step === LAST) { state.mapDone = true; save(); goHome('active'); return; }
-  setStep(state.step + 1);
+  stepBy(1);
 });
-$('#btn-back').addEventListener('click', function () { setStep(state.step - 1); });
-$('#btn-skip').addEventListener('click', function () { setStep(state.step + 1); });
+$('#btn-back').addEventListener('click', function () { stepBy(-1); });
+$('#btn-skip').addEventListener('click', function () { stepBy(1); });
 $('#btn-alt').addEventListener('click', function () {
   if (state.step === 8) { setStep(0); return; }
   state.exp = (state.exp + 1) % EXPERIMENTS.length;
@@ -1032,8 +1154,15 @@ $('#btn-start-map').addEventListener('click', function () { setStep(0); show('on
    ========================================================================= */
 $$('.devbar button').forEach(function (b) {
   b.addEventListener('click', function () {
-    if (b.dataset.go === 'onb') { setStep(0); show('onb'); $$('.devbar button').forEach(function (x) { x.classList.toggle('on', x === b); }); }
-    else goHome(b.dataset.go);
+    var go = b.dataset.go;
+    if (go === 'onb' || go === 'lite') {
+      setFlow(go === 'lite' ? FLOW_LITE : FLOW_FULL);
+      setStep(0); show('onb');
+      $$('.devbar button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    } else {
+      $('#flowtag').hidden = true;
+      goHome(go);
+    }
   });
 });
 
@@ -1042,9 +1171,16 @@ $$('.devbar button').forEach(function (b) {
   var hash = location.hash.replace('#', '');
   if (hash === 'active') { goHome('active'); return; }
   if (hash === 'empty')  { goHome('empty');  return; }
+  if (hash === 'lite') {
+    setFlow(FLOW_LITE); setStep(0); show('onb');
+    $$('.devbar button').forEach(function (x) { x.classList.toggle('on', x.dataset.go === 'lite'); });
+    return;
+  }
   if (state.mapDone) { goHome('active'); return; }
+  setFlow(FLOW_FULL);
   setStep(state.step || 0);
   show('onb');
+  $$('.devbar button').forEach(function (x) { x.classList.toggle('on', x.dataset.go === 'onb'); });
 })();
 </script>
 </body>
