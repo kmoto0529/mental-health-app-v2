@@ -7150,7 +7150,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.95-beta.3';
+window.MOYANOMORI_VERSION = 'v0.9.96-beta.1';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
@@ -8497,14 +8497,15 @@ function viewGuide() {
 
 // ============================================================
 // オンボーディング: 招待コード入力（v0.9.69 β限定アクセス）
-//   - guide → invite-code → home
+//   - v0.9.96: invite-code → welcome → consent → nickname → profile → guide → home
+//     （ゲートを先頭へ移動。旧: guide → invite-code → home）
 //   - 招待コード必須。配布された6桁程度のコードを入力。
 //   - /api/validate-invite で即時検証 → state.preferences.inviteCode に保存
 // ============================================================
 function viewInviteCode() {
   return `
     <div class="screen active ob-screen">
-      <div class="ob-step">最後に</div>
+      <div class="ob-step">はじめに</div>
       <h1 class="ob-h1">招待コードを入力</h1>
       <p class="ob-sub">β版を使うための招待コードを<br>事前にお渡ししています。</p>
 
@@ -18876,7 +18877,14 @@ function handleAction(act, el, ev) {
   if (act === 'consent-agree' || act === 'consent-agree-from-details') {
     state.consent = { given: true, version: (window.ASIDE_CONFIG && window.ASIDE_CONFIG.consentVersion) || 'v1', at: Date.now() };
     saveState();
-    if (window.MoyaLogger) MoyaLogger.recordConsent();
+    if (window.MoyaLogger) {
+      MoyaLogger.recordConsent();
+      // 招待コードは同意より前に入力されている（v0.9.96でゲートを先頭へ移動）。
+      // recordConsent() が activate() を呼んだ後なので、ここで user row に紐づける。
+      // supabaseRpc は userReadyPromise を待つため、行の作成順は担保される。
+      const code = getInviteCode();
+      if (code) MoyaLogger.setInviteCode(code);
+    }
     closeModal();
     go('nickname');
     return;
@@ -18937,18 +18945,13 @@ function handleAction(act, el, ev) {
     return;
   }
 
-  // 使い方ガイド完了 → 招待コード入力へ
+  // 使い方ガイド完了 → ホームへ
+  // v0.9.96: 招待コードは先頭で検証済みのため、ここでの分岐は不要になった。
   if (act === 'guide-done') {
     state.guidedShown = true;
+    state.initialDone = true;
     saveState();
-    // 既に招待コードが入っているなら invite-code 画面はスキップ
-    if (getInviteCode()) {
-      state.initialDone = true;
-      saveState();
-      go('home');
-    } else {
-      go('invite-code');
-    }
+    go('home');
     return;
   }
 
@@ -18969,10 +18972,12 @@ function handleAction(act, el, ev) {
       state.preferences = state.preferences || {};
       state.preferences.inviteCode = trimmed;
       delete state.preferences.geminiApiKey;
-      state.initialDone = true;
       saveState();
-      if (window.MoyaLogger) MoyaLogger.setInviteCode(trimmed); // 配布コードを匿名IDに紐づけ
-      go('home');
+      // 未同意の時点では logger が非活性なので setInviteCode は何もしない（no-op）。
+      // その場合は同意時に改めて紐づける（consent-agree 側で実施）。
+      if (window.MoyaLogger) MoyaLogger.setInviteCode(trimmed);
+      // コード確認後は、進捗に応じた次の画面へ。既存利用者はホームに戻る。
+      routeOnboarding();
     })();
     return;
   }
@@ -20768,8 +20773,24 @@ function init() {
     MoyaLogger.init();
   }
 
-  // ルーティング判定 (v0.9.8: 5ステップ刷新)
-  if (!state.consent.given) {
+  routeOnboarding();
+}
+
+// ============================================================
+// オンボーディングのルーティング判定
+//   v0.9.8: 5ステップ刷新
+//   v0.9.96: 招待コードのゲートを「最後」から「先頭」へ移動。
+//     旧実装では guide-done が invite-code 画面へ進む前に guidedShown=true を
+//     保存していたため、招待コード画面でリロードするだけでホームへ入れてしまった。
+//     コードを先頭で要求すれば、コードを持たない人は同意画面にも到達せず、
+//     consent_given の記録も user row の作成も発生しない（ログも実数も汚れない）。
+//   ※ AI機能自体は api/gemini-proxy.js がサーバー側でコード検証しており、
+//     この変更前からクライアント改造では突破できない。本修正はUIとログの穴を塞ぐもの。
+// ============================================================
+function routeOnboarding() {
+  if (!getInviteCode()) {
+    go('invite-code');
+  } else if (!state.consent.given) {
     go('welcome');
   } else if (!state.user.createdAt) {
     go('nickname');
