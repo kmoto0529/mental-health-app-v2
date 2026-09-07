@@ -1,0 +1,13 @@
+# もやの森β — 招待コード配布制の限定公開アプリ。
+# 検索エンジンへの掲載は想定していないため、全クローラのアクセスを禁止する。
+#
+# 併せて vercel.json で全レスポンスに X-Robots-Tag: noindex, nofollow を付与し、
+# HTML には <meta name="robots" content="noindex, nofollow"> を入れている。
+# robots.txt を無視するクローラにも noindex が届くようにするための二重化。
+#
+# ⚠️ 注意: 万一この URL が検索結果に出てしまった場合は、下の Disallow を一時的に
+# 外すこと。Disallow のままだとクローラがページを取得できず、noindex 指示を
+# 読めないため、URLだけがインデックスに残り続ける。
+
+User-agent: *
+Disallow: /

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <title>もやの森 — ひとりで抱えてる、を、ちょっとずつ整理する。</title>
 
+<!-- β限定公開: 検索エンジンに載せない（robots.txt と vercel.json の X-Robots-Tag と三重化） -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+
 <!-- PWA / iOSホーム画面追加 -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#6B8F71">
@@ -7150,7 +7153,7 @@ body.keyboard-open .mood-chat-bottom .input-row {
 <!-- 設定 -->
 <script>
 // アプリバージョン（service-worker.js の CACHE_VERSION とセットで更新）
-window.MOYANOMORI_VERSION = 'v0.9.96-beta.1';
+window.MOYANOMORI_VERSION = 'v0.9.96-beta.2';
 
 window.ASIDE_CONFIG = {
   supabaseUrl:     'https://tkhxymaxwaokeqsthydi.supabase.co',
