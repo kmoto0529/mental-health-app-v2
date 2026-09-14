@@ -1,7 +1,7 @@
 # もやの森 アプリ仕様書（LLM協業用スナップショット）
 
-**最終更新**: 2026-09-07
-**対応バージョン**: v0.9.95-beta.3
+**最終更新**: 2026-09-14
+**対応バージョン**: v0.9.96-beta.2
 **目的**: 外部LLM（GPT等）にアプリ全体像を共有し、**思考のクセ分析の精度向上**および**プロンプト整理**の協業を行うためのスナップショット。
 **主出典**: `aside-prototype/index.html`（PWA本体）、`aside-prototype/api/gemini-proxy.js`
 **運用**: 本ファイルは毎週自動更新（開発部ルーティン）。ベース本文は v0.9.83 時点だが、§0.5 に v0.9.95 までの差分を集約している。
@@ -90,6 +90,11 @@
 
 ### S. 2026-09-07 週次確認
 - **redesign.html：オンボーディング軽量版フロー（設問3問）を追加**（v0.9.95-beta.3 維持 / index.html 変更なし）：`FLOW_FULL`（設問8問・現行）と`FLOW_LITE`（設問3問＝主訴／安全確認／なりたい状態）を定義。安全確認ステップ(step 9)を新設しリスク該当時のみ相談先を表示。URLハッシュ `#lite` で直接起動可。β実測でワークシート型完了率0%・対話型57%の差から、初回関門を軽量化する意図。AIプロンプト14個に変化なし。
+
+### T. 2026-09-14 週次確認（v0.9.95-beta.3 → v0.9.96-beta.2）
+- **招待コードゲートをオンボーディング先頭へ移動**（`4c4bafc`）：旧ゲート位置（オンボーディング末尾）ではリロードで素通りできる穴があり、未認証ユーザーが `consent_at` を生成してしまう問題を修正。ゲートを先頭に移し、コード未入力はアプリ本体へ一切進めない設計に変更。index.html 大幅改修（57行変更）。
+- **検索エンジンへの掲載をブロック**（`494baed`）：`robots.txt`（`Disallow: /`）を新規追加、`vercel.json` に `X-Robots-Tag: noindex, nofollow` ヘッダを追加、`index.html` / `redesign.html` に `<meta name="robots" content="noindex, nofollow">` を追加。βクローズド期間中の意図しないインデックスを防止。
+- **Supabase RPC拡張：招待コード保持者のみ集計指標**（`e9378c4`・SQL適用要）：`get_retention_summary()` に `invited{}` ブロックと `users_without_invite_code` を追加、`get_daily_usage_summary()` に `active_users_invited` / `new_users_invited` を追加。旧ゲート混入分を除いた実質ユーザー数を把握するため。invite_code 値そのものは返さない設計（anon から実行可能なため）。AIプロンプト14個に変化なし。
 
 ---
 
