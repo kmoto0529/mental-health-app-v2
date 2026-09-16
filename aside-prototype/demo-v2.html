@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>kokoni デモ v2（心理士×AI 週次ループ）</title>
+<style>
+:root{
+  --cream:#f7f4ec; --paper:#fffdf8; --sage:#7fa887; --sage-deep:#4f7c5d; --sage-soft:#e7efe4;
+  --ink:#3a423b; --muted:#8a938a; --line:#e8e3d6; --accent:#e6a15c; --warn:#c97b52;
+  --ai:#5b87a8; --ai-soft:#e6eef4;
+  --pro:#4a5d6e; --pro-bg:#eef2f5;
+  --shadow:0 6px 20px rgba(79,124,93,.10); --radius:20px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;font-size:15px}
+
+/* ── デモ操作パネル ── */
+#demobar{position:fixed;top:0;left:0;right:0;z-index:100;background:#2c3530;color:#e8ece9;
+  font-size:11.5px;padding:6px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;
+  box-shadow:0 2px 10px rgba(0,0,0,.2)}
+#demobar b{font-size:10.5px;letter-spacing:.06em;opacity:.65;margin-right:2px;white-space:nowrap}
+#demobar button{background:#3f4b45;color:#e8ece9;border:1px solid #55635c;border-radius:7px;
+  padding:5px 9px;font-size:11.5px;cursor:pointer;white-space:nowrap;font-family:inherit}
+#demobar button:hover{background:#4c5a53}
+#demobar button.on{background:var(--sage);border-color:var(--sage);color:#17251c;font-weight:700}
+#demobar .sp{flex:1}
+#demobar .tog{background:none;border:none;font-size:15px;padding:2px 6px}
+#demobar.min .hideable{display:none}
+.pad{height:40px}
+
+/* ── 利用者アプリ（スマホ幅） ── */
+.phone{max-width:440px;margin:0 auto;padding-bottom:88px;min-height:100vh;position:relative}
+.screen{display:none;animation:fade .28s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.hero{padding:18px 18px 4px;display:flex;align-items:center;gap:12px}
+.hero img{width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(79,124,93,.18))}
+.hero .hi b{display:block;font-size:18px;font-weight:800}
+.hero .hi span{color:var(--muted);font-size:12.5px}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);margin:12px 16px;padding:16px}
+.card.lead{background:linear-gradient(160deg,#fbfaf3,#eef4ea);border-color:#d9e6d5}
+.card.letter{background:#fffaf2;border-color:#f0e2c8}
+.card.ai{background:var(--ai-soft);border-color:#cfdfea}
+.eyebrow{font-size:11.5px;color:var(--sage-deep);font-weight:800;letter-spacing:.04em;margin-bottom:6px}
+.card h2{margin:2px 0 8px;font-size:19px;font-weight:800;line-height:1.45}
+.card h3{margin:0 0 6px;font-size:15px;font-weight:800}
+.card p{margin:0 0 12px;font-size:14px;color:#5c655c}
+.card p:last-child{margin-bottom:0}
+
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:800;
+  background:var(--sage-deep);color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(79,124,93,.24);font-family:inherit}
+.btn:active{transform:scale(.985)}
+.btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+.btn.ghost{background:#fff;color:var(--sage-deep);border:1.5px solid var(--sage);box-shadow:none}
+.btn.quiet{background:none;color:var(--muted);border:none;box-shadow:none;font-weight:600;font-size:13.5px;padding:10px}
+.btn+.btn{margin-top:8px}
+
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;font-size:14.5px;
+  text-align:left;cursor:pointer;color:var(--ink);font-family:inherit;line-height:1.5}
+.opt:active,.opt.sel{background:var(--sage-soft);border-color:var(--sage);font-weight:700}
+.opts.row{flex-direction:row;flex-wrap:wrap}
+.opts.row .opt{flex:1;min-width:88px;text-align:center;padding:11px 8px;font-size:13.5px}
+
+input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:13px;
+  font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
+input[type=text]:focus{outline:2px solid var(--sage);outline-offset:1px;border-color:var(--sage)}
+textarea{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:12px;font-size:15px;
+  font-family:inherit;background:#fff;color:var(--ink);min-height:90px;resize:vertical}
+textarea:focus{outline:2px solid var(--sage);outline-offset:1px}
+
+.step{font-size:11.5px;color:var(--muted);margin:0 18px 2px;letter-spacing:.04em}
+
+/* 対話 */
+.bubble{margin:10px 16px;max-width:82%}
+.bubble .who{font-size:11px;color:var(--muted);margin-bottom:3px}
+.bubble .txt{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:12px 14px;font-size:14.5px;box-shadow:var(--shadow)}
+.bubble.me{margin-left:auto;text-align:right}
+.bubble.me .txt{background:var(--sage-soft);border-color:#cfe0cd;border-radius:16px 16px 5px 16px;text-align:left;display:inline-block}
+.typing{display:inline-flex;gap:3px;padding:4px 0}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bl 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s} .typing i:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,60%,100%{opacity:.25}30%{opacity:1}}
+.tray{margin:14px 16px}
+
+/* 確認・訂正カード */
+.hypo{background:#fff8ee;border:1.5px solid #f0e2c8;border-radius:16px;padding:14px;margin:12px 16px}
+.hypo .lab{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.04em;margin-bottom:6px}
+.hypo .q{font-size:15px;line-height:1.6;margin-bottom:12px}
+
+/* 心の地図 */
+.mapwrap{margin:12px 16px}
+.layer{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:11px;box-shadow:var(--shadow)}
+.layer h4{margin:0 0 3px;font-size:12.5px;color:var(--sage-deep);font-weight:800}
+.layer .sub{font-size:11.5px;color:var(--muted);margin-bottom:9px}
+.layer ul{margin:0;padding-left:17px;font-size:14px}
+.layer li{margin-bottom:5px}
+.layer li.new{animation:pop .5s ease}
+@keyframes pop{from{background:#fff3dd}to{background:transparent}}
+.layer.locked{background:#f4f2ea;border-style:dashed;color:var(--muted)}
+.layer.locked .lockmsg{font-size:13.5px;line-height:1.6}
+.fill{display:flex;align-items:center;gap:8px;margin:0 16px 4px;font-size:12.5px;color:var(--muted)}
+.dots{display:flex;gap:4px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--sage)}
+
+/* 節目・手紙 */
+.lstate{display:flex;gap:6px;margin:0 16px 8px}
+.lstate span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:5px 2px;border-bottom:2px solid var(--line)}
+.lstate span.on{color:var(--sage-deep);font-weight:800;border-color:var(--sage)}
+.sum{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:9px}
+.sum .k{font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.sum .v{font-size:14.5px;line-height:1.6}
+.sum .fix{display:flex;gap:6px;margin-top:9px}
+.sum .fix button{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 4px;
+  font-size:11.5px;cursor:pointer;color:var(--sage-deep);font-weight:700;font-family:inherit}
+.sum .fix button.sel{background:var(--sage-soft);border-color:var(--sage)}
+.sum.dropped{opacity:.42}
+.waiting{text-align:center;padding:38px 22px;color:var(--muted)}
+.waiting .big{font-size:34px;margin-bottom:12px}
+.waiting p{font-size:14px;line-height:1.7}
+
+/* 安全 */
+.safe{background:#fff6f2;border:1.5px solid #f0d3c4;border-radius:16px;padding:16px;margin:12px 16px}
+.safe h3{color:var(--warn)}
+
+/* ナビ */
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;
+  background:rgba(255,253,248,.95);backdrop-filter:blur(8px);border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:7px 0 max(7px,env(safe-area-inset-bottom));z-index:40}
+nav button{background:none;border:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;cursor:pointer;flex:1;padding:2px;font-family:inherit;position:relative}
+nav button .ic{font-size:18px;line-height:1}
+nav button.on{color:var(--sage-deep);font-weight:800}
+nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7px;border-radius:50%;background:var(--accent)}
+
+/* ── 心理士側 ── */
+#proapp{background:var(--pro-bg);min-height:100vh;padding-bottom:40px}
+.pwrap{max-width:1040px;margin:0 auto;padding:0 16px}
+.phead{padding:16px 0 12px;border-bottom:2px solid #d3dbe1;margin-bottom:16px}
+.phead h1{margin:0;font-size:19px;font-weight:800;color:var(--pro)}
+.phead p{margin:3px 0 0;font-size:12.5px;color:#6b7a85}
+.plist{display:flex;flex-direction:column;gap:9px}
+.prow{background:#fff;border:1px solid #d9e0e5;border-radius:12px;padding:13px 15px;display:grid;
+  grid-template-columns:1fr auto;gap:10px;cursor:pointer;align-items:center}
+.prow:hover{border-color:var(--pro)}
+.prow.alert{border-left:4px solid var(--warn);background:#fff8f5}
+.prow .nm{font-weight:800;font-size:15px}
+.prow .mt{font-size:12px;color:#6b7a85;margin-top:2px}
+.prow .go{font-size:12px;color:var(--pro);font-weight:700;white-space:nowrap}
+.pcols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.pcard{background:#fff;border:1px solid #d9e0e5;border-radius:12px;padding:15px}
+.pcard h3{margin:0 0 4px;font-size:12px;letter-spacing:.06em;color:#6b7a85;font-weight:800;text-transform:uppercase}
+.pcard .note{font-size:11.5px;color:#8a97a0;margin:0 0 12px}
+.pitem{border-bottom:1px solid #eef2f5;padding:9px 0;font-size:13.5px;line-height:1.65}
+.pitem:last-child{border-bottom:0}
+.pitem .k{font-size:11px;color:#8a97a0;display:block;margin-bottom:2px}
+.conf{display:inline-block;background:var(--pro-bg);border:1px solid #c3cfd8;border-radius:5px;
+  padding:1px 7px;font-size:11.5px;font-weight:800;color:var(--pro);font-variant-numeric:tabular-nums}
+.pcard textarea{border-color:#d9e0e5;min-height:120px}
+.pcard select{width:100%;border:1.5px solid #d9e0e5;border-radius:10px;padding:11px;font-size:14px;
+  font-family:inherit;background:#fff;color:var(--ink)}
+.pbtn{display:block;width:100%;border:none;border-radius:11px;padding:13px;font-size:14.5px;font-weight:800;
+  background:var(--pro);color:#fff;cursor:pointer;margin-top:11px;font-family:inherit}
+.pbtn.ghost{background:#fff;color:var(--pro);border:1.5px solid var(--pro)}
+.timer{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--pro);padding:11px 15px;
+  margin-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;border-radius:0 0 12px 12px}
+.timer b{font-family:ui-monospace,monospace;font-size:17px;color:var(--pro);font-variant-numeric:tabular-nums}
+.timer small{color:#8a97a0;font-size:11px}
+.split{display:flex;gap:8px;margin-top:9px}
+.split button{flex:1;background:#fff;border:1.5px solid #d9e0e5;border-radius:9px;padding:8px;
+  font-size:11.5px;cursor:pointer;color:var(--pro);font-weight:700;font-family:inherit}
+.split button.sel{background:var(--pro);color:#fff;border-color:var(--pro)}
+
+.foot{text-align:center;font-size:11px;color:var(--muted);padding:22px 20px 12px;line-height:1.7}
+
+@media(max-width:760px){ .pcols{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="demobar">
+  <b>DEMO</b>
+  <button id="sideBtn" onclick="toggleSide()">心理士側を見る</button>
+  <button class="hideable" onclick="nextWeek()">▶ 1週すすめる</button>
+  <button class="hideable" onclick="setLetter('arrived')">手紙が届いた</button>
+  <button class="hideable" onclick="go('safe')">リスク検知</button>
+  <button class="hideable" onclick="resetAll()">最初から</button>
+  <span class="sp"></span>
+  <span id="wk" style="opacity:.7"></span>
+  <button class="tog" onclick="document.getElementById('demobar').classList.toggle('min')">▾</button>
+</div>
+<div class="pad"></div>
+
+<!-- ══════════ 利用者アプリ ══════════ -->
+<div id="userapp" class="phone">
+
+  <!-- U1 オンボーディング -->
+  <section id="s-onb" class="screen active">
+    <div id="onb"></div>
+  </section>
+
+  <!-- U2 ホーム -->
+  <section id="s-home" class="screen">
+    <div class="hero">
+      <img src="assets/suplan/base.png" alt="すぷらん" onerror="this.style.display='none'">
+      <div class="hi"><b id="greet">こんにちは</b><span id="weekline"></span></div>
+    </div>
+    <div id="homeTop"></div>
+    <div class="card lead">
+      <div class="eyebrow">きょうのこと</div>
+      <h2 id="todayWork">朝、10分だけ外に出てみる</h2>
+      <p id="todayWhy">むずかしければ、窓を開けるだけでも。</p>
+      <button class="btn" onclick="doneWork()">やってみた</button>
+      <button class="btn ghost" onclick="go('talk')">今日は話すだけにする</button>
+    </div>
+    <div class="fill"><span>心の地図</span><span class="dots" id="dotsHome"></span><span id="fillTxt"></span></div>
+    <div class="card" style="padding:13px 16px">
+      <p style="margin:0;font-size:13.5px"><b id="nextGate">次の手紙まで あと3日</b><br>
+      <span style="color:var(--muted);font-size:12.5px">大塚さんが、あなたのまとめを読んで返事を書きます。</span></p>
+    </div>
+    <div class="foot">※ これはデモです。AIの応答はあらかじめ用意したもので、実際の生成は行っていません。</div>
+  </section>
+
+  <!-- U3 AI対話 -->
+  <section id="s-talk" class="screen">
+    <div class="step" style="margin-top:14px">すぷらんと話す</div>
+    <div id="talkFlow"></div>
+    <div class="tray" id="talkTray"></div>
+  </section>
+
+  <!-- U4 心の地図 -->
+  <section id="s-map" class="screen">
+    <div class="step" style="margin-top:14px">心の地図</div>
+    <div class="fill" style="margin-top:8px"><span>わかってきたこと</span><span class="dots" id="dotsMap"></span><span id="fillTxt2"></span></div>
+    <div class="mapwrap" id="mapBody"></div>
+    <div class="foot">この地図は、あなたと一緒に少しずつ作っていくものです。<br>ちがうと思ったところは、いつでも直せます。</div>
+  </section>
+
+  <!-- U6 節目（手紙） -->
+  <section id="s-letter" class="screen">
+    <div class="step" style="margin-top:14px">節目 ── 週に1回</div>
+    <div class="lstate" id="lstate">
+      <span data-s="before">まとめを送る</span>
+      <span data-s="waiting">読んでもらう</span>
+      <span data-s="arrived">手紙が届く</span>
+    </div>
+    <div id="letterBody"></div>
+  </section>
+
+  <!-- U7 記録 -->
+  <section id="s-log" class="screen">
+    <div class="step" style="margin-top:14px">これまで</div>
+    <div class="card">
+      <h3>向き合ったこと</h3>
+      <ul style="margin:0;padding-left:18px;font-size:14px">
+        <li>夕方になると集中が切れること</li>
+        <li>会議のあとに落ち込むこと</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>できるようになったこと</h3>
+      <ul style="margin:0;padding-left:18px;font-size:14px">
+        <li>しんどい日に「今日は話すだけ」を選べた</li>
+        <li>朝、外に出た日が3回あった</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>見つけたパターン</h3>
+      <p style="margin:0">「準備が足りない」と思うと、先回りして動いてしまい、夕方に切れる。</p>
+    </div>
+    <div class="foot">※ できなかったことの回数や、連続記録は出していません。</div>
+  </section>
+
+  <!-- U9 安全 -->
+  <section id="s-safe" class="screen">
+    <div class="safe">
+      <h3>いま、しんどいですね</h3>
+      <p style="font-size:14.5px">ここから先は、すぷらんだけで受けとめるところではないと思っています。<br>
+      いま話せる人につながれるようにします。</p>
+      <button class="btn" style="background:var(--warn)">相談できる窓口をひらく</button>
+      <button class="btn ghost" style="margin-top:8px" onclick="go('home')">いまは大丈夫</button>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:14px;margin-bottom:0">
+      担当の大塚さんにも、いまお知らせしました。次の節目を待たずに連絡がきます。</p>
+    </div>
+    <div class="foot">※ 通常のワークより安全対応を優先します（FR-60）。<br>リスクの点数で人を分けることはしません。</div>
+  </section>
+
+  <nav id="nav">
+    <button data-go="home" onclick="go('home')"><span class="ic">🌿</span>ホーム</button>
+    <button data-go="talk" onclick="go('talk')"><span class="ic">💬</span>はなす</button>
+    <button data-go="map" onclick="go('map')"><span class="ic">🗺️</span>地図</button>
+    <button data-go="letter" onclick="go('letter')"><span class="ic">✉️</span>節目<span id="navDot" class="dot" hidden></span></button>
+    <button data-go="log" onclick="go('log')"><span class="ic">📖</span>これまで</button>
+  </nav>
+</div>
+
+<!-- ══════════ 心理士側 ══════════ -->
+<div id="proapp" hidden>
+  <div class="pwrap">
+    <div class="phead">
+      <h1>kokoni ／ 心理士用</h1>
+      <p>大塚 紀廣 さん（公認心理師・臨床心理士）</p>
+    </div>
+    <div id="proBody"></div>
+    <div class="foot">※ デモです。AIのサマリはあらかじめ用意したものです。</div>
+  </div>
+</div>
+
+<script>
+/* ═══════════ 状態 ═══════════ */
+const S = {
+  nick:"", situation:"", week:1, side:"user", screen:"onb",
+  letter:"before", workDone:0, relief:null,
+  map:{
+    desc:["夕方になると集中が切れる","会議のあと、落ち込みやすい"],
+    expl:["「準備が足りない」と考えて、先回りして動いてしまう"],
+    deep:false
+  },
+  sumFix:{}, proView:"list", timer:0, timerId:null, splitShow:null
+};
+const MAP_TOTAL = 8;
+
+/* ═══════════ 画面遷移 ═══════════ */
+function go(id){
+  if(S.side!=='user') toggleSide();
+  S.screen = id;
+  document.querySelectorAll('#userapp .screen').forEach(e=>e.classList.remove('active'));
+  const el = document.getElementById('s-'+id);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.go===id));
+  document.getElementById('nav').hidden = (id==='onb');
+  if(id==='home') renderHome();
+  if(id==='map') renderMap();
+  if(id==='letter') renderLetter();
+  if(id==='talk') startTalk();
+  window.scrollTo(0,0);
+}
+function toggleSide(){
+  S.side = S.side==='user' ? 'pro' : 'user';
+  document.getElementById('userapp').hidden = S.side!=='user';
+  document.getElementById('proapp').hidden = S.side!=='pro';
+  document.getElementById('sideBtn').textContent = S.side==='user' ? '心理士側を見る' : '利用者側に戻る';
+  document.getElementById('sideBtn').classList.toggle('on', S.side==='pro');
+  if(S.side==='pro'){ S.proView='list'; renderPro(); }
+  window.scrollTo(0,0);
+}
+function nextWeek(){ S.week++; S.letter='before'; S.sumFix={}; syncBar(); if(S.side==='user') go('home'); }
+function setLetter(v){ S.letter=v; syncBar(); if(S.side==='user') go('letter'); }
+function resetAll(){ location.reload(); }
+function syncBar(){
+  document.getElementById('wk').textContent = S.week + '回目 / 16';
+  const d = document.getElementById('navDot'); if(d) d.hidden = S.letter!=='arrived';
+}
+
+/* ═══════════ U1 オンボーディング ═══════════ */
+const ONB = [
+ {k:'nick', step:'1 / 5', h:'はじめまして。<br>なんとお呼びしましょう',
+  p:'本名でなくてかまいません。あとから変えられます。', input:true},
+ {k:'situation', step:'2 / 5', h:'いま、どんな状況に近いですか',
+  p:'あてはまるものを1つ選んでください。',
+  opts:['働きながら、つらさを感じている','休職を考えている／迷っている','復職を控えている／したばかり','いま休職している']},
+ {k:'q1', step:'3 / 5', h:'この1週間、気分の落ち込みはどうでしたか',
+  p:'厚生労働省が公開している「QIDS-J」から抜粋しています（デモでは3問）。',
+  opts:['落ち込まない','すこし落ち込む','かなり落ち込む','ほとんど1日中落ち込む']},
+ {k:'q2', step:'4 / 5', h:'眠りはどうでしたか',
+  opts:['いつもどおり','寝つきに30分以上かかる日がある','夜中に何度も目がさめる','ほとんど眠れていない']},
+ {k:'safety', step:'5 / 5', h:'いま、ご自身を傷つけたい気持ちはありますか',
+  p:'この質問は、いちばん大事なので初回から外しません。',
+  opts:['ない','たまに頭をよぎる','たびたび考える','いま、つらい']},
+ {k:'pick', step:'', h:'では、今日からやれそうなことを<br>ひとつ選んでください',
+  p:'むずかしければ、いちばん軽いもので大丈夫です。あとで変えられます。',
+  opts:['朝、10分だけ外に出てみる','寝る前に、今日あったことを1つだけ書く','何があったか、すぷらんに話すだけ']}
+];
+let onbIdx = 0;
+function renderOnb(){
+  const q = ONB[onbIdx], el = document.getElementById('onb');
+  let inner = '';
+  if(onbIdx===0){
+    inner += `<div class="hero" style="padding-top:22px"><img src="assets/suplan/base.png" alt="" onerror="this.style.display='none'">
+      <div class="hi"><b>kokoni</b><span>もやの森へようこそ</span></div></div>`;
+  }
+  inner += `<div class="step">${q.step}</div><div class="card">
+    <h2>${q.h}</h2>${q.p?`<p>${q.p}</p>`:''}`;
+  if(q.input){
+    inner += `<input type="text" id="nickIn" placeholder="すぷらん" maxlength="12" autocomplete="off">
+      <button class="btn" style="margin-top:12px" onclick="onbNick()">はじめる</button>`;
+  } else {
+    inner += `<div class="opts">` + q.opts.map((o,i)=>
+      `<button class="opt" onclick="onbPick('${q.k}',${i})">${o}</button>`).join('') + `</div>`;
+  }
+  inner += `</div>`;
+  if(q.k==='safety'){
+    inner += `<div class="foot">つらいと答えていただいたときは、ワークより先に、<br>つながれる先をご案内します。</div>`;
+  }
+  el.innerHTML = inner;
+  if(q.input) setTimeout(()=>document.getElementById('nickIn').focus(),80);
+}
+function onbNick(){
+  const v = document.getElementById('nickIn').value.trim();
+  S.nick = v || 'すぷらん'; onbIdx++; renderOnb(); window.scrollTo(0,0);
+}
+function onbPick(k,i){
+  S[k]=i;
+  if(k==='safety' && i>=2){ document.getElementById('nav').hidden=false; go('safe'); return; }
+  if(k==='pick'){
+    S.work = ONB[5].opts[i];
+    document.getElementById('nav').hidden=false; go('home'); return;
+  }
+  onbIdx++; renderOnb(); window.scrollTo(0,0);
+}
+
+/* ═══════════ U2 ホーム ═══════════ */
+function renderHome(){
+  document.getElementById('greet').textContent = S.nick + ' さん';
+  document.getElementById('weekline').textContent = S.week + '回目 ／ 今日はどうしますか';
+  document.getElementById('todayWork').textContent = S.work || '朝、10分だけ外に出てみる';
+  document.getElementById('nextGate').textContent = S.letter==='arrived'
+    ? '大塚さんから手紙が届いています' : '次の手紙まで あと3日';
+  const top = document.getElementById('homeTop');
+  let h = '';
+  if(S.letter==='arrived'){
+    h += `<div class="card letter" onclick="go('letter')" style="cursor:pointer">
+      <div class="eyebrow">✉️ 大塚さんから</div>
+      <h3 style="margin-bottom:4px">手紙が届いています</h3>
+      <p style="margin:0;font-size:13.5px">今週の方向について、お返事がきました。</p></div>`;
+  }
+  if(S.week>=2){
+    h += `<div class="card ai">
+      <div class="eyebrow" style="color:var(--ai)">すぷらんから</div>
+      <p style="margin:0;font-size:14px">あなたの地図に、新しく分かったことがあります。<br>
+      「夕方」ではなく「<b>人と話したあと</b>」に切れているかもしれません。</p></div>`;
+  }
+  h += `<div class="card" style="padding:14px 16px">
+    <div class="eyebrow">いまの気分</div>
+    <div class="opts row">
+      ${['しんどい','あまりよくない','ふつう','すこし楽'].map(t=>`<button class="opt" onclick="this.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${t}</button>`).join('')}
+    </div></div>`;
+  top.innerHTML = h;
+  renderDots('dotsHome','fillTxt');
+}
+function doneWork(){ S.workDone++; addMapItem(); go('map'); }
+function renderDots(dotId,txtId){
+  const n = S.map.desc.length + S.map.expl.length;
+  const d = document.getElementById(dotId);
+  if(d) d.innerHTML = Array.from({length:MAP_TOTAL},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join('');
+  const t = document.getElementById(txtId);
+  if(t) t.textContent = `${n} / まだ空白 ${MAP_TOTAL-n}`;
+}
+
+/* ═══════════ U3 AI対話 ═══════════ */
+const TALK = [
+ {t:'ai', m:'こんにちは。今日はどんな感じですか。'},
+ {t:'choice', o:['しんどい','あまりよくない','ふつう','すこし楽']},
+ {t:'ai', m:'話してくれてありがとうございます。<br>先週の「朝、10分だけ外に出る」は、どうでしたか。'},
+ {t:'choice', o:['できた','すこしできた','できなかった']},
+ {t:'ai', m:'そうだったんですね。<br><b>やってみようとは思えましたか。</b>'},
+ {t:'choice', o:['思ったけど動けなかった','思わなかった']},
+ {t:'ai', m:'思えただけでも十分だと思います。<br>できなかった理由のほうを、一緒に見てみませんか。'},
+ {t:'ai', m:'今日、話しておきたいことはありますか。'},
+ {t:'choice', o:['夕方になると何もできなくなる','人と話したあとが特につらい','とくにない']},
+ {t:'hypo', lab:'すぷらんが、仮に言葉にしてみます',
+  q:'もしかして、<b>人と話したあとに「うまく伝わらなかったかも」と考えて</b>、そこから疲れが出ていませんか。'},
+ {t:'ai', m:'ありがとうございます。地図に書き足しておきますね。'},
+ {t:'ai', m:'今日の一歩を、ひとつだけ決めませんか。'},
+ {t:'choice', o:['話したあと、5分だけ何もしない時間をとる','今日はここまでにする']},
+ {t:'relief'}
+];
+let talkIdx = 0;
+function startTalk(){ talkIdx = 0; document.getElementById('talkFlow').innerHTML=''; document.getElementById('talkTray').innerHTML=''; stepTalk(); }
+function stepTalk(){
+  const flow = document.getElementById('talkFlow'), tray = document.getElementById('talkTray');
+  if(talkIdx >= TALK.length){ tray.innerHTML = `<button class="btn" onclick="go('map')">地図を見る</button>`; return; }
+  const s = TALK[talkIdx];
+  if(s.t==='ai'){
+    tray.innerHTML = `<div class="typing"><i></i><i></i><i></i></div>`;
+    setTimeout(()=>{
+      flow.insertAdjacentHTML('beforeend', `<div class="bubble"><div class="who">すぷらん</div><div class="txt">${s.m}</div></div>`);
+      talkIdx++; stepTalk(); window.scrollTo(0,document.body.scrollHeight);
+    }, 420);
+  } else if(s.t==='choice'){
+    tray.innerHTML = `<div class="opts">` + s.o.map((o,i)=>
+      `<button class="opt" onclick="pickTalk(${i})">${o}</button>`).join('') + `</div>`;
+    window.scrollTo(0,document.body.scrollHeight);
+  } else if(s.t==='hypo'){
+    tray.innerHTML = '';
+    flow.insertAdjacentHTML('beforeend', `<div class="hypo"><div class="lab">${s.lab}</div>
+      <div class="q">${s.q}</div>
+      <div class="opts row">
+        <button class="opt" onclick="hypoAns(1)">そのとおり</button>
+        <button class="opt" onclick="hypoAns(2)">すこし近い</button>
+        <button class="opt" onclick="hypoAns(3)">ちがう</button>
+        <button class="opt" onclick="hypoAns(4)">いまは置いておく</button>
+      </div></div>`);
+    window.scrollTo(0,document.body.scrollHeight);
+  } else if(s.t==='relief'){
+    tray.innerHTML = `<div class="card" style="margin:0">
+      <div class="eyebrow">最後にひとつだけ</div>
+      <h3 style="margin-bottom:10px">いま、どうですか</h3>
+      <div class="opts">
+        ${['整理できた','すこし楽になった','変わらない','しんどいままだ'].map((t,i)=>
+          `<button class="opt" onclick="setRelief(${i})">${t}</button>`).join('')}
+      </div></div>`;
+    window.scrollTo(0,document.body.scrollHeight);
+  }
+}
+function pickTalk(i){
+  const s = TALK[talkIdx];
+  document.getElementById('talkFlow').insertAdjacentHTML('beforeend',
+    `<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
+  document.getElementById('talkTray').innerHTML='';
+  if(talkIdx===3 && i<2){ talkIdx = 7; } else { talkIdx++; }
+  stepTalk();
+}
+function hypoAns(v){
+  document.getElementById('talkTray').innerHTML='';
+  if(v<=2) addMapItem();
+  talkIdx++; stepTalk();
+}
+function setRelief(i){ S.relief=i; go('map'); }
+function addMapItem(){
+  if(!S.map.expl.includes('人と話したあと「うまく伝わらなかったかも」と考えて、疲れが出る')){
+    S.map.expl.push('人と話したあと「うまく伝わらなかったかも」と考えて、疲れが出る');
+  }
+}
+
+/* ═══════════ U4 心の地図 ═══════════ */
+function renderMap(){
+  renderDots('dotsMap','fillTxt2');
+  const b = document.getElementById('mapBody');
+  const li = a => a.map(x=>`<li>${x}</li>`).join('');
+  b.innerHTML = `
+    <div class="layer"><h4>いま起きていること</h4>
+      <div class="sub">あなたが話してくれたこと</div><ul>${li(S.map.desc)}</ul></div>
+    <div class="layer"><h4>どうしてそうなるか</h4>
+      <div class="sub">すぷらんが仮に言葉にして、あなたが直したもの</div><ul>${li(S.map.expl)}</ul></div>
+    <div class="layer locked"><h4>心の奥にあるルール</h4>
+      <div class="lockmsg">ここは、もう少し一緒に見えてきてから、お伝えします。<br>
+      <span style="font-size:12px">（いまは、まだ早いと思っています）</span></div></div>`;
+}
+
+/* ═══════════ U6 節目（手紙） ═══════════ */
+const SUMROWS = [
+ {k:'今週の状態', v:'前半はしんどい日が続き、後半はすこし戻りました。'},
+ {k:'やったこと', v:'「朝、10分だけ外に出る」を3日。2日はできませんでした。'},
+ {k:'できなかった日のこと', v:'「思ったけど動けなかった」と話していました。'},
+ {k:'地図に増えたこと', v:'人と話したあとに「うまく伝わらなかったかも」と考えて疲れが出る。'},
+ {k:'話したいこと', v:'夕方になると何もできなくなることについて。'}
+];
+function renderLetter(){
+  document.querySelectorAll('#lstate span').forEach(s=>s.classList.toggle('on', s.dataset.s===S.letter));
+  const b = document.getElementById('letterBody');
+  if(S.letter==='before'){
+    b.innerHTML = `<div class="card">
+      <div class="eyebrow">すぷらんがまとめました</div>
+      <h3>この1週間を、大塚さんに送ります</h3>
+      <p style="font-size:13.5px">ちがうところは直してください。<b>書かないでほしいこと</b>も選べます。</p>
+      ${SUMROWS.map((r,i)=>`
+        <div class="sum ${S.sumFix[i]===3?'dropped':''}" id="sum${i}">
+          <div class="k">${r.k}</div><div class="v">${r.v}</div>
+          <div class="fix">
+            <button class="${S.sumFix[i]===1?'sel':''}" onclick="fixSum(${i},1)">そのとおり</button>
+            <button class="${S.sumFix[i]===2?'sel':''}" onclick="fixSum(${i},2)">すこし違う</button>
+            <button class="${S.sumFix[i]===3?'sel':''}" onclick="fixSum(${i},3)">書かないで</button>
+          </div></div>`).join('')}
+      <div style="margin-top:12px"><div class="k" style="font-size:11.5px;color:var(--muted);margin-bottom:5px">書き足したいことがあれば</div>
+      <textarea placeholder="（任意）"></textarea></div>
+      <button class="btn" style="margin-top:12px" onclick="setLetter('waiting')">これで送る</button>
+    </div>
+    <div class="foot">※ 送ったあと、大塚さんが読んで返事を書きます。すぐには届きません。</div>`;
+  } else if(S.letter==='waiting'){
+    b.innerHTML = `<div class="waiting">
+      <div class="big">✉️</div>
+      <p><b>大塚さんが読んでいます</b><br>
+      お返事は、2〜3日のうちに届きます。<br>
+      <span style="font-size:12.5px">それまでは、いつもどおりで大丈夫です。</span></p>
+      <button class="btn ghost" style="max-width:260px;margin:18px auto 0" onclick="go('home')">ホームに戻る</button>
+    </div>
+    <div class="foot">※ 既読の表示や「返信を待っています」は出しません。<br>週に1回のリズムと、期待をそろえるためです。</div>`;
+  } else {
+    b.innerHTML = `<div class="card letter">
+      <div class="eyebrow">✉️ 大塚さんから</div>
+      <p style="font-size:14.5px;line-height:1.9;color:var(--ink)">
+      ${S.nick}さん<br><br>
+      まとめを読みました。3日外に出られたこと、まず書いておきますね。できなかった2日について「思ったけど動けなかった」と書いてくださったのが、とても大事だと思いました。<br><br>
+      「人と話したあと」に疲れが出る、という見立ては、私もそうかもしれないと思います。<br><br>
+      今週は、夕方そのものより<b>人と話したあとの5分</b>を見てみませんか。何かをするのではなく、何もしない5分です。<br><br>
+      大塚
+      </p></div>
+    <div class="card">
+      <div class="eyebrow">今週の方向</div>
+      <h3 style="margin-bottom:4px">人と話したあとの5分を、あけてみる</h3>
+      <p style="margin:0;font-size:13.5px">すぷらんが、毎日のかたちにしてお渡しします。</p>
+      <button class="btn" style="margin-top:12px" onclick="S.work='人と話したあと、5分だけ何もしない';go('home')">はじめる</button>
+    </div>`;
+  }
+}
+function fixSum(i,v){ S.sumFix[i]=v; renderLetter(); }
+
+/* ═══════════ 心理士側 ═══════════ */
+function renderPro(){
+  const b = document.getElementById('proBody');
+  if(S.proView==='list'){
+    b.innerHTML = `<div class="plist">
+      <div class="prow alert" onclick="openSession('みなと')">
+        <div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 要確認</span></div>
+        <div class="mt">4回目 ／ 昨日 リスクを検知しました（節目を待たずに通知）</div></div>
+        <div class="go">開く →</div></div>
+      <div class="prow" onclick="openSession('${S.nick||'すぷらん'}')">
+        <div><div class="nm">${S.nick||'すぷらん'} さん</div>
+        <div class="mt">${S.week}回目 ／ まとめが届いています ／ 前回から7日</div></div>
+        <div class="go">節目を行う →</div></div>
+      <div class="prow" onclick="openSession('ゆき')">
+        <div><div class="nm">ゆき さん</div>
+        <div class="mt">11回目 ／ 次の節目まで3日</div></div>
+        <div class="go">開く →</div></div>
+    </div>
+    <div class="foot">並び順：① 要確認がある方 ② 節目が近い順</div>`;
+  } else {
+    b.innerHTML = `
+    <button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="S.proView='list';stopTimer();renderPro()">← 一覧へ</button>
+    <div class="pcols">
+      <div>
+        <div class="pcard">
+          <h3>AIの週次サマリ</h3>
+          <p class="note">本人が確認・訂正したもの。節目の前に自動で作られます（＝はじまりのシート）。</p>
+          <div class="pitem"><span class="k">今週の状態</span>前半はしんどい日が続き、後半はすこし戻った。QIDS-J 14 → 12</div>
+          <div class="pitem"><span class="k">ワークの実施</span>「朝、10分だけ外に出る」3/7日。<b>できなかった日は「思ったけど動けなかった」</b>と回答</div>
+          <div class="pitem"><span class="k">心の地図の差分</span>＋「人と話したあと『うまく伝わらなかったかも』と考えて疲れが出る」<br>
+            <span style="font-size:11.5px;color:#8a97a0">本人の回答＝「そのとおり」</span></div>
+          <div class="pitem"><span class="k">つまずいた箇所</span>夕方の時間帯に、対話の中断が2回</div>
+          <div class="pitem"><span class="k">本人が話したいこと</span>夕方になると何もできなくなること</div>
+          <div class="pitem"><span class="k">本人が「書かないで」とした項目</span>なし</div>
+        </div>
+        <div class="pcard" style="margin-top:14px">
+          <h3>AIの確信度</h3>
+          <p class="note">本人の画面には出していません。判断の材料としてお使いください。</p>
+          <div class="pitem">地図の新しい項目 <span class="conf">72%</span> ／ 次の一歩の提案 <span class="conf">61%</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="pcard">
+          <h3>お返事を書く</h3>
+          <p class="note">手紙として本人に届きます。</p>
+          <textarea placeholder="${S.nick||'すぷらん'}さん&#10;&#10;まとめを読みました。"></textarea>
+          <div style="margin-top:14px">
+            <h3 style="margin-bottom:6px">今週の方向</h3>
+            <select>
+              <option>人と話したあとの5分をあける（行動実験）</option>
+              <option>3つのコラム（出来事・気分・考え）</option>
+              <option>7つのコラム（根拠と反証）</option>
+              <option>活動記録を続ける</option>
+              <option>今週は方向を変えない</option>
+            </select>
+            <p class="note" style="margin-top:6px">選んだ方向を、すぷらんが毎日のかたちに落とします。</p>
+          </div>
+          <div style="margin-top:14px">
+            <h3 style="margin-bottom:6px">見立ての記録</h3>
+            <textarea style="min-height:80px" placeholder="所見"></textarea>
+            <div class="split">
+              <button class="${S.splitShow===1?'sel':''}" onclick="S.splitShow=1;renderPro()">本人にも見せる</button>
+              <button class="${S.splitShow===2||S.splitShow===null?'sel':''}" onclick="S.splitShow=2;renderPro()">自分だけ</button>
+            </div>
+          </div>
+          <button class="pbtn" onclick="alert('デモのため送信は行いません。\\n本人側は「手紙が届いた」ボタンで確認できます。')">手紙を送る</button>
+        </div>
+      </div>
+    </div>
+    <div class="timer">
+      <span>この節目にかかっている時間 <small>（FR-85：自動で計測しています）</small></span>
+      <b id="tm">0:00</b>
+    </div>`;
+    startTimer();
+  }
+}
+function openSession(name){ S.proView='session'; renderPro(); window.scrollTo(0,0); }
+function startTimer(){
+  stopTimer(); S.timer=0;
+  S.timerId = setInterval(()=>{
+    S.timer++;
+    const el=document.getElementById('tm');
+    if(el) el.textContent = Math.floor(S.timer/60)+':'+String(S.timer%60).padStart(2,'0');
+  },1000);
+}
+function stopTimer(){ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; } }
+
+/* ═══════════ 起動 ═══════════ */
+renderOnb(); syncBar();
+document.getElementById('nav').hidden = true;
+</script>
+</body>
+</html>
