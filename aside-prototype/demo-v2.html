@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>kokoni デモ v2（心理士×AI 週次ループ）</title>
+<title>kokoni デモ v2（Day0 初回体験 / 週次ループ）</title>
 <style>
 :root{
   --cream:#f7f4ec; --paper:#fffdf8; --sage:#7fa887; --sage-deep:#4f7c5d; --sage-soft:#e7efe4;
@@ -18,7 +18,7 @@ html,body{margin:0;padding:0}
 body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
   background:var(--cream);color:var(--ink);line-height:1.65;font-size:15px}
 
-/* ── デモ操作パネル ── */
+/* デモ操作パネル */
 #demobar{position:fixed;top:0;left:0;right:0;z-index:100;background:#2c3530;color:#e8ece9;
   font-size:11.5px;padding:6px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;
   box-shadow:0 2px 10px rgba(0,0,0,.2)}
@@ -32,7 +32,6 @@ body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-s
 #demobar.min .hideable{display:none}
 .pad{height:40px}
 
-/* ── 利用者アプリ（スマホ幅） ── */
 .phone{max-width:440px;margin:0 auto;padding-bottom:88px;min-height:100vh;position:relative}
 .screen{display:none;animation:fade .28s ease}
 .screen.active{display:block}
@@ -48,8 +47,9 @@ body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-s
 .card.lead{background:linear-gradient(160deg,#fbfaf3,#eef4ea);border-color:#d9e6d5}
 .card.letter{background:#fffaf2;border-color:#f0e2c8}
 .card.ai{background:var(--ai-soft);border-color:#cfdfea}
+.card.sum{background:linear-gradient(160deg,#fbfaf3,#f4f8f2);border-color:#d9e6d5}
 .eyebrow{font-size:11.5px;color:var(--sage-deep);font-weight:800;letter-spacing:.04em;margin-bottom:6px}
-.card h2{margin:2px 0 8px;font-size:19px;font-weight:800;line-height:1.45}
+.card h2{margin:2px 0 8px;font-size:19px;font-weight:800;line-height:1.5}
 .card h3{margin:0 0 6px;font-size:15px;font-weight:800}
 .card p{margin:0 0 12px;font-size:14px;color:#5c655c}
 .card p:last-child{margin-bottom:0}
@@ -57,31 +57,34 @@ body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-s
 .btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:800;
   background:var(--sage-deep);color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(79,124,93,.24);font-family:inherit}
 .btn:active{transform:scale(.985)}
-.btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+.btn:disabled{opacity:.38;cursor:default;box-shadow:none}
 .btn.ghost{background:#fff;color:var(--sage-deep);border:1.5px solid var(--sage);box-shadow:none}
 .btn.quiet{background:none;color:var(--muted);border:none;box-shadow:none;font-weight:600;font-size:13.5px;padding:10px}
 .btn+.btn{margin-top:8px}
 
 .opts{display:flex;flex-direction:column;gap:8px}
 .opt{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;font-size:14.5px;
-  text-align:left;cursor:pointer;color:var(--ink);font-family:inherit;line-height:1.5}
+  text-align:left;cursor:pointer;color:var(--ink);font-family:inherit;line-height:1.5;position:relative}
 .opt:active,.opt.sel{background:var(--sage-soft);border-color:var(--sage);font-weight:700}
+.opt.sel::after{content:"✓";position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--sage-deep);font-weight:800}
 .opts.row{flex-direction:row;flex-wrap:wrap}
 .opts.row .opt{flex:1;min-width:88px;text-align:center;padding:11px 8px;font-size:13.5px}
+.opts.row .opt.sel::after{display:none}
 
 input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:13px;
   font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
 input[type=text]:focus{outline:2px solid var(--sage);outline-offset:1px;border-color:var(--sage)}
 textarea{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:12px;font-size:15px;
-  font-family:inherit;background:#fff;color:var(--ink);min-height:90px;resize:vertical}
+  font-family:inherit;background:#fff;color:var(--ink);min-height:84px;resize:vertical}
 textarea:focus{outline:2px solid var(--sage);outline-offset:1px}
 
-.step{font-size:11.5px;color:var(--muted);margin:0 18px 2px;letter-spacing:.04em}
+.step{font-size:11.5px;color:var(--muted);margin:0 18px 2px;letter-spacing:.04em;display:flex;justify-content:space-between}
+.step .sid{opacity:.6;font-variant-numeric:tabular-nums}
 
 /* 対話 */
-.bubble{margin:10px 16px;max-width:82%}
+.bubble{margin:10px 16px;max-width:84%}
 .bubble .who{font-size:11px;color:var(--muted);margin-bottom:3px}
-.bubble .txt{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:12px 14px;font-size:14.5px;box-shadow:var(--shadow)}
+.bubble .txt{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:12px 14px;font-size:14.5px;box-shadow:var(--shadow);line-height:1.75}
 .bubble.me{margin-left:auto;text-align:right}
 .bubble.me .txt{background:var(--sage-soft);border-color:#cfe0cd;border-radius:16px 16px 5px 16px;text-align:left;display:inline-block}
 .typing{display:inline-flex;gap:3px;padding:4px 0}
@@ -90,28 +93,24 @@ textarea:focus{outline:2px solid var(--sage);outline-offset:1px}
 @keyframes bl{0%,60%,100%{opacity:.25}30%{opacity:1}}
 .tray{margin:14px 16px}
 
-/* 確認・訂正カード */
+/* 確認・訂正 */
 .hypo{background:#fff8ee;border:1.5px solid #f0e2c8;border-radius:16px;padding:14px;margin:12px 16px}
 .hypo .lab{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.04em;margin-bottom:6px}
-.hypo .q{font-size:15px;line-height:1.6;margin-bottom:12px}
+.hypo .q{font-size:15px;line-height:1.75;margin-bottom:12px}
+.hypo.done{opacity:.55}
+.hypo .ans{font-size:12.5px;color:var(--sage-deep);font-weight:700;margin-top:8px}
 
 /* 心の地図 */
 .mapwrap{margin:12px 16px}
 .layer{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:11px;box-shadow:var(--shadow)}
 .layer h4{margin:0 0 3px;font-size:12.5px;color:var(--sage-deep);font-weight:800}
 .layer .sub{font-size:11.5px;color:var(--muted);margin-bottom:9px}
-.layer ul{margin:0;padding-left:17px;font-size:14px}
-.layer li{margin-bottom:5px}
-.layer li.new{animation:pop .5s ease}
-@keyframes pop{from{background:#fff3dd}to{background:transparent}}
+.layer ul{margin:0;padding-left:17px;font-size:14px;line-height:1.7}
+.layer li{margin-bottom:6px}
 .layer.locked{background:#f4f2ea;border-style:dashed;color:var(--muted)}
 .layer.locked .lockmsg{font-size:13.5px;line-height:1.6}
-.fill{display:flex;align-items:center;gap:8px;margin:0 16px 4px;font-size:12.5px;color:var(--muted)}
-.dots{display:flex;gap:4px}
-.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
-.dots i.on{background:var(--sage)}
 
-/* 節目・手紙 */
+/* 節目 */
 .lstate{display:flex;gap:6px;margin:0 16px 8px}
 .lstate span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:5px 2px;border-bottom:2px solid var(--line)}
 .lstate span.on{color:var(--sage-deep);font-weight:800;border-color:var(--sage)}
@@ -122,16 +121,21 @@ textarea:focus{outline:2px solid var(--sage);outline-offset:1px}
 .sum .fix button{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 4px;
   font-size:11.5px;cursor:pointer;color:var(--sage-deep);font-weight:700;font-family:inherit}
 .sum .fix button.sel{background:var(--sage-soft);border-color:var(--sage)}
-.sum.dropped{opacity:.42}
+.sum.dropped{opacity:.38}
 .waiting{text-align:center;padding:38px 22px;color:var(--muted)}
 .waiting .big{font-size:34px;margin-bottom:12px}
-.waiting p{font-size:14px;line-height:1.7}
+.waiting p{font-size:14px;line-height:1.8}
+
+/* まとめ */
+.recap{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px}
+.recap .k{font-size:11px;color:var(--sage-deep);font-weight:800;letter-spacing:.04em;margin-bottom:4px}
+.recap .v{font-size:14.5px;line-height:1.65}
+.recap .v.small{font-size:13.5px;color:#5c655c}
 
 /* 安全 */
 .safe{background:#fff6f2;border:1.5px solid #f0d3c4;border-radius:16px;padding:16px;margin:12px 16px}
 .safe h3{color:var(--warn)}
 
-/* ナビ */
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;
   background:rgba(255,253,248,.95);backdrop-filter:blur(8px);border-top:1px solid var(--line);
   display:flex;justify-content:space-around;padding:7px 0 max(7px,env(safe-area-inset-bottom));z-index:40}
@@ -141,7 +145,7 @@ nav button .ic{font-size:18px;line-height:1}
 nav button.on{color:var(--sage-deep);font-weight:800}
 nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7px;border-radius:50%;background:var(--accent)}
 
-/* ── 心理士側 ── */
+/* 心理士側 */
 #proapp{background:var(--pro-bg);min-height:100vh;padding-bottom:40px}
 .pwrap{max-width:1040px;margin:0 auto;padding:0 16px}
 .phead{padding:16px 0 12px;border-bottom:2px solid #d3dbe1;margin-bottom:16px}
@@ -162,9 +166,7 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
 .pitem{border-bottom:1px solid #eef2f5;padding:9px 0;font-size:13.5px;line-height:1.65}
 .pitem:last-child{border-bottom:0}
 .pitem .k{font-size:11px;color:#8a97a0;display:block;margin-bottom:2px}
-.conf{display:inline-block;background:var(--pro-bg);border:1px solid #c3cfd8;border-radius:5px;
-  padding:1px 7px;font-size:11.5px;font-weight:800;color:var(--pro);font-variant-numeric:tabular-nums}
-.pcard textarea{border-color:#d9e0e5;min-height:120px}
+.pcard textarea{border-color:#d9e0e5;min-height:110px}
 .pcard select{width:100%;border:1.5px solid #d9e0e5;border-radius:10px;padding:11px;font-size:14px;
   font-family:inherit;background:#fff;color:var(--ink)}
 .pbtn{display:block;width:100%;border:none;border-radius:11px;padding:13px;font-size:14.5px;font-weight:800;
@@ -179,7 +181,8 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
   font-size:11.5px;cursor:pointer;color:var(--pro);font-weight:700;font-family:inherit}
 .split button.sel{background:var(--pro);color:#fff;border-color:var(--pro)}
 
-.foot{text-align:center;font-size:11px;color:var(--muted);padding:22px 20px 12px;line-height:1.7}
+.foot{text-align:center;font-size:11px;color:var(--muted);padding:22px 20px 12px;line-height:1.75}
+.tag{display:inline-block;font-size:10px;background:#efece2;color:var(--muted);border-radius:5px;padding:1px 6px;margin-left:5px;vertical-align:middle}
 
 @media(max-width:760px){ .pcols{grid-template-columns:1fr} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -190,10 +193,12 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
 <div id="demobar">
   <b>DEMO</b>
   <button id="sideBtn" onclick="toggleSide()">心理士側を見る</button>
+  <button class="hideable" onclick="skipD0()">Day0を飛ばす</button>
   <button class="hideable" onclick="nextWeek()">▶ 1週すすめる</button>
-  <button class="hideable" onclick="setLetter('arrived')">手紙が届いた</button>
+  <button class="hideable" onclick="showLetter()">AIレター</button>
+  <button class="hideable" onclick="setGate('arrived')">手紙が届いた</button>
   <button class="hideable" onclick="go('safe')">リスク検知</button>
-  <button class="hideable" onclick="resetAll()">最初から</button>
+  <button class="hideable" onclick="location.reload()">最初から</button>
   <span class="sp"></span>
   <span id="wk" style="opacity:.7"></span>
   <button class="tog" onclick="document.getElementById('demobar').classList.toggle('min')">▾</button>
@@ -203,84 +208,45 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
 <!-- ══════════ 利用者アプリ ══════════ -->
 <div id="userapp" class="phone">
 
-  <!-- U1 オンボーディング -->
-  <section id="s-onb" class="screen active">
-    <div id="onb"></div>
-  </section>
+  <section id="s-d0" class="screen active"><div id="d0"></div></section>
 
-  <!-- U2 ホーム -->
   <section id="s-home" class="screen">
     <div class="hero">
       <img src="assets/suplan/base.png" alt="すぷらん" onerror="this.style.display='none'">
-      <div class="hi"><b id="greet">こんにちは</b><span id="weekline"></span></div>
+      <div class="hi"><b id="greet">こんにちは</b><span id="greetsub"></span></div>
     </div>
-    <div id="homeTop"></div>
-    <div class="card lead">
-      <div class="eyebrow">きょうのこと</div>
-      <h2 id="todayWork">朝、10分だけ外に出てみる</h2>
-      <p id="todayWhy">むずかしければ、窓を開けるだけでも。</p>
-      <button class="btn" onclick="doneWork()">やってみた</button>
-      <button class="btn ghost" onclick="go('talk')">今日は話すだけにする</button>
-    </div>
-    <div class="fill"><span>心の地図</span><span class="dots" id="dotsHome"></span><span id="fillTxt"></span></div>
-    <div class="card" style="padding:13px 16px">
-      <p style="margin:0;font-size:13.5px"><b id="nextGate">次の手紙まで あと3日</b><br>
-      <span style="color:var(--muted);font-size:12.5px">大塚さんが、あなたのまとめを読んで返事を書きます。</span></p>
-    </div>
+    <div id="homeBody"></div>
     <div class="foot">※ これはデモです。AIの応答はあらかじめ用意したもので、実際の生成は行っていません。</div>
   </section>
 
-  <!-- U3 AI対話 -->
   <section id="s-talk" class="screen">
-    <div class="step" style="margin-top:14px">すぷらんと話す</div>
+    <div class="step" style="margin-top:14px"><span>すぷらんと話す</span></div>
     <div id="talkFlow"></div>
     <div class="tray" id="talkTray"></div>
   </section>
 
-  <!-- U4 心の地図 -->
   <section id="s-map" class="screen">
-    <div class="step" style="margin-top:14px">心の地図</div>
-    <div class="fill" style="margin-top:8px"><span>わかってきたこと</span><span class="dots" id="dotsMap"></span><span id="fillTxt2"></span></div>
+    <div class="step" style="margin-top:14px"><span>心の地図</span></div>
     <div class="mapwrap" id="mapBody"></div>
     <div class="foot">この地図は、あなたと一緒に少しずつ作っていくものです。<br>ちがうと思ったところは、いつでも直せます。</div>
   </section>
 
-  <!-- U6 節目（手紙） -->
-  <section id="s-letter" class="screen">
-    <div class="step" style="margin-top:14px">節目 ── 週に1回</div>
+  <section id="s-gate" class="screen">
+    <div class="step" style="margin-top:14px"><span>節目 ── 週に1回</span></div>
     <div class="lstate" id="lstate">
       <span data-s="before">まとめを送る</span>
       <span data-s="waiting">読んでもらう</span>
       <span data-s="arrived">手紙が届く</span>
     </div>
-    <div id="letterBody"></div>
+    <div id="gateBody"></div>
   </section>
 
-  <!-- U7 記録 -->
   <section id="s-log" class="screen">
-    <div class="step" style="margin-top:14px">これまで</div>
-    <div class="card">
-      <h3>向き合ったこと</h3>
-      <ul style="margin:0;padding-left:18px;font-size:14px">
-        <li>夕方になると集中が切れること</li>
-        <li>会議のあとに落ち込むこと</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>できるようになったこと</h3>
-      <ul style="margin:0;padding-left:18px;font-size:14px">
-        <li>しんどい日に「今日は話すだけ」を選べた</li>
-        <li>朝、外に出た日が3回あった</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>見つけたパターン</h3>
-      <p style="margin:0">「準備が足りない」と思うと、先回りして動いてしまい、夕方に切れる。</p>
-    </div>
+    <div class="step" style="margin-top:14px"><span>これまで</span></div>
+    <div id="logBody"></div>
     <div class="foot">※ できなかったことの回数や、連続記録は出していません。</div>
   </section>
 
-  <!-- U9 安全 -->
   <section id="s-safe" class="screen">
     <div class="safe">
       <h3>いま、しんどいですね</h3>
@@ -291,14 +257,15 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
       <p style="font-size:12.5px;color:var(--muted);margin-top:14px;margin-bottom:0">
       担当の大塚さんにも、いまお知らせしました。次の節目を待たずに連絡がきます。</p>
     </div>
-    <div class="foot">※ 通常のワークより安全対応を優先します（FR-60）。<br>リスクの点数で人を分けることはしません。</div>
+    <div class="foot">※ 通常のフローを中断して安全対応を優先します。<br>リスクの点数で人を分けることはしません。<br>
+    <span class="tag">文言・閾値は 9/22 監修待ち</span></div>
   </section>
 
   <nav id="nav">
     <button data-go="home" onclick="go('home')"><span class="ic">🌿</span>ホーム</button>
     <button data-go="talk" onclick="go('talk')"><span class="ic">💬</span>はなす</button>
     <button data-go="map" onclick="go('map')"><span class="ic">🗺️</span>地図</button>
-    <button data-go="letter" onclick="go('letter')"><span class="ic">✉️</span>節目<span id="navDot" class="dot" hidden></span></button>
+    <button data-go="gate" onclick="go('gate')"><span class="ic">✉️</span>節目<span id="navDot" class="dot" hidden></span></button>
     <button data-go="log" onclick="go('log')"><span class="ic">📖</span>これまで</button>
   </nav>
 </div>
@@ -318,383 +285,723 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
 <script>
 /* ═══════════ 状態 ═══════════ */
 const S = {
-  nick:"", situation:"", week:1, side:"user", screen:"onb",
-  letter:"before", workDone:0, relief:null,
-  map:{
-    desc:["夕方になると集中が切れる","会議のあと、落ち込みやすい"],
-    expl:["「準備が足りない」と考えて、先回りして動いてしまう"],
-    deep:false
-  },
-  sumFix:{}, proView:"list", timer:0, timerId:null, splitShow:null
+  nickname:"", context:"", concerns:[], concernNote:"",
+  check:[], safety:0,
+  map:[], goal:"", theme:"", hw:null, hwCat:"", feasible:"", barrier:"", planB:"", planC:"",
+  kpi:{a:null,b:null,c:null},
+  week:1, day:0, gate:"before", sumFix:{}, side:"user", screen:"d0",
+  timerId:null, timer:0, splitShow:2, letterSeen:false
 };
-const MAP_TOTAL = 8;
 
 /* ═══════════ 画面遷移 ═══════════ */
 function go(id){
-  if(S.side!=='user') toggleSide();
+  if(S.side!=="user") toggleSide();
   S.screen = id;
-  document.querySelectorAll('#userapp .screen').forEach(e=>e.classList.remove('active'));
-  const el = document.getElementById('s-'+id);
-  if(el) el.classList.add('active');
-  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.go===id));
-  document.getElementById('nav').hidden = (id==='onb');
-  if(id==='home') renderHome();
-  if(id==='map') renderMap();
-  if(id==='letter') renderLetter();
-  if(id==='talk') startTalk();
+  document.querySelectorAll("#userapp .screen").forEach(e=>e.classList.remove("active"));
+  const el = document.getElementById("s-"+id);
+  if(el) el.classList.add("active");
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on", b.dataset.go===id));
+  document.getElementById("nav").hidden = (id==="d0");
+  if(id==="home") renderHome();
+  if(id==="map") renderMap();
+  if(id==="gate") renderGate();
+  if(id==="log") renderLog();
+  if(id==="talk") startTalk();
   window.scrollTo(0,0);
 }
 function toggleSide(){
-  S.side = S.side==='user' ? 'pro' : 'user';
-  document.getElementById('userapp').hidden = S.side!=='user';
-  document.getElementById('proapp').hidden = S.side!=='pro';
-  document.getElementById('sideBtn').textContent = S.side==='user' ? '心理士側を見る' : '利用者側に戻る';
-  document.getElementById('sideBtn').classList.toggle('on', S.side==='pro');
-  if(S.side==='pro'){ S.proView='list'; renderPro(); }
+  S.side = S.side==="user" ? "pro" : "user";
+  document.getElementById("userapp").hidden = S.side!=="user";
+  document.getElementById("proapp").hidden = S.side!=="pro";
+  const b=document.getElementById("sideBtn");
+  b.textContent = S.side==="user" ? "心理士側を見る" : "利用者側に戻る";
+  b.classList.toggle("on", S.side==="pro");
+  if(S.side==="pro"){ proView="list"; renderPro(); }
   window.scrollTo(0,0);
 }
-function nextWeek(){ S.week++; S.letter='before'; S.sumFix={}; syncBar(); if(S.side==='user') go('home'); }
-function setLetter(v){ S.letter=v; syncBar(); if(S.side==='user') go('letter'); }
-function resetAll(){ location.reload(); }
-function syncBar(){
-  document.getElementById('wk').textContent = S.week + '回目 / 16';
-  const d = document.getElementById('navDot'); if(d) d.hidden = S.letter!=='arrived';
+function nextWeek(){ S.week++; S.gate="before"; S.sumFix={}; sync(); go("home"); }
+function setGate(v){ S.gate=v; sync(); go("gate"); }
+function sync(){
+  document.getElementById("wk").textContent = S.week+"週目";
+  const d=document.getElementById("navDot"); if(d) d.hidden = S.gate!=="arrived";
 }
 
-/* ═══════════ U1 オンボーディング ═══════════ */
-const ONB = [
- {k:'nick', step:'1 / 5', h:'はじめまして。<br>なんとお呼びしましょう',
-  p:'本名でなくてかまいません。あとから変えられます。', input:true},
- {k:'situation', step:'2 / 5', h:'いま、どんな状況に近いですか',
-  p:'あてはまるものを1つ選んでください。',
-  opts:['働きながら、つらさを感じている','休職を考えている／迷っている','復職を控えている／したばかり','いま休職している']},
- {k:'q1', step:'3 / 5', h:'この1週間、気分の落ち込みはどうでしたか',
-  p:'厚生労働省が公開している「QIDS-J」から抜粋しています（デモでは3問）。',
-  opts:['落ち込まない','すこし落ち込む','かなり落ち込む','ほとんど1日中落ち込む']},
- {k:'q2', step:'4 / 5', h:'眠りはどうでしたか',
-  opts:['いつもどおり','寝つきに30分以上かかる日がある','夜中に何度も目がさめる','ほとんど眠れていない']},
- {k:'safety', step:'5 / 5', h:'いま、ご自身を傷つけたい気持ちはありますか',
-  p:'この質問は、いちばん大事なので初回から外しません。',
-  opts:['ない','たまに頭をよぎる','たびたび考える','いま、つらい']},
- {k:'pick', step:'', h:'では、今日からやれそうなことを<br>ひとつ選んでください',
-  p:'むずかしければ、いちばん軽いもので大丈夫です。あとで変えられます。',
-  opts:['朝、10分だけ外に出てみる','寝る前に、今日あったことを1つだけ書く','何があったか、すぷらんに話すだけ']}
-];
-let onbIdx = 0;
-function renderOnb(){
-  const q = ONB[onbIdx], el = document.getElementById('onb');
-  let inner = '';
-  if(onbIdx===0){
-    inner += `<div class="hero" style="padding-top:22px"><img src="assets/suplan/base.png" alt="" onerror="this.style.display='none'">
-      <div class="hi"><b>kokoni</b><span>もやの森へようこそ</span></div></div>`;
-  }
-  inner += `<div class="step">${q.step}</div><div class="card">
-    <h2>${q.h}</h2>${q.p?`<p>${q.p}</p>`:''}`;
-  if(q.input){
-    inner += `<input type="text" id="nickIn" placeholder="すぷらん" maxlength="12" autocomplete="off">
-      <button class="btn" style="margin-top:12px" onclick="onbNick()">はじめる</button>`;
-  } else {
-    inner += `<div class="opts">` + q.opts.map((o,i)=>
-      `<button class="opt" onclick="onbPick('${q.k}',${i})">${o}</button>`).join('') + `</div>`;
-  }
-  inner += `</div>`;
-  if(q.k==='safety'){
-    inner += `<div class="foot">つらいと答えていただいたときは、ワークより先に、<br>つながれる先をご案内します。</div>`;
-  }
-  el.innerHTML = inner;
-  if(q.input) setTimeout(()=>document.getElementById('nickIn').focus(),80);
+/* ═══════════ Day 0 ═══════════ */
+let d0i = 0;
+const CONCERNS = ["仕事のプレッシャー","職場の人間関係","将来への不安","気分の落ち込み",
+  "眠りや生活リズム","疲れやすさ","集中できない","自分を責めてしまう","休むべきか迷っている","うまく言葉にできない"];
+
+const HW_LIB = {
+  A:{cat:"気づく", items:[
+    "仕事が終わった時の気分を、ひとことだけ残す",
+    "しんどくなった場面があったら、その時なにをしていたかだけ覚えておく"]},
+  B:{cat:"生活を整える", items:[
+    "寝る前に10分だけスマホを置いてみる",
+    "仕事の後に5分だけ休む時間をつくる"]},
+  C:{cat:"小さく動く", items:[
+    "5分だけ外に出てみる",
+    "一人で抱えていることを、1人だけに少し話してみる"]},
+  D:{cat:"考えを整理する", items:[
+    "自分を責めた瞬間の言葉を、1回だけ残してみる",
+    "頭に浮かんだことを、ひとことだけ書いてみる"]}
+};
+function pickCats(){
+  const c = S.concerns, out = [];
+  if(c.includes("眠りや生活リズム") || c.includes("疲れやすさ")) out.push("B");
+  if(c.includes("自分を責めてしまう")) out.push("D");
+  if(c.includes("職場の人間関係")) out.push("C");
+  out.push("A");
+  return [...new Set(out)].slice(0,2);
 }
-function onbNick(){
-  const v = document.getElementById('nickIn').value.trim();
-  S.nick = v || 'すぷらん'; onbIdx++; renderOnb(); window.scrollTo(0,0);
+function goalCandidates(){
+  const c = S.concerns, g = [];
+  if(c.includes("休むべきか迷っている")) g.push("休むか続けるかを、少し落ち着いて考えられるようになりたい");
+  if(c.includes("自分を責めてしまう")) g.push("自分を責めすぎないようになりたい");
+  if(c.includes("眠りや生活リズム")) g.push("生活リズムを少し整えたい");
+  g.push("気持ちを少し整理しやすくなりたい");
+  g.push("自分がしんどくなるパターンを知りたい");
+  return [...new Set(g)].slice(0,4);
 }
-function onbPick(k,i){
-  S[k]=i;
-  if(k==='safety' && i>=2){ document.getElementById('nav').hidden=false; go('safe'); return; }
-  if(k==='pick'){
-    S.work = ONB[5].opts[i];
-    document.getElementById('nav').hidden=false; go('home'); return;
-  }
-  onbIdx++; renderOnb(); window.scrollTo(0,0);
+function themeFor(){
+  if(S.goal.indexOf("休むか続けるか")>=0) return "まず、どんな時につらさが強くなるかを知ってみる";
+  if(S.goal.indexOf("責めすぎない")>=0) return "自分を責めた場面に、一度だけ気づいてみる";
+  if(S.goal.indexOf("生活リズム")>=0) return "夜の過ごし方を、ひとつだけ変えてみる";
+  return "しんどさが動いた場面を、ひとつだけ見つけてみる";
 }
 
-/* ═══════════ U2 ホーム ═══════════ */
-function renderHome(){
-  document.getElementById('greet').textContent = S.nick + ' さん';
-  document.getElementById('weekline').textContent = S.week + '回目 ／ 今日はどうしますか';
-  document.getElementById('todayWork').textContent = S.work || '朝、10分だけ外に出てみる';
-  document.getElementById('nextGate').textContent = S.letter==='arrived'
-    ? '大塚さんから手紙が届いています' : '次の手紙まで あと3日';
-  const top = document.getElementById('homeTop');
-  let h = '';
-  if(S.letter==='arrived'){
-    h += `<div class="card letter" onclick="go('letter')" style="cursor:pointer">
-      <div class="eyebrow">✉️ 大塚さんから</div>
-      <h3 style="margin-bottom:4px">手紙が届いています</h3>
-      <p style="margin:0;font-size:13.5px">今週の方向について、お返事がきました。</p></div>`;
-  }
-  if(S.week>=2){
-    h += `<div class="card ai">
+function d0(){
+  const e = document.getElementById("d0");
+  const H = (sid, label) => `<div class="step"><span>${label}</span><span class="sid">${sid}</span></div>`;
+  let h = "";
+
+  switch(d0i){
+  /* ── D0-01 Welcome ── */
+  case 0:
+    h = `<div class="hero" style="padding-top:26px"><img src="assets/suplan/base.png" alt="" onerror="this.style.display='none'">
+      <div class="hi"><b>kokoni</b><span>もやの森</span></div></div>
+      <div class="card lead">
+        <h2 style="font-size:24px;margin-bottom:12px">ここにいていい。</h2>
+        <p style="font-size:15px;line-height:1.9">今日は少しだけ、<br>いまのことを一緒に整理してみよう。</p>
+        <button class="btn" onclick="d0go(1)">はじめる</button>
+      </div>
+      <div class="foot">※ ここでは「CBT」「治療」「16回」という言葉を出しません。</div>`;
+    break;
+
+  /* ── D0-02 ニックネーム ── */
+  case 1:
+    h = H("D0-02","1 / 5") + `<div class="card">
+      <h2>なんとお呼びしましょう。</h2>
+      <p>本名でなくて大丈夫です。あとから変えられます。</p>
+      <input type="text" id="nickIn" placeholder="すぷらん" maxlength="12" autocomplete="off">
+      <button class="btn" style="margin-top:12px" onclick="saveNick()">この名前ではじめる</button>
+    </div>`;
+    break;
+
+  /* ── D0-03 今の状況 ── */
+  case 2:
+    h = H("D0-03","2 / 5") + `<div class="card">
+      <h2>今の状況に、一番近いものを<br>教えてください。</h2>
+      <div class="opts">${["働きながらつらさを感じている","休職するか迷っている","現在休職している",
+        "復職を控えている","復職したばかり","どれにも当てはまらない"]
+        .map(o=>`<button class="opt" onclick="S.context='${o}';d0go(3)">${o}</button>`).join("")}</div>
+    </div>`;
+    break;
+
+  /* ── D0-04 困っていること（複数選択） ── */
+  case 3:
+    h = H("D0-04","3 / 5") + `<div class="card">
+      <h2>最近、どんなことが<br>一番しんどいですか？</h2>
+      <p>いくつでも選べます。あとから変えられます。</p>
+      <div class="opts" id="concernOpts">${CONCERNS.map((o,i)=>
+        `<button class="opt ${S.concerns.includes(o)?"sel":""}" onclick="toggleConcern(${i})">${o}</button>`).join("")}</div>
+      <p style="margin-top:14px;font-size:13px">もし言葉にできそうなら、少しだけ教えてください。</p>
+      <textarea id="cnote" placeholder="（任意・書かなくて大丈夫です）">${S.concernNote}</textarea>
+      <button class="btn" style="margin-top:12px" id="cNext" onclick="saveConcerns()" ${S.concerns.length?"":"disabled"}>つづける</button>
+      <button class="btn quiet" onclick="S.concerns=['うまく言葉にできない'];saveConcerns()">うまく選べない</button>
+    </div>`;
+    break;
+
+  /* ── D0-05 状態チェック ── */
+  case 4:
+    h = H("D0-05","4 / 5") + `<div class="card">
+      <h2>いまの調子を、<br>いくつかの質問で確かめさせてください。</h2>
+      <p>これは診断ではありません。<br>1か月後にもう一度おうかがいして、変化を見るために使います。</p>
+      <div style="margin-top:14px">
+        <div class="eyebrow">この1週間、気分の落ち込みは</div>
+        <div class="opts">${["落ち込まない","すこし落ち込む","かなり落ち込む","ほとんど1日中落ち込む"]
+          .map((o,i)=>`<button class="opt" onclick="pickCheck(0,${i},this)">${o}</button>`).join("")}</div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="eyebrow">眠りはどうでしたか</div>
+        <div class="opts">${["いつもどおり","寝つきに30分以上かかる日がある","夜中に何度も目がさめる","ほとんど眠れていない"]
+          .map((o,i)=>`<button class="opt" onclick="pickCheck(1,${i},this)">${o}</button>`).join("")}</div>
+      </div>
+      <button class="btn" style="margin-top:16px" id="chkNext" onclick="d0go(5)" disabled>つづける</button>
+    </div>
+    <div class="foot"><span class="tag">QIDS-J 抜粋（デモ）</span><br>初回に16項目すべてを置くかは 9/22 の監修結果に従います。<br>点数や「うつ病の可能性」は表示しません。</div>`;
+    break;
+
+  /* ── D0-06 安全確認 ── */
+  case 5:
+    h = H("D0-06","5 / 5") + `<div class="card">
+      <h2>最後に、ひとつだけ<br>大事なことをおうかがいします。</h2>
+      <p>いま、ご自身を傷つけたい気持ちはありますか。</p>
+      <div class="opts">${["ない","たまに頭をよぎる","たびたび考える","いま、つらい"]
+        .map((o,i)=>`<button class="opt" onclick="pickSafety(${i})">${o}</button>`).join("")}</div>
+    </div>
+    <div class="foot"><span class="tag">質問文・閾値は 9/22 監修待ち</span><br>この設問はスキップできません。<br>該当した場合、通常のフローを中断します。</div>`;
+    break;
+
+  /* ── D0-06b 誰が見てくれるのか ── */
+  case 6:
+    h = `<div class="card lead">
+      <div class="eyebrow">これからのこと</div>
+      <h2>このあとは、<br>すぷらんと話していきます。</h2>
+      <p style="line-height:1.9">そして週に1回、<br>臨床心理士の<b>大塚さん</b>が<br>あなたの1週間を読んで、<br>お手紙を書きます。</p>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin:6px 0 14px">
+        <p style="margin:0;font-size:13.5px;line-height:1.8">書いたものは、<b>あなたが「送る」と決めたものだけ</b>が大塚さんに届きます。<br>
+        <b>会社や、ほかの誰にも共有されません。</b></p>
+      </div>
+      <button class="btn" onclick="d0go(7)">わかりました</button>
+    </div>
+    <div class="foot"><span class="tag">実名掲載は本人了承を 9/22 で取得</span></div>`;
+    break;
+
+  /* ── D0-07/08 初回AI対話（別画面で実行） ── */
+  case 7:
+    startD0Talk(); return;
+
+  /* ── D0-09 目標設定 ── */
+  case 8: {
+    const g = goalCandidates();
+    h = H("D0-09","少し先の方向") + `<div class="card">
+      <h2>もし、この1か月で<br>少し変化があるとしたら、<br>どんな状態になれたらよさそうですか？</h2>
+      <p>ぴんとこなければ、近いものでかまいません。</p>
+      <div class="opts">${g.map(o=>`<button class="opt" onclick="S.goal='${o}';d0go(9)">${o}</button>`).join("")}
+        <button class="opt" style="color:var(--muted)" onclick="S.goal='自分で書いたもの';d0go(9)">自分で書く</button></div>
+    </div>`;
+    break; }
+
+  case 9:
+    h = H("D0-09","少し先の方向") + `<div class="card">
+      <div class="eyebrow">この1か月で目指す方向</div>
+      <h2 style="font-size:17px;line-height:1.7">${S.goal}</h2>
+      <p>この方向で近そうですか？</p>
+      <div class="opts">
+        <button class="opt" onclick="d0go(10)">これでよい</button>
+        <button class="opt" onclick="d0go(8)">少し変えたい</button>
+        <button class="opt" onclick="d0go(8)">別のものにしたい</button>
+      </div>
+    </div>`;
+    break;
+
+  /* ── D0-10 今週のテーマ ── */
+  case 10: {
+    if(!S.theme) S.theme = themeFor();
+    h = H("D0-10","今週のこと") + `<div class="card lead">
+      <div class="eyebrow">この1週間でやってみること</div>
+      <h2 style="font-size:18px;line-height:1.7">${S.theme}</h2>
+      <p>1か月の方向を、今週できる大きさにしてみました。</p>
+      <div class="opts">
+        <button class="opt" onclick="d0go(11)">これでよい</button>
+        <button class="opt" onclick="S.theme='しんどさが動いた場面を、1回だけ見つけてみる';d0()">もう少し小さくする</button>
+        <button class="opt" onclick="S.theme='いまは、話すことだけを続けてみる';d0()">別のテーマにする</button>
+      </div>
+    </div>`;
+    break; }
+
+  /* ── D0-11 ホームワーク候補 ── */
+  case 11: {
+    const cats = pickCats();
+    const cand = [];
+    cats.forEach(c=>cand.push({cat:c, t:HW_LIB[c].items[0]}));
+    cand.push({cat:"—", t:"今日は特に何もせず、話したくなった時にkokoniに話す"});
+    h = H("D0-11","最初の一歩") + `<div class="card">
+      <p style="font-size:14px">今週は<b>「${S.theme}」</b>をテーマにしました。<br>そのために、こんな${cand.length}つが考えられます。</p>
+      <div class="opts">${cand.map((c,i)=>
+        `<button class="opt" onclick="pickHw(${i},'${c.cat}')">${c.t}${c.cat!=="—"?`<span class="tag">${HW_LIB[c.cat].cat}</span>`:""}</button>`).join("")}</div>
+      <p style="margin-top:12px;font-size:12.5px;color:var(--muted)">選ぶのはあなたです。すぷらんは提案するだけです。</p>
+    </div>
+    <div class="foot">内部カテゴリ（気づく／生活を整える／小さく動く／考えを整理する）は<br>説明のためにデモで表示しています。実機では出しません。</div>`;
+    window.__cand = cand;
+    break; }
+
+  /* ── D0-12 実行可能性 ── */
+  case 12:
+    h = H("D0-12","確かめる") + `<div class="card">
+      <div class="eyebrow">最初の小さな一歩</div>
+      <h2 style="font-size:17px;line-height:1.7">${S.hw}</h2>
+      <p>これ、今の状態でもできそうですか？</p>
+      <div class="opts">${["かなりできそう","たぶんできそう","少し難しそう","今は難しい"]
+        .map((o,i)=>`<button class="opt" onclick="pickFeasible(${i})">${o}</button>`).join("")}</div>
+    </div>`;
+    break;
+
+  case 13:
+    h = H("D0-12","小さくしました") + `<div class="card ai">
       <div class="eyebrow" style="color:var(--ai)">すぷらんから</div>
-      <p style="margin:0;font-size:14px">あなたの地図に、新しく分かったことがあります。<br>
-      「夕方」ではなく「<b>人と話したあと</b>」に切れているかもしれません。</p></div>`;
+      <p style="font-size:14.5px">では、もう少し小さくしましょう。</p>
+      <h2 style="font-size:17px;line-height:1.7">${S.hw}</h2>
+      <button class="btn" style="margin-top:8px" onclick="d0go(14)">これならできそう</button>
+      <button class="btn ghost" onclick="shrinkHw();d0go(13)">もっと小さく</button>
+    </div>`;
+    break;
+
+  /* ── D0-13 障壁 ── */
+  case 14:
+    h = H("D0-13","念のため") + `<div class="card">
+      <h2>やろうとした時に、<br>邪魔になりそうなことはありますか？</h2>
+      <div class="opts">${["忘れそう","疲れてできなさそう","時間がなさそう","やる意味が分からなくなりそう",
+        "気持ちが向かなさそう","人や環境の都合で難しそう","特になさそう"]
+        .map(o=>`<button class="opt" onclick="S.barrier='${o}';d0go(15)">${o}</button>`).join("")}</div>
+    </div>`;
+    break;
+
+  /* ── D0-14 Plan B ── */
+  case 15: {
+    const adj = {"忘れそう":"寝る前に思い出すだけでも大丈夫です。",
+      "疲れてできなさそう":"疲れている日は、思い出すだけで大丈夫です。",
+      "時間がなさそう":"10秒で終わる形にしておきます。",
+      "やる意味が分からなくなりそう":"意味が分からなくなったら、そのことをすぷらんに話してください。",
+      "気持ちが向かなさそう":"気持ちが向かない日は、何もしなくて大丈夫です。",
+      "人や環境の都合で難しそう":"できる日だけで大丈夫です。",
+      "特になさそう":"うまくいかない日があっても大丈夫です。"}[S.barrier] || "";
+    S.planB = "難しい日は「今日はしんどかった」だけでもOK";
+    S.planC = "それも難しければ、何もしなくてOK。次に話したくなった時に戻ってきてください。";
+    h = H("D0-14","難しい日のために") + `<div class="card">
+      <div class="eyebrow">難しい日のために</div>
+      <p style="font-size:14.5px">${adj}</p>
+      <div class="recap"><div class="k">できそうな日は</div><div class="v">${S.hw}</div></div>
+      <div class="recap"><div class="k">難しい日は</div><div class="v">${S.planB}</div></div>
+      <div class="recap"><div class="k">それも難しければ</div><div class="v small">${S.planC}</div></div>
+      <button class="btn" style="margin-top:12px" onclick="d0go(16)">これでいきます</button>
+    </div>`;
+    break; }
+
+  /* ── D0-15 初回まとめ ── */
+  case 16:
+    h = `<div class="card sum">
+      <div class="eyebrow">今日はここまで。</div>
+      <h2 style="font-size:20px">${S.nickname}さん、<br>ありがとうございました。</h2>
+      <div class="recap"><div class="k">今のあなたについて</div><div class="v">
+        ${S.map.filter(m=>m.ok).map(m=>"・"+m.t).join("<br>") || "（これから一緒に見つけていきます）"}</div></div>
+      <div class="recap"><div class="k">この1か月で目指す方向</div><div class="v">${S.goal}</div></div>
+      <div class="recap"><div class="k">今週のテーマ</div><div class="v">${S.theme}</div></div>
+      <div class="recap"><div class="k">最初の小さな一歩</div><div class="v">${S.hw}</div></div>
+      <div class="recap"><div class="k">難しい日は</div><div class="v small">${S.planB}</div></div>
+      <button class="btn" style="margin-top:14px" onclick="d0go(17)">ホームへ</button>
+    </div>`;
+    break;
+
+  /* ── KPI ── */
+  case 17:
+    h = `<div class="card">
+      <div class="eyebrow">最後に、3つだけ</div>
+      <div style="margin-bottom:14px">
+        <h3>いま自分に何が起きているか、少し分かりましたか</h3>
+        <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
+          .map((o,i)=>`<button class="opt" onclick="kpi('a',${i},this)">${o}</button>`).join("")}</div></div>
+      <div style="margin-bottom:14px">
+        <h3>次に何をするか、自分で選べましたか</h3>
+        <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
+          .map((o,i)=>`<button class="opt" onclick="kpi('b',${i},this)">${o}</button>`).join("")}</div></div>
+      <div>
+        <h3>少し整理できた／気持ちが少し軽くなった</h3>
+        <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
+          .map((o,i)=>`<button class="opt" onclick="kpi('c',${i},this)">${o}</button>`).join("")}</div></div>
+      <button class="btn" style="margin-top:16px" id="kpiNext" onclick="finishD0()" disabled>ホームへ</button>
+    </div>
+    <div class="foot">Actionable Clarity（A・B が Primary、C は Secondary）<br>
+    ※「しんどいまま」は失敗ではありません。</div>`;
+    break;
   }
-  h += `<div class="card" style="padding:14px 16px">
-    <div class="eyebrow">いまの気分</div>
-    <div class="opts row">
-      ${['しんどい','あまりよくない','ふつう','すこし楽'].map(t=>`<button class="opt" onclick="this.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${t}</button>`).join('')}
-    </div></div>`;
-  top.innerHTML = h;
-  renderDots('dotsHome','fillTxt');
+  e.innerHTML = h;
+  if(d0i===1) setTimeout(()=>document.getElementById("nickIn").focus(),80);
+  window.scrollTo(0,0);
 }
-function doneWork(){ S.workDone++; addMapItem(); go('map'); }
-function renderDots(dotId,txtId){
-  const n = S.map.desc.length + S.map.expl.length;
-  const d = document.getElementById(dotId);
-  if(d) d.innerHTML = Array.from({length:MAP_TOTAL},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join('');
-  const t = document.getElementById(txtId);
-  if(t) t.textContent = `${n} / まだ空白 ${MAP_TOTAL-n}`;
+function d0go(n){ d0i=n; d0(); }
+function saveNick(){ S.nickname = (document.getElementById("nickIn").value.trim()||"すぷらん"); d0go(2); }
+function toggleConcern(i){
+  const o = CONCERNS[i];
+  S.concerns.includes(o) ? S.concerns.splice(S.concerns.indexOf(o),1) : S.concerns.push(o);
+  document.querySelectorAll("#concernOpts .opt")[i].classList.toggle("sel");
+  document.getElementById("cNext").disabled = !S.concerns.length;
+}
+function saveConcerns(){ const t=document.getElementById("cnote"); if(t) S.concernNote=t.value.trim(); d0go(4); }
+function pickCheck(q,v,el){
+  S.check[q]=v;
+  el.parentNode.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel")); el.classList.add("sel");
+  if(S.check[0]!==undefined && S.check[1]!==undefined) document.getElementById("chkNext").disabled=false;
+}
+function pickSafety(i){ S.safety=i; if(i>=2){ document.getElementById("nav").hidden=false; go("safe"); return; } d0go(6); }
+function pickHw(i,cat){ const c=window.__cand[i]; S.hw=c.t; S.hwCat=cat; d0go(12); }
+function pickFeasible(i){
+  S.feasible=["かなりできそう","たぶんできそう","少し難しそう","今は難しい"][i];
+  if(i>=2){ shrinkHw(); d0go(13); } else d0go(14);
+}
+function shrinkHw(){
+  const m={"仕事が終わった時の気分を、ひとことだけ残す":"今週1回だけ、仕事後の気分をひとこと残す",
+    "今週1回だけ、仕事後の気分をひとこと残す":"仕事後に、気分を思い出すだけ（書かなくてOK）",
+    "寝る前に10分だけスマホを置いてみる":"寝る前に3分だけスマホを置いてみる",
+    "寝る前に3分だけスマホを置いてみる":"寝る前に、スマホを置くことを思い出すだけ",
+    "自分を責めた瞬間の言葉を、1回だけ残してみる":"自分を責めた瞬間に、気づくだけ",
+    "5分だけ外に出てみる":"玄関のドアを開けてみる"};
+  S.hw = m[S.hw] || ("今週1回だけ、"+S.hw);
+}
+function kpi(k,v,el){
+  S.kpi[k]=v;
+  el.parentNode.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel")); el.classList.add("sel");
+  if(S.kpi.a!==null&&S.kpi.b!==null&&S.kpi.c!==null) document.getElementById("kpiNext").disabled=false;
+}
+function finishD0(){ S.day=1; document.getElementById("nav").hidden=false; go("home"); }
+function skipD0(){
+  S.nickname=S.nickname||"すぷらん"; S.context="働きながらつらさを感じている";
+  S.concerns=["仕事のプレッシャー","休むべきか迷っている"];
+  S.goal="休むか続けるかを、少し落ち着いて考えられるようになりたい";
+  S.theme="まず、どんな時につらさが強くなるかを知ってみる";
+  S.hw="仕事が終わった時の気分を、ひとことだけ残す";
+  S.planB="難しい日は「今日はしんどかった」だけでもOK";
+  S.planC="それも難しければ、何もしなくてOK。次に話したくなった時に戻ってきてください。";
+  if(!S.map.length) S.map=[
+    {t:"仕事を続けることへの不安と、休むことへの不安の両方があり、決めきれない状態なのかもしれません", ok:true},
+    {t:"疲れている時ほど、自分を責める考えが強くなる傾向がありそうです", ok:true}];
+  S.day=1; document.getElementById("nav").hidden=false; go("home");
 }
 
-/* ═══════════ U3 AI対話 ═══════════ */
-const TALK = [
- {t:'ai', m:'こんにちは。今日はどんな感じですか。'},
- {t:'choice', o:['しんどい','あまりよくない','ふつう','すこし楽']},
- {t:'ai', m:'話してくれてありがとうございます。<br>先週の「朝、10分だけ外に出る」は、どうでしたか。'},
- {t:'choice', o:['できた','すこしできた','できなかった']},
- {t:'ai', m:'そうだったんですね。<br><b>やってみようとは思えましたか。</b>'},
- {t:'choice', o:['思ったけど動けなかった','思わなかった']},
- {t:'ai', m:'思えただけでも十分だと思います。<br>できなかった理由のほうを、一緒に見てみませんか。'},
- {t:'ai', m:'今日、話しておきたいことはありますか。'},
- {t:'choice', o:['夕方になると何もできなくなる','人と話したあとが特につらい','とくにない']},
- {t:'hypo', lab:'すぷらんが、仮に言葉にしてみます',
-  q:'もしかして、<b>人と話したあとに「うまく伝わらなかったかも」と考えて</b>、そこから疲れが出ていませんか。'},
- {t:'ai', m:'ありがとうございます。地図に書き足しておきますね。'},
- {t:'ai', m:'今日の一歩を、ひとつだけ決めませんか。'},
- {t:'choice', o:['話したあと、5分だけ何もしない時間をとる','今日はここまでにする']},
- {t:'relief'}
+/* ═══════════ D0-07/08 初回AI対話 ═══════════ */
+const D0TALK = [
+ {t:"ai", m:"はじめまして、すぷらんです。<br><br>今日は、いま気になっていることを少しだけ聞かせてください。<br><b>うまく言葉にできなくて大丈夫です。</b>選ぶだけでも進められます。"},
+ {t:"ai", m:"いま、いちばん気になっているのは、どんなことですか。"},
+ {t:"c", o:["仕事のことが頭から離れない","このまま続けていいのか分からない","朝がつらい","自分でもよく分からない"]},
+ {t:"ai", m:"教えてくれてありがとうございます。<br>それは、どんなときに強くなりますか。"},
+ {t:"c", o:["朝、起きたとき","通勤のとき","人と話したあと","夕方","夜、寝る前","いつもそう"]},
+ {t:"ai", m:"そのとき、頭のなかではどんなことが起きていますか。"},
+ {t:"c", o:["考えごとが止まらない","何も考えられなくなる","自分を責めてしまう","先のことが不安になる","うまく言えない"]},
+ {t:"ai", m:"いま、なにか楽になる方法はありますか。"},
+ {t:"c", o:["寝ると少し楽になる","誰かと話すと楽になる","何をしても変わらない","わからない"]},
+ {t:"hypo", n:0, q:"仕事そのものが大変というより、<b>「このまま続けて大丈夫なのかな」という不安</b>のほうが、気持ちを重くしているのかもしれません。"},
+ {t:"hypo", n:1, q:"<b>疲れている時ほど、自分を責める考えが強くなる</b>傾向がありそうです。"},
+ {t:"ai", m:"ありがとうございます。<br>いま話してくれたことに、ひとつだけ補足させてください。"},
+ {t:"ai", m:"「このままでいいのか」と考える時間は、<br>体を動かしていなくても、かなり体力を使います。<br><br><b>疲れているのは、動いたからではなく、考え続けたからかもしれません。</b>"},
+ {t:"end"}
 ];
-let talkIdx = 0;
-function startTalk(){ talkIdx = 0; document.getElementById('talkFlow').innerHTML=''; document.getElementById('talkTray').innerHTML=''; stepTalk(); }
-function stepTalk(){
-  const flow = document.getElementById('talkFlow'), tray = document.getElementById('talkTray');
-  if(talkIdx >= TALK.length){ tray.innerHTML = `<button class="btn" onclick="go('map')">地図を見る</button>`; return; }
-  const s = TALK[talkIdx];
-  if(s.t==='ai'){
+let dti=0;
+function startD0Talk(){
+  dti=0;
+  document.getElementById("d0").innerHTML =
+    `<div class="step" style="margin-top:14px"><span>すぷらんと話す</span><span class="sid">D0-07</span></div>
+     <div id="dtFlow"></div><div class="tray" id="dtTray"></div>`;
+  stepD0Talk();
+}
+function stepD0Talk(){
+  const flow=document.getElementById("dtFlow"), tray=document.getElementById("dtTray");
+  if(dti>=D0TALK.length) return;
+  const s=D0TALK[dti];
+  if(s.t==="ai"){
     tray.innerHTML = `<div class="typing"><i></i><i></i><i></i></div>`;
     setTimeout(()=>{
-      flow.insertAdjacentHTML('beforeend', `<div class="bubble"><div class="who">すぷらん</div><div class="txt">${s.m}</div></div>`);
-      talkIdx++; stepTalk(); window.scrollTo(0,document.body.scrollHeight);
-    }, 420);
-  } else if(s.t==='choice'){
-    tray.innerHTML = `<div class="opts">` + s.o.map((o,i)=>
-      `<button class="opt" onclick="pickTalk(${i})">${o}</button>`).join('') + `</div>`;
+      flow.insertAdjacentHTML("beforeend", `<div class="bubble"><div class="who">すぷらん</div><div class="txt">${s.m}</div></div>`);
+      dti++; stepD0Talk(); window.scrollTo(0,document.body.scrollHeight);
+    },420);
+  } else if(s.t==="c"){
+    tray.innerHTML = `<div class="opts">${s.o.map((o,i)=>`<button class="opt" onclick="dtPick(${i})">${o}</button>`).join("")}</div>`;
     window.scrollTo(0,document.body.scrollHeight);
-  } else if(s.t==='hypo'){
-    tray.innerHTML = '';
-    flow.insertAdjacentHTML('beforeend', `<div class="hypo"><div class="lab">${s.lab}</div>
+  } else if(s.t==="hypo"){
+    tray.innerHTML="";
+    flow.insertAdjacentHTML("beforeend", `<div class="hypo" id="hy${s.n}">
+      <div class="lab">すぷらんが、仮に言葉にしてみます</div>
       <div class="q">${s.q}</div>
       <div class="opts row">
-        <button class="opt" onclick="hypoAns(1)">そのとおり</button>
-        <button class="opt" onclick="hypoAns(2)">すこし近い</button>
-        <button class="opt" onclick="hypoAns(3)">ちがう</button>
-        <button class="opt" onclick="hypoAns(4)">いまは置いておく</button>
+        <button class="opt" onclick="hypoAns(${s.n},1)">そのとおり</button>
+        <button class="opt" onclick="hypoAns(${s.n},2)">すこし近い</button>
+        <button class="opt" onclick="hypoAns(${s.n},3)">ちがう</button>
+        <button class="opt" onclick="hypoAns(${s.n},4)">今はわからない</button>
       </div></div>`);
     window.scrollTo(0,document.body.scrollHeight);
-  } else if(s.t==='relief'){
-    tray.innerHTML = `<div class="card" style="margin:0">
-      <div class="eyebrow">最後にひとつだけ</div>
-      <h3 style="margin-bottom:10px">いま、どうですか</h3>
-      <div class="opts">
-        ${['整理できた','すこし楽になった','変わらない','しんどいままだ'].map((t,i)=>
-          `<button class="opt" onclick="setRelief(${i})">${t}</button>`).join('')}
-      </div></div>`;
+  } else if(s.t==="end"){
+    tray.innerHTML = `<button class="btn" onclick="d0go(8)">つづける</button>`;
     window.scrollTo(0,document.body.scrollHeight);
   }
 }
-function pickTalk(i){
-  const s = TALK[talkIdx];
-  document.getElementById('talkFlow').insertAdjacentHTML('beforeend',
+function dtPick(i){
+  const s=D0TALK[dti];
+  document.getElementById("dtFlow").insertAdjacentHTML("beforeend",
     `<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
-  document.getElementById('talkTray').innerHTML='';
-  if(talkIdx===3 && i<2){ talkIdx = 7; } else { talkIdx++; }
-  stepTalk();
+  document.getElementById("dtTray").innerHTML="";
+  dti++; stepD0Talk();
 }
-function hypoAns(v){
-  document.getElementById('talkTray').innerHTML='';
-  if(v<=2) addMapItem();
-  talkIdx++; stepTalk();
+const HYPO_TXT=["仕事を続けることへの不安と、休むことへの不安の両方があり、決めきれない状態なのかもしれません",
+  "疲れている時ほど、自分を責める考えが強くなる傾向がありそうです"];
+function hypoAns(n,v){
+  const el=document.getElementById("hy"+n);
+  const lab=["","そのとおり","すこし近い","ちがう","今はわからない"][v];
+  el.classList.add("done");
+  el.querySelector(".opts").outerHTML = `<div class="ans">→ ${lab}</div>`;
+  if(v<=2) S.map.push({t:HYPO_TXT[n], ok:true});
+  dti++; stepD0Talk();
 }
-function setRelief(i){ S.relief=i; go('map'); }
-function addMapItem(){
-  if(!S.map.expl.includes('人と話したあと「うまく伝わらなかったかも」と考えて、疲れが出る')){
-    S.map.expl.push('人と話したあと「うまく伝わらなかったかも」と考えて、疲れが出る');
+
+/* ═══════════ ホーム（§16の7要素） ═══════════ */
+function renderHome(){
+  document.getElementById("greet").textContent = (S.nickname||"すぷらん")+" さん";
+  document.getElementById("greetsub").textContent = S.week+"週目 ／ 今日はどうしますか";
+  let h="";
+  if(S.gate==="arrived"){
+    h += `<div class="card letter" onclick="go('gate')" style="cursor:pointer">
+      <div class="eyebrow">✉️ 大塚さんから</div><h3 style="margin-bottom:4px">手紙が届いています</h3>
+      <p style="margin:0;font-size:13.5px">今週の方向について、お返事がきました。</p></div>`;
+  }
+  if(S.letterSeen){
+    h += `<div class="card ai" onclick="showLetter()" style="cursor:pointer">
+      <div class="eyebrow" style="color:var(--ai)">すぷらんから</div>
+      <h3 style="margin-bottom:4px">この数日で見えてきたこと</h3>
+      <p style="margin:0;font-size:13.5px">あなたの地図に、新しく分かったことがあります。</p></div>`;
+  }
+  h += `<div class="card" style="padding:14px 16px">
+    <div class="eyebrow">今日の状態</div>
+    <div class="opts row">${["しんどい","あまりよくない","ふつう","すこし楽"]
+      .map(t=>`<button class="opt" onclick="this.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${t}</button>`).join("")}</div></div>`;
+  h += `<div class="card" style="padding:13px 16px">
+    <div class="eyebrow">今週のテーマ</div>
+    <p style="margin:0;font-size:14.5px;font-weight:700">${S.theme||"（まだ決まっていません）"}</p></div>`;
+  h += `<div class="card lead">
+    <div class="eyebrow">今日の小さな一歩</div>
+    <h2 style="font-size:17px;line-height:1.7">${S.hw||"朝、10分だけ外に出てみる"}</h2>
+    <p style="font-size:13px">難しい日は「${S.planB||"今日はしんどかった、だけでもOK"}」</p>
+    <button class="btn" onclick="go('talk')">やってみた</button>
+    <button class="btn ghost" onclick="go('talk')">今日は話すだけにする</button></div>`;
+  const last = S.map.filter(m=>m.ok).slice(-1)[0];
+  h += `<div class="card" style="padding:13px 16px">
+    <div class="eyebrow">最近わかったこと</div>
+    <p style="margin:0;font-size:14px;line-height:1.75">${last? last.t : "これから一緒に見つけていきます"}</p></div>`;
+  h += `<div class="card" style="padding:13px 16px">
+    <p style="margin:0;font-size:13.5px"><b>次の節目まで あと3日</b><br>
+    <span style="color:var(--muted);font-size:12.5px">大塚さんが、あなたのまとめを読んで返事を書きます。</span></p></div>`;
+  document.getElementById("homeBody").innerHTML = h;
+}
+
+/* ═══════════ AIレター（Day3） ═══════════ */
+function showLetter(){
+  S.letterSeen=true;
+  go("home");
+  setTimeout(()=>{
+    const b=document.getElementById("homeBody");
+    b.insertAdjacentHTML("afterbegin", `<div class="card ai">
+      <div class="eyebrow" style="color:var(--ai)">✉️ この数日で見えてきたこと</div>
+      <p style="font-size:14.5px;line-height:1.9;color:var(--ink)">
+      ${S.nickname||"すぷらん"}さん<br><br>
+      この数日で、ひとつ見えてきたことがあります。<br><br>
+      <b>仕事そのものよりも、「このままでいいのか」と考える時間に、気持ちが重くなりやすい</b>ようでした。<br><br>
+      よかったら、見にきてください。<br><br>
+      すぷらん</p>
+      <button class="btn ghost" style="margin-top:12px" onclick="go('map')">最近わかったことを見る</button></div>`);
+    window.scrollTo(0,0);
+  },80);
+}
+
+/* ═══════════ 対話（Day1以降） ═══════════ */
+const TALK = [
+ {t:"ai", m:"こんにちは。今日はどんな感じですか。"},
+ {t:"c", o:["しんどい","あまりよくない","ふつう","すこし楽"]},
+ {t:"ai", m:"話してくれてありがとうございます。<br>「${HW}」は、どうでしたか。"},
+ {t:"c", o:["できた","すこしできた","できなかった"]},
+ {t:"ai", m:"そうだったんですね。<br><b>やろうとは思えましたか。</b>"},
+ {t:"c", o:["思ったけど、動けなかった","思わなかった"]},
+ {t:"ai", m:"思えただけでも十分だと思います。<br>何が難しかったか、一緒に見てみませんか。"},
+ {t:"ai", m:"今日は、何を話しましょうか。"},
+ {t:"c", o:["前回の続き","今日あったこと","最近気になっていること","とくにない／決められない"]},
+ {t:"ai", m:"では、すぷらんからひとつ出してみますね。<br>「人と話したあと」のことを、もう少し見てみませんか。"},
+ {t:"ai", m:"今日の一歩を、ひとつだけ決めませんか。"},
+ {t:"c", o:["話したあと、5分だけ何もしない時間をとる","今日はここまでにする"]},
+ {t:"kpi"}
+];
+let ti=0;
+function startTalk(){
+  ti=0; document.getElementById("talkFlow").innerHTML=""; document.getElementById("talkTray").innerHTML=""; stepTalk();
+}
+function stepTalk(){
+  const flow=document.getElementById("talkFlow"), tray=document.getElementById("talkTray");
+  if(ti>=TALK.length){ tray.innerHTML=`<button class="btn" onclick="go('map')">地図を見る</button>`; return; }
+  const s=TALK[ti];
+  if(s.t==="ai"){
+    tray.innerHTML=`<div class="typing"><i></i><i></i><i></i></div>`;
+    setTimeout(()=>{
+      flow.insertAdjacentHTML("beforeend", `<div class="bubble"><div class="who">すぷらん</div><div class="txt">${s.m.replace("${HW}", S.hw||"朝、10分だけ外に出る")}</div></div>`);
+      ti++; stepTalk(); window.scrollTo(0,document.body.scrollHeight);
+    },420);
+  } else if(s.t==="c"){
+    tray.innerHTML=`<div class="opts">${s.o.map((o,i)=>`<button class="opt" onclick="tPick(${i})">${o}</button>`).join("")}</div>`;
+    window.scrollTo(0,document.body.scrollHeight);
+  } else if(s.t==="kpi"){
+    tray.innerHTML=`<div class="card" style="margin:0">
+      <div class="eyebrow">最後に、3つだけ</div>
+      <h3 style="margin-bottom:8px">いま自分に何が起きているか、少し分かりましたか</h3>
+      <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
+        .map(t=>`<button class="opt" onclick="go('map')">${t}</button>`).join("")}</div></div>`;
+    window.scrollTo(0,document.body.scrollHeight);
   }
 }
-
-/* ═══════════ U4 心の地図 ═══════════ */
-function renderMap(){
-  renderDots('dotsMap','fillTxt2');
-  const b = document.getElementById('mapBody');
-  const li = a => a.map(x=>`<li>${x}</li>`).join('');
-  b.innerHTML = `
-    <div class="layer"><h4>いま起きていること</h4>
-      <div class="sub">あなたが話してくれたこと</div><ul>${li(S.map.desc)}</ul></div>
-    <div class="layer"><h4>どうしてそうなるか</h4>
-      <div class="sub">すぷらんが仮に言葉にして、あなたが直したもの</div><ul>${li(S.map.expl)}</ul></div>
-    <div class="layer locked"><h4>心の奥にあるルール</h4>
-      <div class="lockmsg">ここは、もう少し一緒に見えてきてから、お伝えします。<br>
-      <span style="font-size:12px">（いまは、まだ早いと思っています）</span></div></div>`;
+function tPick(i){
+  const s=TALK[ti];
+  document.getElementById("talkFlow").insertAdjacentHTML("beforeend",
+    `<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
+  document.getElementById("talkTray").innerHTML="";
+  if(ti===3 && i<2) ti=7; else if(ti===8 && i<3) ti=10; else ti++;
+  stepTalk();
 }
 
-/* ═══════════ U6 節目（手紙） ═══════════ */
-const SUMROWS = [
- {k:'今週の状態', v:'前半はしんどい日が続き、後半はすこし戻りました。'},
- {k:'やったこと', v:'「朝、10分だけ外に出る」を3日。2日はできませんでした。'},
- {k:'できなかった日のこと', v:'「思ったけど動けなかった」と話していました。'},
- {k:'地図に増えたこと', v:'人と話したあとに「うまく伝わらなかったかも」と考えて疲れが出る。'},
- {k:'話したいこと', v:'夕方になると何もできなくなることについて。'}
+/* ═══════════ 心の地図 ═══════════ */
+function renderMap(){
+  const ok = S.map.filter(m=>m.ok);
+  document.getElementById("mapBody").innerHTML = `
+    <div class="layer"><h4>今起きていること</h4>
+      <div class="sub">あなたが話してくれたこと</div>
+      <ul>${["夕方になると集中が切れる","会議のあと、落ち込みやすい"].map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="layer"><h4>今わかってきたパターン</h4>
+      <div class="sub">すぷらんが仮に言葉にして、あなたが確かめたもの</div>
+      <ul>${ok.length? ok.map(m=>`<li>${m.t}</li>`).join("") : "<li style='color:var(--muted)'>これから一緒に見つけていきます</li>"}</ul></div>
+    <div class="layer locked"><h4>心の奥にあるルール</h4>
+      <div class="lockmsg">ここは、もう少し一緒に見えてきてから、お伝えします。<br>
+      <span style="font-size:12px">（PoCでは原則ひらきません）</span></div></div>`;
+}
+
+/* ═══════════ これまで ═══════════ */
+function renderLog(){
+  document.getElementById("logBody").innerHTML = `
+    <div class="card"><h3>この1か月で目指す方向</h3><p style="margin:0">${S.goal||"（未設定）"}</p></div>
+    <div class="card"><h3>今週のテーマ</h3><p style="margin:0">${S.theme||"（未設定）"}</p></div>
+    <div class="card"><h3>試したこと</h3>
+      <ul style="margin:0;padding-left:18px;font-size:14px"><li>${S.hw||"（未設定）"}</li></ul></div>
+    <div class="card"><h3>できるようになったこと</h3>
+      <ul style="margin:0;padding-left:18px;font-size:14px">
+        <li>しんどい日に「今日は話すだけ」を選べた</li><li>朝、外に出た日が3回あった</li></ul></div>`;
+}
+
+/* ═══════════ 節目 ═══════════ */
+const SUMROWS=[
+ {k:"今週の状態", v:"前半はしんどい日が続き、後半はすこし戻りました。"},
+ {k:"今週のテーマ", v:()=>S.theme||"—"},
+ {k:"試したこと", v:()=>`「${S.hw||"—"}」を3日。2日はできませんでした。`},
+ {k:"できなかった日のこと", v:"「思ったけど動けなかった」と話していました。"},
+ {k:"地図に増えたこと", v:"人と話したあとに「うまく伝わらなかったかも」と考えて疲れが出る。"},
+ {k:"大塚さんに話したいこと", v:"夕方になると何もできなくなることについて。"}
 ];
-function renderLetter(){
-  document.querySelectorAll('#lstate span').forEach(s=>s.classList.toggle('on', s.dataset.s===S.letter));
-  const b = document.getElementById('letterBody');
-  if(S.letter==='before'){
+function renderGate(){
+  document.querySelectorAll("#lstate span").forEach(s=>s.classList.toggle("on", s.dataset.s===S.gate));
+  const b=document.getElementById("gateBody");
+  if(S.gate==="before"){
     b.innerHTML = `<div class="card">
       <div class="eyebrow">すぷらんがまとめました</div>
       <h3>この1週間を、大塚さんに送ります</h3>
-      <p style="font-size:13.5px">ちがうところは直してください。<b>書かないでほしいこと</b>も選べます。</p>
-      ${SUMROWS.map((r,i)=>`
-        <div class="sum ${S.sumFix[i]===3?'dropped':''}" id="sum${i}">
-          <div class="k">${r.k}</div><div class="v">${r.v}</div>
-          <div class="fix">
-            <button class="${S.sumFix[i]===1?'sel':''}" onclick="fixSum(${i},1)">そのとおり</button>
-            <button class="${S.sumFix[i]===2?'sel':''}" onclick="fixSum(${i},2)">すこし違う</button>
-            <button class="${S.sumFix[i]===3?'sel':''}" onclick="fixSum(${i},3)">書かないで</button>
-          </div></div>`).join('')}
-      <div style="margin-top:12px"><div class="k" style="font-size:11.5px;color:var(--muted);margin-bottom:5px">書き足したいことがあれば</div>
+      <p style="font-size:13.5px">ちがうところは直してください。<b>「送らない」</b>も選べます。</p>
+      ${SUMROWS.map((r,i)=>`<div class="sum ${S.sumFix[i]===3?"dropped":""}">
+        <div class="k">${r.k}</div><div class="v">${typeof r.v==="function"?r.v():r.v}</div>
+        <div class="fix">
+          <button class="${S.sumFix[i]===1?"sel":""}" onclick="fixSum(${i},1)">そのとおり</button>
+          <button class="${S.sumFix[i]===2?"sel":""}" onclick="fixSum(${i},2)">すこし違う</button>
+          <button class="${S.sumFix[i]===3?"sel":""}" onclick="fixSum(${i},3)">送らない</button>
+        </div></div>`).join("")}
+      <div style="margin-top:12px"><div class="eyebrow">書き足したいことがあれば</div>
       <textarea placeholder="（任意）"></textarea></div>
-      <button class="btn" style="margin-top:12px" onclick="setLetter('waiting')">これで送る</button>
+      <button class="btn" style="margin-top:12px" onclick="setGate('waiting')">これで送る</button>
     </div>
-    <div class="foot">※ 送ったあと、大塚さんが読んで返事を書きます。すぐには届きません。</div>`;
-  } else if(S.letter==='waiting'){
-    b.innerHTML = `<div class="waiting">
-      <div class="big">✉️</div>
-      <p><b>大塚さんが読んでいます</b><br>
-      お返事は、2〜3日のうちに届きます。<br>
+    <div class="foot">※ AIのまとめを、そのまま心理士へは送りません。<br>必ず本人の確認を通します。</div>`;
+  } else if(S.gate==="waiting"){
+    b.innerHTML = `<div class="waiting"><div class="big">✉️</div>
+      <p><b>大塚さんが読んでいます</b><br>お返事は、2〜3日のうちに届きます。<br>
       <span style="font-size:12.5px">それまでは、いつもどおりで大丈夫です。</span></p>
-      <button class="btn ghost" style="max-width:260px;margin:18px auto 0" onclick="go('home')">ホームに戻る</button>
-    </div>
-    <div class="foot">※ 既読の表示や「返信を待っています」は出しません。<br>週に1回のリズムと、期待をそろえるためです。</div>`;
+      <button class="btn ghost" style="max-width:260px;margin:18px auto 0" onclick="go('home')">ホームに戻る</button></div>
+    <div class="foot">※ 既読の表示や「返信を待っています」は出しません。</div>`;
   } else {
     b.innerHTML = `<div class="card letter">
       <div class="eyebrow">✉️ 大塚さんから</div>
-      <p style="font-size:14.5px;line-height:1.9;color:var(--ink)">
-      ${S.nick}さん<br><br>
-      まとめを読みました。3日外に出られたこと、まず書いておきますね。できなかった2日について「思ったけど動けなかった」と書いてくださったのが、とても大事だと思いました。<br><br>
+      <p style="font-size:14.5px;line-height:1.95;color:var(--ink)">
+      ${S.nickname||"すぷらん"}さん<br><br>
+      まとめを読みました。3日できたこと、まず書いておきますね。<br><br>
+      できなかった2日について「思ったけど動けなかった」と書いてくださったのが、とても大事だと思いました。<br><br>
       「人と話したあと」に疲れが出る、という見立ては、私もそうかもしれないと思います。<br><br>
       今週は、夕方そのものより<b>人と話したあとの5分</b>を見てみませんか。何かをするのではなく、何もしない5分です。<br><br>
-      大塚
-      </p></div>
-    <div class="card">
-      <div class="eyebrow">今週の方向</div>
+      大塚</p></div>
+    <div class="card"><div class="eyebrow">今週の方向</div>
       <h3 style="margin-bottom:4px">人と話したあとの5分を、あけてみる</h3>
       <p style="margin:0;font-size:13.5px">すぷらんが、毎日のかたちにしてお渡しします。</p>
-      <button class="btn" style="margin-top:12px" onclick="S.work='人と話したあと、5分だけ何もしない';go('home')">はじめる</button>
-    </div>`;
+      <button class="btn" style="margin-top:12px" onclick="S.hw='人と話したあと、5分だけ何もしない';S.theme='人と話したあとの5分を、あけてみる';nextWeek()">来週へ進む</button></div>
+    <div class="card"><div class="eyebrow">お手紙について、4つだけ</div>
+      ${["すぷらんと話すだけの時より理解が深まった","来週、何を意識すればよいか分かった",
+         "人が見てくれている安心感があった","この手紙は役に立った"].map(q=>
+        `<div style="margin-bottom:10px"><p style="font-size:13.5px;margin:0 0 5px">${q}</p>
+        <div class="opts row">${["そう思う","やや","あまり","思わない"].map(t=>
+          `<button class="opt" style="font-size:12px" onclick="this.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${t}</button>`).join("")}</div></div>`).join("")}
+      <p style="font-size:11.5px;color:var(--muted);margin:0">H3（心理士 Added Value）の本命指標です。</p></div>`;
   }
 }
-function fixSum(i,v){ S.sumFix[i]=v; renderLetter(); }
+function fixSum(i,v){ S.sumFix[i]=v; renderGate(); }
 
 /* ═══════════ 心理士側 ═══════════ */
+let proView="list";
 function renderPro(){
-  const b = document.getElementById('proBody');
-  if(S.proView==='list'){
+  const b=document.getElementById("proBody");
+  if(proView==="list"){
     b.innerHTML = `<div class="plist">
-      <div class="prow alert" onclick="openSession('みなと')">
-        <div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 要確認</span></div>
-        <div class="mt">4回目 ／ 昨日 リスクを検知しました（節目を待たずに通知）</div></div>
-        <div class="go">開く →</div></div>
-      <div class="prow" onclick="openSession('${S.nick||'すぷらん'}')">
-        <div><div class="nm">${S.nick||'すぷらん'} さん</div>
-        <div class="mt">${S.week}回目 ／ まとめが届いています ／ 前回から7日</div></div>
-        <div class="go">節目を行う →</div></div>
-      <div class="prow" onclick="openSession('ゆき')">
-        <div><div class="nm">ゆき さん</div>
-        <div class="mt">11回目 ／ 次の節目まで3日</div></div>
-        <div class="go">開く →</div></div>
+      <div class="prow alert" onclick="openSession()"><div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 要確認</span></div>
+        <div class="mt">2週目 ／ 昨日 リスクを検知しました（節目を待たずに通知）</div></div><div class="go">開く →</div></div>
+      <div class="prow" onclick="openSession()"><div><div class="nm">${S.nickname||"すぷらん"} さん</div>
+        <div class="mt">${S.week}週目 ／ まとめが届いています ／ 前回から7日</div></div><div class="go">節目を行う →</div></div>
     </div>
     <div class="foot">並び順：① 要確認がある方 ② 節目が近い順</div>`;
   } else {
-    b.innerHTML = `
-    <button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="S.proView='list';stopTimer();renderPro()">← 一覧へ</button>
+    b.innerHTML = `<button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="proView='list';stopTimer();renderPro()">← 一覧へ</button>
     <div class="pcols">
       <div>
-        <div class="pcard">
-          <h3>AIの週次サマリ</h3>
-          <p class="note">本人が確認・訂正したもの。節目の前に自動で作られます（＝はじまりのシート）。</p>
+        <div class="pcard"><h3>AIの週次サマリ</h3>
+          <p class="note">本人が確認・訂正したもの。節目の前に自動で作られます。</p>
+          <div class="pitem"><span class="k">1か月の方向</span>${S.goal||"—"}</div>
+          <div class="pitem"><span class="k">今週のテーマ</span>${S.theme||"—"}</div>
           <div class="pitem"><span class="k">今週の状態</span>前半はしんどい日が続き、後半はすこし戻った。QIDS-J 14 → 12</div>
-          <div class="pitem"><span class="k">ワークの実施</span>「朝、10分だけ外に出る」3/7日。<b>できなかった日は「思ったけど動けなかった」</b>と回答</div>
+          <div class="pitem"><span class="k">ワークの実施</span>「${S.hw||"—"}」3/7日。<b>できなかった日は「思ったけど動けなかった」</b></div>
           <div class="pitem"><span class="k">心の地図の差分</span>＋「人と話したあと『うまく伝わらなかったかも』と考えて疲れが出る」<br>
             <span style="font-size:11.5px;color:#8a97a0">本人の回答＝「そのとおり」</span></div>
-          <div class="pitem"><span class="k">つまずいた箇所</span>夕方の時間帯に、対話の中断が2回</div>
           <div class="pitem"><span class="k">本人が話したいこと</span>夕方になると何もできなくなること</div>
-          <div class="pitem"><span class="k">本人が「書かないで」とした項目</span>なし</div>
-        </div>
-        <div class="pcard" style="margin-top:14px">
-          <h3>AIの確信度</h3>
-          <p class="note">本人の画面には出していません。判断の材料としてお使いください。</p>
-          <div class="pitem">地図の新しい項目 <span class="conf">72%</span> ／ 次の一歩の提案 <span class="conf">61%</span></div>
+          <div class="pitem"><span class="k">本人が「送らない」とした項目</span>なし</div>
         </div>
       </div>
       <div>
-        <div class="pcard">
-          <h3>お返事を書く</h3>
-          <p class="note">手紙として本人に届きます。</p>
-          <textarea placeholder="${S.nick||'すぷらん'}さん&#10;&#10;まとめを読みました。"></textarea>
-          <div style="margin-top:14px">
-            <h3 style="margin-bottom:6px">今週の方向</h3>
+        <div class="pcard"><h3>お返事を書く</h3><p class="note">手紙として本人に届きます。</p>
+          <div style="margin-bottom:10px"><div class="note" style="margin:0 0 4px">① 今週、読んで思ったこと</div><textarea style="min-height:70px"></textarea></div>
+          <div style="margin-bottom:10px"><div class="note" style="margin:0 0 4px">② ${S.nickname||"すぷらん"}さんに伝えたいこと</div><textarea style="min-height:70px"></textarea></div>
+          <div style="margin-bottom:10px"><div class="note" style="margin:0 0 4px">③ 来週、大事にしたいこと</div><textarea style="min-height:60px"></textarea></div>
+          <div><div class="note" style="margin:0 0 4px">④ 来週の方向</div>
             <select>
-              <option>人と話したあとの5分をあける（行動実験）</option>
-              <option>3つのコラム（出来事・気分・考え）</option>
-              <option>7つのコラム（根拠と反証）</option>
-              <option>活動記録を続ける</option>
+              <option>人と話したあとの5分をあける</option>
+              <option>まず生活リズムを整える</option>
+              <option>思考パターンを扱う</option>
+              <option>小さい行動を増やす</option>
+              <option>人との距離について扱う</option>
               <option>今週は方向を変えない</option>
             </select>
-            <p class="note" style="margin-top:6px">選んだ方向を、すぷらんが毎日のかたちに落とします。</p>
-          </div>
-          <div style="margin-top:14px">
-            <h3 style="margin-bottom:6px">見立ての記録</h3>
-            <textarea style="min-height:80px" placeholder="所見"></textarea>
+            <p class="note" style="margin-top:6px">選んだ方向を、すぷらんが毎日のかたちに落とします。</p></div>
+          <div style="margin-top:14px"><h3 style="margin-bottom:6px">見立ての記録</h3>
+            <textarea style="min-height:70px" placeholder="所見"></textarea>
             <div class="split">
-              <button class="${S.splitShow===1?'sel':''}" onclick="S.splitShow=1;renderPro()">本人にも見せる</button>
-              <button class="${S.splitShow===2||S.splitShow===null?'sel':''}" onclick="S.splitShow=2;renderPro()">自分だけ</button>
-            </div>
-          </div>
+              <button class="${S.splitShow===1?"sel":""}" onclick="S.splitShow=1;renderPro()">本人にも見せる</button>
+              <button class="${S.splitShow===2?"sel":""}" onclick="S.splitShow=2;renderPro()">自分だけ</button></div></div>
           <button class="pbtn" onclick="alert('デモのため送信は行いません。\\n本人側は「手紙が届いた」ボタンで確認できます。')">手紙を送る</button>
         </div>
       </div>
     </div>
-    <div class="timer">
-      <span>この節目にかかっている時間 <small>（FR-85：自動で計測しています）</small></span>
-      <b id="tm">0:00</b>
-    </div>`;
+    <div class="timer"><span>この節目にかかっている時間 <small>（自動計測：読む／考える／書く／方向設定）</small></span><b id="tm">0:00</b></div>`;
     startTimer();
   }
 }
-function openSession(name){ S.proView='session'; renderPro(); window.scrollTo(0,0); }
-function startTimer(){
-  stopTimer(); S.timer=0;
-  S.timerId = setInterval(()=>{
-    S.timer++;
-    const el=document.getElementById('tm');
-    if(el) el.textContent = Math.floor(S.timer/60)+':'+String(S.timer%60).padStart(2,'0');
-  },1000);
-}
+function openSession(){ proView="session"; renderPro(); window.scrollTo(0,0); }
+function startTimer(){ stopTimer(); S.timer=0;
+  S.timerId=setInterval(()=>{ S.timer++; const el=document.getElementById("tm");
+    if(el) el.textContent = Math.floor(S.timer/60)+":"+String(S.timer%60).padStart(2,"0"); },1000); }
 function stopTimer(){ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; } }
 
 /* ═══════════ 起動 ═══════════ */
-renderOnb(); syncBar();
-document.getElementById('nav').hidden = true;
+d0(); sync();
+document.getElementById("nav").hidden = true;
 </script>
 </body>
 </html>
