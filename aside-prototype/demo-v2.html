@@ -4,157 +4,189 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>kokoni デモ v2（Day0 初回体験 / 週次ループ）</title>
+<title>kokoni デモ｜初回体験</title>
 <style>
 :root{
-  --cream:#f7f4ec; --paper:#fffdf8; --sage:#7fa887; --sage-deep:#4f7c5d; --sage-soft:#e7efe4;
-  --ink:#3a423b; --muted:#8a938a; --line:#e8e3d6; --accent:#e6a15c; --warn:#c97b52;
-  --ai:#5b87a8; --ai-soft:#e6eef4;
+  --bg:#f2f8f7; --paper:#ffffff; --paper2:#f8fbfa;
+  --teal:#2f9e8f; --teal-deep:#1f7a6e; --teal-soft:#e2f2ef; --teal-line:#c9e6e0;
+  --ink:#2f3a38; --ink2:#55635f; --muted:#8a9794; --line:#e4eeeb;
+  --accent:#e0a05c; --accent-soft:#fdf3e6; --warn:#c97b52;
   --pro:#4a5d6e; --pro-bg:#eef2f5;
-  --shadow:0 6px 20px rgba(79,124,93,.10); --radius:20px;
+  --shadow:0 4px 18px rgba(47,158,143,.09); --r:18px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-  background:var(--cream);color:var(--ink);line-height:1.65;font-size:15px}
+  background:var(--bg);color:var(--ink);line-height:1.7;font-size:15px}
 
-/* デモ操作パネル */
-#demobar{position:fixed;top:0;left:0;right:0;z-index:100;background:#2c3530;color:#e8ece9;
+#demobar{position:fixed;top:0;left:0;right:0;z-index:200;background:#25332f;color:#e8ece9;
   font-size:11.5px;padding:6px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;
   box-shadow:0 2px 10px rgba(0,0,0,.2)}
 #demobar b{font-size:10.5px;letter-spacing:.06em;opacity:.65;margin-right:2px;white-space:nowrap}
-#demobar button{background:#3f4b45;color:#e8ece9;border:1px solid #55635c;border-radius:7px;
+#demobar button{background:#3a4a45;color:#e8ece9;border:1px solid #50635d;border-radius:7px;
   padding:5px 9px;font-size:11.5px;cursor:pointer;white-space:nowrap;font-family:inherit}
-#demobar button:hover{background:#4c5a53}
-#demobar button.on{background:var(--sage);border-color:var(--sage);color:#17251c;font-weight:700}
+#demobar button.on{background:var(--teal);border-color:var(--teal);color:#062520;font-weight:700}
 #demobar .sp{flex:1}
 #demobar .tog{background:none;border:none;font-size:15px;padding:2px 6px}
 #demobar.min .hideable{display:none}
 .pad{height:40px}
 
-.phone{max-width:440px;margin:0 auto;padding-bottom:88px;min-height:100vh;position:relative}
-.screen{display:none;animation:fade .28s ease}
+.phone{max-width:430px;margin:0 auto;padding-bottom:92px;min-height:100vh;position:relative}
+.screen{display:none;animation:fade .3s ease}
 .screen.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 
-.hero{padding:18px 18px 4px;display:flex;align-items:center;gap:12px}
-.hero img{width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(79,124,93,.18))}
-.hero .hi b{display:block;font-size:18px;font-weight:800}
-.hero .hi span{color:var(--muted);font-size:12.5px}
+.pagehead{padding:20px 20px 2px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.pagehead .back{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0 4px;font-family:inherit}
+.brandrow{display:flex;align-items:center;gap:8px;padding:14px 20px 0}
+.brandrow .mark{width:26px;height:26px;border-radius:50%;background:linear-gradient(140deg,#7fd0bf,#2f9e8f);flex-shrink:0}
+.brandrow b{font-size:17px;letter-spacing:.02em}
 
-.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-  box-shadow:var(--shadow);margin:12px 16px;padding:16px}
-.card.lead{background:linear-gradient(160deg,#fbfaf3,#eef4ea);border-color:#d9e6d5}
-.card.letter{background:#fffaf2;border-color:#f0e2c8}
-.card.ai{background:var(--ai-soft);border-color:#cfdfea}
-.card.sum{background:linear-gradient(160deg,#fbfaf3,#f4f8f2);border-color:#d9e6d5}
-.eyebrow{font-size:11.5px;color:var(--sage-deep);font-weight:800;letter-spacing:.04em;margin-bottom:6px}
-.card h2{margin:2px 0 8px;font-size:19px;font-weight:800;line-height:1.5}
-.card h3{margin:0 0 6px;font-size:15px;font-weight:800}
-.card p{margin:0 0 12px;font-size:14px;color:#5c655c}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);margin:14px 18px;padding:20px}
+.card.tint{background:linear-gradient(165deg,#ffffff,#f0f8f6);border-color:var(--teal-line)}
+.card.warm{background:var(--accent-soft);border-color:#f2e2cb}
+.card h2{margin:0 0 10px;font-size:19px;font-weight:800;line-height:1.55}
+.card h3{margin:0 0 6px;font-size:15.5px;font-weight:800}
+.card p{margin:0 0 14px;font-size:14px;color:var(--ink2);line-height:1.85}
 .card p:last-child{margin-bottom:0}
+.lede{font-size:13.5px;color:var(--muted);line-height:1.8}
 
-.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:800;
-  background:var(--sage-deep);color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(79,124,93,.24);font-family:inherit}
+.btn{display:block;width:100%;border:none;border-radius:13px;padding:15px;font-size:15.5px;font-weight:800;
+  background:var(--teal-deep);color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(31,122,110,.22);font-family:inherit}
 .btn:active{transform:scale(.985)}
-.btn:disabled{opacity:.38;cursor:default;box-shadow:none}
-.btn.ghost{background:#fff;color:var(--sage-deep);border:1.5px solid var(--sage);box-shadow:none}
-.btn.quiet{background:none;color:var(--muted);border:none;box-shadow:none;font-weight:600;font-size:13.5px;padding:10px}
-.btn+.btn{margin-top:8px}
+.btn:disabled{opacity:.35;cursor:default;box-shadow:none}
+.btn.ghost{background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal);box-shadow:none}
+.btn+.btn{margin-top:9px}
 
-.opts{display:flex;flex-direction:column;gap:8px}
-.opt{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;font-size:14.5px;
-  text-align:left;cursor:pointer;color:var(--ink);font-family:inherit;line-height:1.5;position:relative}
-.opt:active,.opt.sel{background:var(--sage-soft);border-color:var(--sage);font-weight:700}
-.opt.sel::after{content:"✓";position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--sage-deep);font-weight:800}
+.fld{margin-bottom:18px}
+.fld label{display:block;font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:7px}
+input[type=text],select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px;
+  font-size:16px;font-family:inherit;background:#fff;color:var(--ink);appearance:none}
+input:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios button{flex:1;min-width:76px;background:#fff;border:1.5px solid var(--line);border-radius:11px;
+  padding:11px 6px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:inherit}
+.radios button.sel{background:var(--teal-soft);border-color:var(--teal);font-weight:700;color:var(--teal-deep)}
+
+.checks{display:flex;flex-direction:column;gap:11px;margin:4px 0 18px}
+.chk{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);
+  border-radius:12px;padding:13px;cursor:pointer;font-size:14px;line-height:1.6}
+.chk.on{border-color:var(--teal);background:var(--teal-soft)}
+.chk .bx{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--muted);flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;background:#fff}
+.chk.on .bx{background:var(--teal);border-color:var(--teal)}
+.chk a{color:var(--teal-deep)}
+
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:14px 15px;font-size:14.5px;
+  text-align:left;cursor:pointer;color:var(--ink);font-family:inherit;line-height:1.6;position:relative;display:block;width:100%}
+.opt:active,.opt.sel{background:var(--teal-soft);border-color:var(--teal);font-weight:700}
+.opt.sel::after{content:"✓";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--teal-deep);font-weight:800}
 .opts.row{flex-direction:row;flex-wrap:wrap}
-.opts.row .opt{flex:1;min-width:88px;text-align:center;padding:11px 8px;font-size:13.5px}
+.opts.row .opt{flex:1;min-width:90px;text-align:center;padding:12px 8px;font-size:13.5px;width:auto}
 .opts.row .opt.sel::after{display:none}
 
-input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:13px;
-  font-size:16px;font-family:inherit;background:#fff;color:var(--ink)}
-input[type=text]:focus{outline:2px solid var(--sage);outline-offset:1px;border-color:var(--sage)}
-textarea{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:12px;font-size:15px;
-  font-family:inherit;background:#fff;color:var(--ink);min-height:84px;resize:vertical}
-textarea:focus{outline:2px solid var(--sage);outline-offset:1px}
+.steps{padding:16px 20px 0}
+.steps .lab{font-size:11.5px;color:var(--teal-deep);font-weight:800;letter-spacing:.06em;margin-bottom:7px}
+.bar{height:5px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:99px;transition:width .35s ease}
 
-.step{font-size:11.5px;color:var(--muted);margin:0 18px 2px;letter-spacing:.04em;display:flex;justify-content:space-between}
-.step .sid{opacity:.6;font-variant-numeric:tabular-nums}
+.startcard{background:linear-gradient(165deg,#ffffff,#eaf6f3);border:1px solid var(--teal-line);
+  border-radius:22px;margin:16px 18px;padding:24px 20px;box-shadow:0 6px 22px rgba(47,158,143,.12);text-align:center;position:relative}
+.startcard .ttl{font-size:21px;font-weight:800;margin-bottom:6px}
+.startcard .leaf{font-size:34px;line-height:1;margin-bottom:10px}
+.startcard ul{text-align:left;margin:14px 0 18px;padding-left:18px;font-size:13.5px;color:var(--ink2);line-height:1.9}
+.qbtn{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;
+  border:1.5px solid var(--teal);background:#fff;color:var(--teal-deep);font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
 
-/* 対話 */
-.bubble{margin:10px 16px;max-width:84%}
-.bubble .who{font-size:11px;color:var(--muted);margin-bottom:3px}
-.bubble .txt{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:12px 14px;font-size:14.5px;box-shadow:var(--shadow);line-height:1.75}
-.bubble.me{margin-left:auto;text-align:right}
-.bubble.me .txt{background:var(--sage-soft);border-color:#cfe0cd;border-radius:16px 16px 5px 16px;text-align:left;display:inline-block}
-.typing{display:inline-flex;gap:3px;padding:4px 0}
+.modalbg{position:fixed;inset:0;background:rgba(30,45,42,.45);z-index:150;display:flex;align-items:center;justify-content:center;padding:24px}
+.modal{background:#fff;border-radius:18px;padding:22px;max-width:360px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.modal h3{margin:0 0 12px;font-size:17px;font-weight:800}
+.modal p{font-size:14px;color:var(--ink2);line-height:1.9;margin:0 0 10px}
+
+.bubble{margin:11px 18px;max-width:86%}
+.bubble .who{font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.bubble .who i{width:18px;height:18px;border-radius:50%;background:linear-gradient(140deg,#7fd0bf,#2f9e8f);display:block}
+.bubble .txt{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:13px 15px;font-size:14.5px;box-shadow:var(--shadow);line-height:1.85}
+.bubble.me{margin-left:auto}
+.bubble.me .txt{background:var(--teal-soft);border-color:var(--teal-line);border-radius:16px 16px 5px 16px;display:inline-block}
+.typing{display:inline-flex;gap:4px;padding:6px 0 0 18px}
 .typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bl 1.2s infinite}
 .typing i:nth-child(2){animation-delay:.2s} .typing i:nth-child(3){animation-delay:.4s}
 @keyframes bl{0%,60%,100%{opacity:.25}30%{opacity:1}}
-.tray{margin:14px 16px}
+.tray{margin:16px 18px}
 
-/* 確認・訂正 */
-.hypo{background:#fff8ee;border:1.5px solid #f0e2c8;border-radius:16px;padding:14px;margin:12px 16px}
-.hypo .lab{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.04em;margin-bottom:6px}
-.hypo .q{font-size:15px;line-height:1.75;margin-bottom:12px}
-.hypo.done{opacity:.55}
-.hypo .ans{font-size:12.5px;color:var(--sage-deep);font-weight:700;margin-top:8px}
+.aibadge{display:inline-flex;align-items:center;gap:6px;background:var(--teal-soft);color:var(--teal-deep);
+  border:1px solid var(--teal-line);border-radius:99px;padding:5px 12px;font-size:11.5px;font-weight:800;margin-bottom:12px}
+.aibadge .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(140deg,#7fd0bf,#2f9e8f);display:block}
+.quoteline{background:var(--paper2);border-left:3px solid var(--teal);border-radius:0 10px 10px 0;
+  padding:11px 13px;font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:14px}
+.reco{position:absolute;top:-9px;left:14px;background:var(--teal);color:#fff;font-size:10.5px;font-weight:800;
+  border-radius:99px;padding:2px 10px}
+.opt.hasreco{margin-top:14px;border-color:var(--teal);box-shadow:0 3px 12px rgba(47,158,143,.14)}
 
-/* 心の地図 */
-.mapwrap{margin:12px 16px}
-.layer{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:11px;box-shadow:var(--shadow)}
-.layer h4{margin:0 0 3px;font-size:12.5px;color:var(--sage-deep);font-weight:800}
-.layer .sub{font-size:11.5px;color:var(--muted);margin-bottom:9px}
-.layer ul{margin:0;padding-left:17px;font-size:14px;line-height:1.7}
-.layer li{margin-bottom:6px}
-.layer.locked{background:#f4f2ea;border-style:dashed;color:var(--muted)}
-.layer.locked .lockmsg{font-size:13.5px;line-height:1.6}
-
-/* 節目 */
-.lstate{display:flex;gap:6px;margin:0 16px 8px}
-.lstate span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:5px 2px;border-bottom:2px solid var(--line)}
-.lstate span.on{color:var(--sage-deep);font-weight:800;border-color:var(--sage)}
-.sum{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:9px}
-.sum .k{font-size:11.5px;color:var(--muted);margin-bottom:3px}
-.sum .v{font-size:14.5px;line-height:1.6}
-.sum .fix{display:flex;gap:6px;margin-top:9px}
-.sum .fix button{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 4px;
-  font-size:11.5px;cursor:pointer;color:var(--sage-deep);font-weight:700;font-family:inherit}
-.sum .fix button.sel{background:var(--sage-soft);border-color:var(--sage)}
-.sum.dropped{opacity:.38}
-.waiting{text-align:center;padding:38px 22px;color:var(--muted)}
-.waiting .big{font-size:34px;margin-bottom:12px}
-.waiting p{font-size:14px;line-height:1.8}
-
-/* まとめ */
-.recap{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px}
-.recap .k{font-size:11px;color:var(--sage-deep);font-weight:800;letter-spacing:.04em;margin-bottom:4px}
+.recap{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:11px;display:flex;gap:12px}
+.recap .ic{font-size:19px;line-height:1.3}
+.recap .k{font-size:11.5px;color:var(--teal-deep);font-weight:800;margin-bottom:3px}
 .recap .v{font-size:14.5px;line-height:1.65}
-.recap .v.small{font-size:13.5px;color:#5c655c}
+.recap .v.s{font-size:13px;color:var(--ink2)}
 
-/* 安全 */
-.safe{background:#fff6f2;border:1.5px solid #f0d3c4;border-radius:16px;padding:16px;margin:12px 16px}
+.hi{padding:18px 20px 4px}
+.hi .g{font-size:12.5px;color:var(--muted)}
+.hi b{font-size:20px;display:block;margin-top:2px}
+.hrow{background:#fff;border:1px solid var(--line);border-radius:14px;margin:10px 18px;padding:14px 16px;
+  display:flex;gap:12px;align-items:flex-start;box-shadow:var(--shadow)}
+.hrow .ic{font-size:18px;line-height:1.4}
+.hrow .k{font-size:11.5px;color:var(--teal-deep);font-weight:800;margin-bottom:2px}
+.hrow .v{font-size:14.5px;line-height:1.6}
+.hrow.tap{cursor:pointer}
+.hrow.letter{background:var(--accent-soft);border-color:#f2e2cb}
+
+.layer{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;margin:0 18px 11px;box-shadow:var(--shadow)}
+.layer h4{margin:0 0 3px;font-size:12.5px;color:var(--teal-deep);font-weight:800}
+.layer .sub{font-size:11.5px;color:var(--muted);margin-bottom:9px}
+.layer ul{margin:0;padding-left:17px;font-size:14px;line-height:1.8}
+.layer.locked{background:var(--paper2);border-style:dashed;color:var(--muted)}
+.lstate{display:flex;gap:6px;margin:0 18px 10px}
+.lstate span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:6px 2px;border-bottom:2px solid var(--line)}
+.lstate span.on{color:var(--teal-deep);font-weight:800;border-color:var(--teal)}
+.sum{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:9px}
+.sum .k{font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.sum .v{font-size:14.5px;line-height:1.65}
+.sum .fix{display:flex;gap:6px;margin-top:10px}
+.sum .fix button{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px 4px;
+  font-size:11.5px;cursor:pointer;color:var(--teal-deep);font-weight:700;font-family:inherit}
+.sum .fix button.sel{background:var(--teal-soft);border-color:var(--teal)}
+.sum.dropped{opacity:.38}
+.waiting{text-align:center;padding:40px 24px;color:var(--muted)}
+.waiting .big{font-size:36px;margin-bottom:14px}
+.safe{background:#fff6f2;border:1.5px solid #f2d8c9;border-radius:16px;padding:18px;margin:14px 18px}
 .safe h3{color:var(--warn)}
+textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:15px;
+  font-family:inherit;background:#fff;color:var(--ink);min-height:80px;resize:vertical}
 
-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;
-  background:rgba(255,253,248,.95);backdrop-filter:blur(8px);border-top:1px solid var(--line);
-  display:flex;justify-content:space-around;padding:7px 0 max(7px,env(safe-area-inset-bottom));z-index:40}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:40}
 nav button{background:none;border:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;
   align-items:center;gap:3px;cursor:pointer;flex:1;padding:2px;font-family:inherit;position:relative}
 nav button .ic{font-size:18px;line-height:1}
-nav button.on{color:var(--sage-deep);font-weight:800}
+nav button.on{color:var(--teal-deep);font-weight:800}
 nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7px;border-radius:50%;background:var(--accent)}
+nav.locked button{opacity:.3;pointer-events:none}
 
-/* 心理士側 */
+.foot{text-align:center;font-size:11px;color:var(--muted);padding:20px 22px 14px;line-height:1.8}
+.tag{display:inline-block;font-size:10px;background:#eaf1ef;color:var(--muted);border-radius:5px;padding:1px 7px;margin-left:5px;vertical-align:middle}
+
 #proapp{background:var(--pro-bg);min-height:100vh;padding-bottom:40px}
 .pwrap{max-width:1040px;margin:0 auto;padding:0 16px}
 .phead{padding:16px 0 12px;border-bottom:2px solid #d3dbe1;margin-bottom:16px}
 .phead h1{margin:0;font-size:19px;font-weight:800;color:var(--pro)}
 .phead p{margin:3px 0 0;font-size:12.5px;color:#6b7a85}
-.plist{display:flex;flex-direction:column;gap:9px}
 .prow{background:#fff;border:1px solid #d9e0e5;border-radius:12px;padding:13px 15px;display:grid;
-  grid-template-columns:1fr auto;gap:10px;cursor:pointer;align-items:center}
-.prow:hover{border-color:var(--pro)}
+  grid-template-columns:1fr auto;gap:10px;cursor:pointer;align-items:center;margin-bottom:9px}
 .prow.alert{border-left:4px solid var(--warn);background:#fff8f5}
 .prow .nm{font-weight:800;font-size:15px}
 .prow .mt{font-size:12px;color:#6b7a85;margin-top:2px}
@@ -163,27 +195,17 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
 .pcard{background:#fff;border:1px solid #d9e0e5;border-radius:12px;padding:15px}
 .pcard h3{margin:0 0 4px;font-size:12px;letter-spacing:.06em;color:#6b7a85;font-weight:800;text-transform:uppercase}
 .pcard .note{font-size:11.5px;color:#8a97a0;margin:0 0 12px}
-.pitem{border-bottom:1px solid #eef2f5;padding:9px 0;font-size:13.5px;line-height:1.65}
+.pitem{border-bottom:1px solid #eef2f5;padding:9px 0;font-size:13.5px;line-height:1.7}
 .pitem:last-child{border-bottom:0}
 .pitem .k{font-size:11px;color:#8a97a0;display:block;margin-bottom:2px}
-.pcard textarea{border-color:#d9e0e5;min-height:110px}
-.pcard select{width:100%;border:1.5px solid #d9e0e5;border-radius:10px;padding:11px;font-size:14px;
-  font-family:inherit;background:#fff;color:var(--ink)}
+.pcard textarea{border-color:#d9e0e5;min-height:70px}
+.pcard select{border:1.5px solid #d9e0e5}
 .pbtn{display:block;width:100%;border:none;border-radius:11px;padding:13px;font-size:14.5px;font-weight:800;
   background:var(--pro);color:#fff;cursor:pointer;margin-top:11px;font-family:inherit}
 .pbtn.ghost{background:#fff;color:var(--pro);border:1.5px solid var(--pro)}
 .timer{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--pro);padding:11px 15px;
-  margin-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;border-radius:0 0 12px 12px}
+  margin-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
 .timer b{font-family:ui-monospace,monospace;font-size:17px;color:var(--pro);font-variant-numeric:tabular-nums}
-.timer small{color:#8a97a0;font-size:11px}
-.split{display:flex;gap:8px;margin-top:9px}
-.split button{flex:1;background:#fff;border:1.5px solid #d9e0e5;border-radius:9px;padding:8px;
-  font-size:11.5px;cursor:pointer;color:var(--pro);font-weight:700;font-family:inherit}
-.split button.sel{background:var(--pro);color:#fff;border-color:var(--pro)}
-
-.foot{text-align:center;font-size:11px;color:var(--muted);padding:22px 20px 12px;line-height:1.75}
-.tag{display:inline-block;font-size:10px;background:#efece2;color:var(--muted);border-radius:5px;padding:1px 6px;margin-left:5px;vertical-align:middle}
-
 @media(max-width:760px){ .pcols{grid-template-columns:1fr} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -192,816 +214,627 @@ nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7p
 
 <div id="demobar">
   <b>DEMO</b>
-  <button id="sideBtn" onclick="toggleSide()">心理士側を見る</button>
-  <button class="hideable" onclick="skipD0()">Day0を飛ばす</button>
-  <button class="hideable" onclick="nextWeek()">▶ 1週すすめる</button>
+  <button id="sideBtn" onclick="toggleSide()">心理士側</button>
+  <button class="hideable" onclick="skipSetup()">セットアップ済みへ</button>
   <button class="hideable" onclick="showLetter()">AIレター</button>
   <button class="hideable" onclick="setGate('arrived')">手紙が届いた</button>
   <button class="hideable" onclick="go('safe')">リスク検知</button>
   <button class="hideable" onclick="location.reload()">最初から</button>
   <span class="sp"></span>
-  <span id="wk" style="opacity:.7"></span>
+  <span id="statusLab" style="opacity:.7"></span>
   <button class="tog" onclick="document.getElementById('demobar').classList.toggle('min')">▾</button>
 </div>
 <div class="pad"></div>
 
-<!-- ══════════ 利用者アプリ ══════════ -->
 <div id="userapp" class="phone">
+  <section id="s-flow" class="screen active"><div id="flow"></div></section>
 
-  <section id="s-d0" class="screen active"><div id="d0"></div></section>
-
-  <section id="s-home" class="screen">
-    <div class="hero">
-      <img src="assets/suplan/base.png" alt="すぷらん" onerror="this.style.display='none'">
-      <div class="hi"><b id="greet">こんにちは</b><span id="greetsub"></span></div>
-    </div>
-    <div id="homeBody"></div>
-    <div class="foot">※ これはデモです。AIの応答はあらかじめ用意したもので、実際の生成は行っていません。</div>
-  </section>
+  <section id="s-home" class="screen"><div id="homeBody"></div>
+    <div class="foot">※ デモです。AIの応答はあらかじめ用意したもので、実際の生成は行っていません。</div></section>
 
   <section id="s-talk" class="screen">
-    <div class="step" style="margin-top:14px"><span>すぷらんと話す</span></div>
-    <div id="talkFlow"></div>
-    <div class="tray" id="talkTray"></div>
-  </section>
+    <div class="pagehead"><b style="font-size:16px">はなす</b><span></span></div>
+    <div id="talkFlow"></div><div class="tray" id="talkTray"></div></section>
 
   <section id="s-map" class="screen">
-    <div class="step" style="margin-top:14px"><span>心の地図</span></div>
-    <div class="mapwrap" id="mapBody"></div>
-    <div class="foot">この地図は、あなたと一緒に少しずつ作っていくものです。<br>ちがうと思ったところは、いつでも直せます。</div>
-  </section>
+    <div class="pagehead"><b style="font-size:16px">きろく ／ 心の地図</b><span></span></div>
+    <div id="mapBody" style="margin-top:12px"></div>
+    <div class="foot">この地図は、あなたと一緒に少しずつ作っていくものです。</div></section>
 
   <section id="s-gate" class="screen">
-    <div class="step" style="margin-top:14px"><span>節目 ── 週に1回</span></div>
-    <div class="lstate" id="lstate">
-      <span data-s="before">まとめを送る</span>
-      <span data-s="waiting">読んでもらう</span>
-      <span data-s="arrived">手紙が届く</span>
-    </div>
-    <div id="gateBody"></div>
-  </section>
+    <div class="pagehead"><b style="font-size:16px">節目 ── 週に1回</b><span></span></div>
+    <div class="lstate" id="lstate" style="margin-top:10px">
+      <span data-s="before">まとめを送る</span><span data-s="waiting">読んでもらう</span><span data-s="arrived">手紙が届く</span>
+    </div><div id="gateBody"></div></section>
 
   <section id="s-log" class="screen">
-    <div class="step" style="margin-top:14px"><span>これまで</span></div>
-    <div id="logBody"></div>
-    <div class="foot">※ できなかったことの回数や、連続記録は出していません。</div>
-  </section>
+    <div class="pagehead"><b style="font-size:16px">マイページ</b><span></span></div>
+    <div id="logBody" style="margin-top:12px"></div></section>
 
   <section id="s-safe" class="screen">
     <div class="safe">
       <h3>いま、しんどいですね</h3>
-      <p style="font-size:14.5px">ここから先は、すぷらんだけで受けとめるところではないと思っています。<br>
-      いま話せる人につながれるようにします。</p>
+      <p style="font-size:14.5px">ここから先は、kokoni だけで受けとめるところではないと思っています。<br>いま話せる人につながれるようにします。</p>
       <button class="btn" style="background:var(--warn)">相談できる窓口をひらく</button>
-      <button class="btn ghost" style="margin-top:8px" onclick="go('home')">いまは大丈夫</button>
-      <p style="font-size:12.5px;color:var(--muted);margin-top:14px;margin-bottom:0">
-      担当の大塚さんにも、いまお知らせしました。次の節目を待たずに連絡がきます。</p>
+      <button class="btn ghost" style="margin-top:9px" onclick="go('home')">いまは大丈夫</button>
     </div>
-    <div class="foot">※ 通常のフローを中断して安全対応を優先します。<br>リスクの点数で人を分けることはしません。<br>
-    <span class="tag">文言・閾値は 9/22 監修待ち</span></div>
-  </section>
+    <div class="foot">※ 通常のフローを中断して安全対応を優先します。<br>
+    <span class="tag">今回の初回体験フローには未配置（本番化前に要決定）</span></div></section>
 
   <nav id="nav">
     <button data-go="home" onclick="go('home')"><span class="ic">🌿</span>ホーム</button>
     <button data-go="talk" onclick="go('talk')"><span class="ic">💬</span>はなす</button>
-    <button data-go="map" onclick="go('map')"><span class="ic">🗺️</span>地図</button>
+    <button data-go="map" onclick="go('map')"><span class="ic">📗</span>きろく</button>
     <button data-go="gate" onclick="go('gate')"><span class="ic">✉️</span>節目<span id="navDot" class="dot" hidden></span></button>
-    <button data-go="log" onclick="go('log')"><span class="ic">📖</span>これまで</button>
+    <button data-go="log" onclick="go('log')"><span class="ic">👤</span>マイページ</button>
   </nav>
 </div>
 
-<!-- ══════════ 心理士側 ══════════ -->
 <div id="proapp" hidden>
   <div class="pwrap">
-    <div class="phead">
-      <h1>kokoni ／ 心理士用</h1>
-      <p>大塚 紀廣 さん（公認心理師・臨床心理士）</p>
-    </div>
+    <div class="phead"><h1>kokoni ／ 心理士用</h1><p>大塚 紀廣 さん（公認心理師・臨床心理士）</p></div>
     <div id="proBody"></div>
-    <div class="foot">※ デモです。AIのサマリはあらかじめ用意したものです。</div>
+    <div class="foot">※ 今回の初回体験の対象外ですが、参照用に残しています。</div>
   </div>
 </div>
 
-<script>
-/* ═══════════ 状態 ═══════════ */
-const S = {
-  nickname:"", context:"", concerns:[], concernNote:"",
-  check:[], safety:0,
-  map:[], goal:"", theme:"", hw:null, hwCat:"", feasible:"", barrier:"", planB:"", planC:"",
-  kpi:{a:null,b:null,c:null},
-  week:1, day:0, gate:"before", sumFix:{}, side:"user", screen:"d0",
-  timerId:null, timer:0, splitShow:2, letterSeen:false
-};
+<div id="modalRoot"></div>
 
-/* ═══════════ 画面遷移 ═══════════ */
+<script>
+const S = {
+  nickname:"", age_range:"", gender:"", agree_terms:false, agree_privacy:false,
+  current_status:"", current_concerns:[], ai_conversation_summary:"", ai_confirm:"",
+  direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
+  setup_status:"not_started", setup_completed_at:null,
+  step:"a1", screen:"flow", side:"user", gate:"before", sumFix:{}, letterSeen:false,
+  timerId:null, timer:0
+};
+const STATUS_OPTS=["仕事は続けているけど少ししんどい","休んだ方がいいのか迷っている","いま休職している",
+  "復職を控えている","復職したばかり","うまく言えない"];
+const CONCERN_OPTS=["仕事のプレッシャー","人間関係","将来への不安","気分の落ち込み","眠りや生活リズム","自分を責めてしまう"];
+
 function go(id){
   if(S.side!=="user") toggleSide();
-  S.screen = id;
+  S.screen=id;
   document.querySelectorAll("#userapp .screen").forEach(e=>e.classList.remove("active"));
-  const el = document.getElementById("s-"+id);
-  if(el) el.classList.add("active");
+  const el=document.getElementById("s-"+id); if(el) el.classList.add("active");
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on", b.dataset.go===id));
-  document.getElementById("nav").hidden = (id==="d0");
+  const nav=document.getElementById("nav");
+  nav.hidden=false; nav.classList.toggle("locked", S.setup_status!=="completed");
   if(id==="home") renderHome();
   if(id==="map") renderMap();
   if(id==="gate") renderGate();
   if(id==="log") renderLog();
   if(id==="talk") startTalk();
-  window.scrollTo(0,0);
+  sync(); window.scrollTo(0,0);
 }
 function toggleSide(){
   S.side = S.side==="user" ? "pro" : "user";
   document.getElementById("userapp").hidden = S.side!=="user";
   document.getElementById("proapp").hidden = S.side!=="pro";
   const b=document.getElementById("sideBtn");
-  b.textContent = S.side==="user" ? "心理士側を見る" : "利用者側に戻る";
+  b.textContent = S.side==="user" ? "心理士側" : "利用者側に戻る";
   b.classList.toggle("on", S.side==="pro");
   if(S.side==="pro"){ proView="list"; renderPro(); }
   window.scrollTo(0,0);
 }
-function nextWeek(){ S.week++; S.gate="before"; S.sumFix={}; sync(); go("home"); }
-function setGate(v){ S.gate=v; sync(); go("gate"); }
 function sync(){
-  document.getElementById("wk").textContent = S.week+"週目";
+  document.getElementById("statusLab").textContent="setup_status: "+S.setup_status;
   const d=document.getElementById("navDot"); if(d) d.hidden = S.gate!=="arrived";
 }
+function bar(n){ return `<div class="steps"><div class="lab">STEP ${n} / 3</div><div class="bar"><i style="width:${n/3*100}%"></i></div></div>`; }
+function step(s){ S.step=s; renderFlow(); window.scrollTo(0,0); }
 
-/* ═══════════ Day 0 ═══════════ */
-let d0i = 0;
-const CONCERNS = ["仕事のプレッシャー","職場の人間関係","将来への不安","気分の落ち込み",
-  "眠りや生活リズム","疲れやすさ","集中できない","自分を責めてしまう","休むべきか迷っている","うまく言葉にできない"];
+function renderFlow(){
+  const e=document.getElementById("flow");
+  document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById("s-flow").classList.add("active");
+  const nav=document.getElementById("nav");
+  nav.hidden = (S.step!=="b1"); nav.classList.add("locked");
+  let h="";
+  switch(S.step){
 
-const HW_LIB = {
-  A:{cat:"気づく", items:[
-    "仕事が終わった時の気分を、ひとことだけ残す",
-    "しんどくなった場面があったら、その時なにをしていたかだけ覚えておく"]},
-  B:{cat:"生活を整える", items:[
-    "寝る前に10分だけスマホを置いてみる",
-    "仕事の後に5分だけ休む時間をつくる"]},
-  C:{cat:"小さく動く", items:[
-    "5分だけ外に出てみる",
-    "一人で抱えていることを、1人だけに少し話してみる"]},
-  D:{cat:"考えを整理する", items:[
-    "自分を責めた瞬間の言葉を、1回だけ残してみる",
-    "頭に浮かんだことを、ひとことだけ書いてみる"]}
-};
-function pickCats(){
-  const c = S.concerns, out = [];
-  if(c.includes("眠りや生活リズム") || c.includes("疲れやすさ")) out.push("B");
-  if(c.includes("自分を責めてしまう")) out.push("D");
-  if(c.includes("職場の人間関係")) out.push("C");
-  out.push("A");
-  return [...new Set(out)].slice(0,2);
+  case "a1":
+    h=`<div style="height:8px"></div>
+    <div class="card tint" style="text-align:center;padding:34px 24px 26px">
+      <div style="font-size:42px;line-height:1;margin-bottom:14px">🌿</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:.06em;color:var(--teal-deep);margin-bottom:18px">kokoni</div>
+      <h2 style="font-size:25px;margin-bottom:8px">ここにいていい。</h2>
+      <p style="font-size:14px;margin-bottom:22px">kokoni へようこそ。<br><br>どんな気持ちでも、<br>ここからはじめてみませんか？</p>
+      <button class="btn" onclick="step('a2')">はじめる</button>
+    </div>
+    <div class="foot">※ ここでは「CBT」「治療」「16回」などの言葉を出しません。</div>`;
+    break;
+
+  case "a2":
+    h=`<div class="pagehead"><button class="back" onclick="step('a1')">‹</button><span></span></div>
+    <div class="brandrow"><span class="mark"></span><b>kokoni</b></div>
+    <div class="card">
+      <h2>少しだけ、<br>あなたのことを教えてください</h2>
+      <p class="lede" style="margin-bottom:20px">30秒ほどで終わります。</p>
+      <div class="fld"><label>ニックネーム</label>
+        <input type="text" id="nickIn" placeholder="（例）ここに" maxlength="12" value="${S.nickname}" oninput="checkA2()"></div>
+      <div class="fld"><label>年代</label>
+        <select id="ageIn" onchange="checkA2()"><option value="">選択してください</option>
+          ${["10代","20代","30代","40代","50代","60代以上"].map(a=>`<option ${S.age_range===a?"selected":""}>${a}</option>`).join("")}
+        </select></div>
+      <div class="fld"><label>性別</label>
+        <div class="radios">${["男性","女性","その他","回答しない"].map(g=>
+          `<button class="${S.gender===g?"sel":""}" onclick="S.gender='${g}';renderFlow()">${g}</button>`).join("")}</div></div>
+      <button class="btn" id="a2next" onclick="saveA2()" disabled>次へ</button>
+    </div>
+    <div class="foot">本名・会社名・診断名は取りません。</div>`;
+    break;
+
+  case "a3":
+    h=`<div class="pagehead"><button class="back" onclick="step('a2')">‹</button><span></span></div>
+    <div class="brandrow"><span class="mark"></span><b>kokoni</b></div>
+    <div class="card">
+      <h2>安心してご利用いただくために</h2>
+      <p>kokoni は、あなたのペースで<br>こころのセルフケアをサポートします。</p>
+      <div class="checks">
+        <div class="chk ${S.agree_terms?"on":""}" onclick="S.agree_terms=!S.agree_terms;renderFlow()">
+          <span class="bx">${S.agree_terms?"✓":""}</span><span><a>利用規約</a>に同意する</span></div>
+        <div class="chk ${S.agree_privacy?"on":""}" onclick="S.agree_privacy=!S.agree_privacy;renderFlow()">
+          <span class="bx">${S.agree_privacy?"✓":""}</span><span><a>プライバシーポリシー</a>に同意する</span></div>
+      </div>
+      <button class="btn" ${S.agree_terms&&S.agree_privacy?"":"disabled"} onclick="step('b1')">アプリをはじめる</button>
+    </div>
+    <div class="foot">30秒〜1分で完了する、軽い登録です。</div>`;
+    break;
+
+  case "b1":
+    h=`<div class="hi"><span class="g">おはようございます</span><b>${S.nickname} さん</b>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">今日も、よくここまで来ましたね。</div></div>
+    <div class="startcard">
+      <button class="qbtn" onclick="openWhy()">？</button>
+      <div class="leaf">🌱</div>
+      <div class="ttl">まずはここから</div>
+      <ul><li>今のあなたについて少し教えてください</li>
+        <li>kokoni があなたに合ったサポートをするために使います</li>
+        <li>5分くらいで終わります</li></ul>
+      <button class="btn" onclick="beginSetup()">はじめる</button>
+    </div>
+    <div class="foot">※ セットアップが終わるまで、下のメニューはまだ開きません。</div>`;
+    break;
+
+  case "c1":
+    h=`<div class="pagehead"><button class="back" onclick="step('b1')">‹</button><span class="lede">いまの状況</span></div>
+    ${bar(1)}
+    <div class="card">
+      <h3 style="margin-bottom:10px">今は、どんな感じに近いですか？</h3>
+      <div class="opts">${STATUS_OPTS.map(o=>
+        `<button class="opt ${S.current_status===o?"sel":""}" onclick="S.current_status='${o}';renderFlow()">${o}</button>`).join("")}</div>
+      <h3 style="margin-top:24px;margin-bottom:6px">最近、特に気になっていることは？</h3>
+      <p class="lede" style="margin-bottom:10px">いくつでも選べます。</p>
+      <div class="opts">${CONCERN_OPTS.map((o,i)=>
+        `<button class="opt ${S.current_concerns.includes(o)?"sel":""}" onclick="toggleConcern(${i})">${o}</button>`).join("")}</div>
+      <button class="btn" style="margin-top:20px" ${S.current_status?"":"disabled"} onclick="step('c2')">次へ</button>
+    </div>
+    <div class="foot">長く書く必要はありません。タップだけで進められます。</div>`;
+    break;
+
+  case "c2": startChat(); return;
+
+  case "c3": {
+    const cands=goalCandidates(); window.__gc=cands;
+    h=`<div class="pagehead"><button class="back" onclick="step('c2')">‹</button><span class="lede">少し先にどうなりたいか</span></div>
+    ${bar(2)}
+    <div class="card">
+      <p>この1か月で、こうなったら少し良さそう、と思うものはありますか？</p>
+      <div class="aibadge"><span class="dot"></span>あなたの状況から kokoni が提案</div>
+      <div class="opts">${cands.map(o=>
+        `<button class="opt ${S.direction_goal===o?"sel":""}" onclick="S.direction_goal='${o}';renderFlow()">${o}</button>`).join("")}</div>
+      <div class="opts row" style="margin-top:18px">
+        <button class="opt" ${S.direction_goal?"":"disabled"} onclick="step('c4')">これが近い</button>
+        <button class="opt" onclick="S.direction_goal='';renderFlow()">少し変えたい</button>
+        <button class="opt" onclick="S.direction_goal=window.__gc[0];step('c4')">まだ分からない</button>
+      </div>
+    </div>
+    <div class="foot">「目標」でなくて大丈夫です。方向だけ決めます。</div>`;
+    break; }
+
+  case "c4": {
+    const p=actionProposals(); window.__ap=p;
+    h=`<div class="pagehead"><button class="back" onclick="step('c3')">‹</button><span class="lede">今週やってみること</span></div>
+    ${bar(3)}
+    <div class="card">
+      <div class="aibadge"><span class="dot"></span>あなたの状況から kokoni が提案</div>
+      <div class="quoteline">「${shortStatus()}」という今の状態と、<br>「${S.direction_goal}」という方向に合わせて、<br>
+      <b>じゃあ、まずこの1週間は何から始めよう？</b></div>
+      <div class="opts">${p.map((o,i)=>
+        `<button class="opt ${i===0?"hasreco":""} ${S.first_action===o.t?"sel":""}" onclick="pickAction(${i})">
+          ${i===0?'<span class="reco">いまのあなたに合いそう</span>':""}${o.t}
+          <div style="font-size:11.5px;color:var(--muted);margin-top:5px;font-weight:400">${o.why}</div></button>`).join("")}</div>
+    </div>
+    <div class="foot">選ぶのはあなたです。kokoni は提案するだけです。</div>`;
+    break; }
+
+  case "c4b":
+    h=`<div class="pagehead"><button class="back" onclick="step('c4')">‹</button><span class="lede">今週やってみること</span></div>
+    ${bar(3)}
+    <div class="card">
+      <div class="aibadge"><span class="dot"></span>今週の小さな一歩</div>
+      <h2 style="font-size:18px">${S.first_action}</h2>
+      ${S.action_adjusted_flag?'<p class="lede" style="color:var(--teal-deep);margin-bottom:10px">▸ kokoni が少し小さくしました</p>':""}
+      <h3 style="margin-top:18px">これならできそう？</h3>
+      <div class="opts row" style="margin-top:10px">
+        <button class="opt" onclick="setDifficulty('できそう')">できそう</button>
+        <button class="opt" onclick="setDifficulty('ちょっと難しそう')">ちょっと難しそう</button>
+      </div>
+    </div>`;
+    break;
+
+  case "c4c":
+    h=`<div class="pagehead"><span></span><span class="lede">今週やってみること</span></div>
+    ${bar(3)}
+    <div class="card">
+      <div class="aibadge"><span class="dot"></span>今週の小さな一歩</div>
+      <h2 style="font-size:18px">${S.first_action}</h2>
+      <div class="card warm" style="margin:16px 0 0;padding:15px">
+        <div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:5px">難しい日は</div>
+        <div style="font-size:14.5px;line-height:1.7">${S.plan_b_text}</div></div>
+      <p class="lede" style="margin-top:14px">できない日があっても大丈夫です。<br>そのこと自体を、あとで一緒に見ていきます。</p>
+      <button class="btn" style="margin-top:8px" onclick="completeSetup()">これでいきます</button>
+    </div>`;
+    break;
+
+  case "d1":
+    h=`<div style="height:6px"></div>
+    <div class="card tint">
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:34px;line-height:1;margin-bottom:8px">🌿</div>
+        <h2 style="font-size:22px;margin-bottom:6px">これで準備できました。</h2>
+        <p class="lede">これから、あなたに合ったペースで<br>kokoni がそばにいます。</p></div>
+      <div class="recap"><span class="ic">🧑</span><div><div class="k">今のあなた</div>
+        <div class="v">${S.ai_conversation_summary}</div></div></div>
+      <div class="recap"><span class="ic">💡</span><div><div class="k">少し先に目指すこと</div>
+        <div class="v">${S.direction_goal}</div></div></div>
+      <div class="recap"><span class="ic">✅</span><div><div class="k">今週やってみること</div>
+        <div class="v">${S.first_action}</div>
+        <div class="v s" style="margin-top:4px">難しい日は「${S.plan_b_text}」</div></div></div>
+      <button class="btn" style="margin-top:16px" onclick="openHome()">ホームへ</button>
+    </div>
+    <div class="foot">よくここまで来ましたね。ここから、一緒に。</div>`;
+    break;
+  }
+  e.innerHTML=h;
+  if(S.step==="a2") setTimeout(checkA2,10);
+  sync();
+}
+
+function checkA2(){
+  const n=document.getElementById("nickIn"), a=document.getElementById("ageIn");
+  if(!n||!a) return;
+  S.nickname=n.value.trim(); S.age_range=a.value;
+  document.getElementById("a2next").disabled = !(S.nickname && S.age_range && S.gender);
+}
+function saveA2(){ checkA2(); step("a3"); }
+function openWhy(){
+  document.getElementById("modalRoot").innerHTML=`<div class="modalbg" onclick="closeWhy()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3>なぜ最初にこれをするの？</h3>
+      <p>今の状況や、こうなれたらいいな に合わせて、日々のサポート内容を考えるためです。</p>
+      <p>正解はありません。</p>
+      <p>答えにくいものは、あとから変えられます。</p>
+      <button class="btn" style="margin-top:8px" onclick="closeWhy()">閉じる</button>
+    </div></div>`;
+}
+function closeWhy(){ document.getElementById("modalRoot").innerHTML=""; }
+function beginSetup(){ S.setup_status="in_progress"; step("c1"); }
+function toggleConcern(i){
+  const o=CONCERN_OPTS[i];
+  S.current_concerns.includes(o)? S.current_concerns.splice(S.current_concerns.indexOf(o),1) : S.current_concerns.push(o);
+  renderFlow();
+}
+
+/* C2 AIとの軽い会話 */
+let CS=[], ci=0;
+function chatScript(){
+  const c=S.current_concerns, st=S.current_status;
+  const open = st.indexOf("迷って")>=0 ? "「休んだ方がいいのか迷っている」と教えてくれましたね。"
+    : st.indexOf("続けている")>=0 ? "「仕事は続けているけど少ししんどい」と教えてくれましたね。"
+    : "教えてくれて、ありがとうございます。";
+  const f = (c.includes("将来への不安")||st.indexOf("迷って")>=0)
+    ? {sum:"仕事そのものが大変というより、<b>「このままで大丈夫かな」という不安</b>のほうが大きいのかもしれません。",
+       plain:"仕事そのものより「このままで大丈夫かな」という不安が大きいのかもしれない"}
+    : c.includes("自分を責めてしまう")
+    ? {sum:"疲れている時ほど、<b>自分を責める考えが強くなる</b>ようです。",
+       plain:"疲れている時ほど、自分を責める考えが強くなりやすい"}
+    : c.includes("眠りや生活リズム")
+    ? {sum:"眠りが浅い日が続くと、<b>翌日のしんどさが積み上がっていく</b>ようです。",
+       plain:"眠りが浅い日が続くと、翌日のしんどさが積み上がりやすい"}
+    : {sum:"しんどさは一日中ではなく、<b>特定の場面のあとに強くなっている</b>ようです。",
+       plain:"しんどさは、特定の場面のあとに強くなりやすい"};
+  window.__focus=f;
+  return [
+    {t:"ai", m:"少し整理しましょう。<br>"+open},
+    {t:"ai", m:"それは、どんなときに強くなりますか。"},
+    {t:"c", o:["朝、起きたとき","仕事のあと","人と話したあと","夜、寝る前","いつもそう"]},
+    {t:"ai", m:"そのとき、頭のなかではどんなことが起きていますか。"},
+    {t:"c", o:["考えごとが止まらない","何も考えられなくなる","自分を責めてしまう","先のことが不安になる","うまく言えない"]},
+    {t:"ai", m:"ありがとうございます。<br><br>少し整理すると、<br>"+f.sum+"<br><br><b>この感じ、近いですか？</b>"},
+    {t:"confirm"}
+  ];
+}
+function startChat(){
+  CS=chatScript(); ci=0;
+  document.getElementById("flow").innerHTML=
+    `<div class="pagehead"><button class="back" onclick="step('c1')">‹</button><span class="lede">kokoni と少し話す</span></div>
+     ${bar(1)}<div style="margin-top:10px" id="csFlow"></div><div class="tray" id="csTray"></div>`;
+  stepChat();
+}
+function stepChat(){
+  const flow=document.getElementById("csFlow"), tray=document.getElementById("csTray");
+  if(ci>=CS.length) return;
+  const s=CS[ci];
+  if(s.t==="ai"){
+    tray.innerHTML=`<div class="typing"><i></i><i></i><i></i></div>`;
+    setTimeout(()=>{
+      flow.insertAdjacentHTML("beforeend",`<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">${s.m}</div></div>`);
+      ci++; stepChat(); window.scrollTo(0,document.body.scrollHeight);
+    },430);
+  } else if(s.t==="c"){
+    tray.innerHTML=`<div class="opts">${s.o.map((o,i)=>`<button class="opt" onclick="csPick(${i})">${o}</button>`).join("")}</div>`;
+    window.scrollTo(0,document.body.scrollHeight);
+  } else {
+    tray.innerHTML=`<div class="opts">${["そのとおり","少し近い","違う","まだわからない"].map(o=>
+      `<button class="opt" onclick="csConfirm('${o}')">${o}</button>`).join("")}</div>`;
+    window.scrollTo(0,document.body.scrollHeight);
+  }
+}
+function csPick(i){
+  const s=CS[ci];
+  document.getElementById("csFlow").insertAdjacentHTML("beforeend",`<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
+  document.getElementById("csTray").innerHTML=""; ci++; stepChat();
+}
+function csConfirm(v){
+  S.ai_confirm=v;
+  S.ai_conversation_summary = (v==="違う"||v==="まだわからない")
+    ? "いまは、まだうまく言葉にならない状態かもしれません" : window.__focus.plain;
+  document.getElementById("csFlow").insertAdjacentHTML("beforeend",`<div class="bubble me"><div class="txt">${v}</div></div>`);
+  document.getElementById("csTray").innerHTML=`<div class="typing"><i></i><i></i><i></i></div>`;
+  setTimeout(()=>{
+    const m = (v==="違う") ? "教えてくれてありがとうございます。<br>では、もう少し一緒に見ていきましょう。"
+      : "ありがとうございます。<br>この感じを覚えておきますね。";
+    document.getElementById("csFlow").insertAdjacentHTML("beforeend",`<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">${m}</div></div>`);
+    document.getElementById("csTray").innerHTML=`<button class="btn" onclick="step('c3')">次へ</button>`;
+    window.scrollTo(0,document.body.scrollHeight);
+  },500);
+}
+
+/* 提案ロジック */
+function shortStatus(){
+  return {"仕事は続けているけど少ししんどい":"仕事は続けているけど少ししんどい",
+    "休んだ方がいいのか迷っている":"休むか迷っている","いま休職している":"いま休職している",
+    "復職を控えている":"復職を控えている","復職したばかり":"復職したばかり",
+    "うまく言えない":"うまく言葉にならない"}[S.current_status]||S.current_status;
 }
 function goalCandidates(){
-  const c = S.concerns, g = [];
-  if(c.includes("休むべきか迷っている")) g.push("休むか続けるかを、少し落ち着いて考えられるようになりたい");
-  if(c.includes("自分を責めてしまう")) g.push("自分を責めすぎないようになりたい");
+  const c=S.current_concerns, st=S.current_status, g=[];
+  if(st.indexOf("迷って")>=0) g.push("休むか続けるか、少し落ち着いて考えられるようになりたい");
+  g.push("自分が何に疲れているのか整理したい");
+  if(c.includes("気分の落ち込み")||c.includes("自分を責めてしまう")) g.push("気持ちが沈んだ時の対処を見つけたい");
   if(c.includes("眠りや生活リズム")) g.push("生活リズムを少し整えたい");
-  g.push("気持ちを少し整理しやすくなりたい");
-  g.push("自分がしんどくなるパターンを知りたい");
-  return [...new Set(g)].slice(0,4);
+  g.push("しんどくなるパターンを知りたい");
+  return [...new Set(g)].slice(0,3);
 }
-function themeFor(){
-  if(S.goal.indexOf("休むか続けるか")>=0) return "まず、どんな時につらさが強くなるかを知ってみる";
-  if(S.goal.indexOf("責めすぎない")>=0) return "自分を責めた場面に、一度だけ気づいてみる";
-  if(S.goal.indexOf("生活リズム")>=0) return "夜の過ごし方を、ひとつだけ変えてみる";
-  return "しんどさが動いた場面を、ひとつだけ見つけてみる";
+const ACT={
+  "仕事のプレッシャー":{t:"仕事後の気持ちを一言だけ残す", why:"「仕事のプレッシャー」を挙げていたので"},
+  "人間関係":{t:"人と話したあと、5分だけ何もしない時間をとる", why:"「人間関係」を挙げていたので"},
+  "将来への不安":{t:"不安が強くなった時間帯を1回だけメモする", why:"「将来への不安」を挙げていたので"},
+  "気分の落ち込み":{t:"しんどくなった場面を1回だけ覚えておく", why:"「気分の落ち込み」を挙げていたので"},
+  "眠りや生活リズム":{t:"寝る前に10分だけスマホを置いてみる", why:"「眠りや生活リズム」を挙げていたので"},
+  "自分を責めてしまう":{t:"自分を責めた言葉を、1回だけ残してみる", why:"「自分を責めてしまう」を挙げていたので"}
+};
+function actionProposals(){
+  const out=[];
+  S.current_concerns.forEach(c=>{ if(ACT[c]) out.push(ACT[c]); });
+  if(!out.length) out.push({t:"しんどくなった場面を1回だけ覚えておく", why:"まずは気づくところから"});
+  if(out.length<2) out.push({t:"仕事後の気持ちを一言だけ残す", why:"いちばん軽い一歩として"});
+  const three=out.slice(0,2);
+  three.push({t:"話したくなった時に kokoni に話す", why:"何もしない週があってもいいので"});
+  return three;
 }
-
-function d0(){
-  const e = document.getElementById("d0");
-  const H = (sid, label) => `<div class="step"><span>${label}</span><span class="sid">${sid}</span></div>`;
-  let h = "";
-
-  switch(d0i){
-  /* ── D0-01 Welcome ── */
-  case 0:
-    h = `<div class="hero" style="padding-top:26px"><img src="assets/suplan/base.png" alt="" onerror="this.style.display='none'">
-      <div class="hi"><b>kokoni</b><span>もやの森</span></div></div>
-      <div class="card lead">
-        <h2 style="font-size:24px;margin-bottom:12px">ここにいていい。</h2>
-        <p style="font-size:15px;line-height:1.9">今日は少しだけ、<br>いまのことを一緒に整理してみよう。</p>
-        <button class="btn" onclick="d0go(1)">はじめる</button>
-      </div>
-      <div class="foot">※ ここでは「CBT」「治療」「16回」という言葉を出しません。</div>`;
-    break;
-
-  /* ── D0-02 ニックネーム ── */
-  case 1:
-    h = H("D0-02","1 / 5") + `<div class="card">
-      <h2>なんとお呼びしましょう。</h2>
-      <p>本名でなくて大丈夫です。あとから変えられます。</p>
-      <input type="text" id="nickIn" placeholder="すぷらん" maxlength="12" autocomplete="off">
-      <button class="btn" style="margin-top:12px" onclick="saveNick()">この名前ではじめる</button>
-    </div>`;
-    break;
-
-  /* ── D0-03 今の状況 ── */
-  case 2:
-    h = H("D0-03","2 / 5") + `<div class="card">
-      <h2>今の状況に、一番近いものを<br>教えてください。</h2>
-      <div class="opts">${["働きながらつらさを感じている","休職するか迷っている","現在休職している",
-        "復職を控えている","復職したばかり","どれにも当てはまらない"]
-        .map(o=>`<button class="opt" onclick="S.context='${o}';d0go(3)">${o}</button>`).join("")}</div>
-    </div>`;
-    break;
-
-  /* ── D0-04 困っていること（複数選択） ── */
-  case 3:
-    h = H("D0-04","3 / 5") + `<div class="card">
-      <h2>最近、どんなことが<br>一番しんどいですか？</h2>
-      <p>いくつでも選べます。あとから変えられます。</p>
-      <div class="opts" id="concernOpts">${CONCERNS.map((o,i)=>
-        `<button class="opt ${S.concerns.includes(o)?"sel":""}" onclick="toggleConcern(${i})">${o}</button>`).join("")}</div>
-      <p style="margin-top:14px;font-size:13px">もし言葉にできそうなら、少しだけ教えてください。</p>
-      <textarea id="cnote" placeholder="（任意・書かなくて大丈夫です）">${S.concernNote}</textarea>
-      <button class="btn" style="margin-top:12px" id="cNext" onclick="saveConcerns()" ${S.concerns.length?"":"disabled"}>つづける</button>
-      <button class="btn quiet" onclick="S.concerns=['うまく言葉にできない'];saveConcerns()">うまく選べない</button>
-    </div>`;
-    break;
-
-  /* ── D0-05 状態チェック ── */
-  case 4:
-    h = H("D0-05","4 / 5") + `<div class="card">
-      <h2>いまの調子を、<br>いくつかの質問で確かめさせてください。</h2>
-      <p>これは診断ではありません。<br>1か月後にもう一度おうかがいして、変化を見るために使います。</p>
-      <div style="margin-top:14px">
-        <div class="eyebrow">この1週間、気分の落ち込みは</div>
-        <div class="opts">${["落ち込まない","すこし落ち込む","かなり落ち込む","ほとんど1日中落ち込む"]
-          .map((o,i)=>`<button class="opt" onclick="pickCheck(0,${i},this)">${o}</button>`).join("")}</div>
-      </div>
-      <div style="margin-top:16px">
-        <div class="eyebrow">眠りはどうでしたか</div>
-        <div class="opts">${["いつもどおり","寝つきに30分以上かかる日がある","夜中に何度も目がさめる","ほとんど眠れていない"]
-          .map((o,i)=>`<button class="opt" onclick="pickCheck(1,${i},this)">${o}</button>`).join("")}</div>
-      </div>
-      <button class="btn" style="margin-top:16px" id="chkNext" onclick="d0go(5)" disabled>つづける</button>
-    </div>
-    <div class="foot"><span class="tag">QIDS-J 抜粋（デモ）</span><br>初回に16項目すべてを置くかは 9/22 の監修結果に従います。<br>点数や「うつ病の可能性」は表示しません。</div>`;
-    break;
-
-  /* ── D0-06 安全確認 ── */
-  case 5:
-    h = H("D0-06","5 / 5") + `<div class="card">
-      <h2>最後に、ひとつだけ<br>大事なことをおうかがいします。</h2>
-      <p>いま、ご自身を傷つけたい気持ちはありますか。</p>
-      <div class="opts">${["ない","たまに頭をよぎる","たびたび考える","いま、つらい"]
-        .map((o,i)=>`<button class="opt" onclick="pickSafety(${i})">${o}</button>`).join("")}</div>
-    </div>
-    <div class="foot"><span class="tag">質問文・閾値は 9/22 監修待ち</span><br>この設問はスキップできません。<br>該当した場合、通常のフローを中断します。</div>`;
-    break;
-
-  /* ── D0-06b 誰が見てくれるのか ── */
-  case 6:
-    h = `<div class="card lead">
-      <div class="eyebrow">これからのこと</div>
-      <h2>このあとは、<br>すぷらんと話していきます。</h2>
-      <p style="line-height:1.9">そして週に1回、<br>臨床心理士の<b>大塚さん</b>が<br>あなたの1週間を読んで、<br>お手紙を書きます。</p>
-      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin:6px 0 14px">
-        <p style="margin:0;font-size:13.5px;line-height:1.8">書いたものは、<b>あなたが「送る」と決めたものだけ</b>が大塚さんに届きます。<br>
-        <b>会社や、ほかの誰にも共有されません。</b></p>
-      </div>
-      <button class="btn" onclick="d0go(7)">わかりました</button>
-    </div>
-    <div class="foot"><span class="tag">実名掲載は本人了承を 9/22 で取得</span></div>`;
-    break;
-
-  /* ── D0-07/08 初回AI対話（別画面で実行） ── */
-  case 7:
-    startD0Talk(); return;
-
-  /* ── D0-09 目標設定 ── */
-  case 8: {
-    const g = goalCandidates();
-    h = H("D0-09","少し先の方向") + `<div class="card">
-      <h2>もし、この1か月で<br>少し変化があるとしたら、<br>どんな状態になれたらよさそうですか？</h2>
-      <p>ぴんとこなければ、近いものでかまいません。</p>
-      <div class="opts">${g.map(o=>`<button class="opt" onclick="S.goal='${o}';d0go(9)">${o}</button>`).join("")}
-        <button class="opt" style="color:var(--muted)" onclick="S.goal='自分で書いたもの';d0go(9)">自分で書く</button></div>
-    </div>`;
-    break; }
-
-  case 9:
-    h = H("D0-09","少し先の方向") + `<div class="card">
-      <div class="eyebrow">この1か月で目指す方向</div>
-      <h2 style="font-size:17px;line-height:1.7">${S.goal}</h2>
-      <p>この方向で近そうですか？</p>
-      <div class="opts">
-        <button class="opt" onclick="d0go(10)">これでよい</button>
-        <button class="opt" onclick="d0go(8)">少し変えたい</button>
-        <button class="opt" onclick="d0go(8)">別のものにしたい</button>
-      </div>
-    </div>`;
-    break;
-
-  /* ── D0-10 今週のテーマ ── */
-  case 10: {
-    if(!S.theme) S.theme = themeFor();
-    h = H("D0-10","今週のこと") + `<div class="card lead">
-      <div class="eyebrow">この1週間でやってみること</div>
-      <h2 style="font-size:18px;line-height:1.7">${S.theme}</h2>
-      <p>1か月の方向を、今週できる大きさにしてみました。</p>
-      <div class="opts">
-        <button class="opt" onclick="d0go(11)">これでよい</button>
-        <button class="opt" onclick="S.theme='しんどさが動いた場面を、1回だけ見つけてみる';d0()">もう少し小さくする</button>
-        <button class="opt" onclick="S.theme='いまは、話すことだけを続けてみる';d0()">別のテーマにする</button>
-      </div>
-    </div>`;
-    break; }
-
-  /* ── D0-11 ホームワーク候補 ── */
-  case 11: {
-    const cats = pickCats();
-    const cand = [];
-    cats.forEach(c=>cand.push({cat:c, t:HW_LIB[c].items[0]}));
-    cand.push({cat:"—", t:"今日は特に何もせず、話したくなった時にkokoniに話す"});
-    h = H("D0-11","最初の一歩") + `<div class="card">
-      <p style="font-size:14px">今週は<b>「${S.theme}」</b>をテーマにしました。<br>そのために、こんな${cand.length}つが考えられます。</p>
-      <div class="opts">${cand.map((c,i)=>
-        `<button class="opt" onclick="pickHw(${i},'${c.cat}')">${c.t}${c.cat!=="—"?`<span class="tag">${HW_LIB[c.cat].cat}</span>`:""}</button>`).join("")}</div>
-      <p style="margin-top:12px;font-size:12.5px;color:var(--muted)">選ぶのはあなたです。すぷらんは提案するだけです。</p>
-    </div>
-    <div class="foot">内部カテゴリ（気づく／生活を整える／小さく動く／考えを整理する）は<br>説明のためにデモで表示しています。実機では出しません。</div>`;
-    window.__cand = cand;
-    break; }
-
-  /* ── D0-12 実行可能性 ── */
-  case 12:
-    h = H("D0-12","確かめる") + `<div class="card">
-      <div class="eyebrow">最初の小さな一歩</div>
-      <h2 style="font-size:17px;line-height:1.7">${S.hw}</h2>
-      <p>これ、今の状態でもできそうですか？</p>
-      <div class="opts">${["かなりできそう","たぶんできそう","少し難しそう","今は難しい"]
-        .map((o,i)=>`<button class="opt" onclick="pickFeasible(${i})">${o}</button>`).join("")}</div>
-    </div>`;
-    break;
-
-  case 13:
-    h = H("D0-12","小さくしました") + `<div class="card ai">
-      <div class="eyebrow" style="color:var(--ai)">すぷらんから</div>
-      <p style="font-size:14.5px">では、もう少し小さくしましょう。</p>
-      <h2 style="font-size:17px;line-height:1.7">${S.hw}</h2>
-      <button class="btn" style="margin-top:8px" onclick="d0go(14)">これならできそう</button>
-      <button class="btn ghost" onclick="shrinkHw();d0go(13)">もっと小さく</button>
-    </div>`;
-    break;
-
-  /* ── D0-13 障壁 ── */
-  case 14:
-    h = H("D0-13","念のため") + `<div class="card">
-      <h2>やろうとした時に、<br>邪魔になりそうなことはありますか？</h2>
-      <div class="opts">${["忘れそう","疲れてできなさそう","時間がなさそう","やる意味が分からなくなりそう",
-        "気持ちが向かなさそう","人や環境の都合で難しそう","特になさそう"]
-        .map(o=>`<button class="opt" onclick="S.barrier='${o}';d0go(15)">${o}</button>`).join("")}</div>
-    </div>`;
-    break;
-
-  /* ── D0-14 Plan B ── */
-  case 15: {
-    const adj = {"忘れそう":"寝る前に思い出すだけでも大丈夫です。",
-      "疲れてできなさそう":"疲れている日は、思い出すだけで大丈夫です。",
-      "時間がなさそう":"10秒で終わる形にしておきます。",
-      "やる意味が分からなくなりそう":"意味が分からなくなったら、そのことをすぷらんに話してください。",
-      "気持ちが向かなさそう":"気持ちが向かない日は、何もしなくて大丈夫です。",
-      "人や環境の都合で難しそう":"できる日だけで大丈夫です。",
-      "特になさそう":"うまくいかない日があっても大丈夫です。"}[S.barrier] || "";
-    S.planB = "難しい日は「今日はしんどかった」だけでもOK";
-    S.planC = "それも難しければ、何もしなくてOK。次に話したくなった時に戻ってきてください。";
-    h = H("D0-14","難しい日のために") + `<div class="card">
-      <div class="eyebrow">難しい日のために</div>
-      <p style="font-size:14.5px">${adj}</p>
-      <div class="recap"><div class="k">できそうな日は</div><div class="v">${S.hw}</div></div>
-      <div class="recap"><div class="k">難しい日は</div><div class="v">${S.planB}</div></div>
-      <div class="recap"><div class="k">それも難しければ</div><div class="v small">${S.planC}</div></div>
-      <button class="btn" style="margin-top:12px" onclick="d0go(16)">これでいきます</button>
-    </div>`;
-    break; }
-
-  /* ── D0-15 初回まとめ ── */
-  case 16:
-    h = `<div class="card sum">
-      <div class="eyebrow">今日はここまで。</div>
-      <h2 style="font-size:20px">${S.nickname}さん、<br>ありがとうございました。</h2>
-      <div class="recap"><div class="k">今のあなたについて</div><div class="v">
-        ${S.map.filter(m=>m.ok).map(m=>"・"+m.t).join("<br>") || "（これから一緒に見つけていきます）"}</div></div>
-      <div class="recap"><div class="k">この1か月で目指す方向</div><div class="v">${S.goal}</div></div>
-      <div class="recap"><div class="k">今週のテーマ</div><div class="v">${S.theme}</div></div>
-      <div class="recap"><div class="k">最初の小さな一歩</div><div class="v">${S.hw}</div></div>
-      <div class="recap"><div class="k">難しい日は</div><div class="v small">${S.planB}</div></div>
-      <button class="btn" style="margin-top:14px" onclick="d0go(17)">ホームへ</button>
-    </div>`;
-    break;
-
-  /* ── KPI ── */
-  case 17:
-    h = `<div class="card">
-      <div class="eyebrow">最後に、3つだけ</div>
-      <div style="margin-bottom:14px">
-        <h3>いま自分に何が起きているか、少し分かりましたか</h3>
-        <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
-          .map((o,i)=>`<button class="opt" onclick="kpi('a',${i},this)">${o}</button>`).join("")}</div></div>
-      <div style="margin-bottom:14px">
-        <h3>次に何をするか、自分で選べましたか</h3>
-        <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
-          .map((o,i)=>`<button class="opt" onclick="kpi('b',${i},this)">${o}</button>`).join("")}</div></div>
-      <div>
-        <h3>少し整理できた／気持ちが少し軽くなった</h3>
-        <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
-          .map((o,i)=>`<button class="opt" onclick="kpi('c',${i},this)">${o}</button>`).join("")}</div></div>
-      <button class="btn" style="margin-top:16px" id="kpiNext" onclick="finishD0()" disabled>ホームへ</button>
-    </div>
-    <div class="foot">Actionable Clarity（A・B が Primary、C は Secondary）<br>
-    ※「しんどいまま」は失敗ではありません。</div>`;
-    break;
-  }
-  e.innerHTML = h;
-  if(d0i===1) setTimeout(()=>document.getElementById("nickIn").focus(),80);
-  window.scrollTo(0,0);
+function pickAction(i){ S.first_action=window.__ap[i].t; S.action_adjusted_flag=false; step("c4b"); }
+function setDifficulty(v){
+  S.action_difficulty=v;
+  if(v==="ちょっと難しそう"){ shrink(); S.action_adjusted_flag=true; renderFlow(); return; }
+  S.plan_b_text="難しい日は「今日はしんどかった」だけでもOK";
+  step("c4c");
 }
-function d0go(n){ d0i=n; d0(); }
-function saveNick(){ S.nickname = (document.getElementById("nickIn").value.trim()||"すぷらん"); d0go(2); }
-function toggleConcern(i){
-  const o = CONCERNS[i];
-  S.concerns.includes(o) ? S.concerns.splice(S.concerns.indexOf(o),1) : S.concerns.push(o);
-  document.querySelectorAll("#concernOpts .opt")[i].classList.toggle("sel");
-  document.getElementById("cNext").disabled = !S.concerns.length;
-}
-function saveConcerns(){ const t=document.getElementById("cnote"); if(t) S.concernNote=t.value.trim(); d0go(4); }
-function pickCheck(q,v,el){
-  S.check[q]=v;
-  el.parentNode.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel")); el.classList.add("sel");
-  if(S.check[0]!==undefined && S.check[1]!==undefined) document.getElementById("chkNext").disabled=false;
-}
-function pickSafety(i){ S.safety=i; if(i>=2){ document.getElementById("nav").hidden=false; go("safe"); return; } d0go(6); }
-function pickHw(i,cat){ const c=window.__cand[i]; S.hw=c.t; S.hwCat=cat; d0go(12); }
-function pickFeasible(i){
-  S.feasible=["かなりできそう","たぶんできそう","少し難しそう","今は難しい"][i];
-  if(i>=2){ shrinkHw(); d0go(13); } else d0go(14);
-}
-function shrinkHw(){
-  const m={"仕事が終わった時の気分を、ひとことだけ残す":"今週1回だけ、仕事後の気分をひとこと残す",
-    "今週1回だけ、仕事後の気分をひとこと残す":"仕事後に、気分を思い出すだけ（書かなくてOK）",
+function shrink(){
+  const m={"仕事後の気持ちを一言だけ残す":"今週1回だけ、仕事後の気分を残す",
+    "今週1回だけ、仕事後の気分を残す":"仕事後に、気分を思い出すだけ（書かなくてOK）",
+    "人と話したあと、5分だけ何もしない時間をとる":"人と話したあと、1分だけ深呼吸する",
+    "不安が強くなった時間帯を1回だけメモする":"不安が強くなった時間帯に、気づくだけ",
+    "しんどくなった場面を1回だけ覚えておく":"しんどくなった時に、そのことに気づくだけ",
     "寝る前に10分だけスマホを置いてみる":"寝る前に3分だけスマホを置いてみる",
-    "寝る前に3分だけスマホを置いてみる":"寝る前に、スマホを置くことを思い出すだけ",
-    "自分を責めた瞬間の言葉を、1回だけ残してみる":"自分を責めた瞬間に、気づくだけ",
-    "5分だけ外に出てみる":"玄関のドアを開けてみる"};
-  S.hw = m[S.hw] || ("今週1回だけ、"+S.hw);
+    "自分を責めた言葉を、1回だけ残してみる":"自分を責めた瞬間に、気づくだけ",
+    "話したくなった時に kokoni に話す":"気が向いた日だけ、kokoni をひらく"};
+  S.first_action = m[S.first_action] || ("今週1回だけ、"+S.first_action);
 }
-function kpi(k,v,el){
-  S.kpi[k]=v;
-  el.parentNode.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel")); el.classList.add("sel");
-  if(S.kpi.a!==null&&S.kpi.b!==null&&S.kpi.c!==null) document.getElementById("kpiNext").disabled=false;
-}
-function finishD0(){ S.day=1; document.getElementById("nav").hidden=false; go("home"); }
-function skipD0(){
-  S.nickname=S.nickname||"すぷらん"; S.context="働きながらつらさを感じている";
-  S.concerns=["仕事のプレッシャー","休むべきか迷っている"];
-  S.goal="休むか続けるかを、少し落ち着いて考えられるようになりたい";
-  S.theme="まず、どんな時につらさが強くなるかを知ってみる";
-  S.hw="仕事が終わった時の気分を、ひとことだけ残す";
-  S.planB="難しい日は「今日はしんどかった」だけでもOK";
-  S.planC="それも難しければ、何もしなくてOK。次に話したくなった時に戻ってきてください。";
-  if(!S.map.length) S.map=[
-    {t:"仕事を続けることへの不安と、休むことへの不安の両方があり、決めきれない状態なのかもしれません", ok:true},
-    {t:"疲れている時ほど、自分を責める考えが強くなる傾向がありそうです", ok:true}];
-  S.day=1; document.getElementById("nav").hidden=false; go("home");
+function completeSetup(){ S.setup_status="completed"; S.setup_completed_at=new Date().toISOString(); step("d1"); }
+function openHome(){ document.getElementById("nav").classList.remove("locked"); go("home"); }
+function skipSetup(){
+  S.nickname=S.nickname||"ここに"; S.age_range=S.age_range||"30代"; S.gender=S.gender||"回答しない";
+  S.current_status=S.current_status||"休んだ方がいいのか迷っている";
+  if(!S.current_concerns.length) S.current_concerns=["仕事のプレッシャー","将来への不安"];
+  S.ai_conversation_summary=S.ai_conversation_summary||"仕事そのものより「このままで大丈夫かな」という不安が大きいのかもしれない";
+  S.direction_goal=S.direction_goal||"休むか続けるか、少し落ち着いて考えられるようになりたい";
+  S.first_action=S.first_action||"仕事後の気持ちを一言だけ残す";
+  S.plan_b_text=S.plan_b_text||"難しい日は「今日はしんどかった」だけでもOK";
+  S.setup_status="completed"; document.getElementById("nav").classList.remove("locked"); go("home");
 }
 
-/* ═══════════ D0-07/08 初回AI対話 ═══════════ */
-const D0TALK = [
- {t:"ai", m:"はじめまして、すぷらんです。<br><br>今日は、いま気になっていることを少しだけ聞かせてください。<br><b>うまく言葉にできなくて大丈夫です。</b>選ぶだけでも進められます。"},
- {t:"ai", m:"いま、いちばん気になっているのは、どんなことですか。"},
- {t:"c", o:["仕事のことが頭から離れない","このまま続けていいのか分からない","朝がつらい","自分でもよく分からない"]},
- {t:"ai", m:"教えてくれてありがとうございます。<br>それは、どんなときに強くなりますか。"},
- {t:"c", o:["朝、起きたとき","通勤のとき","人と話したあと","夕方","夜、寝る前","いつもそう"]},
- {t:"ai", m:"そのとき、頭のなかではどんなことが起きていますか。"},
- {t:"c", o:["考えごとが止まらない","何も考えられなくなる","自分を責めてしまう","先のことが不安になる","うまく言えない"]},
- {t:"ai", m:"いま、なにか楽になる方法はありますか。"},
- {t:"c", o:["寝ると少し楽になる","誰かと話すと楽になる","何をしても変わらない","わからない"]},
- {t:"hypo", n:0, q:"仕事そのものが大変というより、<b>「このまま続けて大丈夫なのかな」という不安</b>のほうが、気持ちを重くしているのかもしれません。"},
- {t:"hypo", n:1, q:"<b>疲れている時ほど、自分を責める考えが強くなる</b>傾向がありそうです。"},
- {t:"ai", m:"ありがとうございます。<br>いま話してくれたことに、ひとつだけ補足させてください。"},
- {t:"ai", m:"「このままでいいのか」と考える時間は、<br>体を動かしていなくても、かなり体力を使います。<br><br><b>疲れているのは、動いたからではなく、考え続けたからかもしれません。</b>"},
- {t:"end"}
-];
-let dti=0;
-function startD0Talk(){
-  dti=0;
-  document.getElementById("d0").innerHTML =
-    `<div class="step" style="margin-top:14px"><span>すぷらんと話す</span><span class="sid">D0-07</span></div>
-     <div id="dtFlow"></div><div class="tray" id="dtTray"></div>`;
-  stepD0Talk();
-}
-function stepD0Talk(){
-  const flow=document.getElementById("dtFlow"), tray=document.getElementById("dtTray");
-  if(dti>=D0TALK.length) return;
-  const s=D0TALK[dti];
-  if(s.t==="ai"){
-    tray.innerHTML = `<div class="typing"><i></i><i></i><i></i></div>`;
-    setTimeout(()=>{
-      flow.insertAdjacentHTML("beforeend", `<div class="bubble"><div class="who">すぷらん</div><div class="txt">${s.m}</div></div>`);
-      dti++; stepD0Talk(); window.scrollTo(0,document.body.scrollHeight);
-    },420);
-  } else if(s.t==="c"){
-    tray.innerHTML = `<div class="opts">${s.o.map((o,i)=>`<button class="opt" onclick="dtPick(${i})">${o}</button>`).join("")}</div>`;
-    window.scrollTo(0,document.body.scrollHeight);
-  } else if(s.t==="hypo"){
-    tray.innerHTML="";
-    flow.insertAdjacentHTML("beforeend", `<div class="hypo" id="hy${s.n}">
-      <div class="lab">すぷらんが、仮に言葉にしてみます</div>
-      <div class="q">${s.q}</div>
-      <div class="opts row">
-        <button class="opt" onclick="hypoAns(${s.n},1)">そのとおり</button>
-        <button class="opt" onclick="hypoAns(${s.n},2)">すこし近い</button>
-        <button class="opt" onclick="hypoAns(${s.n},3)">ちがう</button>
-        <button class="opt" onclick="hypoAns(${s.n},4)">今はわからない</button>
-      </div></div>`);
-    window.scrollTo(0,document.body.scrollHeight);
-  } else if(s.t==="end"){
-    tray.innerHTML = `<button class="btn" onclick="d0go(8)">つづける</button>`;
-    window.scrollTo(0,document.body.scrollHeight);
-  }
-}
-function dtPick(i){
-  const s=D0TALK[dti];
-  document.getElementById("dtFlow").insertAdjacentHTML("beforeend",
-    `<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
-  document.getElementById("dtTray").innerHTML="";
-  dti++; stepD0Talk();
-}
-const HYPO_TXT=["仕事を続けることへの不安と、休むことへの不安の両方があり、決めきれない状態なのかもしれません",
-  "疲れている時ほど、自分を責める考えが強くなる傾向がありそうです"];
-function hypoAns(n,v){
-  const el=document.getElementById("hy"+n);
-  const lab=["","そのとおり","すこし近い","ちがう","今はわからない"][v];
-  el.classList.add("done");
-  el.querySelector(".opts").outerHTML = `<div class="ans">→ ${lab}</div>`;
-  if(v<=2) S.map.push({t:HYPO_TXT[n], ok:true});
-  dti++; stepD0Talk();
-}
-
-/* ═══════════ ホーム（§16の7要素） ═══════════ */
+/* D2 通常ホーム */
 function renderHome(){
-  document.getElementById("greet").textContent = (S.nickname||"すぷらん")+" さん";
-  document.getElementById("greetsub").textContent = S.week+"週目 ／ 今日はどうしますか";
-  let h="";
-  if(S.gate==="arrived"){
-    h += `<div class="card letter" onclick="go('gate')" style="cursor:pointer">
-      <div class="eyebrow">✉️ 大塚さんから</div><h3 style="margin-bottom:4px">手紙が届いています</h3>
-      <p style="margin:0;font-size:13.5px">今週の方向について、お返事がきました。</p></div>`;
-  }
-  if(S.letterSeen){
-    h += `<div class="card ai" onclick="showLetter()" style="cursor:pointer">
-      <div class="eyebrow" style="color:var(--ai)">すぷらんから</div>
-      <h3 style="margin-bottom:4px">この数日で見えてきたこと</h3>
-      <p style="margin:0;font-size:13.5px">あなたの地図に、新しく分かったことがあります。</p></div>`;
-  }
-  h += `<div class="card" style="padding:14px 16px">
-    <div class="eyebrow">今日の状態</div>
-    <div class="opts row">${["しんどい","あまりよくない","ふつう","すこし楽"]
-      .map(t=>`<button class="opt" onclick="this.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${t}</button>`).join("")}</div></div>`;
-  h += `<div class="card" style="padding:13px 16px">
-    <div class="eyebrow">今週のテーマ</div>
-    <p style="margin:0;font-size:14.5px;font-weight:700">${S.theme||"（まだ決まっていません）"}</p></div>`;
-  h += `<div class="card lead">
-    <div class="eyebrow">今日の小さな一歩</div>
-    <h2 style="font-size:17px;line-height:1.7">${S.hw||"朝、10分だけ外に出てみる"}</h2>
-    <p style="font-size:13px">難しい日は「${S.planB||"今日はしんどかった、だけでもOK"}」</p>
-    <button class="btn" onclick="go('talk')">やってみた</button>
-    <button class="btn ghost" onclick="go('talk')">今日は話すだけにする</button></div>`;
-  const last = S.map.filter(m=>m.ok).slice(-1)[0];
-  h += `<div class="card" style="padding:13px 16px">
-    <div class="eyebrow">最近わかったこと</div>
-    <p style="margin:0;font-size:14px;line-height:1.75">${last? last.t : "これから一緒に見つけていきます"}</p></div>`;
-  h += `<div class="card" style="padding:13px 16px">
-    <p style="margin:0;font-size:13.5px"><b>次の節目まで あと3日</b><br>
-    <span style="color:var(--muted);font-size:12.5px">大塚さんが、あなたのまとめを読んで返事を書きます。</span></p></div>`;
-  document.getElementById("homeBody").innerHTML = h;
+  let h=`<div class="hi"><span class="g">おはようございます</span><b>${S.nickname||"ここに"} さん</b></div>`;
+  if(S.gate==="arrived") h+=`<div class="hrow letter tap" onclick="go('gate')"><span class="ic">✉️</span>
+    <div><div class="k">大塚さんから</div><div class="v">手紙が届いています</div></div></div>`;
+  if(S.letterSeen) h+=`<div class="hrow letter tap" onclick="showLetter()"><span class="ic">💌</span>
+    <div><div class="k">kokoni から</div><div class="v">この数日で見えてきたこと</div></div></div>`;
+  h+=`<div class="hrow"><span class="ic">🌤</span><div style="flex:1">
+      <div class="k">今日の状態</div><div class="v" style="margin-bottom:8px">どんな一日を過ごしていますか？</div>
+      <div class="opts row">${["しんどい","あまり","ふつう","すこし楽"].map(t=>
+        `<button class="opt" style="font-size:12.5px;padding:9px 6px" onclick="this.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${t}</button>`).join("")}</div></div></div>
+  <div class="hrow"><span class="ic">🎯</span><div><div class="k">今週のテーマ</div>
+    <div class="v">${S.direction_goal||"—"}</div></div></div>
+  <div class="hrow tap" onclick="go('talk')"><span class="ic">🌱</span><div><div class="k">今日の小さな一歩</div>
+    <div class="v">${S.first_action||"—"}</div>
+    <div class="v" style="font-size:12.5px;color:var(--muted);margin-top:4px">難しい日は「${S.plan_b_text||"今日はしんどかった、だけでもOK"}」</div></div></div>
+  <div style="margin:10px 18px"><button class="btn ghost" onclick="go('talk')">💬 今日は話すだけにする</button></div>
+  <div class="hrow"><span class="ic">📗</span><div><div class="k">最近わかったこと</div>
+    <div class="v">${S.ai_conversation_summary||"これから一緒に見つけていきます"}</div></div></div>
+  <div class="hrow"><span class="ic">📅</span><div><div class="k">次の節目まで</div>
+    <div class="v">あと <b>3日</b></div>
+    <div class="v" style="font-size:12.5px;color:var(--muted);margin-top:2px">大塚さんが、あなたの1週間を読んで手紙を書きます</div></div></div>
+  <div class="hrow" style="opacity:.55"><span class="ic">💌</span><div><div class="k">AIレター</div>
+    <div class="v" style="font-size:13px">今後の隙間として、kokoni からの振り返りレターをお届けします</div></div></div>`;
+  document.getElementById("homeBody").innerHTML=h;
 }
-
-/* ═══════════ AIレター（Day3） ═══════════ */
 function showLetter(){
-  S.letterSeen=true;
-  go("home");
+  S.letterSeen=true; go("home");
   setTimeout(()=>{
-    const b=document.getElementById("homeBody");
-    b.insertAdjacentHTML("afterbegin", `<div class="card ai">
-      <div class="eyebrow" style="color:var(--ai)">✉️ この数日で見えてきたこと</div>
-      <p style="font-size:14.5px;line-height:1.9;color:var(--ink)">
-      ${S.nickname||"すぷらん"}さん<br><br>
+    document.getElementById("homeBody").insertAdjacentHTML("afterbegin",
+    `<div class="card warm"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:8px">💌 この数日で見えてきたこと</div>
+      <p style="color:var(--ink);line-height:1.95;margin:0">${S.nickname||"ここに"}さん<br><br>
       この数日で、ひとつ見えてきたことがあります。<br><br>
-      <b>仕事そのものよりも、「このままでいいのか」と考える時間に、気持ちが重くなりやすい</b>ようでした。<br><br>
-      よかったら、見にきてください。<br><br>
-      すぷらん</p>
-      <button class="btn ghost" style="margin-top:12px" onclick="go('map')">最近わかったことを見る</button></div>`);
+      <b>${S.ai_conversation_summary||"しんどさは、特定の場面のあとに強くなりやすい"}</b> ようでした。<br><br>
+      よかったら、見にきてください。<br><br>kokoni</p>
+      <button class="btn ghost" style="margin-top:14px" onclick="go('map')">最近わかったことを見る</button></div>`);
     window.scrollTo(0,0);
   },80);
 }
 
-/* ═══════════ 対話（Day1以降） ═══════════ */
-const TALK = [
+/* 以下は初回体験の対象外（参照用） */
+const TALK=[
  {t:"ai", m:"こんにちは。今日はどんな感じですか。"},
  {t:"c", o:["しんどい","あまりよくない","ふつう","すこし楽"]},
- {t:"ai", m:"話してくれてありがとうございます。<br>「${HW}」は、どうでしたか。"},
+ {t:"ai", m:"「__HW__」は、どうでしたか。"},
  {t:"c", o:["できた","すこしできた","できなかった"]},
  {t:"ai", m:"そうだったんですね。<br><b>やろうとは思えましたか。</b>"},
  {t:"c", o:["思ったけど、動けなかった","思わなかった"]},
  {t:"ai", m:"思えただけでも十分だと思います。<br>何が難しかったか、一緒に見てみませんか。"},
- {t:"ai", m:"今日は、何を話しましょうか。"},
- {t:"c", o:["前回の続き","今日あったこと","最近気になっていること","とくにない／決められない"]},
- {t:"ai", m:"では、すぷらんからひとつ出してみますね。<br>「人と話したあと」のことを、もう少し見てみませんか。"},
- {t:"ai", m:"今日の一歩を、ひとつだけ決めませんか。"},
- {t:"c", o:["話したあと、5分だけ何もしない時間をとる","今日はここまでにする"]},
- {t:"kpi"}
+ {t:"end"}
 ];
 let ti=0;
-function startTalk(){
-  ti=0; document.getElementById("talkFlow").innerHTML=""; document.getElementById("talkTray").innerHTML=""; stepTalk();
-}
+function startTalk(){ ti=0; document.getElementById("talkFlow").innerHTML=""; document.getElementById("talkTray").innerHTML=""; stepTalk(); }
 function stepTalk(){
   const flow=document.getElementById("talkFlow"), tray=document.getElementById("talkTray");
-  if(ti>=TALK.length){ tray.innerHTML=`<button class="btn" onclick="go('map')">地図を見る</button>`; return; }
+  if(ti>=TALK.length) return;
   const s=TALK[ti];
   if(s.t==="ai"){
     tray.innerHTML=`<div class="typing"><i></i><i></i><i></i></div>`;
     setTimeout(()=>{
-      flow.insertAdjacentHTML("beforeend", `<div class="bubble"><div class="who">すぷらん</div><div class="txt">${s.m.replace("${HW}", S.hw||"朝、10分だけ外に出る")}</div></div>`);
+      flow.insertAdjacentHTML("beforeend",`<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">${s.m.replace("__HW__",S.first_action||"小さな一歩")}</div></div>`);
       ti++; stepTalk(); window.scrollTo(0,document.body.scrollHeight);
-    },420);
+    },430);
   } else if(s.t==="c"){
     tray.innerHTML=`<div class="opts">${s.o.map((o,i)=>`<button class="opt" onclick="tPick(${i})">${o}</button>`).join("")}</div>`;
     window.scrollTo(0,document.body.scrollHeight);
-  } else if(s.t==="kpi"){
-    tray.innerHTML=`<div class="card" style="margin:0">
-      <div class="eyebrow">最後に、3つだけ</div>
-      <h3 style="margin-bottom:8px">いま自分に何が起きているか、少し分かりましたか</h3>
-      <div class="opts row">${["そう思う","少しそう思う","あまり思わない","思わない"]
-        .map(t=>`<button class="opt" onclick="go('map')">${t}</button>`).join("")}</div></div>`;
-    window.scrollTo(0,document.body.scrollHeight);
-  }
+  } else { tray.innerHTML=`<button class="btn" onclick="go('map')">きろくを見る</button>`; }
 }
 function tPick(i){
   const s=TALK[ti];
-  document.getElementById("talkFlow").insertAdjacentHTML("beforeend",
-    `<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
+  document.getElementById("talkFlow").insertAdjacentHTML("beforeend",`<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
   document.getElementById("talkTray").innerHTML="";
-  if(ti===3 && i<2) ti=7; else if(ti===8 && i<3) ti=10; else ti++;
+  if(ti===3 && i<2) ti=7; else ti++;
   stepTalk();
 }
-
-/* ═══════════ 心の地図 ═══════════ */
 function renderMap(){
-  const ok = S.map.filter(m=>m.ok);
-  document.getElementById("mapBody").innerHTML = `
-    <div class="layer"><h4>今起きていること</h4>
-      <div class="sub">あなたが話してくれたこと</div>
-      <ul>${["夕方になると集中が切れる","会議のあと、落ち込みやすい"].map(x=>`<li>${x}</li>`).join("")}</ul></div>
-    <div class="layer"><h4>今わかってきたパターン</h4>
-      <div class="sub">すぷらんが仮に言葉にして、あなたが確かめたもの</div>
-      <ul>${ok.length? ok.map(m=>`<li>${m.t}</li>`).join("") : "<li style='color:var(--muted)'>これから一緒に見つけていきます</li>"}</ul></div>
+  document.getElementById("mapBody").innerHTML=`
+    <div class="layer"><h4>今起きていること</h4><div class="sub">あなたが話してくれたこと</div>
+      <ul>${S.current_concerns.length? S.current_concerns.map(c=>`<li>${c}</li>`).join("") : "<li>—</li>"}</ul></div>
+    <div class="layer"><h4>今わかってきたパターン</h4><div class="sub">kokoni が仮に言葉にして、あなたが確かめたもの</div>
+      <ul><li>${S.ai_conversation_summary||"これから一緒に見つけていきます"}</li></ul></div>
     <div class="layer locked"><h4>心の奥にあるルール</h4>
-      <div class="lockmsg">ここは、もう少し一緒に見えてきてから、お伝えします。<br>
-      <span style="font-size:12px">（PoCでは原則ひらきません）</span></div></div>`;
+      <div style="font-size:13.5px">ここは、もう少し一緒に見えてきてから、お伝えします。</div></div>`;
 }
-
-/* ═══════════ これまで ═══════════ */
 function renderLog(){
-  document.getElementById("logBody").innerHTML = `
-    <div class="card"><h3>この1か月で目指す方向</h3><p style="margin:0">${S.goal||"（未設定）"}</p></div>
-    <div class="card"><h3>今週のテーマ</h3><p style="margin:0">${S.theme||"（未設定）"}</p></div>
-    <div class="card"><h3>試したこと</h3>
-      <ul style="margin:0;padding-left:18px;font-size:14px"><li>${S.hw||"（未設定）"}</li></ul></div>
-    <div class="card"><h3>できるようになったこと</h3>
-      <ul style="margin:0;padding-left:18px;font-size:14px">
-        <li>しんどい日に「今日は話すだけ」を選べた</li><li>朝、外に出た日が3回あった</li></ul></div>`;
+  document.getElementById("logBody").innerHTML=`
+    <div class="card"><h3>基本情報</h3><p style="margin:0;font-size:13.5px">
+      ニックネーム：${S.nickname||"—"}／年代：${S.age_range||"—"}／性別：${S.gender||"—"}</p></div>
+    <div class="card"><h3>いまの状況</h3><p style="margin:0;font-size:13.5px">${S.current_status||"—"}<br>
+      <span style="color:var(--muted)">${S.current_concerns.join("・")||"—"}</span></p></div>
+    <div class="card"><h3>少し先に目指すこと</h3><p style="margin:0">${S.direction_goal||"—"}</p></div>
+    <div class="card"><h3>今週やってみること</h3><p style="margin:0">${S.first_action||"—"}
+      ${S.action_adjusted_flag?'<span class="tag">小さく調整済み</span>':""}</p></div>`;
 }
-
-/* ═══════════ 節目 ═══════════ */
 const SUMROWS=[
- {k:"今週の状態", v:"前半はしんどい日が続き、後半はすこし戻りました。"},
- {k:"今週のテーマ", v:()=>S.theme||"—"},
- {k:"試したこと", v:()=>`「${S.hw||"—"}」を3日。2日はできませんでした。`},
- {k:"できなかった日のこと", v:"「思ったけど動けなかった」と話していました。"},
- {k:"地図に増えたこと", v:"人と話したあとに「うまく伝わらなかったかも」と考えて疲れが出る。"},
- {k:"大塚さんに話したいこと", v:"夕方になると何もできなくなることについて。"}
+ {k:"今週の状態", v:()=>"前半はしんどい日が続き、後半はすこし戻りました。"},
+ {k:"今週のテーマ", v:()=>S.direction_goal||"—"},
+ {k:"試したこと", v:()=>`「${S.first_action||"—"}」を3日。2日はできませんでした。`},
+ {k:"できなかった日のこと", v:()=>"「思ったけど動けなかった」と話していました。"},
+ {k:"大塚さんに話したいこと", v:()=>"夕方になると何もできなくなることについて。"}
 ];
+function setGate(v){ S.gate=v; go("gate"); }
 function renderGate(){
   document.querySelectorAll("#lstate span").forEach(s=>s.classList.toggle("on", s.dataset.s===S.gate));
   const b=document.getElementById("gateBody");
   if(S.gate==="before"){
-    b.innerHTML = `<div class="card">
-      <div class="eyebrow">すぷらんがまとめました</div>
-      <h3>この1週間を、大塚さんに送ります</h3>
-      <p style="font-size:13.5px">ちがうところは直してください。<b>「送らない」</b>も選べます。</p>
+    b.innerHTML=`<div class="card"><h3>この1週間を、大塚さんに送ります</h3>
+      <p class="lede" style="margin-bottom:14px">ちがうところは直してください。「送らない」も選べます。</p>
       ${SUMROWS.map((r,i)=>`<div class="sum ${S.sumFix[i]===3?"dropped":""}">
-        <div class="k">${r.k}</div><div class="v">${typeof r.v==="function"?r.v():r.v}</div>
-        <div class="fix">
-          <button class="${S.sumFix[i]===1?"sel":""}" onclick="fixSum(${i},1)">そのとおり</button>
-          <button class="${S.sumFix[i]===2?"sel":""}" onclick="fixSum(${i},2)">すこし違う</button>
-          <button class="${S.sumFix[i]===3?"sel":""}" onclick="fixSum(${i},3)">送らない</button>
-        </div></div>`).join("")}
-      <div style="margin-top:12px"><div class="eyebrow">書き足したいことがあれば</div>
-      <textarea placeholder="（任意）"></textarea></div>
-      <button class="btn" style="margin-top:12px" onclick="setGate('waiting')">これで送る</button>
-    </div>
-    <div class="foot">※ AIのまとめを、そのまま心理士へは送りません。<br>必ず本人の確認を通します。</div>`;
+        <div class="k">${r.k}</div><div class="v">${r.v()}</div>
+        <div class="fix"><button class="${S.sumFix[i]===1?"sel":""}" onclick="fixSum(${i},1)">そのとおり</button>
+        <button class="${S.sumFix[i]===2?"sel":""}" onclick="fixSum(${i},2)">すこし違う</button>
+        <button class="${S.sumFix[i]===3?"sel":""}" onclick="fixSum(${i},3)">送らない</button></div></div>`).join("")}
+      <button class="btn" style="margin-top:12px" onclick="setGate('waiting')">これで送る</button></div>
+    <div class="foot">※ AIのまとめを、そのまま心理士へは送りません。</div>`;
   } else if(S.gate==="waiting"){
-    b.innerHTML = `<div class="waiting"><div class="big">✉️</div>
-      <p><b>大塚さんが読んでいます</b><br>お返事は、2〜3日のうちに届きます。<br>
-      <span style="font-size:12.5px">それまでは、いつもどおりで大丈夫です。</span></p>
-      <button class="btn ghost" style="max-width:260px;margin:18px auto 0" onclick="go('home')">ホームに戻る</button></div>
-    <div class="foot">※ 既読の表示や「返信を待っています」は出しません。</div>`;
+    b.innerHTML=`<div class="waiting"><div class="big">✉️</div>
+      <p><b>大塚さんが読んでいます</b><br>お返事は、2〜3日のうちに届きます。</p>
+      <button class="btn ghost" style="max-width:260px;margin:18px auto 0" onclick="go('home')">ホームに戻る</button></div>`;
   } else {
-    b.innerHTML = `<div class="card letter">
-      <div class="eyebrow">✉️ 大塚さんから</div>
-      <p style="font-size:14.5px;line-height:1.95;color:var(--ink)">
-      ${S.nickname||"すぷらん"}さん<br><br>
+    b.innerHTML=`<div class="card warm">
+      <div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:10px">✉️ 大塚さんから</div>
+      <p style="color:var(--ink);line-height:1.95;margin:0">${S.nickname||"ここに"}さん<br><br>
       まとめを読みました。3日できたこと、まず書いておきますね。<br><br>
       できなかった2日について「思ったけど動けなかった」と書いてくださったのが、とても大事だと思いました。<br><br>
-      「人と話したあと」に疲れが出る、という見立ては、私もそうかもしれないと思います。<br><br>
-      今週は、夕方そのものより<b>人と話したあとの5分</b>を見てみませんか。何かをするのではなく、何もしない5分です。<br><br>
-      大塚</p></div>
-    <div class="card"><div class="eyebrow">今週の方向</div>
-      <h3 style="margin-bottom:4px">人と話したあとの5分を、あけてみる</h3>
-      <p style="margin:0;font-size:13.5px">すぷらんが、毎日のかたちにしてお渡しします。</p>
-      <button class="btn" style="margin-top:12px" onclick="S.hw='人と話したあと、5分だけ何もしない';S.theme='人と話したあとの5分を、あけてみる';nextWeek()">来週へ進む</button></div>
-    <div class="card"><div class="eyebrow">お手紙について、4つだけ</div>
-      ${["すぷらんと話すだけの時より理解が深まった","来週、何を意識すればよいか分かった",
-         "人が見てくれている安心感があった","この手紙は役に立った"].map(q=>
-        `<div style="margin-bottom:10px"><p style="font-size:13.5px;margin:0 0 5px">${q}</p>
-        <div class="opts row">${["そう思う","やや","あまり","思わない"].map(t=>
-          `<button class="opt" style="font-size:12px" onclick="this.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${t}</button>`).join("")}</div></div>`).join("")}
-      <p style="font-size:11.5px;color:var(--muted);margin:0">H3（心理士 Added Value）の本命指標です。</p></div>`;
+      今週は<b>人と話したあとの5分</b>を見てみませんか。何かをするのではなく、何もしない5分です。<br><br>大塚</p></div>
+    <div class="card"><h3>今週の方向</h3><p style="margin:0 0 12px">人と話したあとの5分を、あけてみる</p>
+      <button class="btn" onclick="S.first_action='人と話したあと、5分だけ何もしない';S.gate='before';go('home')">来週へ進む</button></div>`;
   }
 }
 function fixSum(i,v){ S.sumFix[i]=v; renderGate(); }
 
-/* ═══════════ 心理士側 ═══════════ */
 let proView="list";
 function renderPro(){
   const b=document.getElementById("proBody");
   if(proView==="list"){
-    b.innerHTML = `<div class="plist">
-      <div class="prow alert" onclick="openSession()"><div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 要確認</span></div>
-        <div class="mt">2週目 ／ 昨日 リスクを検知しました（節目を待たずに通知）</div></div><div class="go">開く →</div></div>
-      <div class="prow" onclick="openSession()"><div><div class="nm">${S.nickname||"すぷらん"} さん</div>
-        <div class="mt">${S.week}週目 ／ まとめが届いています ／ 前回から7日</div></div><div class="go">節目を行う →</div></div>
-    </div>
-    <div class="foot">並び順：① 要確認がある方 ② 節目が近い順</div>`;
+    b.innerHTML=`<div class="prow alert" onclick="openSession()"><div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 要確認</span></div>
+      <div class="mt">2週目 ／ 昨日 リスクを検知しました</div></div><div class="go">開く →</div></div>
+      <div class="prow" onclick="openSession()"><div><div class="nm">${S.nickname||"ここに"} さん</div>
+      <div class="mt">1週目 ／ 初期セットアップ ${S.setup_status==="completed"?"完了":"未完了"}</div></div><div class="go">開く →</div></div>`;
   } else {
-    b.innerHTML = `<button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="proView='list';stopTimer();renderPro()">← 一覧へ</button>
-    <div class="pcols">
-      <div>
-        <div class="pcard"><h3>AIの週次サマリ</h3>
-          <p class="note">本人が確認・訂正したもの。節目の前に自動で作られます。</p>
-          <div class="pitem"><span class="k">1か月の方向</span>${S.goal||"—"}</div>
-          <div class="pitem"><span class="k">今週のテーマ</span>${S.theme||"—"}</div>
-          <div class="pitem"><span class="k">今週の状態</span>前半はしんどい日が続き、後半はすこし戻った。QIDS-J 14 → 12</div>
-          <div class="pitem"><span class="k">ワークの実施</span>「${S.hw||"—"}」3/7日。<b>できなかった日は「思ったけど動けなかった」</b></div>
-          <div class="pitem"><span class="k">心の地図の差分</span>＋「人と話したあと『うまく伝わらなかったかも』と考えて疲れが出る」<br>
-            <span style="font-size:11.5px;color:#8a97a0">本人の回答＝「そのとおり」</span></div>
-          <div class="pitem"><span class="k">本人が話したいこと</span>夕方になると何もできなくなること</div>
-          <div class="pitem"><span class="k">本人が「送らない」とした項目</span>なし</div>
-        </div>
-      </div>
-      <div>
-        <div class="pcard"><h3>お返事を書く</h3><p class="note">手紙として本人に届きます。</p>
-          <div style="margin-bottom:10px"><div class="note" style="margin:0 0 4px">① 今週、読んで思ったこと</div><textarea style="min-height:70px"></textarea></div>
-          <div style="margin-bottom:10px"><div class="note" style="margin:0 0 4px">② ${S.nickname||"すぷらん"}さんに伝えたいこと</div><textarea style="min-height:70px"></textarea></div>
-          <div style="margin-bottom:10px"><div class="note" style="margin:0 0 4px">③ 来週、大事にしたいこと</div><textarea style="min-height:60px"></textarea></div>
-          <div><div class="note" style="margin:0 0 4px">④ 来週の方向</div>
-            <select>
-              <option>人と話したあとの5分をあける</option>
-              <option>まず生活リズムを整える</option>
-              <option>思考パターンを扱う</option>
-              <option>小さい行動を増やす</option>
-              <option>人との距離について扱う</option>
-              <option>今週は方向を変えない</option>
-            </select>
-            <p class="note" style="margin-top:6px">選んだ方向を、すぷらんが毎日のかたちに落とします。</p></div>
-          <div style="margin-top:14px"><h3 style="margin-bottom:6px">見立ての記録</h3>
-            <textarea style="min-height:70px" placeholder="所見"></textarea>
-            <div class="split">
-              <button class="${S.splitShow===1?"sel":""}" onclick="S.splitShow=1;renderPro()">本人にも見せる</button>
-              <button class="${S.splitShow===2?"sel":""}" onclick="S.splitShow=2;renderPro()">自分だけ</button></div></div>
-          <button class="pbtn" onclick="alert('デモのため送信は行いません。\\n本人側は「手紙が届いた」ボタンで確認できます。')">手紙を送る</button>
-        </div>
-      </div>
-    </div>
-    <div class="timer"><span>この節目にかかっている時間 <small>（自動計測：読む／考える／書く／方向設定）</small></span><b id="tm">0:00</b></div>`;
+    b.innerHTML=`<button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="proView='list';stopTimer();renderPro()">← 一覧へ</button>
+    <div class="pcols"><div><div class="pcard"><h3>初期セットアップの結果</h3>
+      <p class="note">本人が選んだもの。節目の前に自動でまとまります。</p>
+      <div class="pitem"><span class="k">いまの状況</span>${S.current_status||"—"}</div>
+      <div class="pitem"><span class="k">気になっていること</span>${S.current_concerns.join("・")||"—"}</div>
+      <div class="pitem"><span class="k">AIの整理（本人確認：${S.ai_confirm||"—"}）</span>${S.ai_conversation_summary||"—"}</div>
+      <div class="pitem"><span class="k">少し先の方向</span>${S.direction_goal||"—"}</div>
+      <div class="pitem"><span class="k">今週の一歩</span>${S.first_action||"—"} ${S.action_adjusted_flag?"（小さく調整済み）":""}</div>
+      <div class="pitem"><span class="k">難しい日は</span>${S.plan_b_text||"—"}</div></div></div>
+    <div><div class="pcard"><h3>お返事を書く</h3><p class="note">手紙として本人に届きます。</p>
+      <textarea placeholder="今週、読んで思ったこと"></textarea>
+      <div style="margin-top:10px"><select><option>人と話したあとの5分をあける</option>
+        <option>まず生活リズムを整える</option><option>思考パターンを扱う</option>
+        <option>小さい行動を増やす</option><option>今週は方向を変えない</option></select></div>
+      <button class="pbtn" onclick="alert('デモのため送信は行いません。')">手紙を送る</button></div></div></div>
+    <div class="timer"><span>この節目にかかっている時間 <small>（自動計測）</small></span><b id="tm">0:00</b></div>`;
     startTimer();
   }
 }
 function openSession(){ proView="session"; renderPro(); window.scrollTo(0,0); }
 function startTimer(){ stopTimer(); S.timer=0;
   S.timerId=setInterval(()=>{ S.timer++; const el=document.getElementById("tm");
-    if(el) el.textContent = Math.floor(S.timer/60)+":"+String(S.timer%60).padStart(2,"0"); },1000); }
+    if(el) el.textContent=Math.floor(S.timer/60)+":"+String(S.timer%60).padStart(2,"0"); },1000); }
 function stopTimer(){ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; } }
 
-/* ═══════════ 起動 ═══════════ */
-d0(); sync();
-document.getElementById("nav").hidden = true;
+renderFlow();
+document.getElementById("nav").hidden=true;
 </script>
 </body>
 </html>
