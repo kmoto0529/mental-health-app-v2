@@ -5,19 +5,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>kokoni デモ｜初回体験</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f2f8f7; --paper:#ffffff; --paper2:#f8fbfa;
-  --teal:#2f9e8f; --teal-deep:#1f7a6e; --teal-soft:#e2f2ef; --teal-line:#c9e6e0;
-  --ink:#2f3a38; --ink2:#55635f; --muted:#8a9794; --line:#e4eeeb;
-  --accent:#e0a05c; --accent-soft:#fdf3e6; --warn:#c97b52;
+  /* デザイン部トークン（redesign.html / design_system/design_tokens_v2 準拠） */
+  --bg:#F4F0E5; --paper:#FFFFFF; --paper2:#FCFBF6;
+  --teal:#7FA05F; --teal-deep:#5E7B49; --teal-soft:#EAF0E1; --teal-line:#DCE6CC;
+  --g-pale-2:#EEF2E5; --g-pale-3:#F5F7EE;
+  --ink:#3B4A38; --ink2:#5D6657; --muted:#8A9179; --sub2:#9AA089;
+  --line:#ECE7D8; --line-input:#E1DCCB;
+  --accent:#B08535; --accent-soft:#F5E9D4; --accent-line:#EBDCBE; --warn:#B4685A;
+  --cta-grad:linear-gradient(160deg,#5C7A45,#455E33); --cta-ink:#FCFBF4;
+  --link:#5E7B49; --link-hover:#445A34;
   --pro:#4a5d6e; --pro-bg:#eef2f5;
-  --shadow:0 4px 18px rgba(47,158,143,.09); --r:18px;
+  --shadow:0 8px 22px -16px rgba(90,100,60,.45);
+  --sh-lift:0 16px 34px -20px rgba(90,100,60,.45);
+  --sh-cta:0 14px 26px -14px rgba(70,90,45,.8);
+  --r:24px; --r-m:16px; --r-btn:17px; --r-chip:14px;
+  --jp:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Hiragino Sans',system-ui,sans-serif;
+  --num:'Nunito','Zen Maru Gothic',system-ui,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-  background:var(--bg);color:var(--ink);line-height:1.7;font-size:15px}
+body{font-family:var(--jp);background:var(--bg);color:var(--ink2);line-height:1.75;font-size:15px;
+  -webkit-font-smoothing:antialiased}
+b,strong{color:var(--ink)}
 
 #demobar{position:fixed;top:0;left:0;right:0;z-index:200;background:#25332f;color:#e8ece9;
   font-size:11.5px;padding:6px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;
@@ -39,31 +53,33 @@ body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-s
 .pagehead{padding:20px 20px 2px;display:flex;align-items:center;gap:10px;justify-content:space-between}
 .pagehead .back{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0 4px;font-family:inherit}
 .brandrow{display:flex;align-items:center;gap:8px;padding:14px 20px 0}
-.brandrow .mark{width:26px;height:26px;border-radius:50%;background:linear-gradient(140deg,#7fd0bf,#2f9e8f);flex-shrink:0}
+.brandrow .mark{width:26px;height:26px;border-radius:50%;background:linear-gradient(140deg,#A8C48A,#6E8A54);flex-shrink:0}
 .brandrow b{font-size:17px;letter-spacing:.02em}
 
 .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
   box-shadow:var(--shadow);margin:14px 18px;padding:20px}
-.card.tint{background:linear-gradient(165deg,#ffffff,#f0f8f6);border-color:var(--teal-line)}
-.card.warm{background:var(--accent-soft);border-color:#f2e2cb}
+.card.tint{background:linear-gradient(160deg,#FBFBF4,#EEF4E2)}
+.card.warm{background:linear-gradient(120deg,#F7EFDF,#F3E7D0);border-color:var(--accent-line)}
 .card h2{margin:0 0 10px;font-size:19px;font-weight:800;line-height:1.55}
 .card h3{margin:0 0 6px;font-size:15.5px;font-weight:800}
 .card p{margin:0 0 14px;font-size:14px;color:var(--ink2);line-height:1.85}
 .card p:last-child{margin-bottom:0}
 .lede{font-size:13.5px;color:var(--muted);line-height:1.8}
 
-.btn{display:block;width:100%;border:none;border-radius:13px;padding:15px;font-size:15.5px;font-weight:800;
-  background:var(--teal-deep);color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(31,122,110,.22);font-family:inherit}
+.btn{display:block;width:100%;border:none;border-radius:var(--r-btn);padding:15px 18px;font-size:15.5px;font-weight:700;
+  background:var(--cta-grad);color:var(--cta-ink);cursor:pointer;box-shadow:var(--sh-cta);
+  letter-spacing:.02em;font-family:inherit;transition:transform .14s,opacity .2s}
 .btn:active{transform:scale(.985)}
 .btn:disabled{opacity:.35;cursor:default;box-shadow:none}
-.btn.ghost{background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal);box-shadow:none}
+.btn.ghost{background:var(--paper);color:var(--link);border:1px solid var(--teal-line);box-shadow:var(--shadow);font-weight:700}
+.btn.ghost:hover{color:var(--link-hover)}
 .btn+.btn{margin-top:9px}
 
 .fld{margin-bottom:18px}
 .fld label{display:block;font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:7px}
-input[type=text],select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px;
-  font-size:16px;font-family:inherit;background:#fff;color:var(--ink);appearance:none}
-input:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+input[type=text],select{width:100%;border:1px solid var(--line-input);border-radius:var(--r-chip);padding:13px 14px;
+  font-size:16px;font-family:inherit;background:var(--paper2);color:var(--ink);appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--g-pale-2)}
 
 .radios{display:flex;gap:8px;flex-wrap:wrap}
 .radios button{flex:1;min-width:76px;background:#fff;border:1.5px solid var(--line);border-radius:11px;
@@ -80,9 +96,9 @@ input:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border
 .chk a{color:var(--teal-deep)}
 
 .opts{display:flex;flex-direction:column;gap:9px}
-.opt{background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:14px 15px;font-size:14.5px;
+.opt{background:var(--paper);border:1px solid var(--line-input);border-radius:var(--r-chip);padding:14px 15px;font-size:14.5px;
   text-align:left;cursor:pointer;color:var(--ink);font-family:inherit;line-height:1.6;position:relative;display:block;width:100%}
-.opt:active,.opt.sel{background:var(--teal-soft);border-color:var(--teal);font-weight:700}
+.opt:active,.opt.sel{background:var(--teal-soft);border-color:var(--teal-line);font-weight:700;color:var(--ink)}
 .opt.sel::after{content:"✓";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--teal-deep);font-weight:800}
 .opts.row{flex-direction:row;flex-wrap:wrap}
 .opts.row .opt{flex:1;min-width:90px;text-align:center;padding:12px 8px;font-size:13.5px;width:auto}
@@ -93,8 +109,8 @@ input:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border
 .bar{height:5px;background:var(--line);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--teal);border-radius:99px;transition:width .35s ease}
 
-.startcard{background:linear-gradient(165deg,#ffffff,#eaf6f3);border:1px solid var(--teal-line);
-  border-radius:22px;margin:16px 18px;padding:24px 20px;box-shadow:0 6px 22px rgba(47,158,143,.12);text-align:center;position:relative}
+.startcard{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);
+  border-radius:22px;margin:16px 18px;padding:24px 20px;box-shadow:var(--sh-lift);text-align:center;position:relative}
 .startcard .ttl{font-size:21px;font-weight:800;margin-bottom:6px}
 .startcard .leaf{font-size:34px;line-height:1;margin-bottom:10px}
 .startcard ul{text-align:left;margin:14px 0 18px;padding-left:18px;font-size:13.5px;color:var(--ink2);line-height:1.9}
@@ -108,7 +124,7 @@ input:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border
 
 .bubble{margin:11px 18px;max-width:86%}
 .bubble .who{font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:6px}
-.bubble .who i{width:18px;height:18px;border-radius:50%;background:linear-gradient(140deg,#7fd0bf,#2f9e8f);display:block}
+.bubble .who i{width:18px;height:18px;border-radius:50%;background:linear-gradient(140deg,#A8C48A,#6E8A54);display:block}
 .bubble .txt{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:13px 15px;font-size:14.5px;box-shadow:var(--shadow);line-height:1.85}
 .bubble.me{margin-left:auto}
 .bubble.me .txt{background:var(--teal-soft);border-color:var(--teal-line);border-radius:16px 16px 5px 16px;display:inline-block}
@@ -120,7 +136,7 @@ input:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border
 
 .aibadge{display:inline-flex;align-items:center;gap:6px;background:var(--teal-soft);color:var(--teal-deep);
   border:1px solid var(--teal-line);border-radius:99px;padding:5px 12px;font-size:11.5px;font-weight:800;margin-bottom:12px}
-.aibadge .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(140deg,#7fd0bf,#2f9e8f);display:block}
+.aibadge .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(140deg,#A8C48A,#6E8A54);display:block}
 .quoteline{background:var(--paper2);border-left:3px solid var(--teal);border-radius:0 10px 10px 0;
   padding:11px 13px;font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:14px}
 .reco{position:absolute;top:-9px;left:14px;background:var(--teal);color:#fff;font-size:10.5px;font-weight:800;
@@ -131,18 +147,19 @@ input:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border
 .recap .ic{font-size:19px;line-height:1.3}
 .recap .k{font-size:11.5px;color:var(--teal-deep);font-weight:800;margin-bottom:3px}
 .recap .v{font-size:14.5px;line-height:1.65}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums;font-weight:800}
 .recap .v.s{font-size:13px;color:var(--ink2)}
 
 .hi{padding:18px 20px 4px}
 .hi .g{font-size:12.5px;color:var(--muted)}
 .hi b{font-size:20px;display:block;margin-top:2px}
-.hrow{background:#fff;border:1px solid var(--line);border-radius:14px;margin:10px 18px;padding:14px 16px;
+.hrow{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);margin:10px 18px;padding:15px 16px;
   display:flex;gap:12px;align-items:flex-start;box-shadow:var(--shadow)}
 .hrow .ic{font-size:18px;line-height:1.4}
 .hrow .k{font-size:11.5px;color:var(--teal-deep);font-weight:800;margin-bottom:2px}
 .hrow .v{font-size:14.5px;line-height:1.6}
 .hrow.tap{cursor:pointer}
-.hrow.letter{background:var(--accent-soft);border-color:#f2e2cb}
+.hrow.letter{background:linear-gradient(120deg,#F7EFDF,#F3E7D0);border-color:var(--accent-line)}
 
 .layer{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;margin:0 18px 11px;box-shadow:var(--shadow)}
 .layer h4{margin:0 0 3px;font-size:12.5px;color:var(--teal-deep);font-weight:800}
@@ -176,6 +193,25 @@ nav button .ic{font-size:18px;line-height:1}
 nav button.on{color:var(--teal-deep);font-weight:800}
 nav button .dot{position:absolute;top:0;left:calc(50% + 9px);width:7px;height:7px;border-radius:50%;background:var(--accent)}
 nav.locked button{opacity:.3;pointer-events:none}
+
+/* ── 週1回のふり返りカード（redesign.html 準拠） ── */
+.recall{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  margin:14px 18px;padding:22px 20px 20px;box-shadow:var(--sh-lift)}
+.recall .top{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+.recall .ring{position:relative;width:74px;height:74px;flex-shrink:0}
+.recall .ring svg{transform:rotate(-90deg)}
+.recall .ring .cnt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.recall .ring .n{font-family:var(--num);font-size:25px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.recall .ring .u{font-size:10.5px;color:var(--muted);margin-top:3px}
+.recall h3{margin:0 0 5px;font-size:17px;font-weight:700;color:var(--ink)}
+.recall .desc{margin:0;font-size:13px;color:var(--ink2);line-height:1.8}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:18px}
+.week .wd{text-align:center;font-size:11px;color:var(--sub2);padding-bottom:7px}
+.week .d{text-align:center;font-family:var(--num);font-size:14.5px;font-weight:700;padding:11px 0;
+  border-radius:var(--r-chip);background:var(--paper2);color:var(--muted);border:1px solid transparent;font-variant-numeric:tabular-nums}
+.week .d.past{background:var(--teal-soft);color:var(--teal-deep)}
+.week .d.today{background:var(--paper);color:var(--ink);border-color:var(--teal);box-shadow:0 0 0 3px var(--g-pale-3)}
+.week .d.gate{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line)}
 
 .foot{text-align:center;font-size:11px;color:var(--muted);padding:20px 22px 14px;line-height:1.8}
 .tag{display:inline-block;font-size:10px;background:#eaf1ef;color:var(--muted);border-radius:5px;padding:1px 7px;margin-left:5px;vertical-align:middle}
@@ -686,12 +722,37 @@ function renderHome(){
   <div style="margin:10px 18px"><button class="btn ghost" onclick="go('talk')">💬 今日は話すだけにする</button></div>
   <div class="hrow"><span class="ic">📗</span><div><div class="k">最近わかったこと</div>
     <div class="v">${S.ai_conversation_summary||"これから一緒に見つけていきます"}</div></div></div>
-  <div class="hrow"><span class="ic">📅</span><div><div class="k">次の節目まで</div>
-    <div class="v">あと <b>3日</b></div>
-    <div class="v" style="font-size:12.5px;color:var(--muted);margin-top:2px">大塚さんが、あなたの1週間を読んで手紙を書きます</div></div></div>
+  ${recallCard()}
   <div class="hrow" style="opacity:.55"><span class="ic">💌</span><div><div class="k">AIレター</div>
     <div class="v" style="font-size:13px">今後の隙間として、kokoni からの振り返りレターをお届けします</div></div></div>`;
   document.getElementById("homeBody").innerHTML=h;
+}
+function recallCard(){
+  const now=new Date(), dow=(now.getDay()+6)%7;            // 月=0
+  const mon=new Date(now); mon.setDate(now.getDate()-dow);
+  const days=[...Array(7)].map(function(_,i){ const d=new Date(mon); d.setDate(mon.getDate()+i); return d; });
+  const left=6-dow;                                        // 節目＝日曜
+  const C=2*Math.PI*31, off=C*(1-(7-left)/7);
+  const unit = left===0 ? "" : "<span class=\"u\">日後</span>";
+  const lab  = left===0 ? "今日" : String(left);
+  const wd=["月","火","水","木","金","土","日"].map(function(w){ return "<div class=\"wd\">"+w+"</div>"; }).join("");
+  const dd=days.map(function(d,i){
+    const cls = i===dow ? "today" : (i===6 ? "gate" : (i<dow ? "past" : ""));
+    return "<div class=\"d "+cls+"\">"+d.getDate()+"</div>";
+  }).join("");
+  return "<div class=\"recall\">"
+    + "<div class=\"top\">"
+    +   "<div class=\"ring\"><svg width=\"74\" height=\"74\">"
+    +     "<circle cx=\"37\" cy=\"37\" r=\"31\" fill=\"none\" stroke=\"#EBE6D6\" stroke-width=\"6\"></circle>"
+    +     "<circle cx=\"37\" cy=\"37\" r=\"31\" fill=\"none\" stroke=\"#7FA05F\" stroke-width=\"6\" stroke-linecap=\"round\""
+    +     " stroke-dasharray=\""+C.toFixed(1)+"\" stroke-dashoffset=\""+off.toFixed(1)+"\"></circle>"
+    +   "</svg><div class=\"cnt\"><span class=\"n\">"+lab+"</span>"+unit+"</div></div>"
+    +   "<div><h3>週1回のふり返り</h3>"
+    +   "<p class=\"desc\">この1週間の気持ちの動きを、<br>すぷらんと一緒に見わたします。</p></div>"
+    + "</div>"
+    + "<div class=\"week\">"+wd+dd+"</div>"
+    + "<button class=\"btn\" onclick=\"go('gate')\">ふり返りをはじめる</button>"
+  + "</div>";
 }
 function showLetter(){
   S.letterSeen=true; go("home");
