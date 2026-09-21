@@ -291,11 +291,13 @@ nav.locked button{opacity:.3;pointer-events:none}
     <div class="safe">
       <h3>いま、しんどいですね</h3>
       <p style="font-size:14.5px">ここから先は、kokoni だけで受けとめるところではないと思っています。<br>いま話せる人につながれるようにします。</p>
+      <p style="font-size:13.5px;margin-top:10px">いま話せる先を、いくつかご案内します。</p>
       <button class="btn" style="background:var(--warn)">相談できる窓口をひらく</button>
-      <button class="btn ghost" style="margin-top:9px" onclick="go('home')">いまは大丈夫</button>
+      <button class="btn ghost" style="margin-top:9px" onclick="safeBack()">いまは大丈夫</button>
     </div>
-    <div class="foot">※ 通常のフローを中断して安全対応を優先します。<br>
-    <span class="tag">今回の初回体験フローには未配置（本番化前に要決定）</span></div></section>
+    <div class="foot">※ 通常のフローを中断して安全対応を優先します。心理士側 P4 へも通知が飛びます。<br>
+    <span class="tag">仮｜文面・閾値・窓口の中身は 9/22 大塚さんレビュー前</span><br>
+    出さないもの：危険度のスコア表示／「あなたは危険です」という断定／24時間対応の約束</div></section>
 
   <nav id="nav">
     <button data-go="home" onclick="go('home')"><span class="ic">🌿</span>ホーム</button>
@@ -319,7 +321,7 @@ nav.locked button{opacity:.3;pointer-events:none}
 <script>
 const S = {
   nickname:"", age_range:"", gender:"", agree_terms:false, agree_privacy:false,
-  current_status:"", current_concerns:[], ai_conversation_summary:"", ai_confirm:"",
+  current_status:"", current_concerns:[], safety_answer:"", ai_conversation_summary:"", ai_confirm:"",
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
   setup_status:"not_started", setup_completed_at:null,
   step:"a1", screen:"flow", side:"user", gate:"before", sumFix:{}, letterSeen:false,
@@ -327,6 +329,7 @@ const S = {
 };
 const STATUS_OPTS=["仕事は続けているけど少ししんどい","休んだ方がいいのか迷っている","いま休職している",
   "復職を控えている","復職したばかり","うまく言えない"];
+const SAFE_OPTS=[{t:"ない",risk:false},{t:"たまに頭をよぎる",risk:false},{t:"たびたび考える",risk:true},{t:"いま、つらい",risk:true}];
 const CONCERN_OPTS=["仕事のプレッシャー","人間関係","将来への不安","気分の落ち込み","眠りや生活リズム","自分を責めてしまう"];
 
 function go(id){
@@ -445,9 +448,23 @@ function renderFlow(){
       <p class="lede" style="margin-bottom:10px">いくつでも選べます。</p>
       <div class="opts">${CONCERN_OPTS.map((o,i)=>
         `<button class="opt ${S.current_concerns.includes(o)?"sel":""}" onclick="toggleConcern(${i})">${o}</button>`).join("")}</div>
-      <button class="btn" style="margin-top:20px" ${S.current_status?"":"disabled"} onclick="step('c2')">次へ</button>
+      <button class="btn" style="margin-top:20px" ${S.current_status?"":"disabled"} onclick="step('c1b')">次へ</button>
     </div>
     <div class="foot">長く書く必要はありません。タップだけで進められます。</div>`;
+    break;
+
+  case "c1b":
+    h=`<div class="pagehead"><button class="back" onclick="step('c1')">‹</button><span class="lede">安全の確認</span></div>
+    ${bar(1)}
+    <div class="card">
+      <p class="lede" style="margin-bottom:16px">最後に、ひとつだけ<br>大事なことをおうかがいします。</p>
+      <h3 style="margin-bottom:14px;line-height:1.6">いま、ご自身を傷つけたい<br>気持ちはありますか。</h3>
+      <div class="opts">${SAFE_OPTS.map((o,i)=>
+        `<button class="opt ${S.safety_answer===o.t?"sel":""}" onclick="pickSafety(${i})">${o.t}</button>`).join("")}</div>
+    </div>
+    <div class="foot"><span class="tag">仮配置｜文言と閾値は 9/22 大塚さんレビュー前</span><br>
+    この設問はスキップできない設計です（FR-73「安全確認は初回から外さない」）。<br>
+    下2つを選ぶと、通常フローを中断して安全対応へ移ります。</div>`;
     break;
 
   case "c2": startChat(); return;
@@ -557,6 +574,13 @@ function openWhy(){
     </div></div>`;
 }
 function closeWhy(){ document.getElementById("modalRoot").innerHTML=""; }
+function pickSafety(i){
+  const o=SAFE_OPTS[i]; S.safety_answer=o.t;
+  if(o.risk){ go("safe"); } else { step("c2"); }
+}
+function safeBack(){
+  if(S.setup_status==="completed"){ go("home"); } else { step("c1b"); }
+}
 function beginSetup(){ S.setup_status="in_progress"; step("c1"); }
 function toggleConcern(i){
   const o=CONCERN_OPTS[i];
@@ -596,7 +620,7 @@ function chatScript(){
 function startChat(){
   CS=chatScript(); ci=0;
   document.getElementById("flow").innerHTML=
-    `<div class="pagehead"><button class="back" onclick="step('c1')">‹</button><span class="lede">kokoni と少し話す</span></div>
+    `<div class="pagehead"><button class="back" onclick="step('c1b')">‹</button><span class="lede">kokoni と少し話す</span></div>
      ${bar(1)}<div style="margin-top:10px" id="csFlow"></div><div class="tray" id="csTray"></div>`;
   stepChat();
 }

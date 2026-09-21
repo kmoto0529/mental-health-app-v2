@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" --max-time 60 \"https://www.bighealth.com/news/nhs-staff-across-england-get-free-access-to-mental-health-apps-daylight-and-sleepio\" -o /tmp/bighealth.html)",
+      "Bash(echo \"EXIT:$?\")",
+      "WebFetch(domain:cotree.jp)",
+      "Bash(curl -sL -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" \"https://prtimes.jp/main/html/rd/p/000000031.000043787.html\" -o /tmp/emol.html)",
+      "WebFetch(domain:smart-sou.co.jp)",
+      "WebFetch(domain:www.prnewswire.com)",
+      "WebFetch(domain:www.modernhealth.com)",
+      "WebFetch(domain:www.cbinsights.com)",
+      "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.ncbi.nlm.nih.gov)",
+      "Bash(curl -sL -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" \"https://prtimes.jp/main/html/rd/p/000000031.000043787.html\" -o \"C:/tmp/emol.html\")",
+      "Bash(echo \"EXIT=$?\")",
+      "WebFetch(domain:www.iesohealth.com)",
+      "WebFetch(domain:formative.jmir.org)",
+      "WebFetch(domain:www.globenewswire.com)"
+    ]
+  }
+}
