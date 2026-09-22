@@ -197,6 +197,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
   font-size:11.5px;cursor:pointer;color:var(--teal-deep);font-weight:700;font-family:inherit}
 .sum .fix button.sel{background:var(--teal-soft);border-color:var(--teal)}
 .sum.dropped{opacity:.38}
+.sum .edit{margin-top:9px}
+.sum .edit textarea{width:100%;border:1px solid var(--teal);border-radius:11px;background:var(--paper2);
+  color:var(--ink);font-family:inherit;font-size:14px;line-height:1.75;padding:10px 12px;resize:vertical;min-height:58px}
+.sum .edit textarea:focus{outline:none;box-shadow:0 0 0 3px var(--g-pale-2)}
+.sum .edit .hint{font-size:11.5px;color:var(--muted);margin-bottom:5px}
+.askbox{background:linear-gradient(120deg,#F7EFDF,#F3E7D0);border:1px solid var(--accent-line);
+  border-radius:var(--r-m);padding:15px 16px;margin:14px 0 4px}
+.askbox h4{margin:0 0 3px;font-size:13.5px;color:var(--accent);font-weight:800}
+.askbox .hint{font-size:12px;color:var(--ink2);margin-bottom:10px;line-height:1.7}
+.askbox textarea{width:100%;border:1px solid var(--accent-line);border-radius:12px;background:var(--paper);
+  color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.8;padding:11px 13px;resize:vertical;min-height:88px}
+.askbox textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px #F7EFDF}
+.askbox .cnt{font-family:var(--num);font-size:11px;color:var(--muted);text-align:right;margin-top:5px}
 .waiting{text-align:center;padding:40px 24px;color:var(--muted)}
 .waiting .big{font-size:36px;margin-bottom:14px}
 .safe{background:#fff6f2;border:1.5px solid #f2d8c9;border-radius:16px;padding:18px;margin:14px 18px}
@@ -346,7 +359,7 @@ const S = {
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
   setup_status:"not_started", setup_completed_at:null,
   step:"a1", screen:"flow", side:"user", gate:"before", sumFix:{}, letterSeen:false,
-  timerId:null, timer:0
+  timerId:null, timer:0, gate_note:"", sumEdit:{}
 };
 const STATUS_OPTS=["仕事は続けているけど少ししんどい","休んだ方がいいのか迷っている","いま休職している",
   "復職を控えている","復職したばかり","うまく言えない"];
@@ -889,6 +902,7 @@ function renderLog(){
 const SUMROWS=[
  {k:"今週の状態", v:()=>"前半はしんどい日が続き、後半はすこし戻りました。"},
  {k:"今週のテーマ", v:()=>S.direction_goal||"—"},
+ {k:"すぷらんと話したこと", v:()=>"今週は3回話しました。"+(S.ai_conversation_summary?"<br>"+S.ai_conversation_summary:"夕方の疲れと、人と会ったあとの消耗について。")+"<br>「夕方そのものより、人と関わったあとではないか」と一緒に整理しました。"},
  {k:"試したこと", v:()=>`「${S.first_action||"—"}」を3日。2日はできませんでした。`},
  {k:"できなかった日のこと", v:()=>"「思ったけど動けなかった」と話していました。"},
  {k:"大塚さんに話したいこと", v:()=>"夕方になると何もできなくなることについて。"}
@@ -904,9 +918,20 @@ function renderGate(){
         <div class="k">${r.k}</div><div class="v">${r.v()}</div>
         <div class="fix"><button class="${S.sumFix[i]===1?"sel":""}" onclick="fixSum(${i},1)">そのとおり</button>
         <button class="${S.sumFix[i]===2?"sel":""}" onclick="fixSum(${i},2)">すこし違う</button>
-        <button class="${S.sumFix[i]===3?"sel":""}" onclick="fixSum(${i},3)">送らない</button></div></div>`).join("")}
-      <button class="btn" style="margin-top:12px" onclick="setGate('waiting')">これで送る</button></div>
-    <div class="foot">※ AIのまとめを、そのまま心理士へは送りません。</div>`;
+        <button class="${S.sumFix[i]===3?"sel":""}" onclick="fixSum(${i},3)">送らない</button></div>
+        ${S.sumFix[i]===2?`<div class="edit"><div class="hint">どこが違いましたか。書き直してください。</div>
+          <textarea oninput="S.sumEdit[${i}]=this.value" placeholder="（例）後半も戻っていません">${S.sumEdit[i]||""}</textarea></div>`:""}
+        </div>`).join("")}
+
+      <div class="askbox"><h4>大塚さんに聞いてみたいこと</h4>
+        <div class="hint">まとめとは別に、そのまま届きます。<br>書かなくても大丈夫です。</div>
+        <textarea id="askIn" maxlength="400" oninput="S.gate_note=this.value;document.getElementById('askCnt').textContent=this.value.length+' / 400'"
+          placeholder="うまくまとまっていなくて大丈夫です。">${S.gate_note}</textarea>
+        <div class="cnt" id="askCnt">${S.gate_note.length} / 400</div></div>
+
+      <button class="btn" style="margin-top:14px" onclick="setGate('waiting')">これで送る</button></div>
+    <div class="foot">※ AIのまとめを、そのまま心理士へは送りません。<br>
+    あなたが「送る」と決めたものだけが、大塚さんに届きます。</div>`;
   } else if(S.gate==="waiting"){
     b.innerHTML=`<div class="waiting"><div class="big">✉️</div>
       <p><b>大塚さんが読んでいます</b><br>お返事は、2〜3日のうちに届きます。</p>
@@ -941,7 +966,18 @@ function renderPro(){
       <div class="pitem"><span class="k">AIの整理（本人確認：${S.ai_confirm||"—"}）</span>${S.ai_conversation_summary||"—"}</div>
       <div class="pitem"><span class="k">少し先の方向</span>${S.direction_goal||"—"}</div>
       <div class="pitem"><span class="k">今週の一歩</span>${S.first_action||"—"} ${S.action_adjusted_flag?"（小さく調整済み）":""}</div>
-      <div class="pitem"><span class="k">難しい日は</span>${S.plan_b_text||"—"}</div></div></div>
+      <div class="pitem"><span class="k">難しい日は</span>${S.plan_b_text||"—"}</div></div>
+      <div class="pcard"><h3>今週のまとめ（本人が確認済み）</h3>
+      <p class="note">本人が「送る」と決めたものだけが届いています。訂正があれば訂正後を表示します。</p>
+      ${SUMROWS.map((r,i)=> S.sumFix[i]===3 ? "" :
+        `<div class="pitem"><span class="k">${r.k}${S.sumFix[i]===2?"（本人が訂正）":""}</span>${S.sumFix[i]===2&&S.sumEdit[i]?S.sumEdit[i]:r.v()}</div>`).join("")}
+      ${SUMROWS.some((r,i)=>S.sumFix[i]===3) ? `<div class="pitem"><span class="k">本人が送らなかった項目</span>${SUMROWS.filter((r,i)=>S.sumFix[i]===3).length}件あります（内容は届きません）</div>` : ""}
+      </div>
+      ${S.gate_note ? `<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7">
+        <h3 style="color:#8a6a2a">本人から届いた相談</h3>
+        <p class="note">まとめとは別に、本人が自由に書いたものです。</p>
+        <div class="pitem" style="white-space:pre-wrap">${S.gate_note}</div></div>` : ""}
+      </div>
     <div><div class="pcard"><h3>お返事を書く</h3><p class="note">手紙として本人に届きます。</p>
       <textarea placeholder="今週、読んで思ったこと"></textarea>
       <div style="margin-top:10px"><select><option>人と話したあとの5分をあける</option>
