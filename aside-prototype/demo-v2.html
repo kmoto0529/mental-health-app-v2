@@ -166,6 +166,26 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .layer .sub{font-size:11.5px;color:var(--muted);margin-bottom:9px}
 .layer ul{margin:0;padding-left:17px;font-size:14px;line-height:1.8}
 .layer.locked{background:var(--paper2);border-style:dashed;color:var(--muted)}
+/* ── 心の地図 8ブロック（すぷらん 1枚図 準拠） ── */
+.mapsum{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);
+  border-radius:var(--r);margin:0 18px 14px;padding:18px 18px 16px;box-shadow:var(--sh-lift)}
+.mapsum h3{margin:0 0 4px;font-size:16px;color:var(--ink)}
+.mapsum .lede{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.mapsum .row{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--teal-line)}
+.mapsum .row:first-of-type{border-top:none}
+.mapsum .k{flex:0 0 96px;font-size:11.5px;color:var(--teal-deep);font-weight:800;line-height:1.55}
+.mapsum .v{font-size:13.5px;color:var(--ink);line-height:1.6}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 18px 11px}
+.mgrid .layer{margin:0}
+.layer.wide{grid-column:1 / -1}
+.layer.loop{background:linear-gradient(160deg,#FFFDF6,#F7EFDF);border-color:var(--accent-line)}
+.layer.loop h4{color:var(--accent)}
+.layer.loop .flow{font-size:13.5px;line-height:1.9;color:var(--ink);font-weight:700}
+.layer.good{background:#FBFDF7;border-color:var(--teal-line)}
+.layer.res{background:#FFFDF6;border-color:var(--accent-line)}
+.layer.res h4{color:var(--accent)}
+.layer ul li{margin-bottom:2px}
+.mapnote{font-size:11.5px;color:var(--muted);margin:2px 18px 14px;line-height:1.75}
 .lstate{display:flex;gap:6px;margin:0 18px 10px}
 .lstate span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:6px 2px;border-bottom:2px solid var(--line)}
 .lstate span.on{color:var(--teal-deep);font-weight:800;border-color:var(--teal)}
@@ -275,7 +295,8 @@ nav.locked button{opacity:.3;pointer-events:none}
   <section id="s-map" class="screen">
     <div class="pagehead"><b style="font-size:16px">きろく ／ 心の地図</b><span></span></div>
     <div id="mapBody" style="margin-top:12px"></div>
-    <div class="foot">この地図は、あなたと一緒に少しずつ作っていくものです。</div></section>
+    <div class="foot">この地図は、あなたと一緒に少しずつ作っていくものです。<br>
+    <span class="tag">完成度%・埋まり具合の数値は出していません（要件定義の「出さないもの」）</span></div></section>
 
   <section id="s-gate" class="screen">
     <div class="pagehead"><b style="font-size:16px">節目 ── 週に1回</b><span></span></div>
@@ -828,13 +849,32 @@ function tPick(i){
   stepTalk();
 }
 function renderMap(){
-  document.getElementById("mapBody").innerHTML=`
-    <div class="layer"><h4>今起きていること</h4><div class="sub">あなたが話してくれたこと</div>
-      <ul>${S.current_concerns.length? S.current_concerns.map(c=>`<li>${c}</li>`).join("") : "<li>—</li>"}</ul></div>
-    <div class="layer"><h4>今わかってきたパターン</h4><div class="sub">kokoni が仮に言葉にして、あなたが確かめたもの</div>
-      <ul><li>${S.ai_conversation_summary||"これから一緒に見つけていきます"}</li></ul></div>
-    <div class="layer locked"><h4>心の奥にあるルール</h4>
-      <div style="font-size:13.5px">ここは、もう少し一緒に見えてきてから、お伝えします。</div></div>`;
+  const c = S.current_concerns.length ? S.current_concerns : ["—"];
+  const pat = S.ai_conversation_summary || "これから一緒に見つけていきます";
+  const li = a => a.map(x=>"<li>"+x+"</li>").join("");
+  document.getElementById("mapBody").innerHTML =
+    '<div class="mapsum"><h3>少しずつ、道が見えてきました</h3>'
+    + '<div class="lede">これまでの記録と対話から、すぷらんが整理しました。</div>'
+    + '<div class="row"><div class="k">今、特に<br>向き合っていること</div><div class="v">'+c[0]+'</div></div>'
+    + '<div class="row"><div class="k">よくある<br>パターン</div><div class="v">考える → 避ける → さらに不安</div></div>'
+    + '<div class="row"><div class="k">試してみて<br>よかったこと</div><div class="v">散歩すると気分が上がる</div></div>'
+    + '<div class="row"><div class="k">これから<br>試したいこと</div><div class="v">人に気持ちを話してみる</div></div>'
+    + '</div>'
+    + '<div class="mgrid">'
+    +   '<div class="layer"><h4>心が動きやすい場面</h4><ul>'+li(["仕事の連絡を見るとき","日曜の夜","人と比較したとき"])+'</ul></div>'
+    +   '<div class="layer"><h4>浮かびやすい考え</h4><ul>'+li(["また失敗するかもしれない","自分はまだまだだ","迷惑をかけてしまう"])+'</ul></div>'
+    +   '<div class="layer"><h4>感情・身体の反応</h4><ul>'+li(["不安・焦り・落ち込み","胸が苦しくなる","体が重くなる・眠れない"])+'</ul></div>'
+    +   '<div class="layer"><h4>取りやすい行動</h4><ul>'+li(["考えるのを避ける","SNSを見て紛らわす","やるべきことを後回しにする"])+'</ul></div>'
+    +   '<div class="layer loop wide"><h4>繰り返しやすいパターン</h4>'
+    +     '<div class="sub">すぷらんが仮に言葉にして、あなたが確かめたもの</div>'
+    +     '<div class="flow">考える → 不安になる → 避ける → さらに不安</div></div>'
+    +   '<div class="layer good wide"><h4>試して分かったこと</h4><ul>'+li(["考えを書き出せると少し楽になる","散歩すると気分が上がる","人に相談すると整理される","夜のスマホは気分が下がりやすい"])+'</ul></div>'
+    +   '<div class="layer res wide"><h4>自分を支えてくれるもの</h4><ul>'+li(["家族・パートナー","散歩・運動","好きな音楽・旅行","すぷらんとの対話"])+'</ul></div>'
+    +   '<div class="layer locked wide"><h4>背景にあるもの</h4>'
+    +     '<div style="font-size:13px">ここは、もう少し一緒に見えてきてから、お伝えします。</div></div>'
+    + '</div>'
+    + '<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。<br>'
+    +   '<span class="tag">8ブロックは「すぷらん 心の地図」1枚図 準拠／中身はデモ用の例</span></div>';
 }
 function renderLog(){
   document.getElementById("logBody").innerHTML=`
