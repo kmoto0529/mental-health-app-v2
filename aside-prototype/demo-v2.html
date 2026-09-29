@@ -322,6 +322,8 @@ nav.locked button{opacity:.3;pointer-events:none}
     <div class="pagehead"><b style="font-size:16px">マイページ</b><span></span></div>
     <div id="logBody" style="margin-top:12px"></div></section>
 
+  <section id="s-act" class="screen"><div id="actBody"></div></section>
+
   <section id="s-safe" class="screen">
     <div class="safe">
       <h3>いま、しんどいですね</h3>
@@ -359,6 +361,8 @@ const S = {
   current_status:"", current_concerns:[], safety_answer:"", ai_conversation_summary:"", ai_confirm:"",
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
   setup_status:"not_started", setup_completed_at:null, entered:false,
+  act_id:"", act_duration:0, act_frequency:"", act_timing:"", act_adjusted:false,
+  act_input:"", act_feeling:"", act_logs:[], iv_exclude:[], iv_scene:"",
   step:"a1", screen:"flow", side:"user", gate:"before", sumFix:{}, letterSeen:false,
   timerId:null, timer:0, gate_note:"", sumEdit:{}
 };
@@ -466,6 +470,249 @@ function safeBack(){ if(S.entered){ go("home"); } else { step("a1"); } }
    → ⑦提案 → ⑧選択 → ⑨できそう度 → ⑩確定 → ⑪プロフィール → ホーム
    ══════════════════════════════════════════════════════════════ */
 
+/* ══════════════════════════════════════════════════════════════
+   行動マスター エンジン
+   介入内容は固定（data/action-master.json）／パーソナライズは可変。
+   画面・ロジックは action_id 経由でのみ行動を参照する。
+   マスターに無い行動を新しく生成しない。
+   ══════════════════════════════════════════════════════════════ */
+
+let AM=null, AM_BY_ID={};
+const DEBUG = new URLSearchParams(location.search).get("debug")==="1";
+
+function loadActionMaster(){
+  return fetch("./data/action-master.json",{cache:"no-cache"})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(j){
+      AM=j; AM_BY_ID={};
+      j.actions.forEach(function(a){ AM_BY_ID[a.action_id]=a; });
+      return j;
+    })
+    .catch(function(e){
+      console.error("action-master の読み込みに失敗:",e);
+      AM={actions:[],categories:[]};
+      return AM;
+    });
+}
+function act(id){ return AM_BY_ID[id]||null; }
+
+/* ── 候補の絞り込みと採点 ───────────────────────────────── */
+function scoreActions(){
+  const st=S.current_status, tp=(S.current_concerns||[])[0], wt=S.direction_goal, sc=S.iv_scene||"";
+  return (AM.actions||[]).filter(function(a){ return a.status==="published"; }).map(function(a){
+    const m=a.match||{}; let s=0; const why=[]; let ex=null;
+    if((m.want||[]).indexOf(wt)>=0){ s+=4; why.push("Q3「"+wt+"」"); }
+    if((m.topic||[]).indexOf(tp)>=0){ s+=2; why.push("Q2「"+tp+"」"); }
+    if((m.state||[]).indexOf(st)>=0){ s+=2; why.push("Q1「"+st+"」"); }
+    const hits=(m.keywords||[]).filter(function(k){ return sc.indexOf(k)>=0; });
+    if(hits.length){ s+=Math.min(3,hits.length)*2; why.push("場面の言葉「"+hits.join("・")+"」"); }
+    if(st==="かなりしんどい" && a.difficulty>=3){ s-=4; ex="かなりしんどい×難易度"+a.difficulty+" のため減点"; }
+    return {id:a.action_id, a:a, score:s, why:why, ex:ex};
+  }).sort(function(x,y){ return y.score-x.score || x.id.localeCompare(y.id); });
+}
+
+/* 候補5〜8件 → 同一カテゴリは最大2件までにして最大3件を選ぶ */
+function selectActions(){
+  const ex=S.iv_exclude||[];
+  const all=scoreActions().filter(function(r){ return ex.indexOf(r.id)<0; });
+  const cand=all.filter(function(r){ return r.score>0; }).slice(0,8);
+  const pool = cand.length>=3 ? cand : all.slice(0,8);
+  const picked=[], perCat={};
+  pool.forEach(function(r){
+    if(picked.length>=3) return;
+    const c=r.a.category_id;
+    if((perCat[c]||0)>=2){ r.ex=(r.ex?r.ex+" / ":"")+"同カテゴリ("+r.a.category_name+")が既に2件"; return; }
+    perCat[c]=(perCat[c]||0)+1; picked.push(r);
+  });
+  window.__AMDBG={all:all, cand:pool, picked:picked};
+  return picked;
+}
+
+/* 提案理由。場面の言葉が当たっていればそれを引用する */
+function actReason(r){
+  const kw=(r.why||[]).filter(function(w){ return w.indexOf("場面の言葉")===0; })[0];
+  if(kw && S.iv_scene){
+    const s=S.iv_scene.length>22 ? S.iv_scene.slice(0,22)+"…" : S.iv_scene;
+    return "「"+s+"」と話してくれたので提案しています。";
+  }
+  if((r.a.match&&r.a.match.want||[]).indexOf(S.direction_goal)>=0)
+    return "「"+S.direction_goal+"」と答えてくれたので提案しています。";
+  return "「"+((S.current_concerns||[])[0]||"いまの状態")+"」について答えてくれたので提案しています。";
+}
+
+/* ── パーソナライズ（時間・頻度・タイミングのみ）───────────── */
+function setPlan(id){
+  const a=act(id);
+  S.act_id=id; S.act_duration=a.duration_minutes; S.act_frequency=a.default_frequency;
+  S.act_timing=""; S.act_adjusted=false;
+}
+const FREQ_DOWN={"毎日":"今週2回","週3回":"週1回","週2回":"週1回","週1回":"今週1回","今週2回":"今週1回"};
+function shrinkPlan(){
+  const a=act(S.act_id), cf=a.customizable_fields||[];
+  if(cf.indexOf("duration")>=0 && S.act_duration>1)
+    S.act_duration = S.act_duration>=10 ? 5 : (S.act_duration>=5 ? 3 : 1);
+  if(cf.indexOf("frequency")>=0) S.act_frequency = FREQ_DOWN[S.act_frequency] || "今週1回";
+  S.act_adjusted=true;
+}
+function planLabel(){ return S.act_frequency + "・1回" + S.act_duration + "分"; }
+
+/* ── 実施画面（app_type を4系統にまとめる）──────────────── */
+const UI_FAMILY={
+  breathing_timer:"timer", mindfulness_timer:"timer", body_scan:"timer",
+  muscle_relaxation:"timer", activity_timer:"timer",
+  guided_journal:"write", self_compassion:"write", message_draft:"write",
+  problem_solving:"step", task_breakdown:"step",
+  activity_planner:"plan", connection_planner:"plan", mood_experiment:"plan"
+};
+const STEPS={
+  problem_solving:["いま困っていることを書く","自分で変えられそうな部分を選ぶ","今日できる一歩を1つ決める"],
+  task_breakdown:["気が重いことを1つ書く","最初のひとかけらに分ける","5分でできる形にする"]
+};
+
+let actTimerId=null, actLeft=0;
+function openAction(id){
+  if(id) S.act_id=id;
+  S.act_input=""; S.act_feeling="";
+  go("act"); renderAction("intro");
+}
+function renderAction(phase){
+  const a=act(S.act_id); const body=document.getElementById("actBody");
+  if(!a){ body.innerHTML='<div class="card"><p>行動マスターを読み込めませんでした。</p></div>'; return; }
+  const fam=UI_FAMILY[a.app_type]||"write";
+  const head='<div class="pagehead"><button class="back" onclick="closeAction()">‹</button>'
+    +'<span class="lede">'+a.category_name+'</span></div>';
+  let h="";
+
+  if(phase==="intro"){
+    h=head+'<div class="card">'
+      +'<h2 style="font-size:20px;line-height:1.7">'+a.title+'</h2>'
+      +'<p class="lede" style="margin:8px 0 14px">'+a.short_description+'</p>'
+      +'<div class="opts row" style="margin-bottom:14px">'
+      +'<span class="opt" style="pointer-events:none">目安 '+S.act_duration+'分</span>'
+      +'<span class="opt" style="pointer-events:none">'+"★".repeat(a.difficulty)+'</span></div>'
+      +'<p style="font-size:14px;line-height:1.9">'+a.instruction+'</p>'
+      +'<button class="btn" style="margin-top:16px" onclick="renderAction(\''+fam+'\')">'+a.cta_label+'</button>'
+      +'</div><div class="foot"><span class="tag">注意事項｜マスター登録値</span><br>'
+      +a.caution+'<br>※ 運用上の注意であり、利用者向けの文言ではありません（10/2レビュー用に表示しています）</div>';
+  }
+  else if(phase==="timer"){
+    actLeft=S.act_duration*60;
+    h=head+'<div class="card tint" style="text-align:center;padding:34px 22px">'
+      +'<h2 style="font-size:19px;margin-bottom:6px">'+a.title+'</h2>'
+      +'<p class="lede" style="margin-bottom:20px">'+a.instruction+'</p>'
+      +'<div id="actClock" style="font-size:44px;font-weight:800;letter-spacing:.04em;color:var(--teal-deep)">'+fmtSec(actLeft)+'</div>'
+      +'<button class="btn" style="margin-top:20px" id="actStart" onclick="startActTimer()">はじめる</button>'
+      +'<button class="btn ghost" style="margin-top:9px" onclick="renderAction(\'done\')">終わった</button></div>';
+  }
+  else if(phase==="write"){
+    h=head+'<div class="card">'
+      +'<div class="aibadge"><span class="dot"></span>'+a.title+'</div>'
+      +'<p style="font-size:14px;line-height:1.9;margin:10px 0 12px">'+a.instruction+'</p>'
+      +'<textarea id="actIn" rows="7" style="width:100%;box-sizing:border-box" placeholder="ここに書いてみましょう">'+(S.act_input||"")+'</textarea>'
+      +'<button class="btn" style="margin-top:12px" onclick="saveActInput()">保存する</button></div>';
+  }
+  else if(phase==="step"){
+    const st=STEPS[a.app_type]||["書く","選ぶ","決める"];
+    h=head+'<div class="card">'
+      +'<div class="aibadge"><span class="dot"></span>'+a.title+'</div>'
+      +'<p style="font-size:14px;line-height:1.9;margin:10px 0 4px">'+a.instruction+'</p></div>'
+      +st.map(function(s,i){ return '<div class="card" style="margin-top:10px">'
+        +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);margin-bottom:6px">STEP '+(i+1)+'</div>'
+        +'<div style="font-size:14.5px;margin-bottom:8px">'+s+'</div>'
+        +'<textarea class="actStep" rows="2" style="width:100%;box-sizing:border-box"></textarea></div>'; }).join("")
+      +'<div style="margin:12px 18px"><button class="btn" onclick="saveActSteps()">保存する</button></div>';
+  }
+  else if(phase==="plan"){
+    h=head+'<div class="card">'
+      +'<div class="aibadge"><span class="dot"></span>'+a.title+'</div>'
+      +'<p style="font-size:14px;line-height:1.9;margin:10px 0 14px">'+a.instruction+'</p>'
+      +'<div class="fld"><label>何をするか</label><input type="text" id="actWhat" placeholder="例）近所を一周する"></div>'
+      +'<div class="fld"><label>いつするか</label><input type="text" id="actWhen" placeholder="例）明日の夕方"></div>'
+      +'<div class="fld"><label>どのくらいやるか</label><input type="text" id="actHow" placeholder="例）5分"></div>'
+      +'<button class="btn" onclick="saveActPlan()">これで決める</button></div>';
+  }
+  else if(phase==="done"){
+    stopActTimer();
+    h=head+'<div class="card tint" style="text-align:center">'
+      +'<div style="font-size:30px;line-height:1;margin-bottom:8px">🌿</div>'
+      +'<h2 style="font-size:18px;margin-bottom:6px">やってみましたね。</h2>'
+      +'<p class="lede">'+a.reflection+'</p></div>'
+      +'<div class="card"><h3 style="margin-bottom:12px">やってみて、今どんな感じですか？</h3>'
+      +'<div class="opts">'
+      +["少し楽になった","あまり変わらない","少ししんどくなった"].map(function(o){
+          return '<button class="opt" onclick="finishAction(\''+o+'\')">'+o+'</button>'; }).join("")
+      +'</div></div>';
+  }
+  body.innerHTML=h;
+  window.scrollTo(0,0);
+}
+function fmtSec(s){ return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function startActTimer(){
+  stopActTimer();
+  document.getElementById("actStart").disabled=true;
+  actTimerId=setInterval(function(){
+    actLeft--; const el=document.getElementById("actClock");
+    if(el) el.textContent=fmtSec(Math.max(0,actLeft));
+    if(actLeft<=0){ stopActTimer(); renderAction("done"); }
+  },1000);
+}
+function stopActTimer(){ if(actTimerId){ clearInterval(actTimerId); actTimerId=null; } }
+function saveActInput(){
+  const el=document.getElementById("actIn"); S.act_input=el?el.value:""; renderAction("done");
+}
+function saveActSteps(){
+  S.act_input=[].slice.call(document.querySelectorAll(".actStep")).map(function(t,i){
+    return "STEP"+(i+1)+": "+t.value; }).join(" / ");
+  renderAction("done");
+}
+function saveActPlan(){
+  const v=function(id){ const e=document.getElementById(id); return e?e.value:""; };
+  S.act_input="何を: "+v("actWhat")+" / いつ: "+v("actWhen")+" / どのくらい: "+v("actHow");
+  renderAction("done");
+}
+/* 実施結果を保持する（将来：心の地図・週次の振り返り・心理士への共有に使う） */
+function finishAction(feeling){
+  const a=act(S.act_id);
+  S.act_logs.push({
+    action_id:S.act_id, app_type:a.app_type, title:a.title,
+    duration_minutes:S.act_duration, frequency:S.act_frequency,
+    input:S.act_input||"", feeling:feeling, at:new Date().toISOString()
+  });
+  S.act_feeling=feeling;
+  const body=document.getElementById("actBody");
+  body.innerHTML='<div class="card tint" style="text-align:center;margin-top:24px">'
+    +'<div style="font-size:30px;line-height:1;margin-bottom:8px">🌱</div>'
+    +'<h2 style="font-size:18px;margin-bottom:8px">記録しました。</h2>'
+    +'<p class="lede" style="margin-bottom:16px">「'+feeling+'」<br>また一緒に振り返りましょう。</p>'
+    +'<button class="btn" onclick="closeAction()">ホームへ</button></div>';
+  window.scrollTo(0,0);
+}
+function closeAction(){ stopActTimer(); go("home"); }
+
+/* ── DEBUG（?debug=1 のときだけ。通常のユーザー画面には出さない）──── */
+function debugPanel(){
+  if(!DEBUG || !window.__AMDBG) return "";
+  const d=window.__AMDBG;
+  const row=function(r){ return '<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid #eee">'
+    +'<b style="width:92px">'+r.id+'</b><span style="width:52px">score '+r.score+'</span>'
+    +'<span style="flex:1;color:#555">'+(r.why.join(" / ")||"—")+(r.ex?'<br><i style="color:#a33">除外/減点: '+r.ex+'</i>':"")+'</span></div>'; };
+  return '<div style="margin:14px 18px;padding:12px;border:2px dashed #c33;border-radius:10px;'
+    +'background:#fff;font-family:monospace;font-size:11px;line-height:1.6;color:#333">'
+    +'<b style="color:#c33">DEBUG（?debug=1 のときだけ表示）</b><hr>'
+    +'<b>入力</b><br>Q1: '+(S.current_status||"—")+'<br>Q2: '+((S.current_concerns||[])[0]||"—")
+    +'<br>Q3: '+(S.direction_goal||"—")+'<br>場面: '+(S.iv_scene||"（なし）")
+    +'<hr><b>Candidate Actions（上位8）</b>'+d.cand.map(row).join("")
+    +'<hr><b>Selected</b><br>'+d.picked.map(function(r){ return r.id+"  "+r.a.title; }).join("<br>")
+    +'<hr><b>Reason</b><br>'+d.picked.map(function(r){ return r.id+": "+(r.why.join(" / ")||"—"); }).join("<br>")
+    +'<hr><b>Excluded / 減点</b><br>'
+    +(d.all.filter(function(r){ return r.ex; }).map(function(r){ return r.id+": "+r.ex; }).join("<br>")||"—")
+    +'<hr><b>Plan</b><br>action_id: '+(S.act_id||"—")+' / '+S.act_duration+'分 / '+S.act_frequency
+    +(S.act_adjusted?" （小さく調整済み）":"")
+    +'<hr><b>act_logs</b> '+S.act_logs.length+' 件<br>'
+    +(S.act_logs.map(function(l){ return l.action_id+" → "+l.feeling; }).join("<br>")||"—")
+    +'</div>';
+}
+
 const IV_STATE=["かなりしんどい","少ししんどい","波がある","まあ大丈夫","うまく言えない"];
 const IV_TOPIC=["仕事・学校","人間関係","将来・お金","自分自身のこと","生活・体調","その他","まだわからない"];
 const IV_WANT=["気持ちを少し軽くしたい","頭の中を整理したい","少し動けるようになりたい",
@@ -480,51 +727,6 @@ const IV_WANT_P={"気持ちを少し軽くしたい":"気持ちの重さを少�
   "人との関わりを楽にしたい":"人との距離を少し楽にする","自分のことを理解したい":"自分のパターンに気づく",
   "まだわからない":"いまの状態をそのまま眺めてみる"};
 
-/* 提案カタログ：小さい・具体的・確認できる・1週間で試せる。裏側は行動活性化/モニタリング/問題整理 */
-const IV_PLAN={
-  "頭の中を整理したい":{
-    lead:"今は『考えないようにする』よりも、頭の中にあることを一度外に出すところから始めてみるのがよさそうです。",
-    a:[{t:"気になることが浮かんだら、3分だけメモする",n:"今週3回",s:{t:"気になることが浮かんだら、1分だけメモする",n:"今週2回"}},
-       {t:"1日1回、起きたことと気持ちを一言ずつ残す",n:"毎日1回",s:{t:"起きたことを一言だけ残す",n:"今週3日"}},
-       {t:"夜に15分だけ、気になることを考える時間をつくる",n:"今週2回",s:{t:"夜に5分だけ、考える時間をつくる",n:"今週1回"}}]},
-  "気持ちを少し軽くしたい":{
-    lead:"今は気持ちを変えようとするよりも、しんどさが動く場面に気づくところから始めてみるのがよさそうです。",
-    a:[{t:"しんどくなった場面を、1日1回だけ書き残す",n:"今週3回",s:{t:"しんどくなった場面を、ひとことだけ残す",n:"今週2回"}},
-       {t:"1日の終わりに、よかったことを1つ書く",n:"毎日1回",s:{t:"よかったことを1つ書く",n:"今週3日"}},
-       {t:"気持ちが重い時に、5分だけ外の空気を吸う",n:"今週3回",s:{t:"気持ちが重い時に、窓を1分だけ開ける",n:"今週2回"}}]},
-  "少し動けるようになりたい":{
-    lead:"今はやる気が出るのを待つよりも、先に小さく動いてみるほうが進みやすいようです。",
-    a:[{t:"朝、カーテンを開けて5分だけ座る",n:"毎朝",s:{t:"朝、カーテンを開ける",n:"今週3日"}},
-       {t:"1日1回、5分だけ家の外に出る",n:"今週3回",s:{t:"玄関の外に1分だけ立つ",n:"今週2回"}},
-       {t:"やることを1つだけ決めて、10分やってみる",n:"今週2回",s:{t:"やることを1つ決めて、3分やってみる",n:"今週1回"}}]},
-  "生活リズムを整えたい":{
-    lead:"今は全部を整えようとするよりも、1か所だけ決めて様子を見るほうが続きやすいようです。",
-    a:[{t:"寝た時間と起きた時間だけ記録する",n:"毎日",s:{t:"起きた時間だけ記録する",n:"今週3日"}},
-       {t:"寝る前の10分、スマホを置いてみる",n:"今週3回",s:{t:"寝る前の3分、スマホを置いてみる",n:"今週2回"}},
-       {t:"朝、決めた時間に一度だけ起きてみる",n:"今週2回",s:{t:"朝、決めた時間に一度だけ起きてみる",n:"今週1回"}}]},
-  "人との関わりを楽にしたい":{
-    lead:"今は関わり方を変えるよりも、消耗している場面に気づくところから始めてみるのがよさそうです。",
-    a:[{t:"人と話したあと、5分だけ何もしない時間をとる",n:"今週3回",s:{t:"人と話したあと、1分だけ深呼吸する",n:"今週2回"}},
-       {t:"気を使いすぎたと感じた場面を1つ書き残す",n:"今週2回",s:{t:"気を使いすぎたと感じたら、気づくだけ",n:"今週2回"}},
-       {t:"断ってもよかった場面を、あとで1つ思い出す",n:"今週2回",s:{t:"断ってもよかった場面を、1つ思い出す",n:"今週1回"}}]},
-  "自分のことを理解したい":{
-    lead:"今は答えを出そうとするよりも、気持ちが動いた場面を集めるところから始めてみるのがよさそうです。",
-    a:[{t:"気分が動いた瞬間を1日1回メモする",n:"今週3回",s:{t:"気分が動いた瞬間に、気づくだけ",n:"今週2回"}},
-       {t:"自分を責めた言葉を、そのまま書き残す",n:"今週2回",s:{t:"自分を責めたことに、気づくだけ",n:"今週2回"}},
-       {t:"落ち着ける場面としんどい場面を1つずつ挙げる",n:"今週1回",s:{t:"落ち着ける場面を1つだけ挙げる",n:"今週1回"}}]}
-};
-const IV_PLAN_DEF={
-  lead:"今は無理に決めようとせず、その日の感じを残すところから始めてみるのがよさそうです。",
-  a:[{t:"その日の気分を、ひとことだけ残す",n:"今週3回",s:{t:"その日の気分を、ひとことだけ残す",n:"今週2回"}},
-     {t:"しんどくなった場面を1つだけ覚えておく",n:"今週2回",s:{t:"しんどくなった場面に、気づくだけ",n:"今週2回"}},
-     {t:"話したくなった時に kokoni をひらく",n:"今週いつでも",s:{t:"気が向いた日だけ kokoni をひらく",n:"今週いつでも"}}]};
-const IV_PLAN_ALT={
-  lead:"では、別のかたちも見てみましょう。",
-  a:[{t:"1日の終わりに、体の疲れ具合だけ記録する",n:"今週3回",s:{t:"体の疲れ具合を記録する",n:"今週2回"}},
-     {t:"少しほっとした瞬間を1つだけ残す",n:"今週2回",s:{t:"ほっとした瞬間に、気づくだけ",n:"今週2回"}},
-     {t:"今週は何も足さず、kokoni に話すだけにする",n:"今週いつでも",s:{t:"気が向いた日だけ話す",n:"今週いつでも"}}]};
-
-function ivPlan(){ return (S.iv_alt ? IV_PLAN_ALT : (IV_PLAN[S.direction_goal] || IV_PLAN_DEF)); }
 function nick(){ return S.nickname || "あなた"; }
 
 function beginSetup(){
@@ -610,15 +812,22 @@ function ivRender(){
     });
     break;
 
-  /* ⑦ 今週の一歩を提案（決めるのは本人） */
+  /* ⑦ 今週の一歩を提案。候補は必ず行動マスターの中から選ぶ（新規生成はしない） */
   case 7: {
-    const p=ivPlan();
-    ivSay((S.iv_alt?"":"話してくれてありがとう。<br><br>")+p.lead+"<br><br>今週なら、どれが一番やれそうですか？",function(){
+    const picked=selectActions(); window.__IVP=picked;
+    ivSay("話してくれてありがとう。<br><br>今の話から、今週ならこんなことから始められそうです。<br><br>無理なくできそうなものを1つ選んでみませんか？",function(){
       tray.innerHTML='<div class="opts">'
-        +p.a.map(function(o,i){ return '<button class="opt" onclick="ivPick('+i+')">'+o.t
-          +'<div style="font-size:11.5px;color:var(--muted);margin-top:5px;font-weight:400">目安：'+o.n+'</div></button>'; }).join("")
-        +(S.iv_alt?"":'<button class="opt" onclick="ivAlt()">別の方法を一緒に考える</button>')
-        +'</div>';
+        +picked.map(function(r,i){ const a=r.a;
+          return '<button class="opt" style="text-align:left" onclick="ivPick('+i+')">'
+            +'<div style="font-size:11px;color:var(--teal-deep);font-weight:800;margin-bottom:4px">'+a.category_name+'</div>'
+            +'<div style="font-size:15px;font-weight:800;line-height:1.6">'+a.title+'</div>'
+            +'<div style="font-size:11.5px;color:var(--muted);margin:6px 0;font-weight:400">'
+              +a.duration_minutes+'分 ・ 難易度 '+"★".repeat(a.difficulty)+'</div>'
+            +'<div style="font-size:12.5px;color:var(--ink2);font-weight:400;line-height:1.75">'+a.short_description+'</div>'
+            +'<div style="font-size:12px;color:var(--muted);font-weight:400;line-height:1.75;margin-top:6px">'+actReason(r)+'</div>'
+            +'</button>'; }).join("")
+        +'<button class="opt" onclick="ivAlt()">別の方法を一緒に考える</button></div>'
+        +debugPanel();
       window.scrollTo(0,document.body.scrollHeight);
     });
     break; }
@@ -628,21 +837,23 @@ function ivRender(){
     tray.innerHTML="";
     document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
       '<div class="card warm" style="margin:12px 0"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:6px">今週やってみること</div>'
-      +'<h2 style="font-size:18px;line-height:1.7;margin:0">'+S.first_action+'</h2>'
-      +'<p class="lede" style="margin:8px 0 0">目安：'+S.iv_note+'</p></div>');
+      +'<h2 style="font-size:18px;line-height:1.7;margin:0">'+act(S.act_id).title+'</h2>'
+      +'<p class="lede" style="margin:8px 0 0">目安：'+planLabel()+'</p></div>');
     ivSay("これなら、<br>今週どのくらいできそうですか？",function(){ ivOpts(["難しそう","たぶんできそう","できそう"],"ivFeas"); });
     break;
 
   /* ⑩ 確定 */
   case 9:
     ivSay("ありがとう。<br>今週は、これでいきましょう。",function(){
+      const a=act(S.act_id);
       tray.innerHTML='<div class="card tint" style="margin:0;text-align:center">'
         +'<div style="font-size:30px;line-height:1;margin-bottom:8px">🌱</div>'
         +'<div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;margin-bottom:10px">今週、一緒にやってみること</div>'
-        +'<h2 style="font-size:19px;line-height:1.75;margin-bottom:10px">'+S.first_action+'</h2>'
-        +'<p class="lede" style="margin-bottom:14px">目安：'+S.iv_note+'</p>'
+        +'<h2 style="font-size:19px;line-height:1.75;margin-bottom:10px">'+a.title+'</h2>'
+        +'<p class="lede" style="margin-bottom:14px">目安：'+planLabel()+'</p>'
         +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">完璧にできなくても大丈夫です。<br>やってみてどうだったかを、<br>また一緒に振り返りましょう。</p>'
-        +'<button class="btn" onclick="ivNext()">これでやってみる</button></div>';
+        +'<button class="btn" onclick="ivNext()">これでやってみる</button></div>'
+        +debugPanel();
       window.scrollTo(0,document.body.scrollHeight);
     });
     break;
@@ -674,25 +885,35 @@ function ivSetNick(){
 function ivQ1(i){ S.current_status=IV_STATE[i]; ivMe(IV_STATE[i]); ivNext(); }
 function ivQ2(i){ S.current_concerns=[IV_TOPIC[i]]; ivMe(IV_TOPIC[i]); ivNext(); }
 function ivQ3(i){ S.direction_goal=IV_WANT[i]; ivMe(IV_WANT[i]); ivNext(); }
+/* 既存の危機対応条件に触れる記述があれば、行動提案より安全対応を優先する */
+const RISK_RE=/死に|しにたい|死にたい|消えたい|いなくなりたい|自殺|リストカット|傷つけ|終わりに/;
 function ivScene(skip){
   const el=document.getElementById("ivScene");
   S.iv_scene = skip ? "" : (el?el.value.trim():"");
   ivMe((skip||!S.iv_scene) ? "今は思いつかない" : S.iv_scene);
   S.ai_conversation_summary = S.iv_scene ? S.iv_scene
     : (IV_TOPIC_P[S.current_concerns[0]]+"について、"+IV_WANT_P[S.direction_goal]+"ところから始める");
+  if(S.iv_scene && RISK_RE.test(S.iv_scene)){ S.safety_answer="自由記述で検知"; go("safe"); return; }
   ivNext();
 }
-function ivAlt(){ S.iv_alt=true; S.iv=7; ivMe("別の方法を一緒に考える"); ivRender(); }
+/* 別案＝同じ行動マスターの中から、いま提案していないものを出し直す */
+function ivAlt(){
+  const shown=(window.__IVP||[]).map(function(r){ return r.id; });
+  S.iv_exclude=(S.iv_exclude||[]).concat(shown);
+  ivMe("別の方法を一緒に考える"); S.iv=7; ivRender();
+}
 function ivPick(i){
-  const o=ivPlan().a[i];
-  S.first_action=o.t; S.iv_note=o.n; S.iv_small=o.s; S.action_adjusted_flag=false;
-  ivMe(o.t); ivNext();
+  const r=(window.__IVP||[])[i]; if(!r) return;
+  setPlan(r.id);
+  S.first_action=r.a.title; S.action_adjusted_flag=false;
+  ivMe(r.a.title); ivNext();
 }
 function ivFeas(i){
   const v=["難しそう","たぶんできそう","できそう"][i];
   S.action_difficulty=v; ivMe(v);
-  if(v==="難しそう" && !S.action_adjusted_flag){
-    S.first_action=S.iv_small.t; S.iv_note=S.iv_small.n; S.action_adjusted_flag=true;
+  /* 行動そのものは変えない。まず時間・頻度・難易度を下げる */
+  if(v==="難しそう" && !S.act_adjusted){
+    shrinkPlan(); S.action_adjusted_flag=true;
     S.plan_b_text="難しい日は「今日はしんどかった」だけでもOK";
     ivSay("では、もう少し小さくしてみましょう。",function(){ S.iv=8; ivRender(); });
     return;
@@ -709,8 +930,7 @@ function skipSetup(){
   S.direction_goal=S.direction_goal||"頭の中を整理したい";
   S.iv_scene=S.iv_scene||"夜ベッドに入ってから、明日の仕事のことをずっと考えてしまう";
   S.ai_conversation_summary=S.ai_conversation_summary||S.iv_scene;
-  S.first_action=S.first_action||"気になることが浮かんだら、3分だけメモする";
-  S.iv_note=S.iv_note||"今週3回";
+  if(!S.act_id){ const p=selectActions()[0]; if(p){ setPlan(p.id); S.first_action=p.a.title; } }
   S.plan_b_text=S.plan_b_text||"難しい日は「今日はしんどかった」だけでもOK";
   S.setup_status="completed"; go("home");
 }
@@ -744,13 +964,16 @@ function renderHome(){
 }
 /* 初回体験のあと、「まずはここから」と入れ替わるカード */
 function weekGoalCard(){
+  const a=act(S.act_id);
+  const done=S.act_logs.filter(function(l){ return l.action_id===S.act_id; }).length;
   return `<div class="startcard" style="text-align:left">
     <div class="leaf" style="text-align:center">🌱</div>
     <div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;text-align:center;margin-bottom:10px">今週、一緒にやってみること</div>
-    <div style="font-size:17.5px;font-weight:800;line-height:1.75;text-align:center">${S.first_action||"—"}</div>
-    <p class="lede" style="text-align:center;margin:8px 0 0">目安：${S.iv_note||"今週2回"}</p>
+    <div style="font-size:17.5px;font-weight:800;line-height:1.75;text-align:center">${a?a.title:(S.first_action||"—")}</div>
+    <p class="lede" style="text-align:center;margin:8px 0 0">目安：${S.act_frequency||"今週2回"}${S.act_duration?"・1回"+S.act_duration+"分":""}</p>
+    ${done?`<p class="lede" style="text-align:center;margin:4px 0 0;color:var(--teal-deep)">これまで ${done} 回やってみました</p>`:""}
     <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn" style="flex:1" onclick="go('talk')">やってみた記録を残す</button>
+      <button class="btn" style="flex:1" ${a?"":"disabled"} onclick="openAction()">やってみる</button>
       <button class="btn ghost" style="flex:1" onclick="go('log')">これまでを見る</button>
     </div>
   </div>`;
@@ -976,8 +1199,12 @@ function startTimer(){ stopTimer(); S.timer=0;
     if(el) el.textContent=Math.floor(S.timer/60)+":"+String(S.timer%60).padStart(2,"0"); },1000); }
 function stopTimer(){ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; } }
 
-renderFlow();
-document.getElementById("nav").hidden=true;
+/* 行動マスターを読み込んでから起動する */
+loadActionMaster().then(function(){
+  if(DEBUG) console.log("action-master:", (AM.actions||[]).length, "actions loaded");
+  renderFlow();
+  document.getElementById("nav").hidden=true;
+});
 </script>
 </body>
 </html>
