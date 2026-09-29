@@ -220,6 +220,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
   background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
   display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:40}
+nav[hidden]{display:none}   /* nav{display:flex} が hidden 属性を打ち消すため明示する */
 nav button{background:none;border:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;
   align-items:center;gap:3px;cursor:pointer;flex:1;padding:2px;font-family:inherit;position:relative}
 nav button .ic{font-size:18px;line-height:1}
