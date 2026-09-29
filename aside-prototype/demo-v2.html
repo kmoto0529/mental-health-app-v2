@@ -357,7 +357,7 @@ const S = {
   nickname:"", age_range:"", gender:"", agree_terms:false, agree_privacy:false,
   current_status:"", current_concerns:[], safety_answer:"", ai_conversation_summary:"", ai_confirm:"",
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
-  setup_status:"not_started", setup_completed_at:null,
+  setup_status:"not_started", setup_completed_at:null, entered:false,
   step:"a1", screen:"flow", side:"user", gate:"before", sumFix:{}, letterSeen:false,
   timerId:null, timer:0, gate_note:"", sumEdit:{}
 };
@@ -373,7 +373,7 @@ function go(id){
   const el=document.getElementById("s-"+id); if(el) el.classList.add("active");
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on", b.dataset.go===id));
   const nav=document.getElementById("nav");
-  nav.hidden=false; nav.classList.toggle("locked", S.setup_status!=="completed");
+  S.entered=true; nav.hidden=false; nav.classList.remove("locked");
   if(id==="home") renderHome();
   if(id==="map") renderMap();
   if(id==="gate") renderGate();
@@ -403,7 +403,7 @@ function renderFlow(){
   document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
   document.getElementById("s-flow").classList.add("active");
   const nav=document.getElementById("nav");
-  nav.hidden = (S.step!=="b1"); nav.classList.add("locked");
+  nav.hidden = !S.entered; nav.classList.remove("locked");
   let h="";
   switch(S.step){
 
@@ -412,35 +412,15 @@ function renderFlow(){
     <div class="card tint" style="text-align:center;padding:34px 24px 26px">
       <div style="font-size:42px;line-height:1;margin-bottom:14px">🌿</div>
       <div style="font-size:15px;font-weight:800;letter-spacing:.06em;color:var(--teal-deep);margin-bottom:18px">kokoni</div>
-      <h2 style="font-size:25px;margin-bottom:8px">ここにいていい。</h2>
-      <p style="font-size:14px;margin-bottom:22px">kokoni へようこそ。<br><br>どんな気持ちでも、<br>ここからはじめてみませんか？</p>
-      <button class="btn" onclick="step('a2')">はじめる</button>
+      <h2 style="font-size:22px;margin-bottom:12px;line-height:1.6">こころを整理し、<br>自分のことを少しずつ<br>知っていく場所。</h2>
+      <p style="font-size:14px;margin-bottom:22px">kokoni は、気持ちや考えを整理しながら、<br>自分に合った進み方を<br>見つけていくための場所です。</p>
+      <button class="btn" onclick="step('a3')">次へ</button>
     </div>
     <div class="foot">※ ここでは「CBT」「治療」「16回」などの言葉を出しません。</div>`;
     break;
 
-  case "a2":
-    h=`<div class="pagehead"><button class="back" onclick="step('a1')">‹</button><span></span></div>
-    <div class="brandrow"><span class="mark"></span><b>kokoni</b></div>
-    <div class="card">
-      <h2>少しだけ、<br>あなたのことを教えてください</h2>
-      <p class="lede" style="margin-bottom:20px">30秒ほどで終わります。</p>
-      <div class="fld"><label>ニックネーム</label>
-        <input type="text" id="nickIn" placeholder="（例）ここに" maxlength="12" value="${S.nickname}" oninput="checkA2()"></div>
-      <div class="fld"><label>年代</label>
-        <select id="ageIn" onchange="checkA2()"><option value="">選択してください</option>
-          ${["10代","20代","30代","40代","50代","60代以上"].map(a=>`<option ${S.age_range===a?"selected":""}>${a}</option>`).join("")}
-        </select></div>
-      <div class="fld"><label>性別</label>
-        <div class="radios">${["男性","女性","その他","回答しない"].map(g=>
-          `<button class="${S.gender===g?"sel":""}" onclick="S.gender='${g}';renderFlow()">${g}</button>`).join("")}</div></div>
-      <button class="btn" id="a2next" onclick="saveA2()" disabled>次へ</button>
-    </div>
-    <div class="foot">本名・会社名・診断名は取りません。</div>`;
-    break;
-
   case "a3":
-    h=`<div class="pagehead"><button class="back" onclick="step('a2')">‹</button><span></span></div>
+    h=`<div class="pagehead"><button class="back" onclick="step('a1')">‹</button><span></span></div>
     <div class="brandrow"><span class="mark"></span><b>kokoni</b></div>
     <div class="card">
       <h2>安心してご利用いただくために</h2>
@@ -451,28 +431,12 @@ function renderFlow(){
         <div class="chk ${S.agree_privacy?"on":""}" onclick="S.agree_privacy=!S.agree_privacy;renderFlow()">
           <span class="bx">${S.agree_privacy?"✓":""}</span><span><a>プライバシーポリシー</a>に同意する</span></div>
       </div>
-      <button class="btn" ${S.agree_terms&&S.agree_privacy?"":"disabled"} onclick="step('b1')">アプリをはじめる</button>
-    </div>
-    <div class="foot">30秒〜1分で完了する、軽い登録です。</div>`;
-    break;
-
-  case "b1":
-    h=`<div class="hi"><span class="g">おはようございます</span><b>${S.nickname} さん</b>
-      <div style="font-size:13px;color:var(--muted);margin-top:4px">今日も、よくここまで来ましたね。</div></div>
-    <div class="startcard">
-      <button class="qbtn" onclick="openWhy()">？</button>
-      <div class="leaf">🌱</div>
-      <div class="ttl">まずはここから</div>
-      <ul><li>今のあなたについて少し教えてください</li>
-        <li>kokoni があなたに合ったサポートをするために使います</li>
-        <li>5分くらいで終わります</li></ul>
-      <button class="btn" onclick="beginSetup()">はじめる</button>
-    </div>
-    <div class="foot">※ セットアップが終わるまで、下のメニューはまだ開きません。</div>`;
+      <button class="btn" ${S.agree_terms&&S.agree_privacy?"":"disabled"} onclick="startApp()">kokoni をはじめる</button>
+    </div>`;
     break;
 
   case "c1":
-    h=`<div class="pagehead"><button class="back" onclick="step('b1')">‹</button><span class="lede">いまの状況</span></div>
+    h=`<div class="pagehead"><button class="back" onclick="go('home')">‹</button><span class="lede">いまの状況</span></div>
     ${bar(1)}
     <div class="card">
       <h3 style="margin-bottom:10px">今は、どんな感じに近いですか？</h3>
@@ -586,17 +550,11 @@ function renderFlow(){
     break;
   }
   e.innerHTML=h;
-  if(S.step==="a2") setTimeout(checkA2,10);
   sync();
 }
 
-function checkA2(){
-  const n=document.getElementById("nickIn"), a=document.getElementById("ageIn");
-  if(!n||!a) return;
-  S.nickname=n.value.trim(); S.age_range=a.value;
-  document.getElementById("a2next").disabled = !(S.nickname && S.age_range && S.gender);
-}
-function saveA2(){ checkA2(); step("a3"); }
+/* 同意 →（プロフィール入力を挟まず）そのままホームへ。この時点で下部タブを全活性化する */
+function startApp(){ S.entered=true; go("home"); }
 function openWhy(){
   document.getElementById("modalRoot").innerHTML=`<div class="modalbg" onclick="closeWhy()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -763,7 +721,10 @@ function skipSetup(){
 
 /* D2 通常ホーム */
 function renderHome(){
-  let h=`<div class="hi"><span class="g">おはようございます</span><b>${S.nickname||"ここに"} さん</b></div>`;
+  let h= S.nickname
+    ? `<div class="hi"><span class="g">おはようございます</span><b>${S.nickname} さん</b></div>`
+    : `<div class="hi"><b>おはようございます</b></div>`;   // 名前はまだ聞いていない
+  if(S.setup_status!=="completed") h+=startHereCard();
   if(S.gate==="arrived") h+=`<div class="hrow letter tap" onclick="go('gate')"><span class="ic">✉️</span>
     <div><div class="k">大塚さんから</div><div class="v">手紙が届いています</div></div></div>`;
   if(S.letterSeen) h+=`<div class="hrow letter tap" onclick="showLetter()"><span class="ic">💌</span>
@@ -784,6 +745,17 @@ function renderHome(){
   <div class="hrow" style="opacity:.55"><span class="ic">💌</span><div><div class="k">AIレター</div>
     <div class="v" style="font-size:13px">今後の隙間として、kokoni からの振り返りレターをお届けします</div></div></div>`;
   document.getElementById("homeBody").innerHTML=h;
+}
+/* 初回ホームの「まずはここから」── 登録の催促ではなく、これからを一緒に決める入口 */
+function startHereCard(){
+  return `<div class="startcard">
+    <button class="qbtn" onclick="openWhy()">？</button>
+    <div class="leaf">🌱</div>
+    <div class="ttl">まずは、これからのことを<br>一緒に決めましょう</div>
+    <p style="font-size:13.5px;line-height:1.85;color:var(--ink2);margin:10px 0 0">kokoni では、決まったやり方を一方的に進めるのではなく、今のあなたに合った進み方を一緒に考えていきます。</p>
+    <p style="font-size:12.5px;line-height:1.8;color:var(--muted);margin:10px 0 0">3つほど質問しながら、今の状態と、これからやっていくことを整理します。</p>
+    <button class="btn" style="margin-top:16px" onclick="beginSetup()">一緒に決める</button>
+  </div>`;
 }
 function recallCard(){
   const now=new Date(), dow=(now.getDay()+6)%7;            // 月=0
