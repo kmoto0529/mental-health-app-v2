@@ -362,7 +362,7 @@ const S = {
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
   setup_status:"not_started", setup_completed_at:null, entered:false,
   act_id:"", act_duration:0, act_frequency:"", act_timing:"", act_adjusted:false,
-  act_input:"", act_feeling:"", act_logs:[], iv_exclude:[], iv_scene:"",
+  act_input:"", act_feeling:"", act_logs:[], iv_exclude:[], iv_scene:"", iv_offered:[], profileOpen:false,
   step:"a1", screen:"flow", side:"user", gate:"before", sumFix:{}, letterSeen:false,
   timerId:null, timer:0, gate_note:"", sumEdit:{}
 };
@@ -730,7 +730,7 @@ const IV_WANT_P={"気持ちを少し軽くしたい":"気持ちの重さを少�
 function nick(){ return S.nickname || "あなた"; }
 
 function beginSetup(){
-  S.setup_status="in_progress"; S.iv=0; S.iv_alt=false; S.step="iv";
+  S.setup_status="in_progress"; S.iv=0; S.iv_offered=[]; S.iv_exclude=[]; S.step="iv";
   document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
   document.getElementById("s-flow").classList.add("active");
   document.getElementById("nav").hidden=false;
@@ -783,25 +783,36 @@ function ivRender(){
     ivSay(IV_STATE_P[S.current_status]+"んですね。<br>教えてくれてありがとう。",ivNext);
     break;
 
-  /* ③ Q2 いちばん気になっていること */
+  /* ②' 安全確認（Q1のあと）。下2つを選ぶと通常フローを中断して安全対応へ */
   case 3:
+    ivSay("ひとつだけ、大事なことを<br>おうかがいさせてください。<br><br>いま、ご自身を傷つけたい<br>気持ちはありますか。",function(){
+      tray.innerHTML='<div class="opts">'
+        +SAFE_OPTS.map(function(o,i){ return '<button class="opt" onclick="pickSafety('+i+')">'+o.t+'</button>'; }).join("")
+        +'</div><div class="foot"><span class="tag">仮配置｜文言と閾値は 10/2 大塚さんレビュー前</span><br>'
+        +'この設問はスキップできない設計です（FR-73）。</div>';
+      window.scrollTo(0,document.body.scrollHeight);
+    });
+    break;
+
+  /* ③ Q2 いちばん気になっていること */
+  case 4:
     ivSay("今、いちばん心を占めているのは<br>どんなことですか？",function(){ ivOpts(IV_TOPIC,"ivQ2"); });
     break;
 
   /* ④ Q3 この1週間で変えたいこと */
-  case 4:
+  case 5:
     ivSay("この1週間で、<br>少し変わったら楽になりそうなのはどれですか？",function(){ ivOpts(IV_WANT,"ivQ3"); });
     break;
 
   /* ⑤ 整理（診断も断定もしない。言い換えと方向の確認だけ） */
-  case 5:
+  case 6:
     ivSay("教えてくれてありがとう、"+nick()+"さん。<br><br>"
       +"今は"+IV_TOPIC_P[S.current_concerns[0]]+"が頭を占めていて、"+IV_STATE_P[S.current_status]+"んですね。<br><br>"
       +"まずは、"+IV_WANT_P[S.direction_goal]+"ところから始めるのがよさそうです。",ivNext);
     break;
 
   /* ⑥ 最近の場面をひとつだけ（自由記述は原則ここだけ・深掘りしない） */
-  case 6:
+  case 7:
     ivSay("最近、"+IV_TOPIC_P[S.current_concerns[0]]+"で<br>特にしんどかった場面を1つだけ<br>教えてもらえますか？<br><br>うまく書けなくても大丈夫です。",function(){
       tray.innerHTML='<div class="card" style="margin:0">'
         +'<textarea id="ivScene" rows="4" placeholder="例）夜ベッドに入ってから、明日の仕事のことをずっと考えてしまう"'
@@ -812,28 +823,16 @@ function ivRender(){
     });
     break;
 
-  /* ⑦ 今週の一歩を提案。候補は必ず行動マスターの中から選ぶ（新規生成はしない） */
-  case 7: {
-    const picked=selectActions(); window.__IVP=picked;
-    ivSay("話してくれてありがとう。<br><br>今の話から、今週ならこんなことから始められそうです。<br><br>無理なくできそうなものを1つ選んでみませんか？",function(){
-      tray.innerHTML='<div class="opts">'
-        +picked.map(function(r,i){ const a=r.a;
-          return '<button class="opt" style="text-align:left" onclick="ivPick('+i+')">'
-            +'<div style="font-size:11px;color:var(--teal-deep);font-weight:800;margin-bottom:4px">'+a.category_name+'</div>'
-            +'<div style="font-size:15px;font-weight:800;line-height:1.6">'+a.title+'</div>'
-            +'<div style="font-size:11.5px;color:var(--muted);margin:6px 0;font-weight:400">'
-              +a.duration_minutes+'分 ・ 難易度 '+"★".repeat(a.difficulty)+'</div>'
-            +'<div style="font-size:12.5px;color:var(--ink2);font-weight:400;line-height:1.75">'+a.short_description+'</div>'
-            +'<div style="font-size:12px;color:var(--muted);font-weight:400;line-height:1.75;margin-top:6px">'+actReason(r)+'</div>'
-            +'</button>'; }).join("")
-        +'<button class="opt" onclick="ivAlt()">別の方法を一緒に考える</button></div>'
-        +debugPanel();
-      window.scrollTo(0,document.body.scrollHeight);
-    });
+  /* ⑦ 今週の一歩を提案。候補は必ず行動マスターの中から選ぶ（新規生成はしない）
+       「他も見てみる」は置き換えではなく追加。前の候補も選べるまま残す */
+  case 8: {
+    if(!S.iv_offered.length) addOffers();
+    ivSay("話してくれてありがとう。<br><br>今の話から、今週ならこんなことから始められそうです。<br><br>無理なくできそうなものを1つ選んでみませんか？",
+      function(){ renderOffers(tray); });
     break; }
 
   /* ⑧⑨ 選んだ行動を大きく出して、できそう度を聞く */
-  case 8:
+  case 9:
     tray.innerHTML="";
     document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
       '<div class="card warm" style="margin:12px 0"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:6px">今週やってみること</div>'
@@ -842,8 +841,8 @@ function ivRender(){
     ivSay("これなら、<br>今週どのくらいできそうですか？",function(){ ivOpts(["難しそう","たぶんできそう","できそう"],"ivFeas"); });
     break;
 
-  /* ⑩ 確定 */
-  case 9:
+  /* ⑩ 確定。ここで初回体験は終了。年代・性別は聞かずにホームへ戻す */
+  case 10:
     ivSay("ありがとう。<br>今週は、これでいきましょう。",function(){
       const a=act(S.act_id);
       tray.innerHTML='<div class="card tint" style="margin:0;text-align:center">'
@@ -852,28 +851,10 @@ function ivRender(){
         +'<h2 style="font-size:19px;line-height:1.75;margin-bottom:10px">'+a.title+'</h2>'
         +'<p class="lede" style="margin-bottom:14px">目安：'+planLabel()+'</p>'
         +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">完璧にできなくても大丈夫です。<br>やってみてどうだったかを、<br>また一緒に振り返りましょう。</p>'
-        +'<button class="btn" onclick="ivNext()">これでやってみる</button></div>'
+        +'<button class="btn" onclick="completeSetup()">これでやってみる</button></div>'
         +debugPanel();
       window.scrollTo(0,document.body.scrollHeight);
     });
-    break;
-
-  /* ⑪ 基本プロフィール（ここで初めて年代・性別を聞く） */
-  case 10:
-    document.getElementById("ivFlow").innerHTML="";
-    tray.innerHTML='<div class="card" style="margin:0">'
-      +'<h2>最後に、プロフィールを少しだけ</h2>'
-      +'<p class="lede" style="margin-bottom:18px">よりよいサービスづくりのため、基本情報を教えてください。</p>'
-      +'<div class="fld"><label>年代</label><div class="opts">'
-      +["10代","20代","30代","40代","50代","60代以上"].map(function(a){
-          return '<button class="opt '+(S.age_range===a?"sel":"")+'" onclick="S.age_range=\''+a+'\';ivRender()">'+a+'</button>'; }).join("")
-      +'</div></div>'
-      +'<div class="fld"><label>性別</label><div class="radios">'
-      +["女性","男性","その他","回答しない"].map(function(g){
-          return '<button class="'+(S.gender===g?"sel":"")+'" onclick="S.gender=\''+g+'\';ivRender()">'+g+'</button>'; }).join("")
-      +'</div></div>'
-      +'<button class="btn" style="margin-top:6px" '+(S.age_range&&S.gender?"":"disabled")+' onclick="completeSetup()">完了</button></div>';
-    window.scrollTo(0,0);
     break;
   }
 }
@@ -896,14 +877,53 @@ function ivScene(skip){
   if(S.iv_scene && RISK_RE.test(S.iv_scene)){ S.safety_answer="自由記述で検知"; go("safe"); return; }
   ivNext();
 }
-/* 別案＝同じ行動マスターの中から、いま提案していないものを出し直す */
+/* ── 提案候補は「置き換え」ではなく「追加」していく ─────────────
+   S.iv_offered に提示済みを積み、最大6件まで。重複は出さない。 */
+const OFFER_MAX=6;
+function addOffers(){
+  const have=S.iv_offered.map(function(r){ return r.id; });
+  S.iv_exclude=have.slice();
+  const more=selectActions().filter(function(r){ return have.indexOf(r.id)<0; });
+  const room=OFFER_MAX-S.iv_offered.length;
+  const add=more.slice(0,Math.min(3,room));
+  add.forEach(function(r){ r.batch = S.iv_offered.length ? "other" : "first"; });
+  S.iv_offered=S.iv_offered.concat(add);
+  window.__IVP=S.iv_offered;
+  return add.length;
+}
+function offerCard(r){
+  const a=r.a, i=S.iv_offered.indexOf(r);
+  return '<button class="opt" style="text-align:left" onclick="ivPick('+i+')">'
+    +'<div style="font-size:11px;color:var(--teal-deep);font-weight:800;margin-bottom:4px">'+a.category_name+'</div>'
+    +'<div style="font-size:15px;font-weight:800;line-height:1.6">'+a.title+'</div>'
+    +'<div style="font-size:11.5px;color:var(--muted);margin:6px 0;font-weight:400">'
+      +a.duration_minutes+'分 ・ 難易度 '+"★".repeat(a.difficulty)+'</div>'
+    +'<div style="font-size:12.5px;color:var(--ink2);font-weight:400;line-height:1.75">'+a.short_description+'</div>'
+    +'<div style="font-size:12px;color:var(--muted);font-weight:400;line-height:1.75;margin-top:6px">'+actReason(r)+'</div>'
+    +'</button>';
+}
+function renderOffers(tray){
+  const first=S.iv_offered.filter(function(r){ return r.batch!=="other"; });
+  const other=S.iv_offered.filter(function(r){ return r.batch==="other"; });
+  const head=function(t){ return '<div style="font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin:14px 0 6px">'+t+'</div>'; };
+  let h='<div class="opts">'+first.map(offerCard).join("")+'</div>';
+  if(other.length) h+=head("ほかの候補")+'<div class="opts">'+other.map(offerCard).join("")+'</div>';
+  h += (S.iv_offered.length<OFFER_MAX)
+    ? '<div class="opts" style="margin-top:12px"><button class="opt" onclick="ivAlt()">他も見てみる</button></div>'
+    : '<div class="foot">これで全部です。この中から1つ選んでみてください。</div>';
+  tray.innerHTML = h + debugPanel();
+  window.scrollTo(0,document.body.scrollHeight);
+}
+/* 「他も見てみる」＝前の候補を残したまま、マスターから追加で提示する */
 function ivAlt(){
-  const shown=(window.__IVP||[]).map(function(r){ return r.id; });
-  S.iv_exclude=(S.iv_exclude||[]).concat(shown);
-  ivMe("別の方法を一緒に考える"); S.iv=7; ivRender();
+  const n=addOffers();
+  const tray=document.getElementById("ivTray");
+  if(!n){ renderOffers(tray); return; }
+  ivMe("他も見てみる");
+  ivSay("では、ほかの候補も出しますね。<br>さきほどの3つも、そのまま選べます。",function(){ renderOffers(tray); });
 }
 function ivPick(i){
-  const r=(window.__IVP||[])[i]; if(!r) return;
+  const r=S.iv_offered[i]; if(!r) return;
   setPlan(r.id);
   S.first_action=r.a.title; S.action_adjusted_flag=false;
   ivMe(r.a.title); ivNext();
@@ -915,7 +935,7 @@ function ivFeas(i){
   if(v==="難しそう" && !S.act_adjusted){
     shrinkPlan(); S.action_adjusted_flag=true;
     S.plan_b_text="難しい日は「今日はしんどかった」だけでもOK";
-    ivSay("では、もう少し小さくしてみましょう。",function(){ S.iv=8; ivRender(); });
+    ivSay("では、もう少し小さくしてみましょう。",function(){ S.iv=9; ivRender(); });
     return;
   }
   S.plan_b_text=S.plan_b_text||"難しい日は「今日はしんどかった」だけでもOK";
@@ -1095,7 +1115,8 @@ function renderMap(){
     +   '<span class="tag">8ブロックは「すぷらん 心の地図」1枚図 準拠／中身はデモ用の例</span></div>';
 }
 function renderLog(){
-  document.getElementById("logBody").innerHTML=`
+  document.getElementById("logBody").innerHTML=
+    profileCard()+`
     <div class="card"><h3>基本情報</h3><p style="margin:0;font-size:13.5px">
       ニックネーム：${S.nickname||"—"}／年代：${S.age_range||"—"}／性別：${S.gender||"—"}</p></div>
     <div class="card"><h3>いまの状況</h3><p style="margin:0;font-size:13.5px">${S.current_status||"—"}<br>
@@ -1103,6 +1124,34 @@ function renderLog(){
     <div class="card"><h3>少し先に目指すこと</h3><p style="margin:0">${S.direction_goal||"—"}</p></div>
     <div class="card"><h3>今週やってみること</h3><p style="margin:0">${S.first_action||"—"}
       ${S.action_adjusted_flag?'<span class="tag">小さく調整済み</span>':""}</p></div>`;
+}
+/* マイページのプロフィール。任意入力で、未入力でも全機能が使える。
+   属性は補助情報であり、行動提案は Q1/Q2/Q3/場面 を優先する（属性で決めつけない） */
+function profileCard(){
+  const filled = S.age_range && S.gender;
+  if(!S.profileOpen){
+    return `<div class="card">
+      <h3>AIにあなたのことをもう少し教える</h3>
+      <p class="lede" style="margin:8px 0 12px">${filled
+        ? "年代：" + S.age_range + "／性別：" + S.gender
+        : "プロフィールを少し追加すると、AIがあなたに合った提案をより考えやすくなります。"}</p>
+      <button class="btn ghost" onclick="S.profileOpen=true;renderLog()">${filled?"プロフィールを変更する":"プロフィールを追加する"}</button>
+    </div>`;
+  }
+  return `<div class="card">
+    <h3>AIにあなたのことをもう少し教える</h3>
+    <p class="lede" style="margin:8px 0 16px">少しだけプロフィールを教えてもらうと、あなたに合った提案やサポートをより考えやすくなります。</p>
+    <div class="fld"><label>年代（任意）</label><div class="opts">${
+      ["10代","20代","30代","40代","50代","60代以上"].map(a=>
+        `<button class="opt ${S.age_range===a?"sel":""}" onclick="S.age_range=(S.age_range==='${a}'?'':'${a}');renderLog()">${a}</button>`).join("")
+    }</div></div>
+    <div class="fld"><label>性別（任意）</label><div class="radios">${
+      ["女性","男性","その他","回答しない"].map(g=>
+        `<button class="${S.gender===g?"sel":""}" onclick="S.gender=(S.gender==='${g}'?'':'${g}');renderLog()">${g}</button>`).join("")
+    }</div></div>
+    <button class="btn" onclick="S.profileOpen=false;renderLog()">保存する</button>
+    <div class="foot" style="margin:10px 0 0">どちらも任意です。未入力のままでも、すべての機能をお使いいただけます。</div>
+  </div>`;
 }
 const SUMROWS=[
  {k:"今週の状態", v:()=>"前半はしんどい日が続き、後半はすこし戻りました。"},
