@@ -1,0 +1,107 @@
+{
+  "master_version": "0.1",
+  "updated_at": "2026-09-30",
+  "note": "相談先マスター。UIコードに相談先をベタ書きしないこと。電話番号・URL・受付時間は、既存プロトタイプ／β版規約・プライバシーポリシーに記載済みのものだけを転記している（source 参照）。verified_at が null のものは公式サイトでの確認前。公式リリース前に全件を確認し verified_at を入れること。",
+  "categories": [
+    {
+      "category_id": "talk_now",
+      "name": "今すぐ誰かと話したい",
+      "description": "電話やチャットなど、今の気持ちを誰かに話せる相談先",
+      "order": 1
+    },
+    {
+      "category_id": "specialist",
+      "name": "医療・専門機関に相談したい",
+      "description": "医療機関や地域の相談機関など、専門的な支援につながるための窓口",
+      "order": 2
+    },
+    {
+      "category_id": "unsafe_now",
+      "name": "今すぐ身の安全を保つことが難しい",
+      "description": "今すぐ自分を傷つけてしまいそう、一人で安全を保つことが難しい場合の緊急の相談先",
+      "order": 3
+    }
+  ],
+  "resources": [
+    {
+      "resource_id": "SUPPORT_001",
+      "category": "talk_now",
+      "also_show_in": ["unsafe_now"],
+      "name": "よりそいホットライン",
+      "description": "電話で、いまの気持ちを話せる相談窓口です。",
+      "channel": ["phone"],
+      "phone": "0120-279-338",
+      "url": null,
+      "chat_url": null,
+      "hours": "24時間・無料",
+      "emergency_level": "high",
+      "active": true,
+      "verified_at": null,
+      "source": "index.html 危機モーダル / docs/terms-of-service-beta.md / docs/privacy-policy-beta.md（3箇所で一致）"
+    },
+    {
+      "resource_id": "SUPPORT_002",
+      "category": "talk_now",
+      "also_show_in": [],
+      "name": "まもろうよ こころ（厚生労働省）",
+      "description": "電話やSNS・チャットで相談できる窓口がまとまっている、厚生労働省のページです。",
+      "channel": ["web"],
+      "phone": null,
+      "url": "https://www.mhlw.go.jp/mamorouyokokoro/",
+      "chat_url": null,
+      "hours": null,
+      "emergency_level": "normal",
+      "active": true,
+      "verified_at": null,
+      "source": "index.html 危機モーダル"
+    },
+    {
+      "resource_id": "SUPPORT_003",
+      "category": "specialist",
+      "also_show_in": [],
+      "name": "こころの健康相談統一ダイヤル",
+      "description": "お住まいの地域の公的な相談機関につながる電話窓口です。",
+      "channel": ["phone"],
+      "phone": "0570-064-556",
+      "url": null,
+      "chat_url": null,
+      "hours": null,
+      "emergency_level": "normal",
+      "active": true,
+      "verified_at": null,
+      "source": "docs/terms-of-service-beta.md / docs/privacy-policy-beta.md（index.html では同じ番号が「いのちの電話」と表記されており、要確認）"
+    },
+    {
+      "resource_id": "SUPPORT_004",
+      "category": "talk_now",
+      "also_show_in": [],
+      "name": "いのちの電話",
+      "description": "電話で、いまの気持ちを話せる相談窓口です。",
+      "channel": ["phone"],
+      "phone": null,
+      "url": null,
+      "chat_url": null,
+      "hours": null,
+      "emergency_level": "normal",
+      "active": false,
+      "verified_at": null,
+      "source": "資料間で番号が不一致（index.html: 0570-064-556 / docs: 0570-783-556）。正式な番号を確認するまで停止"
+    },
+    {
+      "resource_id": "SUPPORT_005",
+      "category": "unsafe_now",
+      "also_show_in": [],
+      "name": null,
+      "description": null,
+      "channel": [],
+      "phone": null,
+      "url": null,
+      "chat_url": null,
+      "hours": null,
+      "emergency_level": "emergency",
+      "active": false,
+      "verified_at": null,
+      "source": "未登録。緊急時の正式な案内先（救急・警察等の案内文を含む）を運営側で確認のうえ登録する枠"
+    }
+  ]
+}

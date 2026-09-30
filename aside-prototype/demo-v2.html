@@ -288,7 +288,7 @@ nav.locked button{opacity:.3;pointer-events:none}
   <button class="hideable" onclick="skipSetup()">セットアップ済みへ</button>
   <button class="hideable" onclick="showLetter()">AIレター</button>
   <button class="hideable" onclick="setGate('arrived')">手紙が届いた</button>
-  <button class="hideable" onclick="go('safe')">リスク検知</button>
+  <button class="hideable" onclick="openSafety('demo','some')">リスク検知</button>
   <button class="hideable" onclick="location.reload()">最初から</button>
   <span class="sp"></span>
   <span id="statusLab" style="opacity:.7"></span>
@@ -324,17 +324,18 @@ nav.locked button{opacity:.3;pointer-events:none}
 
   <section id="s-act" class="screen"><div id="actBody"></div></section>
 
+  <!-- 安全対応画面。相談先を見るかどうかは本人が選ぶ。心理士への自動通知はしない -->
   <section id="s-safe" class="screen">
     <div class="safe">
-      <h3>いま、しんどいですね</h3>
-      <p style="font-size:14.5px">ここから先は、kokoni だけで受けとめるところではないと思っています。<br>いま話せる人につながれるようにします。</p>
-      <p style="font-size:13.5px;margin-top:10px">いま話せる先を、いくつかご案内します。</p>
-      <button class="btn" style="background:var(--warn)">相談できる窓口をひらく</button>
-      <button class="btn ghost" style="margin-top:9px" onclick="safeBack()">いまは大丈夫</button>
+      <h3>いま、しんどいんですね</h3>
+      <p style="font-size:14.5px;line-height:1.9">教えてくれてありがとうございます。<br><br>いまは、kokoniの中だけで抱えず、<br>必要ならすぐ相談できる窓口につながることもできます。<br><br>いま利用できる相談先をご案内します。</p>
+      <button class="btn" style="margin-top:14px" onclick="openSupportList()">相談できる窓口を見る</button>
+      <button class="btn ghost" style="margin-top:9px" onclick="safeReturn('safety_screen')">いまは大丈夫</button>
     </div>
-    <div class="foot">※ 通常のフローを中断して安全対応を優先します。心理士側 P4 へも通知が飛びます。<br>
-    <span class="tag">仮｜文面・閾値・窓口の中身は 9/22 大塚さんレビュー前</span><br>
-    出さないもの：危険度のスコア表示／「あなたは危険です」という断定／24時間対応の約束</div></section>
+    <div id="safeDebug"></div></section>
+
+  <!-- 相談窓口一覧。中身は data/support-resources.json から描画する -->
+  <section id="s-support" class="screen"><div id="supportBody"></div></section>
 
   <nav id="nav">
     <button data-go="home" onclick="go('home')"><span class="ic">🌿</span>ホーム</button>
@@ -368,7 +369,7 @@ const S = {
 };
 const STATUS_OPTS=["仕事は続けているけど少ししんどい","休んだ方がいいのか迷っている","いま休職している",
   "復職を控えている","復職したばかり","うまく言えない"];
-const SAFE_OPTS=[{t:"ない",risk:false},{t:"たまに頭をよぎる",risk:false},{t:"たびたび考える",risk:true},{t:"いま、つらい",risk:true}];
+const SAFE_OPTS=[{t:"ない",answer:"none"},{t:"少しある",answer:"some"},{t:"強くある",answer:"strong"}];
 const CONCERN_OPTS=["仕事のプレッシャー","人間関係","将来への不安","気分の落ち込み","眠りや生活リズム","自分を責めてしまう"];
 
 function go(id){
@@ -457,11 +458,161 @@ function openWhy(){
     </div></div>`;
 }
 function closeWhy(){ document.getElementById("modalRoot").innerHTML=""; }
-function pickSafety(i){
-  const o=SAFE_OPTS[i]; S.safety_answer=o.t;
-  if(o.risk){ go("safe"); } else { ivNext(); }
+/* ══════════════════════════════════════════════════════════════
+   安全確認・危機対応
+   - 「少しある／強くある」で安全対応画面へ。相談先を見るかは本人が選ぶ
+   - 「いまは大丈夫」「kokoniに戻る」で、中断した初回チャットの続きへ戻す
+   - 心理士への自動通知はしない。代わりに構造化イベントをプロダクト側ログに残す
+   - ログに自由記述は入れない（何を表示し、何を選んだかだけ）
+   ══════════════════════════════════════════════════════════════ */
+
+const SESSION_ID = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+  : "s-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+const SAFETY_LOG_KEY="kokoni_safety_events";
+const SAFETY_LOG=[];
+window.__SAFETY_LOG=SAFETY_LOG;
+/* 開発側の確認方法：console で __SAFETY_LOG、または localStorage の kokoni_safety_events（過去セッション分も残る）。
+   ?debug=1 なら安全対応画面・相談先一覧の下にも表示する */
+function logSafety(event,props){
+  const e=Object.assign({event:event, timestamp:new Date().toISOString(), session_id:SESSION_ID}, props||{});
+  SAFETY_LOG.push(e);
+  try{
+    const all=JSON.parse(localStorage.getItem(SAFETY_LOG_KEY)||"[]"); all.push(e);
+    localStorage.setItem(SAFETY_LOG_KEY, JSON.stringify(all));
+  }catch(_){}
+  if(DEBUG) console.log("[safety]",e);
 }
-function safeBack(){ if(S.entered){ go("home"); } else { step("a1"); } }
+
+let SR=null;
+function loadSupportResources(){
+  return loadData("support-resources","SUPPORT_RESOURCES")
+    .then(function(j){ SR=j; return j; })
+    .catch(function(e){ console.error("support-resources の読み込みに失敗:",e); SR={categories:[],resources:[]}; return SR; });
+}
+
+/* 安全対応に入るときの文脈。戻るときに使う（iv＝中断した初回チャットの位置） */
+S.safe_ctx=null;
+function openSafety(trigger,risk){
+  S.safe_ctx={ trigger:trigger, risk_level:risk,
+    iv: (S.step==="iv" && document.getElementById("ivFlow")) ? S.iv : null };
+  logSafety("safety_screen_shown",{trigger:trigger, risk_level:risk});
+  go("safe");
+  renderSafetyDebug("safeDebug");
+}
+function pickSafety(i){
+  const o=SAFE_OPTS[i]; S.safety_answer=o.answer;
+  ivMe(o.t);
+  logSafety("safety_question_answered",{answer:o.answer});
+  if(o.answer==="none"){ ivNext(); return; }
+  openSafety("safety_question",o.answer);
+}
+
+/* 相談窓口一覧。「強くある」のときは緊急の相談先を先頭に出して目立たせる */
+function supportItems(catId){
+  return (SR.resources||[]).filter(function(r){
+    return r.active && (r.category===catId || (r.also_show_in||[]).indexOf(catId)>=0);
+  });
+}
+function openSupportList(){
+  logSafety("safety_resource_list_opened",{});
+  document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById("s-support").classList.add("active");
+  S.screen="support";
+  renderSupportList(null);
+  window.scrollTo(0,0);
+}
+const CH_LABEL={phone:"電話する", web:"Webサイトを開く", chat:"チャット相談を開く"};
+function channelHref(r,ch){
+  if(ch==="phone" && r.phone) return "tel:"+r.phone.replace(/[^0-9+]/g,"");
+  if(ch==="web" && r.url) return r.url;
+  if(ch==="chat" && r.chat_url) return r.chat_url;
+  return null;
+}
+function renderSupportList(openId){
+  const strong = S.safe_ctx && S.safe_ctx.risk_level==="strong";
+  const cats=(SR.categories||[]).slice().sort(function(a,b){
+    if(strong){ if(a.category_id==="unsafe_now") return -1; if(b.category_id==="unsafe_now") return 1; }
+    return a.order-b.order;
+  });
+  let h='<div class="pagehead"><button class="back" onclick="backToSafety()">‹</button><span></span></div>'
+    +'<div style="padding:4px 18px 0"><h2 style="font-size:20px;margin-bottom:8px">いま相談できるところ</h2>'
+    +'<p class="lede" style="line-height:1.85">話したいと思ったときに使える窓口があります。<br>今の状況に近いものから選んでください。</p></div>';
+  cats.forEach(function(c){
+    const emph = strong && c.category_id==="unsafe_now";
+    const items=supportItems(c.category_id);
+    h+='<div class="card" style="margin:12px 18px;'+(emph?'border:1.5px solid #f2d8c9;background:#fff6f2':'')+'">'
+      +'<h3 style="font-size:16px;margin-bottom:4px'+(emph?';color:var(--warn)':'')+'">'+c.name+'</h3>'
+      +'<p class="lede" style="margin-bottom:10px;line-height:1.8">'+c.description+'</p>';
+    if(!items.length){
+      h+='<p style="font-size:12.5px;color:var(--muted);margin:0">この項目の相談先は準備中です。</p>';
+    }
+    items.forEach(function(r){
+      const key=c.category_id+"/"+r.resource_id, open = openId===key;
+      h+='<div class="opt" style="text-align:left;margin-top:8px;cursor:pointer" onclick="selectSupport(\''+r.resource_id+'\',\''+c.category_id+'\')">'
+        +'<div style="font-size:14.5px;font-weight:800">'+r.name+'</div>'
+        +(r.hours?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px">'+r.hours+'</div>':'')
+        +'<div style="font-size:12.5px;color:var(--ink2);line-height:1.75;margin-top:4px">'+r.description+'</div></div>';
+      if(open){
+        h+='<div style="margin:8px 0 4px">'
+          +(r.channel||[]).map(function(ch){
+            const href=channelHref(r,ch); if(!href) return "";
+            return '<a class="btn" style="text-decoration:none;text-align:center;margin-top:8px" href="'+href+'"'
+              +(ch==="phone"?'':' target="_blank" rel="noopener"')
+              +' onclick="logSafety(\'safety_external_link_clicked\',{resource_id:\''+r.resource_id+'\',channel:\''+ch+'\'})">'
+              +CH_LABEL[ch]+(ch==="phone"?'（'+r.phone+'）':'')+'</a>';
+          }).join("")+'</div>';
+      }
+    });
+    h+='</div>';
+  });
+  h+='<div style="padding:8px 18px 24px"><button class="btn ghost" onclick="safeReturn(\'resource_list\')">kokoniに戻る</button></div>'
+    +'<div id="supportDebug"></div>';
+  document.getElementById("supportBody").innerHTML=h;
+  renderSafetyDebug("supportDebug");
+}
+function selectSupport(id,catId){
+  const r=(SR.resources||[]).filter(function(x){ return x.resource_id===id; })[0]; if(!r) return;
+  logSafety("safety_resource_selected",{resource_id:id, resource_category:r.category});
+  const y=window.scrollY; renderSupportList(catId+"/"+id); window.scrollTo(0,y);
+}
+function backToSafety(){
+  document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById("s-safe").classList.add("active");
+  S.screen="safe"; renderSafetyDebug("safeDebug"); window.scrollTo(0,0);
+}
+
+/* 中断した初回チャットの続きへ戻す。回答・会話履歴はそのまま。次の質問から再開する */
+function safeReturn(from){
+  logSafety("safety_return_to_chat",{return_from:from});
+  const ctx=S.safe_ctx; S.safe_ctx=null;
+  if(!ctx || ctx.iv===null || !document.getElementById("ivFlow")){
+    if(S.entered) go("home"); else renderFlow();
+    return;
+  }
+  document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById("s-flow").classList.add("active");
+  S.screen="flow"; S.iv=ctx.iv;
+  document.getElementById("nav").hidden=false;
+  window.scrollTo(0,document.body.scrollHeight);
+  ivSay("戻ってきてくれてありがとうございます。<br>では、続きをゆっくり進めましょう。",ivNext);
+}
+
+/* DEBUG（?debug=1 のみ）。運営向けの注記とイベントログ */
+function renderSafetyDebug(elId){
+  const el=document.getElementById(elId); if(!el) return;
+  if(!DEBUG){ el.innerHTML=""; return; }
+  const unverified=(SR&&SR.resources||[]).filter(function(r){ return r.active && !r.verified_at; }).map(function(r){ return r.resource_id; });
+  el.innerHTML='<div style="margin:14px 18px;padding:12px;border:2px dashed #c33;border-radius:10px;'
+    +'background:#fff;font-family:monospace;font-size:11px;line-height:1.6;color:#333">'
+    +'<b style="color:#c33">DEBUG（?debug=1 のときだけ表示）</b><hr>'
+    +'文言・閾値は 10/2 大塚さんレビュー前の仮配置。心理士への自動通知はしない。<br>'
+    +'出さないもの：危険度のスコア表示／「あなたは危険です」という断定／24時間対応の約束<br>'
+    +'文脈: '+JSON.stringify(S.safe_ctx)+'<br>'
+    +'未確認(verified_at=null)の相談先: '+(unverified.join(", ")||"—")
+    +'<hr><b>安全イベントログ（このセッション）</b><br>'
+    +(SAFETY_LOG.map(function(e){ return JSON.stringify(e); }).join("<br>")||"—")
+    +'</div>';
+}
 
 /* ══════════════════════════════════════════════════════════════
    初回体験（ガイド型対話）
@@ -480,23 +631,26 @@ function safeBack(){ if(S.entered){ go("home"); } else { step("a1"); } }
 let AM=null, AM_BY_ID={};
 const DEBUG = new URLSearchParams(location.search).get("debug")==="1";
 
-/* file:// で開くと fetch が使えないので、生成済みの data/action-master.js を <script> で読む */
-function loadActionMasterScript(){
+/* data/*.json を読む。file:// で開くと fetch が使えないので、生成済みの data/*.js を <script> で読む */
+function loadDataScript(name,globalVar){
   return new Promise(function(ok,ng){
     const s=document.createElement("script");
-    s.src="./data/action-master.js";
-    s.onload=function(){ window.ACTION_MASTER ? ok(window.ACTION_MASTER) : ng(new Error("ACTION_MASTER が空")); };
-    s.onerror=function(){ ng(new Error("action-master.js を読めません")); };
+    s.src="./data/"+name+".js";
+    s.onload=function(){ window[globalVar] ? ok(window[globalVar]) : ng(new Error(globalVar+" が空")); };
+    s.onerror=function(){ ng(new Error(name+".js を読めません")); };
     document.head.appendChild(s);
   });
 }
-function loadActionMaster(){
-  return fetch("./data/action-master.json",{cache:"no-cache"})
+function loadData(name,globalVar){
+  return fetch("./data/"+name+".json",{cache:"no-cache"})
     .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
     .catch(function(e){
-      console.warn("action-master.json を fetch できないため .js で読み込みます:",e.message);
-      return loadActionMasterScript();
-    })
+      console.warn(name+".json を fetch できないため .js で読み込みます:",e.message);
+      return loadDataScript(name,globalVar);
+    });
+}
+function loadActionMaster(){
+  return loadData("action-master","ACTION_MASTER")
     .then(function(j){
       AM=j; AM_BY_ID={};
       j.actions.forEach(function(a){ AM_BY_ID[a.action_id]=a; });
@@ -802,8 +956,8 @@ function ivRender(){
     ivSay("ひとつだけ、大事なことを<br>おうかがいさせてください。<br><br>いま、ご自身を傷つけたい<br>気持ちはありますか。",function(){
       tray.innerHTML='<div class="opts">'
         +SAFE_OPTS.map(function(o,i){ return '<button class="opt" onclick="pickSafety('+i+')">'+o.t+'</button>'; }).join("")
-        +'</div><div class="foot"><span class="tag">仮配置｜文言と閾値は 10/2 大塚さんレビュー前</span><br>'
-        +'この設問はスキップできない設計です（FR-73）。</div>';
+        +'</div>'
+        +(DEBUG?'<div class="foot">DEBUG：仮配置｜文言と閾値は 10/2 大塚さんレビュー前。この設問はスキップできない設計（FR-73）</div>':'');
       window.scrollTo(0,document.body.scrollHeight);
     });
     break;
@@ -888,7 +1042,7 @@ function ivScene(skip){
   ivMe((skip||!S.iv_scene) ? "今は思いつかない" : S.iv_scene);
   S.ai_conversation_summary = S.iv_scene ? S.iv_scene
     : (IV_TOPIC_P[S.current_concerns[0]]+"について、"+IV_WANT_P[S.direction_goal]+"ところから始める");
-  if(S.iv_scene && RISK_RE.test(S.iv_scene)){ S.safety_answer="自由記述で検知"; go("safe"); return; }
+  if(S.iv_scene && RISK_RE.test(S.iv_scene)){ openSafety("free_text","unspecified"); return; }
   ivNext();
 }
 /* ── 提案候補は「置き換え」ではなく「追加」していく ─────────────
@@ -1229,8 +1383,8 @@ let proView="list";
 function renderPro(){
   const b=document.getElementById("proBody");
   if(proView==="list"){
-    b.innerHTML=`<div class="prow alert" onclick="openSession()"><div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 要確認</span></div>
-      <div class="mt">2週目 ／ 昨日 リスクを検知しました</div></div><div class="go">開く →</div></div>
+    b.innerHTML=`<div class="prow alert" onclick="openSession()"><div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 未読</span></div>
+      <div class="mt">2週目 ／ 節目のまとめが届いています</div></div><div class="go">開く →</div></div>
       <div class="prow" onclick="openSession()"><div><div class="nm">${S.nickname||"ここに"} さん</div>
       <div class="mt">1週目 ／ 初期セットアップ ${S.setup_status==="completed"?"完了":"未完了"}</div></div><div class="go">開く →</div></div>`;
   } else {
@@ -1271,7 +1425,7 @@ function startTimer(){ stopTimer(); S.timer=0;
 function stopTimer(){ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; } }
 
 /* 行動マスターを読み込んでから起動する */
-loadActionMaster().then(function(){
+Promise.all([loadActionMaster(),loadSupportResources()]).then(function(){
   if(DEBUG) console.log("action-master:", (AM.actions||[]).length, "actions loaded");
   renderFlow();
   document.getElementById("nav").hidden=true;
