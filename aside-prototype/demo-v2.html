@@ -161,6 +161,47 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .hrow.tap{cursor:pointer}
 .hrow.letter{background:linear-gradient(120deg,#F7EFDF,#F3E7D0);border-color:var(--accent-line)}
 
+/* ── Home ダッシュボード（今週の現在地） ── */
+.hhead{display:flex;align-items:center;gap:12px;padding:20px 20px 6px}
+.hhead .txt{flex:1;min-width:0}
+.hhead .g{font-size:12.5px;color:var(--muted)}
+.hhead b{font-size:21px;display:block;margin:1px 0 3px;color:var(--ink)}
+.hhead .sub{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.hhead .sprout{width:52px;height:52px;border-radius:50%;background:var(--g-pale-2);border:1px solid var(--teal-line);
+  display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+/* いちばん目立たせるカード */
+.stepcard{background:linear-gradient(160deg,#FBFBF4,#E7F0DA);border:1.5px solid var(--teal-line);border-radius:var(--r);
+  margin:12px 18px 16px;padding:20px 20px 16px;box-shadow:var(--sh-lift)}
+.stepcard .lab{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em}
+.stepcard h2{font-size:21px;line-height:1.6;margin:8px 0 4px;color:var(--ink)}
+.stepcard .plan{font-size:13px;color:var(--ink2)}
+.prog{background:rgba(255,255,255,.75);border:1px solid var(--teal-line);border-radius:var(--r-m);padding:12px 14px;margin:14px 0 16px}
+.prog .row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.prog .k{font-size:11.5px;font-weight:800;color:var(--teal-deep)}
+.prog .n{font-family:var(--num);font-size:18px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.prog .n small{font-size:12px;color:var(--muted);font-weight:700;margin-left:2px}
+.prog .note{font-size:12px;color:var(--muted);line-height:1.6}
+.pips{display:flex;gap:6px}
+.pips i{flex:1;height:9px;border-radius:99px;background:var(--line)}
+.pips i.on{background:var(--teal)}
+.linkbtn{display:block;width:100%;background:none;border:none;color:var(--teal-deep);font-size:13.5px;font-weight:700;
+  padding:12px 0 2px;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--teal-line)}
+.hcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);margin:10px 18px;padding:14px 16px;box-shadow:var(--shadow)}
+.hcard.tap{cursor:pointer}
+.hcard .k{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--teal-deep);font-weight:800;margin-bottom:4px}
+.hcard .v{font-size:15px;line-height:1.65;color:var(--ink)}
+.hcard .s{font-size:11.5px;color:var(--muted);margin-top:4px}
+.hcard .go{margin-left:auto;color:var(--muted);font-weight:700}
+.mood{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.mood button{background:var(--paper2);border:1px solid var(--line-input);border-radius:99px;padding:8px 2px;font-size:12.5px;
+  color:var(--ink2);cursor:pointer;font-family:inherit}
+.mood button.sel{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-deep);font-weight:800}
+.subgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 18px}
+.subgrid .hcard{margin:0;padding:13px 14px;box-shadow:none;background:var(--paper2)}
+.subgrid .v{font-size:13.5px;font-weight:700;line-height:1.5}
+.hcard.quiet{background:transparent;box-shadow:none;border-style:dashed}
+.recall .note{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+
 .layer{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;margin:0 18px 11px;box-shadow:var(--shadow)}
 .layer h4{margin:0 0 3px;font-size:12.5px;color:var(--teal-deep);font-weight:800}
 .layer .sub{font-size:11.5px;color:var(--muted);margin-bottom:9px}
@@ -1313,36 +1354,48 @@ function skipSetup(){
   completeSetup();
 }
 
-/* D2 通常ホーム */
+/* ══════════════════════════════════════════════════════════════
+   Home ── 今週の現在地がわかるダッシュボード
+   優先順：今週の小さな一歩 → 今週のテーマ → 今日の状態 → 話す／最近わかったこと
+          → 週1回のふり返り → AIレター
+   過去の詳細は、きろく・心の地図・節目に任せる（Home には載せない）
+   ══════════════════════════════════════════════════════════════ */
+function greeting(){
+  const h=new Date(nowMs()).getHours();
+  return h>=5&&h<11 ? "おはようございます" : (h>=11&&h<18 ? "こんにちは" : "こんばんは");
+}
 function renderHome(){
-  let h= S.nickname
-    ? `<div class="hi"><span class="g">おはようございます</span><b>${S.nickname} さん</b></div>`
-    : `<div class="hi"><b>おはようございます</b></div>`;   // 名前はまだ聞いていない
-  const ready=S.initial_plan_completed;
-  h += ready ? weekGoalCard() : startHereCard();
+  const ready=S.initial_plan_completed, mood=todayMood();
+  let h=`<div class="hhead"><div class="txt"><div class="g">${greeting()}</div>
+      ${S.nickname?`<b>${S.nickname}さん</b>`:""}
+      <div class="sub">今日も、ここに来てくれてありがとうございます。</div></div>
+    <div class="sprout" aria-hidden="true">🌱</div></div>`;
+
+  if(ready){
+    h+=stepCard()
+      +`<div class="hcard tap" onclick="openTheme()"><div class="k">🎯 今週のテーマ<span class="go">›</span></div>
+          <div class="v">${themeText()}</div><div class="s">kokoniと一緒に見つけたテーマ</div></div>`;
+  } else {
+    /* 初回前の主役は「一緒に決める」。ほかは見えるが未設定・操作不可 */
+    h+=startHereCard()+`<div class="prelock" onclick="showLock('home')">
+      <div class="hcard"><div class="k">🌱 今週の小さな一歩</div><div class="v" style="color:var(--muted)">一緒に決めたあとに表示されます</div></div>
+      <div class="hcard"><div class="k">🎯 今週のテーマ</div><div class="v" style="color:var(--muted)">—</div></div>`;
+  }
+
+  h+=`<div class="hcard"><div class="k">🌤 今日の状態</div>
+      <div class="v" style="font-size:14px">今日はどんな感じですか？</div>
+      <div class="mood">${MOODS.map(t=>`<button class="${mood===t?"sel":""}" onclick="setMood('${t}')">${t}</button>`).join("")}</div></div>
+    <div class="subgrid">
+      <div class="hcard tap" onclick="go('talk')"><div class="k">💬</div><div class="v">今日は話すだけにする</div><div class="s">今の気持ちを言葉にしてみましょう</div></div>
+      <div class="hcard tap" onclick="go('map')"><div class="k">📗</div><div class="v">最近わかったこと</div><div class="s">これから一緒に見つけていきます</div></div>
+    </div>`;
   if(letterArrived()) h+=`<div class="hrow letter tap" onclick="go('gate')"><span class="ic">✉️</span>
     <div><div class="k">大塚さんから</div><div class="v">手紙が届いています</div></div></div>`;
-  if(S.letterSeen) h+=`<div class="hrow letter tap" onclick="showLetter()"><span class="ic">💌</span>
-    <div><div class="k">kokoni から</div><div class="v">この数日で見えてきたこと</div></div></div>`;
-  const mood=todayMood();
-  /* 初回前は見えるが操作できない。押すと「一緒に決める」の案内へ */
-  h+=`<div ${ready?"":'class="prelock" onclick="showLock(\'home\')"'}>
-  <div class="hrow"><span class="ic">🌤</span><div style="flex:1">
-      <div class="k">今日の状態</div><div class="v" style="margin-bottom:8px">どんな一日を過ごしていますか？</div>
-      <div class="opts row">${MOODS.map(t=>
-        `<button class="opt ${mood===t?"sel":""}" style="font-size:12.5px;padding:9px 6px" onclick="setMood('${t}')">${t}</button>`).join("")}</div></div></div>
-  <div class="hrow"><span class="ic">🎯</span><div><div class="k">今週のテーマ</div>
-    <div class="v">${ready?(S.direction_goal||"—"):"—"}</div></div></div>
-  <div class="hrow tap" onclick="go('talk')"><span class="ic">🌱</span><div><div class="k">今日の小さな一歩</div>
-    <div class="v">${ready?(S.first_action||"—"):"—"}</div>
-    ${ready?`<div class="v" style="font-size:12.5px;color:var(--muted);margin-top:4px">${S.plan_b_text||"難しい日は「今日はしんどかった」だけでもOK"}</div>`:""}</div></div>
-  <div style="margin:10px 18px"><button class="btn ghost" onclick="go('talk')">💬 今日は話すだけにする</button></div>
-  <div class="hrow"><span class="ic">📗</span><div><div class="k">最近わかったこと</div>
-    <div class="v">${ready?(S.ai_conversation_summary||"これから一緒に見つけていきます"):"これから一緒に見つけていきます"}</div></div></div>
-  ${recallCard()}
-  </div>
-  <div class="hrow" style="opacity:.55"><span class="ic">💌</span><div><div class="k">AIレター</div>
-    <div class="v" style="font-size:13px">今後の隙間として、kokoni からの振り返りレターをお届けします</div></div></div>`;
+  h+=recallCard();
+  if(!ready) h+=`</div>`;
+  h+=`<div class="hcard quiet${S.letterSeen?" tap":""}" ${S.letterSeen?'onclick="showLetter()"':""}>
+      <div class="k" style="color:var(--muted)">💌 AIレター</div>
+      <div class="s" style="margin:0;line-height:1.7">今後の節目にあわせて、<br>kokoniからの振り返りレターをお届けします。</div></div>`;
   document.getElementById("homeBody").innerHTML=h;
 }
 /* 今日の状態。週次ふり返りの「今週の状態」に使う（1日1件、押し直したら上書き） */
@@ -1354,21 +1407,74 @@ function setMood(v){
   S.mood_logs=S.mood_logs.filter(function(x){ return dayKey(Date.parse(x.at))!==k; });
   S.mood_logs.push({at:nowIso(), v:v}); renderHome();
 }
-/* 初回体験のあと、「まずはここから」と入れ替わるカード */
-function weekGoalCard(){
-  const a=curAct();
-  const done=S.act_logs.filter(function(l){ return l.action_id===S.act_id; }).length;
-  return `<div class="startcard" style="text-align:left">
-    <div class="leaf" style="text-align:center">🌱</div>
-    <div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;text-align:center;margin-bottom:10px">今週、一緒にやってみること</div>
-    <div style="font-size:17.5px;font-weight:800;line-height:1.75;text-align:center">${a?a.title:(S.first_action||"—")}</div>
-    <p class="lede" style="text-align:center;margin:8px 0 0">目安：${a?planLabel():(S.act_frequency||"今週2回")}</p>
-    ${done?`<p class="lede" style="text-align:center;margin:4px 0 0;color:var(--teal-deep)">これまで ${done} 回やってみました</p>`:""}
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn" style="flex:1" ${a?"":"disabled"} onclick="openAction()">やってみる</button>
-      <button class="btn ghost" style="flex:1" onclick="go('log')">これまでを見る</button>
-    </div>
+
+/* 今週のテーマ＝「なぜ今週これに取り組むか」。初回対話の Q2（気になっていること）と Q3（変えたいこと）から */
+function themeText(){
+  const tp=(S.current_concerns||[])[0], wt=S.direction_goal;
+  if(tp && wt && IV_TOPIC_P[tp] && IV_WANT_P[wt] && tp!=="まだわからない" && tp!=="その他")
+    return IV_TOPIC_P[tp]+"について、"+IV_WANT_P[wt];
+  return wt ? (IV_WANT_P[wt]||wt) : "—";
+}
+function openTheme(){
+  const row=function(k,v){ return v ? '<div style="margin-bottom:10px"><div style="font-size:11.5px;font-weight:800;color:var(--teal-deep)">'+k+'</div><div style="font-size:14px;line-height:1.75">'+v+'</div></div>' : ""; };
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>今週のテーマ</h3><p style="color:var(--ink)">'+themeText()+'</p><hr style="border:none;border-top:1px solid var(--line);margin:12px 0">'
+    +'<p class="lede" style="margin-bottom:10px">最初に一緒に話したこと</p>'
+    +row("今のこころの状態",S.current_status)+row("いちばん心を占めていること",(S.current_concerns||[])[0])
+    +row("少し変わったら楽になりそうなこと",S.direction_goal)+row("話してくれた場面",S.iv_scene)
+    +'<button class="btn" style="margin-top:6px" onclick="closeWhy()">閉じる</button></div></div>';
+}
+
+/* 今週の進捗。cadence_type と今の頻度に合わせて出し方を変える（すべて「◯/3回」にはしない） */
+function weekProgress(){
+  const a=act(S.act_id); if(!a) return null;
+  const from=S.cycle?Date.parse(S.cycle.cycle_started_at):0;
+  const logs=S.act_logs.filter(function(l){ return l.action_id===S.act_id && Date.parse(l.at)>=from; });
+  const n=logs.length, f=S.act_frequency;
+  if(isTrigger(a)) return {k:"今週の記録", n: n ? "今週"+n+"回試しました" : "まだ試していません", pips:null,
+    note: freqText(f,a)+"、思い出したら開いてみてください。"};
+  if(f==="今週1回") return {k:"今週の記録", n: n ? "完了" : "未実施", pips:[n>0],
+    note: n ? "今週の分はできました。" : "今週のどこかで、1回だけ。"};
+  if(f==="毎日"){
+    const days=new Set(logs.map(function(l){ return dayKey(Date.parse(l.at)); })).size;
+    return {k:"今週やった日", n: days+'<small>/ 7日</small>', pips:[...Array(7)].map(function(_,i){ return i<days; }),
+      note: days ? "できた日を、少しずつ重ねています。" : "できる日だけで大丈夫です。"};
+  }
+  const m=/週(\d+)回/.exec(f), target=m?+m[1]:1;
+  return {k:"今週", n: n+'<small>/ '+target+'回</small>', pips:[...Array(target)].map(function(_,i){ return i<n; }),
+    note: n>=target ? "今週の目安に届きました。" : "できる日だけで大丈夫です。"};
+}
+/* いちばん大きく見せるカード */
+function stepCard(){
+  const a=curAct(), p=weekProgress();
+  return `<div class="stepcard">
+    <div class="lab">🌱 今週の小さな一歩</div>
+    <h2>${a?a.title:(S.first_action||"—")}</h2>
+    <div class="plan">目安：${a?planLabel():"—"}</div>
+    ${p?`<div class="prog"><div class="row"><span class="k">${p.k}</span><span class="n" id="stepProg">${p.n}</span></div>
+      ${p.pips?`<div class="pips">${p.pips.map(function(on){ return '<i class="'+(on?"on":"")+'"></i>'; }).join("")}</div>`:""}
+      <div class="note" style="margin-top:${p.pips?8:0}px">${p.note}</div></div>`:""}
+    <button class="btn" ${a?"":"disabled"} onclick="openAction()">やってみる</button>
+    <button class="linkbtn" onclick="openAlt()">ほかのやり方を考える</button>
   </div>`;
+}
+/* 「ほかのやり方を考える」。候補は行動マスターから（同じ目的のより簡単な行動を先頭に）。変えるかは本人が決める */
+function openAlt(){
+  const cur=act(S.act_id), ids=[];
+  if(cur && cur.easier_action_id && act(cur.easier_action_id)) ids.push(cur.easier_action_id);
+  scoreActions().forEach(function(r){ if(ids.length<3 && r.id!==S.act_id && ids.indexOf(r.id)<0) ids.push(r.id); });
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>ほかのやり方を考える</h3><p>今のやり方が合わないときは、ほかの方法に変えても大丈夫です。</p>'
+    +'<div class="opts">'+ids.map(function(id){ const x=act(id);
+      return '<button class="opt" style="text-align:left" onclick="changeAction(\''+id+'\')">'
+        +'<div style="font-size:14.5px;font-weight:800;line-height:1.6">'+x.title+'</div>'
+        +'<div style="font-size:11.5px;color:var(--muted);font-weight:400">'+defaultPlanLabel(x)+'</div></button>'; }).join("")+'</div>'
+    +'<button class="btn ghost" style="margin-top:12px" onclick="closeWhy()">今のまま続ける</button></div></div>';
+}
+function changeAction(id){
+  setPlan(id); S.first_action=act(id).title; S.action_adjusted_flag=false;
+  if(S.cycle) S.cycle.action_id=id;
+  closeWhy(); renderHome();
 }
 
 /* 初回ホームの「まずはここから」── 登録の催促ではなく、これからを一緒に決める入口 */
@@ -1388,14 +1494,15 @@ function startHereCard(){
 function recallCard(){
   const c=refreshCycle();
   const C=2*Math.PI*31;
-  let lab="—", unit="", off=C, desc="この1週間の気持ちの動きを、<br>すぷらんと一緒に見わたします。", btn, dd="", wd="";
+  let lab="—", unit="", off=C, desc="この1週間の気持ちや動きを、<br>kokoniと一緒に見なおします。", btn, dd="", wd="";
   if(!c){
+    desc="一緒に決めたあとに表示されます。";
     btn="<button class=\"btn\" disabled>ふり返りをはじめる</button>";
   } else {
     const st=c.weekly_review_status, left=daysLeft(), start=Date.parse(c.cycle_started_at), now=nowMs();
     off=C*(1-Math.min(1,(now-start)/(7*DAY)));
     if(st==="locked"){ lab=String(left); unit="<span class=\"u\">日後</span>";
-      btn="<button class=\"btn\" disabled>あと"+left+"日でふり返りできます</button>"; }
+      btn="<button class=\"btn\" disabled>ふり返りは"+left+"日後に開きます</button>"; }
     else if(st==="available"){ lab="今日";
       btn="<button class=\"btn\" onclick=\"go('gate')\">ふり返りをはじめる</button>"; }
     else { lab="✓"; off=0; desc="今週のふり返りは完了しました。";
