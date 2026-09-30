@@ -708,21 +708,26 @@ function actReason(r){
   return "「"+((S.current_concerns||[])[0]||"いまの状態")+"」について答えてくれたので提案しています。";
 }
 
-/* ── パーソナライズ（時間・頻度・タイミングのみ）───────────── */
+/* ── パーソナライズ（頻度・時間・やり方）─────────────────────
+   初期値も調整の下限も行動マスターが持つ（cadence_type ごとに違う）。
+   ここで勝手に「毎日」「週3回」へ揃えない。調整はマスターの範囲内だけ。 */
 function setPlan(id){
   const a=act(id);
-  S.act_id=id; S.act_duration=a.duration_minutes; S.act_frequency=a.default_frequency;
-  S.act_timing=""; S.act_adjusted=false;
+  S.act_id=id; S.act_duration=a.default_duration; S.act_frequency=a.default_frequency;
+  S.act_timing=""; S.act_adjusted=false; S.act_simpler=""; S.adj_round=0; S.adj_log=[];
 }
-const FREQ_DOWN={"毎日":"今週2回","週3回":"週1回","週2回":"週1回","週1回":"今週1回","今週2回":"今週1回"};
-function shrinkPlan(){
-  const a=act(S.act_id), cf=a.customizable_fields||[];
-  if(cf.indexOf("duration")>=0 && S.act_duration>1)
-    S.act_duration = S.act_duration>=10 ? 5 : (S.act_duration>=5 ? 3 : 1);
-  if(cf.indexOf("frequency")>=0) S.act_frequency = FREQ_DOWN[S.act_frequency] || "今週1回";
-  S.act_adjusted=true;
+/* 内容を簡単にしたやり方（simpler_version）を選んでいれば、その題名・手順で見せる */
+function curAct(){
+  const a=act(S.act_id);
+  if(!a || S.act_simpler!==S.act_id || !a.simpler_version) return a;
+  return Object.assign({},a,{title:a.simpler_version.title, instruction:a.simpler_version.instruction});
 }
-function planLabel(){ return S.act_frequency + "・1回" + S.act_duration + "分"; }
+function isTrigger(a){ return !!a && a.cadence_type==="trigger_based"; }
+/* trigger_based の default_frequency は「考えが止まらなくなった時」のような状況の文言 */
+function freqText(f,a){ return isTrigger(a) ? f+"に" : f; }
+function planText(f,d,a){ return freqText(f,a)+"・1回"+d+"分"; }
+function planLabel(){ return planText(S.act_frequency,S.act_duration,act(S.act_id)); }
+function defaultPlanLabel(a){ return planText(a.default_frequency,a.default_duration,a); }
 
 /* ── 実施画面（app_type を4系統にまとめる）──────────────── */
 const UI_FAMILY={
@@ -744,7 +749,7 @@ function openAction(id){
   go("act"); renderAction("intro");
 }
 function renderAction(phase){
-  const a=act(S.act_id); const body=document.getElementById("actBody");
+  const a=curAct(); const body=document.getElementById("actBody");
   if(!a){ body.innerHTML='<div class="card"><p>行動マスターを読み込めませんでした。</p></div>'; return; }
   const fam=UI_FAMILY[a.app_type]||"write";
   const head='<div class="pagehead"><button class="back" onclick="closeAction()">‹</button>'
@@ -840,7 +845,7 @@ function saveActPlan(){
 }
 /* 実施結果を保持する（将来：心の地図・週次の振り返り・心理士への共有に使う） */
 function finishAction(feeling){
-  const a=act(S.act_id);
+  const a=curAct();
   S.act_logs.push({
     action_id:S.act_id, app_type:a.app_type, title:a.title,
     duration_minutes:S.act_duration, frequency:S.act_frequency,
@@ -875,7 +880,8 @@ function debugPanel(){
     +'<hr><b>Excluded / 減点</b><br>'
     +(d.all.filter(function(r){ return r.ex; }).map(function(r){ return r.id+": "+r.ex; }).join("<br>")||"—")
     +'<hr><b>Plan</b><br>action_id: '+(S.act_id||"—")+' / '+S.act_duration+'分 / '+S.act_frequency
-    +(S.act_adjusted?" （小さく調整済み）":"")
+    +(S.act_adjusted?" （調整済み）":"")+'<br>cadence: '+((act(S.act_id)||{}).cadence_type||"—")
+    +'<br>adjust: '+((S.adj_log||[]).join(" → ")||"—")
     +'<hr><b>act_logs</b> '+S.act_logs.length+' 件<br>'
     +(S.act_logs.map(function(l){ return l.action_id+" → "+l.feeling; }).join("<br>")||"—")
     +'</div>';
@@ -1004,7 +1010,7 @@ function ivRender(){
     tray.innerHTML="";
     document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
       '<div class="card warm" style="margin:12px 0"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:6px">今週やってみること</div>'
-      +'<h2 style="font-size:18px;line-height:1.7;margin:0">'+act(S.act_id).title+'</h2>'
+      +'<h2 style="font-size:18px;line-height:1.7;margin:0">'+curAct().title+'</h2>'
       +'<p class="lede" style="margin:8px 0 0">目安：'+planLabel()+'</p></div>');
     ivSay("これなら、<br>今週どのくらいできそうですか？",function(){ ivOpts(["難しそう","たぶんできそう","できそう"],"ivFeas"); });
     break;
@@ -1012,7 +1018,7 @@ function ivRender(){
   /* ⑩ 確定。ここで初回体験は終了。年代・性別は聞かずにホームへ戻す */
   case 10:
     ivSay("ありがとう。<br>今週は、これでいきましょう。",function(){
-      const a=act(S.act_id);
+      const a=curAct();
       tray.innerHTML='<div class="card tint" style="margin:0;text-align:center">'
         +'<div style="font-size:30px;line-height:1;margin-bottom:8px">🌱</div>'
         +'<div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;margin-bottom:10px">今週、一緒にやってみること</div>'
@@ -1065,7 +1071,7 @@ function offerCard(r){
     +'<div style="font-size:11px;color:var(--teal-deep);font-weight:800;margin-bottom:4px">'+a.category_name+'</div>'
     +'<div style="font-size:15px;font-weight:800;line-height:1.6">'+a.title+'</div>'
     +'<div style="font-size:11.5px;color:var(--muted);margin:6px 0;font-weight:400">'
-      +a.duration_minutes+'分 ・ 難易度 '+"★".repeat(a.difficulty)+'</div>'
+      +defaultPlanLabel(a)+' ・ 難易度 '+"★".repeat(a.difficulty)+'</div>'
     +'<div style="font-size:12.5px;color:var(--ink2);font-weight:400;line-height:1.75">'+a.short_description+'</div>'
     +'<div style="font-size:12px;color:var(--muted);font-weight:400;line-height:1.75;margin-top:6px">'+actReason(r)+'</div>'
     +'</button>';
@@ -1107,15 +1113,120 @@ function ivPick(i){
 function ivFeas(i){
   const v=["難しそう","たぶんできそう","できそう"][i];
   S.action_difficulty=v; ivMe(v);
-  /* 行動そのものは変えない。まず時間・頻度・難易度を下げる */
-  if(v==="難しそう" && !S.act_adjusted){
-    shrinkPlan(); S.action_adjusted_flag=true;
-    S.plan_b_text="難しい日は「今日はしんどかった」だけでもOK";
-    ivSay("では、もう少し小さくしてみましょう。",function(){ S.iv=9; ivRender(); });
+  S.plan_b_text=S.plan_b_text||"難しい日は「今日はしんどかった」だけでもOK";
+  if(v==="難しそう"){ S.adj_round++; ivAdjust(); return; }
+  ivNext();
+}
+
+/* ── 「難しそう」のときの調整 ─────────────────────────────
+   順番：① 時間を短く ② 回数を減らす ③ やり方を簡単に ④ 同じ目的のより簡単な行動へ
+   ①②が両方できるときは本人に選んでもらう。同じ調整・同じ文言は繰り返さない。
+   すべてマスターの範囲内（minimum_* / adjustable_fields / simpler_version / easier_action_id）。 */
+const FREQ_RANK={"毎日":4,"週3回":3,"週2回":2,"週1回":1,"今週1回":1};
+const FREQ_NEXT={"毎日":"週3回","週3回":"週1回","週2回":"週1回"};
+function adjustOptions(){
+  const a=act(S.act_id), af=a.adjustable_fields||[], o={freq:null,dur:null,content:false,swap:null};
+  const nf=FREQ_NEXT[S.act_frequency];
+  if(af.indexOf("frequency")>=0 && nf && FREQ_RANK[nf]>=(FREQ_RANK[a.minimum_frequency]||1)) o.freq={f:nf,d:S.act_duration};
+  if(af.indexOf("duration")>=0 && S.act_duration>a.minimum_duration) o.dur={f:S.act_frequency,d:a.minimum_duration};
+  if(af.indexOf("content")>=0 && a.simpler_version && S.act_simpler!==S.act_id) o.content=true;
+  const e=a.easier_action_id && act(a.easier_action_id);
+  if(e && e.status==="published" && (S.adj_seen||[]).indexOf(e.action_id)<0) o.swap=e.action_id;
+  return o;
+}
+function adjDone(kind){ S.adj_log.push(kind); S.act_adjusted=true; S.action_adjusted_flag=true; }
+function shortPlan(f,d){ return f+"・"+d+"分"; }
+function ivAdjust(){
+  const o=adjustOptions();
+  if(o.freq && o.dur){
+    S.adj_choice=o;
+    ivSay((S.adj_round>1 ? "まだ少し負担がありそうですね。<br>" : shortPlan(S.act_frequency,S.act_duration)+"だと少し大変そうですね。<br>")
+      +"どちらならやれそうですか？",function(){
+      ivOpts([shortPlan(o.freq.f,o.freq.d)+"にする", shortPlan(o.dur.f,o.dur.d)+"にする", "別の方法を見てみる"],"ivAdjPick");
+    });
     return;
   }
-  S.plan_b_text=S.plan_b_text||"難しい日は「今日はしんどかった」だけでもOK";
-  ivNext();
+  if(o.dur) return applyDur(o.dur,false);
+  if(o.freq) return applyFreq(o.freq,false);
+  ivOther();
+}
+function ivAdjPick(i){
+  const o=S.adj_choice, t=document.querySelectorAll("#ivTray .opt")[i];
+  ivMe(t?t.textContent:"");
+  if(i===0) return applyFreq(o.freq,true);
+  if(i===1) return applyDur(o.dur,true);
+  ivOther();
+}
+/* ③ やり方を簡単に → ④ より簡単な行動 → 候補の選び直し の順で次の手を出す */
+function ivOther(){
+  const o=adjustOptions();
+  if(o.content) return applyContent();
+  if(o.swap) return offerSwap(o.swap);
+  if(!S.adj_log.length) return ivReselect(false);
+  adjustEnd();
+}
+function backToCard(){ S.iv=9; ivRender(); }
+function applyFreq(p,chosen){
+  const a=curAct(), prev=S.act_frequency, once=p.f==="週1回";
+  S.act_frequency=p.f; adjDone("frequency");
+  let m;
+  if(chosen) m="では、"+(once?"今週は1回だけ":p.f)+"にしてみましょう。<br>1回"+p.d+"分はそのままです。";
+  else if(S.adj_round>1) m="まだ少し大変そうですね。<br>回数をもう少し減らして、"+(once?"今週1回だけ":p.f+"で")+"試してみましょうか。";
+  else if(prev==="毎日") m="毎日続けるのは少し大変そうですね。<br>まずは"+p.f+"から試してみましょうか。";
+  else if(once) m=prev+"だと少し負担がありそうですね。<br>まずは今週1回だけ、<br>「"+a.title+"」をやってみましょうか。";
+  else m=prev+"だと少し負担がありそうですね。<br>まずは"+p.f+"くらいから試してみましょうか。";
+  ivSay(m,backToCard);
+}
+function applyDur(p,chosen){
+  const a=act(S.act_id), prev=S.act_duration;
+  S.act_duration=p.d; adjDone("duration");
+  let m;
+  if(chosen) m="では、"+S.act_frequency+"はそのままで、<br>1回"+p.d+"分だけにしてみましょう。";
+  else if(S.adj_round>1) m="まだ少し大変そうですね。<br>1回の時間を"+p.d+"分に短くしてみましょう。";
+  else if(isTrigger(a)) m=prev+"分だと少し負担がありそうですね。<br>"+freqText(S.act_frequency,a)+"、"+p.d+"分だけやってみるのはどうでしょう。";
+  else m=prev+"分だと少し負担がありそうですね。<br>まずは"+p.d+"分だけやってみるのはどうでしょう。";
+  ivSay(m,backToCard);
+}
+function applyContent(){
+  const before=curAct().title;
+  S.act_simpler=S.act_id; adjDone("content");
+  S.first_action=curAct().title;
+  ivSay("もう少し取り組みやすいやり方に<br>変えてみましょう。<br><br>「"+before+"」の代わりに、<br>「"+curAct().title+"」はどうでしょう。",backToCard);
+}
+function offerSwap(id){
+  const e=act(id), tray=document.getElementById("ivTray");
+  ivSay("この方法は今は少し負担がありそうなので、<br>別のやり方も見てみましょうか。",function(){
+    tray.innerHTML='<div class="opts"><button class="opt" style="text-align:left" onclick="ivSwap(\''+id+'\')">'
+      +'<div style="font-size:11px;color:var(--teal-deep);font-weight:800;margin-bottom:4px">'+e.category_name+'</div>'
+      +'<div style="font-size:15px;font-weight:800;line-height:1.6">'+e.title+'</div>'
+      +'<div style="font-size:11.5px;color:var(--muted);margin:6px 0;font-weight:400">'+defaultPlanLabel(e)+'</div>'
+      +'<div style="font-size:12.5px;color:var(--ink2);font-weight:400;line-height:1.75">'+e.short_description+'</div></button>'
+      +'<button class="opt" onclick="ivReselect(true)">ほかの候補から選び直す</button></div>';
+    window.scrollTo(0,document.body.scrollHeight);
+  });
+}
+function ivSwap(id){
+  S.adj_seen=(S.adj_seen||[]).concat([S.act_id]);
+  const log=S.adj_log.concat(["swap:"+S.act_id+"→"+id]);
+  setPlan(id); S.adj_log=log; S.act_adjusted=true; S.action_adjusted_flag=true;
+  S.first_action=act(id).title; ivMe(act(id).title); backToCard();
+}
+function adjustEnd(){
+  ivSay("いろいろ試してみても、<br>今は少し負担がありそうですね。<br><br>今週は無理に決めなくても大丈夫です。<br>"
+    +"今の形で、できる日だけやってみることも、<br>ほかの候補から選び直すこともできます。",function(){
+    ivOpts(["今の形で、できる日だけやってみる","ほかの候補から選び直す"],"ivEndPick");
+  });
+}
+function ivEndPick(i){
+  if(i===1) return ivReselect(true);
+  ivMe("今の形で、できる日だけやってみる");
+  S.plan_b_text="できる日だけでOK。難しい日は「今日はしんどかった」だけでもOK";
+  S.iv=10; ivRender();
+}
+function ivReselect(echo){
+  if(echo) ivMe("ほかの候補から選び直す");
+  const tray=document.getElementById("ivTray");
+  ivSay("では、ほかの候補から選んでみましょう。",function(){ S.iv=8; renderOffers(tray); });
 }
 function completeSetup(){ S.setup_status="completed"; S.setup_completed_at=new Date().toISOString(); go("home"); }
 function openHome(){ go("home"); }
@@ -1160,13 +1271,13 @@ function renderHome(){
 }
 /* 初回体験のあと、「まずはここから」と入れ替わるカード */
 function weekGoalCard(){
-  const a=act(S.act_id);
+  const a=curAct();
   const done=S.act_logs.filter(function(l){ return l.action_id===S.act_id; }).length;
   return `<div class="startcard" style="text-align:left">
     <div class="leaf" style="text-align:center">🌱</div>
     <div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;text-align:center;margin-bottom:10px">今週、一緒にやってみること</div>
     <div style="font-size:17.5px;font-weight:800;line-height:1.75;text-align:center">${a?a.title:(S.first_action||"—")}</div>
-    <p class="lede" style="text-align:center;margin:8px 0 0">目安：${S.act_frequency||"今週2回"}${S.act_duration?"・1回"+S.act_duration+"分":""}</p>
+    <p class="lede" style="text-align:center;margin:8px 0 0">目安：${a?planLabel():(S.act_frequency||"今週2回")}</p>
     ${done?`<p class="lede" style="text-align:center;margin:4px 0 0;color:var(--teal-deep)">これまで ${done} 回やってみました</p>`:""}
     <div style="display:flex;gap:8px;margin-top:16px">
       <button class="btn" style="flex:1" ${a?"":"disabled"} onclick="openAction()">やってみる</button>

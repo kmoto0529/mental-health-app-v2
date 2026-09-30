@@ -1,6 +1,6 @@
 /* 自動生成（scripts/build-action-master-js.js）。直接編集しない。正本は action-master.json */
 window.ACTION_MASTER = {
-  "master_version": "0.1",
+  "master_version": "0.2",
   "updated_at": "2026-09-30",
   "note": "行動マスター。介入内容は固定・パーソナライズは可変。将来は CSV/Sheets → Supabase → 心理士編集画面へ移行する。画面やロジックは action_id 経由でのみ参照すること。",
   "categories": [
@@ -49,17 +49,24 @@ window.ACTION_MASTER = {
         "何が不安なのかわからない"
       ],
       "caution": "書きながらつらさが強くなったら、途中でやめてよいと伝える。",
-      "duration_minutes": 5,
       "difficulty": 1,
       "app_type": "guided_journal",
       "instruction": "うまく書こうとしなくて大丈夫です。今、頭の中にあることを、浮かんだ順にそのまま書いてみましょう。",
       "reflection": "書き出してみて、いまどんな感じですか。",
-      "default_frequency": "週3回",
-      "customizable_fields": [
+      "cadence_type": "trigger_based",
+      "default_frequency": "考えが止まらなくなった時",
+      "default_duration": 5,
+      "minimum_frequency": null,
+      "minimum_duration": 1,
+      "adjustable_fields": [
         "duration",
-        "frequency",
-        "timing"
+        "content"
       ],
+      "simpler_version": {
+        "title": "今の考えを3行だけ書き出してみる",
+        "instruction": "全部書かなくて大丈夫です。いま浮かんでいることを、3行だけ書いてみましょう。"
+      },
+      "easier_action_id": null,
       "cta_label": "書き出してみる",
       "match": {
         "want": [
@@ -86,7 +93,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_002",
@@ -101,16 +108,24 @@ window.ACTION_MASTER = {
         "何に反応しているのかわからない"
       ],
       "caution": "分けられなくてよい。分けようとしたこと自体を肯定する。",
-      "duration_minutes": 7,
       "difficulty": 2,
       "app_type": "guided_journal",
       "instruction": "3つに分けてみましょう。①実際に起きたこと ②そのとき頭に浮かんだこと ③そのときの気持ち。順番どおりでなくて構いません。",
       "reflection": "分けてみて、気づいたことはありましたか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
+      "cadence_type": "trigger_based",
+      "default_frequency": "気持ちが大きく動いた時",
+      "default_duration": 7,
+      "minimum_frequency": null,
+      "minimum_duration": 3,
+      "adjustable_fields": [
         "duration",
-        "frequency"
+        "content"
       ],
+      "simpler_version": {
+        "title": "出来事と気持ちの2つだけ書いてみる",
+        "instruction": "「何があったか」と「どう感じたか」の2つだけ、ひとことずつ書いてみましょう。"
+      },
+      "easier_action_id": "ACTION_001",
       "cta_label": "整理してみる",
       "match": {
         "want": [
@@ -134,7 +149,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_003",
@@ -149,16 +164,20 @@ window.ACTION_MASTER = {
         "一つの考えにとらわれている"
       ],
       "caution": "前向きに考え直させるワークではない。無理に別の見方が出なくてよい。",
-      "duration_minutes": 7,
       "difficulty": 3,
       "app_type": "guided_journal",
       "instruction": "いま浮かんでいる考えを1つ書いてみましょう。そのあとで、「他にどんな見方がありそうか」を1つだけ探してみます。出てこなければ、それでも大丈夫です。",
       "reflection": "別の見方を探してみて、いまどんな感じですか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "trigger_based",
+      "default_frequency": "自分を責める考えが浮かんだ時",
+      "default_duration": 7,
+      "minimum_frequency": null,
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_022",
       "cta_label": "別の見方を探す",
       "match": {
         "want": [
@@ -184,7 +203,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_004",
@@ -199,16 +218,20 @@ window.ACTION_MASTER = {
         "自信をなくしている"
       ],
       "caution": "励ましを強要しない。出てこなければ書かなくてよい。",
-      "duration_minutes": 5,
       "difficulty": 2,
       "app_type": "guided_journal",
       "instruction": "いまの自分に、どんな言葉をかけたいですか。うまい言葉でなくて構いません。",
       "reflection": "書いてみて、いまどんな感じですか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "trigger_based",
+      "default_frequency": "自分を責めてしまった時",
+      "default_duration": 5,
+      "minimum_frequency": null,
+      "minimum_duration": 2,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_021",
       "cta_label": "言葉を考える",
       "match": {
         "want": [
@@ -230,7 +253,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_005",
@@ -245,17 +268,25 @@ window.ACTION_MASTER = {
         "少し身体を動かしたい"
       ],
       "caution": "体調が悪いときは行わない。天候・時間帯の安全に配慮する。",
-      "duration_minutes": 5,
       "difficulty": 2,
       "app_type": "activity_timer",
       "instruction": "家の外に出て、5分だけ歩いてみましょう。距離も速さも気にしなくて大丈夫です。",
       "reflection": "歩く前と後で、気分に違いはありましたか。",
+      "cadence_type": "scheduled",
       "default_frequency": "週3回",
-      "customizable_fields": [
-        "duration",
+      "default_duration": 5,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 2,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration",
+        "content"
       ],
+      "simpler_version": {
+        "title": "外に出て、1分だけ外の空気を吸う",
+        "instruction": "歩かなくても大丈夫です。玄関やベランダに出て、1分だけ外の空気を吸ってみましょう。"
+      },
+      "easier_action_id": null,
       "cta_label": "5分歩いてみる",
       "match": {
         "want": [
@@ -279,7 +310,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_006",
@@ -294,17 +325,21 @@ window.ACTION_MASTER = {
         "毎日が単調になっている"
       ],
       "caution": "「楽しめないこと」を責める材料にしない。",
-      "duration_minutes": 10,
       "difficulty": 2,
       "app_type": "activity_planner",
       "instruction": "少しだけ気分が上がりそうなことを1つ決めて、いつやるかまで決めておきましょう。小さいほど続きます。",
       "reflection": "やってみて、気分に変化はありましたか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "duration",
+      "cadence_type": "scheduled",
+      "default_frequency": "週3回",
+      "default_duration": 10,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 3,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "1つ決める",
       "match": {
         "want": [
@@ -329,7 +364,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_007",
@@ -344,16 +379,20 @@ window.ACTION_MASTER = {
         "始められない"
       ],
       "caution": "分解しても取りかかれないこと自体を責めない。",
-      "duration_minutes": 10,
       "difficulty": 2,
       "app_type": "task_breakdown",
       "instruction": "気が重いことを1つ思い浮かべ、それを「5分でできる最初のひとかけら」まで小さくしてみましょう。",
       "reflection": "小さくしてみて、取りかかれそうな感じはありますか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "trigger_based",
+      "default_frequency": "やることに手がつかない時",
+      "default_duration": 10,
+      "minimum_frequency": null,
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "小さくしてみる",
       "match": {
         "want": [
@@ -377,7 +416,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_008",
@@ -391,16 +430,20 @@ window.ACTION_MASTER = {
         "何をすると楽になるかわからない"
       ],
       "caution": "気分が変わらなくても失敗ではないと伝える。",
-      "duration_minutes": 10,
       "difficulty": 2,
       "app_type": "mood_experiment",
       "instruction": "やることを1つ決めて、やる前の気分を記録します。終わったらもう一度記録して、違いを見てみましょう。",
       "reflection": "前と後で、気分の数字は動きましたか。",
+      "cadence_type": "scheduled",
       "default_frequency": "週2回",
-      "customizable_fields": [
-        "frequency",
-        "timing"
+      "default_duration": 10,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 10,
+      "adjustable_fields": [
+        "frequency"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "試してみる",
       "match": {
         "want": [
@@ -424,7 +467,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_009",
@@ -439,17 +482,21 @@ window.ACTION_MASTER = {
         "頭の中がいっぱい"
       ],
       "caution": "実施中に苦しさが強くなった場合は中止する。",
-      "duration_minutes": 3,
       "difficulty": 1,
       "app_type": "breathing_timer",
       "instruction": "楽な姿勢で座り、鼻から息を吸って、口からゆっくり吐きます。考えごとが浮かんだら、そのまま呼吸に戻ってきてください。",
       "reflection": "呼吸のあと、身体や気持ちに変化はありましたか。",
-      "default_frequency": "週3回",
-      "customizable_fields": [
-        "duration",
+      "cadence_type": "daily",
+      "default_frequency": "毎日",
+      "default_duration": 3,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 1,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "3分やってみる",
       "match": {
         "want": [
@@ -478,7 +525,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_010",
@@ -493,17 +540,21 @@ window.ACTION_MASTER = {
         "少し落ち着きたい"
       ],
       "caution": "無理に無心になろうとしない。つらくなったら中止する。",
-      "duration_minutes": 3,
       "difficulty": 2,
       "app_type": "mindfulness_timer",
       "instruction": "いま聞こえている音、触れている感触に、順番に注意を向けてみましょう。良い悪いを決めなくて大丈夫です。",
       "reflection": "やってみて、いまどんな感じですか。",
-      "default_frequency": "週3回",
-      "customizable_fields": [
-        "duration",
+      "cadence_type": "daily",
+      "default_frequency": "毎日",
+      "default_duration": 3,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 1,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_009",
       "cta_label": "3分やってみる",
       "match": {
         "want": [
@@ -528,7 +579,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_011",
@@ -543,17 +594,21 @@ window.ACTION_MASTER = {
         "頭から身体へ注意を移したい"
       ],
       "caution": "痛みが強い部位は無理にたどらない。",
-      "duration_minutes": 5,
       "difficulty": 2,
       "app_type": "body_scan",
       "instruction": "足先から順に、頭まで注意を移していきます。力が入っているところを見つけたら、気づくだけで大丈夫です。",
       "reflection": "身体のどこかに、力が入っていることに気づけましたか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "duration",
+      "cadence_type": "daily",
+      "default_frequency": "毎日",
+      "default_duration": 5,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 2,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_012",
       "cta_label": "やってみる",
       "match": {
         "want": [
@@ -579,7 +634,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_012",
@@ -594,17 +649,25 @@ window.ACTION_MASTER = {
         "身体を使って落ち着きたい"
       ],
       "caution": "けがや痛みのある部位では行わない。",
-      "duration_minutes": 5,
       "difficulty": 1,
       "app_type": "muscle_relaxation",
       "instruction": "肩をぎゅっと上げて5秒。そのあと、いっきに力を抜きます。手、顔の順に繰り返してみましょう。",
       "reflection": "力を抜いたあと、身体はどんな感じですか。",
-      "default_frequency": "週3回",
-      "customizable_fields": [
-        "duration",
+      "cadence_type": "daily",
+      "default_frequency": "毎日",
+      "default_duration": 5,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 1,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration",
+        "content"
       ],
+      "simpler_version": {
+        "title": "肩だけゆるめる",
+        "instruction": "肩をぎゅっと上げて5秒、ストンと落とします。これを2回だけやってみましょう。"
+      },
+      "easier_action_id": null,
       "cta_label": "ゆるめてみる",
       "match": {
         "want": [
@@ -629,7 +692,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_013",
@@ -644,16 +707,20 @@ window.ACTION_MASTER = {
         "考えがまとまらない"
       ],
       "caution": "1文にまとまらなくてよい。大まかで構わないと伝える。",
-      "duration_minutes": 7,
       "difficulty": 2,
       "app_type": "problem_solving",
       "instruction": "「いま困っているのは、◯◯が◯◯であることだ」の形で、1文にしてみましょう。",
       "reflection": "1文にしてみて、見え方は変わりましたか。",
-      "default_frequency": "週1回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "one_off",
+      "default_frequency": "今週1回",
+      "default_duration": 7,
+      "minimum_frequency": "今週1回",
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "整理してみる",
       "match": {
         "want": [
@@ -679,7 +746,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_014",
@@ -693,16 +760,20 @@ window.ACTION_MASTER = {
         "問題が大きく感じる"
       ],
       "caution": "「変えられない」と結論づけて諦めさせる方向に使わない。",
-      "duration_minutes": 7,
       "difficulty": 2,
       "app_type": "problem_solving",
       "instruction": "気になっていることを挙げて、「自分で変えられそうなこと」と「そうでないこと」に分けてみましょう。",
       "reflection": "分けてみて、いまどんな感じですか。",
-      "default_frequency": "週1回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "one_off",
+      "default_frequency": "今週1回",
+      "default_duration": 7,
+      "minimum_frequency": "今週1回",
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_013",
       "cta_label": "分けてみる",
       "match": {
         "want": [
@@ -727,7 +798,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_015",
@@ -741,16 +812,20 @@ window.ACTION_MASTER = {
         "選択肢がないように感じる"
       ],
       "caution": "実行を迫らない。出すだけで終わってよい。",
-      "duration_minutes": 10,
       "difficulty": 3,
       "app_type": "problem_solving",
       "instruction": "良い案でなくて構いません。思いつく方法を3つ並べてみましょう。現実的でないものが混ざっていても大丈夫です。",
       "reflection": "3つ並べてみて、気持ちに変化はありましたか。",
-      "default_frequency": "週1回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "one_off",
+      "default_frequency": "今週1回",
+      "default_duration": 10,
+      "minimum_frequency": "今週1回",
+      "minimum_duration": 5,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_013",
       "cta_label": "3つ考える",
       "match": {
         "want": [
@@ -775,7 +850,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_016",
@@ -789,17 +864,21 @@ window.ACTION_MASTER = {
         "問題を先延ばししている"
       ],
       "caution": "できなかった週があっても責めない。",
-      "duration_minutes": 5,
       "difficulty": 2,
       "app_type": "problem_solving",
       "instruction": "今日か明日のうちにできる、いちばん小さな一歩を1つだけ決めましょう。",
       "reflection": "決めた一歩は、やれそうですか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "duration",
+      "cadence_type": "scheduled",
+      "default_frequency": "週3回",
+      "default_duration": 5,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 2,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "一歩を決める",
       "match": {
         "want": [
@@ -824,7 +903,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_017",
@@ -839,16 +918,20 @@ window.ACTION_MASTER = {
         "孤独を感じる"
       ],
       "caution": "思いつかない場合に、それを問題として扱わない。",
-      "duration_minutes": 5,
       "difficulty": 2,
       "app_type": "connection_planner",
       "instruction": "実際に話すかどうかは決めなくて大丈夫です。「もし話すとしたら誰か」を1人だけ思い浮かべてみましょう。",
       "reflection": "思い浮かべてみて、いまどんな感じですか。",
-      "default_frequency": "週1回",
-      "customizable_fields": [
-        "frequency",
-        "timing"
+      "cadence_type": "one_off",
+      "default_frequency": "今週1回",
+      "default_duration": 5,
+      "minimum_frequency": "今週1回",
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "考えてみる",
       "match": {
         "want": [
@@ -873,7 +956,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_018",
@@ -887,16 +970,20 @@ window.ACTION_MASTER = {
         "話すことに不安がある"
       ],
       "caution": "実際に相談することを前提にしない。",
-      "duration_minutes": 7,
       "difficulty": 2,
       "app_type": "guided_journal",
       "instruction": "「何が起きているか」「どうしてほしいか」を、短くて構わないので書いてみましょう。",
       "reflection": "整理してみて、話せそうな感じはありますか。",
-      "default_frequency": "週1回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "one_off",
+      "default_frequency": "今週1回",
+      "default_duration": 7,
+      "minimum_frequency": "今週1回",
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_017",
       "cta_label": "整理してみる",
       "match": {
         "want": [
@@ -920,7 +1007,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_019",
@@ -935,16 +1022,24 @@ window.ACTION_MASTER = {
         "連絡することにハードルを感じる"
       ],
       "caution": "送信を促さない。下書きのまま終わってよい。",
-      "duration_minutes": 7,
       "difficulty": 3,
       "app_type": "message_draft",
       "instruction": "実際に送らなくて大丈夫です。もし送るとしたら、という前提で文面だけ書いてみましょう。",
       "reflection": "書いてみて、送れそうな感じはありますか。",
-      "default_frequency": "週1回",
-      "customizable_fields": [
+      "cadence_type": "one_off",
+      "default_frequency": "今週1回",
+      "default_duration": 7,
+      "minimum_frequency": "今週1回",
+      "minimum_duration": 3,
+      "adjustable_fields": [
         "duration",
-        "frequency"
+        "content"
       ],
+      "simpler_version": {
+        "title": "メッセージの最初の1文だけ書いてみる",
+        "instruction": "全部書かなくて大丈夫です。送りたいメッセージの、最初の1文だけ書いてみましょう。送らなくてもかまいません。"
+      },
+      "easier_action_id": "ACTION_018",
       "cta_label": "下書きを作る",
       "match": {
         "want": [
@@ -969,7 +1064,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_020",
@@ -983,15 +1078,18 @@ window.ACTION_MASTER = {
         "周囲との関係に悩んでいる"
       ],
       "caution": "「助けを求められない自分」を責める方向に使わない。",
-      "duration_minutes": 5,
       "difficulty": 2,
       "app_type": "connection_planner",
       "instruction": "「聞いてほしい」「代わってほしい」「そっとしておいてほしい」。どれに近いか考えてみましょう。",
       "reflection": "考えてみて、いまどんな感じですか。",
-      "default_frequency": "週1回",
-      "customizable_fields": [
-        "frequency"
-      ],
+      "cadence_type": "one_off",
+      "default_frequency": "今週1回",
+      "default_duration": 5,
+      "minimum_frequency": "今週1回",
+      "minimum_duration": 5,
+      "adjustable_fields": [],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_017",
       "cta_label": "考えてみる",
       "match": {
         "want": [
@@ -1016,7 +1114,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_021",
@@ -1031,17 +1129,24 @@ window.ACTION_MASTER = {
         "失敗について考えている"
       ],
       "caution": "ポジティブな言葉を強要しない。",
-      "duration_minutes": 5,
       "difficulty": 1,
       "app_type": "self_compassion",
       "instruction": "がんばっている自分に、いまどんな言葉をかけたいですか。短くて大丈夫です。",
       "reflection": "書いてみて、いまどんな感じですか。",
-      "default_frequency": "週3回",
-      "customizable_fields": [
+      "cadence_type": "trigger_based",
+      "default_frequency": "落ち込んでいる時",
+      "default_duration": 5,
+      "minimum_frequency": null,
+      "minimum_duration": 1,
+      "adjustable_fields": [
         "duration",
-        "frequency",
-        "timing"
+        "content"
       ],
+      "simpler_version": {
+        "title": "今の自分にひとことだけ声をかける",
+        "instruction": "長く書かなくて大丈夫です。「おつかれさま」のような、ひとことだけ書いてみましょう。"
+      },
+      "easier_action_id": null,
       "cta_label": "書いてみる",
       "match": {
         "want": [
@@ -1064,7 +1169,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_022",
@@ -1078,16 +1183,20 @@ window.ACTION_MASTER = {
         "自己否定が強い"
       ],
       "caution": "自分と他人の扱いの差を責める材料にしない。",
-      "duration_minutes": 5,
       "difficulty": 2,
       "app_type": "self_compassion",
       "instruction": "同じ状況にいるのが親しい友人だったら、あなたは何と言いますか。それを書いてみましょう。",
       "reflection": "書いた言葉を自分に向けてみると、どんな感じですか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "duration",
-        "frequency"
+      "cadence_type": "trigger_based",
+      "default_frequency": "自分に厳しくなっている時",
+      "default_duration": 5,
+      "minimum_frequency": null,
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "duration"
       ],
+      "simpler_version": null,
+      "easier_action_id": "ACTION_021",
       "cta_label": "考えてみる",
       "match": {
         "want": [
@@ -1111,7 +1220,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_023",
@@ -1125,17 +1234,25 @@ window.ACTION_MASTER = {
         "できないことばかり考えている"
       ],
       "caution": "見つからない日があってよいと伝える。",
-      "duration_minutes": 3,
       "difficulty": 1,
       "app_type": "self_compassion",
       "instruction": "どんなに小さくて構いません。今日できたことを1つだけ書いてみましょう。起きた、でも大丈夫です。",
       "reflection": "1つ見つけてみて、いまどんな感じですか。",
-      "default_frequency": "週3回",
-      "customizable_fields": [
-        "duration",
+      "cadence_type": "daily",
+      "default_frequency": "毎日",
+      "default_duration": 3,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 1,
+      "adjustable_fields": [
         "frequency",
-        "timing"
+        "duration",
+        "content"
       ],
+      "simpler_version": {
+        "title": "今日できたことを1語だけ書く",
+        "instruction": "「起きた」「食べた」など、1語だけで大丈夫です。"
+      },
+      "easier_action_id": null,
       "cta_label": "1つ見つける",
       "match": {
         "want": [
@@ -1161,7 +1278,7 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "action_id": "ACTION_024",
@@ -1176,16 +1293,20 @@ window.ACTION_MASTER = {
         "やることに追われている"
       ],
       "caution": "重要な予定を安易に削らせない。",
-      "duration_minutes": 3,
       "difficulty": 1,
       "app_type": "self_compassion",
       "instruction": "今日やらなくても大きな問題にならないことを、1つだけ選んで手放してみましょう。",
       "reflection": "1つ手放してみて、いまどんな感じですか。",
-      "default_frequency": "週2回",
-      "customizable_fields": [
-        "frequency",
-        "timing"
+      "cadence_type": "scheduled",
+      "default_frequency": "週3回",
+      "default_duration": 3,
+      "minimum_frequency": "週1回",
+      "minimum_duration": 3,
+      "adjustable_fields": [
+        "frequency"
       ],
+      "simpler_version": null,
+      "easier_action_id": null,
       "cta_label": "1つ決める",
       "match": {
         "want": [
@@ -1210,7 +1331,8 @@ window.ACTION_MASTER = {
         ]
       },
       "status": "published",
-      "version": "0.1"
+      "version": "0.2"
     }
-  ]
+  ],
+  "cadence_note": "cadence_type: daily=習慣として練習 / scheduled=週に数回 / trigger_based=特定の状況で行う（default_frequency は状況の文言） / one_off=今週1回。頻度・時間の調整は minimum_* の範囲内のみ。simpler_version と easier_action_id は v0.2 の仮登録（心理士レビュー前）。"
 };
