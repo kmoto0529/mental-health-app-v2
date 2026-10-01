@@ -1520,7 +1520,7 @@ function recallCard(){
   const title = first ? "最初のふり返り" : "週1回のふり返り";
   let lab="—", unit="", off=C, dd="", wd="", btn;
   let desc = first ? "最初の3日を過ごしたら、今のやり方が自分に合っていそうか、一緒に見なおしてみましょう。"
-                   : "この1週間の気持ちや動きを、<br>kokoniと一緒に見なおします。";
+                   : "毎週"+DOW[REVIEW_DOW]+"曜日に、この1週間の気持ちや動きを<br>kokoniと一緒に見なおします。";
   const len = c ? c.cycle_length_days : 7;
   if(!c){
     desc="一緒に決めたあとに表示されます。";
@@ -1840,17 +1840,31 @@ const DAY=86400000;
 function nowMs(){ return Date.now()+S.clock_offset; }
 function nowIso(){ return new Date(nowMs()).toISOString(); }
 const CYCLE_DAYS={first:3, regular:7};
+/* 9/22 決定：本人がまとめを送るのは火曜、心理士が読んで返すのは水・木。「2日ほどで届きます」
+   通常サイクルの節目は火曜の朝に開く。最初のサイクル（3日）は曜日にそろえない（10/2 確認事項）
+   火曜までが近すぎるときは翌週の火曜にする（最短 REVIEW_MIN_DAYS 日） */
+const REVIEW_DOW=2, REVIEW_MIN_DAYS=4, LETTER_DAYS=2;
+const DOW=["日","月","火","水","木","金","土"];
+function dayStart(ms){ const d=new Date(ms); d.setHours(0,0,0,0); return d.getTime(); }
+function nextReviewDay(t){
+  let d=dayStart(t)+DAY;
+  while(new Date(d).getDay()!==REVIEW_DOW || (d-dayStart(t))/DAY<REVIEW_MIN_DAYS) d+=DAY;
+  return d;
+}
+function mdw(ms){ const d=new Date(ms); return (d.getMonth()+1)+"/"+d.getDate()+"（"+DOW[d.getDay()]+"）"; }
 function startCycle(type){
   type=type||"regular";
-  const t=nowMs(), len=CYCLE_DAYS[type];
+  const t=nowMs();
+  const rev = type==="regular" ? nextReviewDay(t) : t+CYCLE_DAYS[type]*DAY;
+  const len = Math.round((dayStart(rev)-dayStart(t))/DAY);
   if(S.cycle){ S.cycle.cycle_ends_at=new Date(t).toISOString(); S.cycles.push(S.cycle); }
   const n=S.cycles.length+1;
   S.cycle={
     weekly_cycle_id:"WC-"+String(n).padStart(3,"0"),
     cycle_type:type, cycle_length_days:len,
     cycle_started_at:new Date(t).toISOString(),
-    review_available_at:new Date(t+len*DAY).toISOString(),
-    cycle_ends_at:new Date(t+len*DAY).toISOString(),   // 予定。実際は次のサイクルを始めた時刻で確定する
+    review_available_at:new Date(rev).toISOString(),
+    cycle_ends_at:new Date(rev).toISOString(),   // 予定。実際は次のサイクルを始めた時刻で確定する
     weekly_review_status:"locked",
     action_id:S.act_id
   };
@@ -1944,7 +1958,7 @@ function gateLocked(c){
     <div style="font-size:40px;font-weight:800;color:var(--teal-deep);line-height:1.2;margin:4px 0"><span id="gateLeft">あと${left}日</span></div>
     <p style="font-size:13.5px;line-height:1.9;color:var(--ink2);margin:10px 0 16px">${first
       ? "最初の3日を過ごしたら、<br>今のやり方が自分に合っていそうか、<br>一緒に見なおしてみましょう。"
-      : "この1週間の様子をためて、<br>節目で一緒に振り返ります。"}</p>
+      : "次の節目は <b>"+mdw(Date.parse(c.review_available_at))+"</b> です。<br>この1週間の様子をためて、<br>節目で一緒に振り返ります。<br><span style=\"font-size:12.5px;color:var(--muted)\">"+DOW[REVIEW_DOW]+"曜日に送ると、大塚さんのお返事は"+LETTER_DAYS+"日ほどで届きます。</span>"}</p>
     <button class="btn" disabled>まとめを送る</button>
     <p class="lede" style="margin-top:8px">節目の日になると、ふり返りと送信ができるようになります。</p></div>`;
 }
@@ -2076,7 +2090,9 @@ function completeReview(share){
     /* 最初のふり返りの「気づいたこと」は共有内容に含める。週次の「自分のふり返り」は本人が選んだときだけ */
     self_shared: share && !!rv.self && (first || rv.selfShare),
     note: share ? rv.note : "",
-    letter_status: share ? "waiting" : null, letter_read:false
+    letter_status: share ? "waiting" : null, letter_read:false,
+    /* 手紙の目安。送った日から LETTER_DAYS 日（火曜に送れば木曜） */
+    letter_due_at: share ? new Date(dayStart(nowMs())+LETTER_DAYS*DAY).toISOString() : null
   });
   c.weekly_review_status="completed";
   go("gate");
@@ -2092,7 +2108,8 @@ function reviewView(r){
 }
 /* 手紙の本文（デモ。実際は心理士が書いたものが届く） */
 function letterHtml(r){
-  const body = r.cycle_type==="first"
+  const body = r.letter_text ? esc(r.letter_text).replace(/\n/g,"<br>")
+    : r.cycle_type==="first"
     ? "この3日間の振り返りを読みました。まず試してみてくれたこと、ありがとうございます。<br><br>"
       +"最初の一歩は、合うかどうかを確かめるためのものです。合わないところがあれば、遠慮なく変えていきましょう。<br><br>"
       +"ここから1週間ずつ、無理のない形で一緒に見ていきましょう。"
@@ -2121,7 +2138,7 @@ function gateCompleted(r){
         <p class="lede">大塚さんには${first?"共有して":"送って"}いません。ふり返りは kokoni の中に残っています。</p></div>`;
   if(r.shared && r.letter_status!=="arrived"){
     h+=`<div class="waiting"><div class="big">✉️</div>
-      <p><b>大塚さんが読んでいます</b><br>お返事は、2〜3日のうちに届きます。</p></div>`;
+      <p><b>大塚さんが読んでいます</b><br>お返事は${LETTER_DAYS}日ほどで届きます。<br><span style="font-size:12.5px;color:var(--muted)">${mdw(Date.parse(r.letter_due_at))}ごろ</span></p></div>`;
   }
   if(r.shared && r.letter_status==="arrived") h+=letterHtml(r);
   h+=`<div class="card"><h3>${r.shared?"送った内容":"ふり返りの内容"}</h3>${reviewView(r)}</div>`;
@@ -2279,17 +2296,50 @@ function renderPro(){
           <div class="pitem" style="white-space:pre-wrap">${rv.note}</div></div>` : ""}`;
       })()}
       </div>
-    <div><div class="pcard"><h3>お返事を書く</h3><p class="note">手紙として本人に届きます。</p>
-      <textarea placeholder="今週、読んで思ったこと"></textarea>
-      <div style="margin-top:10px"><select><option>人と話したあとの5分をあける</option>
-        <option>まず生活リズムを整える</option><option>思考パターンを扱う</option>
-        <option>小さい行動を増やす</option><option>今週は方向を変えない</option></select></div>
-      <button class="pbtn" onclick="alert('デモのため送信は行いません。')">手紙を送る</button></div></div></div>
+    <div>${proLetterCard()}</div></div>
     <div class="timer"><span>この節目にかかっている時間 <small>（自動計測）</small></span><b id="tm">0:00</b></div>`;
     startTimer();
   }
 }
 function openSession(){ proView="session"; renderPro(); window.scrollTo(0,0); }
+
+/* ── 心理士の手紙 ─────────────────────────────────────
+   9/22 B4「文字制限があった方がいい」。上限の数値は 10/2 で決める（いまは仮置き）
+   本人が送ったまとめ1件につき1通。送ると本人側に「手紙が届いています」が出る */
+const LETTER_MAX=400, LETTER_GUIDE=250;
+function proLetterCard(){
+  const r=lastShared();
+  if(!r) return `<div class="pcard"><h3>お返事を書く</h3><p class="note">本人からまとめが届くと書けるようになります。</p></div>`;
+  if(r.letter_status==="arrived") return `<div class="pcard"><h3>送った手紙</h3>
+    <p class="note">${r.letter_sent_at?mdw(Date.parse(r.letter_sent_at))+" に送信":"送信済み"}／${(r.letter_text||"").length}字</p>
+    <div class="pitem" style="white-space:pre-wrap">${esc(r.letter_text||"（デモ：既定の文面）")}</div></div>`;
+  const due=Date.parse(r.letter_due_at), late=nowMs()>=due+DAY;
+  return `<div class="pcard"><h3>お返事を書く</h3>
+    <p class="note">手紙として本人に届きます。本人の画面には「${LETTER_DAYS}日ほどで届きます」と出ています。<br>
+      お返事の目安：<b style="color:${late?"var(--warn)":"inherit"}">${mdw(due)}</b>${late?"（目安を過ぎています）":""}</p>
+    <textarea id="ltIn" maxlength="${LETTER_MAX}" style="min-height:180px" placeholder="今週、読んで思ったこと"
+      oninput="proLetterCount()">${esc(S.letter_draft||"")}</textarea>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7a85;margin-top:4px">
+      <span>目安 ${LETTER_GUIDE}字／上限 ${LETTER_MAX}字（仮）</span><span id="ltCnt">${(S.letter_draft||"").length} / ${LETTER_MAX}</span></div>
+    <div style="margin-top:10px"><label style="font-size:12px;color:#6b7a85">来週の方向</label><select id="ltDir">
+      <option>今週は方向を変えない</option><option>小さい行動を増やす</option><option>まず生活リズムを整える</option>
+      <option>考えの整理を扱う</option><option>人と話したあとの5分をあける</option></select></div>
+    <button class="pbtn" id="ltSend" ${(S.letter_draft||"").trim()?"":"disabled"} onclick="sendLetter()">手紙を送る</button></div>`;
+}
+function proLetterCount(){
+  const t=document.getElementById("ltIn"); S.letter_draft=t.value;
+  document.getElementById("ltCnt").textContent=t.value.length+" / "+LETTER_MAX;
+  document.getElementById("ltSend").disabled=!t.value.trim();
+}
+function sendLetter(){
+  const r=lastShared(), t=(S.letter_draft||"").trim();
+  if(!r || r.letter_status==="arrived" || !t) return;
+  if(!confirm("この内容で本人に送ります。送ったあとは直せません。")) return;
+  r.letter_text=t.slice(0,LETTER_MAX); r.letter_status="arrived"; r.letter_read=false;
+  r.letter_sent_at=nowIso(); r.letter_direction=(document.getElementById("ltDir")||{}).value||"";
+  r.letter_minutes=Math.round(S.timer/60*10)/10;   // FR-85 節目の所要時間
+  S.letter_draft=""; renderPro();
+}
 function startTimer(){ stopTimer(); S.timer=0;
   S.timerId=setInterval(()=>{ S.timer++; const el=document.getElementById("tm");
     if(el) el.textContent=Math.floor(S.timer/60)+":"+String(S.timer%60).padStart(2,"0"); },1000); }
