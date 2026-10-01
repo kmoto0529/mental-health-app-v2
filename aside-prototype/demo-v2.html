@@ -280,6 +280,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .pfchips span.on{border-style:solid;border-color:var(--teal-line);color:var(--teal-deep);background:var(--teal-soft)}
 .btn.sm2{padding:9px;font-size:13.5px;margin:0}
 .pfmodal{max-height:86vh;overflow:auto}
+.pfgroup{background:var(--paper2);border:1px solid var(--line);border-radius:14px;padding:10px 12px 2px;margin:10px 0}
+.pfgh{font-size:12px;font-weight:800;color:var(--teal-deep);margin-bottom:6px}
+.pfsub{margin-top:8px;padding:8px 10px;border-left:3px solid var(--teal-line);background:var(--paper);border-radius:0 10px 10px 0}
+.pfsub h4{margin:0 0 4px;font-size:12px;color:var(--ink2)}
+.chip.off{opacity:.4;cursor:default}
+.pfcard .pct{text-align:right}
+.pfcard .pct .pl{display:block;font-size:10px;color:var(--muted);font-weight:700}
 .pfmulti{font-size:10.5px;color:var(--muted);font-weight:700;margin-left:6px}
 .pfwhy{font-size:11.5px;line-height:1.75;color:var(--muted);background:var(--paper2);border-radius:10px;padding:8px 10px;margin-top:8px}
 .mcount{font-size:13px;color:var(--ink2);font-weight:700}
@@ -649,7 +656,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 
 <script>
 const S = {
-  nickname:"", age_range:"", gender:"", life_status:"", support_use:[], agree_terms:false, agree_privacy:false,
+  nickname:"", age_range:"", gender:"", life_status:"", leave_duration:"", support_use:[], support_past:false, confidant:"", time_slots:[], agree_terms:false, agree_privacy:false,
   current_status:"", current_concerns:[], safety_answer:"", ai_conversation_summary:"", ai_confirm:"",
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
   setup_status:"not_started", setup_completed_at:null, entered:false,
@@ -989,6 +996,7 @@ function scoreActions(){
     const hits=(m.keywords||[]).filter(function(k){ return sc.indexOf(k)>=0; });
     if(hits.length){ s+=Math.min(3,hits.length)*2; why.push("場面の言葉「"+hits.join("・")+"」"); }
     if(st==="かなりしんどい" && a.difficulty>=3){ s-=4; ex="かなりしんどい×難易度"+a.difficulty+" のため減点"; }
+    if(S.confidant==="いるけれど、少し話しにくい" && (a.action_id==="ACTION_018"||a.action_id==="ACTION_019")){ s+=2; why.push("プロフィール「相談できる人：いるけれど、少し話しにくい」"); }
     return {id:a.action_id, a:a, score:s, why:why, ex:ex};
   }).sort(function(x,y){ return y.score-x.score || x.id.localeCompare(y.id); });
 }
@@ -2298,23 +2306,39 @@ function renderMap(){
    - 入力率は心の地図の進捗とは別。「回答しない」も回答済みとして数える。100%でなくても全機能が使える
    - 通院・カウンセリングの状況は、提案の内容やペースを考えるためだけに使う。心理士への共有は本人が選んだときだけ
    ══════════════════════════════════════════════════════════════ */
+/* 基本7項目（入力状況の分母）。g＝表示グループ。ex＝ほかと同時に選べない選択肢
+   サポート利用状況は「今」（support_use）と「過去の利用歴」（support_past）を別フィールドで持つ */
 const PF_FIELDS=[
-  {id:"nickname",   k:"ニックネーム"},
-  {id:"age_range",  k:"年代",   o:["10代","20代","30代","40代","50代","60代以上","回答しない"]},
-  {id:"gender",     k:"性別",   o:["女性","男性","その他","回答しない"]},
-  {id:"life_status",k:"現在の状況", o:["就業中","休職中","離職中","学生","その他","回答しない"]},
-  {id:"support_use",k:"サポートの利用状況", multi:true,
-   o:["現在、医療機関に通院している","現在、カウンセリングを利用している","過去に利用したことがある","現在は利用していない","回答しない"]}
+  {id:"nickname",   g:"basic", k:"ニックネーム"},
+  {id:"age_range",  g:"basic", k:"年代",   o:["10代","20代","30代","40代","50代","60代以上","回答しない"]},
+  {id:"gender",     g:"basic", k:"性別",   o:["女性","男性","その他","回答しない"]},
+  {id:"life_status",g:"life",  k:"現在の状況", o:["就業中","休職中","離職中","学生","その他","回答しない"]},
+  {id:"support_use",g:"life",  k:"サポートの利用状況", multi:true, ex:["現在は利用していない","回答しない"],
+   o:["現在、医療機関に通院している","現在、カウンセリングを利用している","現在は利用していない","回答しない"]},
+  {id:"confidant",  g:"life",  k:"相談できる人", q:"困ったときに、相談できる人はいますか？",
+   o:["いる","いるけれど、少し話しにくい","いない","よくわからない","回答しない"]},
+  {id:"time_slots", g:"life",  k:"取り組みやすい時間帯", q:"自分のための時間を取りやすいのは、いつ頃ですか？", multi:true, ex:["日によって違う","まだわからない","回答しない"],
+   o:["朝","昼","夕方","夜","日によって違う","まだわからない","回答しない"]}
 ];
-function pfVal(id){ const v=S[id]; return Array.isArray(v) ? v : (v||""); }
-function pfDone(id){ const v=pfVal(id); return Array.isArray(v) ? v.length>0 : !!v; }
+/* 条件つきの補足（入力状況には数えない） */
+const PF_LEAVE={id:"leave_duration", k:"休職してからの期間", q:"休職してから、どのくらい経ちますか？", o:["1か月未満","1〜3か月未満","3〜6か月未満","6か月以上","回答しない"]};
+const PF_GROUPS=[["basic","あなたの基本情報"],["life","今の生活・サポートについて"]];
+/* 以前の形式（support_use に「過去に利用したことがある」）を読み替える */
+function pfMigrate(){
+  if(Array.isArray(S.support_use) && S.support_use.indexOf("過去に利用したことがある")>=0){
+    S.support_use=S.support_use.filter(function(x){ return x!=="過去に利用したことがある"; }); S.support_past=true; }
+  if(!Array.isArray(S.support_use)) S.support_use=[];
+  if(!Array.isArray(S.time_slots)) S.time_slots=[];
+}
+function pfVal(id){ pfMigrate(); const v=S[id]; return Array.isArray(v) ? v : (v||""); }
+function pfDone(id){ const v=pfVal(id); if(id==="support_use") return v.length>0 || !!S.support_past; return Array.isArray(v) ? v.length>0 : !!v; }
 function pfPct(){ return Math.round(PF_FIELDS.filter(function(f){ return pfDone(f.id); }).length/PF_FIELDS.length*100); }
 function pfText(id){ const v=pfVal(id); return Array.isArray(v) ? v.join("・") : v; }
 function profileMini(){
   const pct=pfPct(), done=PF_FIELDS.filter(function(f){ return pfDone(f.id); }), todo=PF_FIELDS.filter(function(f){ return !pfDone(f.id); });
   return '<div class="pfcard"><div class="top"><div style="min-width:0"><h3>あなたのことをもう少し教える</h3>'
     +'<p>今の生活や状況を少し教えてもらうと、kokoniもあなたに合った提案を考えやすくなります。</p></div>'
-    +'<div class="pct"><b>'+pct+'</b>%</div></div>'
+    +'<div class="pct"><span class="pl">プロフィール入力状況</span><b>'+pct+'</b>%</div></div>'
     +'<div class="pfbar"><i style="width:'+pct+'%"></i></div>'
     +'<div class="pfchips">'+done.map(function(f){ return '<span class="on">✓ '+f.k+'</span>'; }).join("")
       +todo.map(function(f){ return '<span>'+f.k+'</span>'; }).join("")+'</div>'
@@ -2322,39 +2346,69 @@ function profileMini(){
 }
 /* 編集はマイページ・心の地図の共通モーダル。保存するまでは下書き（S.pf） */
 function openProfile(){
-  S.pf={}; PF_FIELDS.forEach(function(f){ const v=pfVal(f.id); S.pf[f.id]=Array.isArray(v)?v.slice():v; });
+  pfMigrate(); S.pf={support_past:!!S.support_past, leave_duration:S.leave_duration||""};
+  PF_FIELDS.forEach(function(f){ const v=pfVal(f.id); S.pf[f.id]=Array.isArray(v)?v.slice():v; });
   renderProfile();
+}
+function pfChips(f,P){
+  return '<div class="chips">'+f.o.map(function(o){ const on = f.multi ? P[f.id].indexOf(o)>=0 : P[f.id]===o;
+    return '<button class="chip'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="pfPick(\''+f.id+'\',\''+o+'\')">'+o+'</button>'; }).join("")+'</div>';
 }
 function renderProfile(){
   const P=S.pf;
-  const chip=function(f,o){ const on = f.multi ? P[f.id].indexOf(o)>=0 : P[f.id]===o;
-    return '<button class="chip'+(on?' on':'')+'" onclick="pfPick(\''+f.id+'\',\''+o+'\')">'+o+'</button>'; };
+  const field=function(f){
+    let h='<div class="msgrp"><h4>'+(f.q||f.k)+(f.multi?'<span class="pfmulti">いくつでも</span>':'')+'</h4>';
+    if(f.id==="nickname") return h+'<input type="text" id="pfNick" maxlength="12" value="'+esc(P.nickname)+'"></div>';
+    h+=pfChips(f,P);
+    if(f.id==="life_status" && P.life_status==="休職中")
+      h+='<div class="pfsub"><h4>'+PF_LEAVE.q+'<span class="pfmulti">任意</span></h4>'+pfChips(PF_LEAVE,P)+'</div>';
+    if(f.id==="support_use"){
+      const past=P.support_past, noAns=P.support_use.indexOf("回答しない")>=0;
+      h+='<div class="chips" style="margin-top:6px"><button class="chip'+(past?' on':'')+(noAns?' off':'')+'" aria-pressed="'+!!past+'" '+(noAns?'disabled':'onclick="pfPast()"')+'>過去に利用したことがある</button></div>'
+        +'<div class="pfwhy">通院やカウンセリングの状況は、提案の内容やペースを考えるためだけに使います。診断や判断には使いません。大塚さんには自動で共有されません。</div>';
+    }
+    if(f.id==="confidant") h+='<div class="pfwhy">一歩を考えるときに、まわりのサポートの様子を参考にします。</div>';
+    if(f.id==="time_slots") h+='<div class="pfwhy">一歩に取り組むタイミングを考える参考にします。</div>';
+    return h+'</div>';
+  };
   document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal pfmodal" onclick="event.stopPropagation()">'
-    +'<h3>あなたのことをもう少し教える</h3><p style="font-size:12.5px">どれも任意です。答えたくないものは「回答しない」を選べます。</p>'
-    +'<div class="msgrp"><h4>ニックネーム</h4><input type="text" id="pfNick" maxlength="12" value="'+esc(P.nickname)+'"></div>'
-    +PF_FIELDS.slice(1).map(function(f){ return '<div class="msgrp"><h4>'+f.k+(f.multi?'<span class="pfmulti">いくつでも</span>':'')+'</h4><div class="chips">'+f.o.map(function(o){ return chip(f,o); }).join("")+'</div>'
-      +(f.id==="support_use"?'<div class="pfwhy">通院やカウンセリングの状況は、提案の内容やペースを考えるためだけに使います。診断や判断には使いません。心理士に共有されるのは、あなたが共有を選んだときだけです。</div>':'')+'</div>'; }).join("")
+    +'<h3>あなたのことをもう少し教える</h3><p style="font-size:12.5px;margin-bottom:6px">どれも任意です。答えたくないものは「回答しない」を選べます。</p>'
+    +PF_GROUPS.map(function(g){ return '<div class="pfgroup"><div class="pfgh">'+g[1]+'</div>'+PF_FIELDS.filter(function(f){ return f.g===g[0]; }).map(field).join("")+'</div>'; }).join("")
     +'<button class="btn" onclick="pfSave()">保存する</button><button class="linkbtn" onclick="closeWhy()">やめる</button></div></div>';
 }
+function pfKeepNick(){ const n=document.getElementById("pfNick"); if(n) S.pf.nickname=n.value; }
+function pfRerender(){ const box=document.querySelector(".pfmodal"), y=box?box.scrollTop:0; renderProfile(); const b2=document.querySelector(".pfmodal"); if(b2) b2.scrollTop=y; }
+function pfPast(){ pfKeepNick(); S.pf.support_past=!S.pf.support_past; pfRerender(); }
 function pfPick(id,o){
-  const f=PF_FIELDS.filter(function(x){ return x.id===id; })[0], P=S.pf;
-  const nick=document.getElementById("pfNick"); if(nick) P.nickname=nick.value;
+  pfKeepNick();
+  const P=S.pf, f=id===PF_LEAVE.id ? PF_LEAVE : PF_FIELDS.filter(function(x){ return x.id===id; })[0];
   if(f.multi){
-    const a=P[id], k=a.indexOf(o);
+    const a=P[id], k=a.indexOf(o), ex=f.ex||[];
     if(k>=0) a.splice(k,1);
-    else if(o==="回答しない") a.length=0, a.push(o);
-    else { const n=a.indexOf("回答しない"); if(n>=0) a.splice(n,1);
-      if(o==="現在は利用していない"){ ["現在、医療機関に通院している","現在、カウンセリングを利用している"].forEach(function(x){ const j=a.indexOf(x); if(j>=0) a.splice(j,1); }); }
-      if(o.indexOf("現在、")===0){ const j=a.indexOf("現在は利用していない"); if(j>=0) a.splice(j,1); }
-      a.push(o); }
+    else if(ex.indexOf(o)>=0){ a.length=0; a.push(o); }                       // 排他：ほかを外す
+    else { for(let i=a.length-1;i>=0;i--) if(ex.indexOf(a[i])>=0) a.splice(i,1); a.push(o); }
+    if(id==="support_use" && a.indexOf("回答しない")>=0) P.support_past=false;   // 回答しない は過去の利用歴とも排他
   } else P[id] = P[id]===o ? "" : o;
-  const box=document.querySelector(".pfmodal"), y=box?box.scrollTop:0; renderProfile(); const b2=document.querySelector(".pfmodal"); if(b2) b2.scrollTop=y;
+  if(id==="life_status" && P.life_status!=="休職中") P.leave_duration="";        // 休職中以外は聞かない
+  pfRerender();
 }
 function pfSave(){
-  const nick=document.getElementById("pfNick"); if(nick) S.pf.nickname=nick.value.trim();
+  pfKeepNick(); S.pf.nickname=(S.pf.nickname||"").trim();
   PF_FIELDS.forEach(function(f){ if(f.id==="nickname" && !S.pf.nickname) return; S[f.id]=S.pf[f.id]; });   // ニックネームは空にしない
+  S.support_past=!!S.pf.support_past; S.leave_duration=S.pf.life_status==="休職中" ? (S.pf.leave_duration||"") : "";
   S.pf=null; closeWhy();
   if(S.screen==="log") renderLog(); else if(S.screen==="map") renderMap();
+}
+/* AIに渡すプロフィール。「回答しない」と未回答の項目は渡さない（推測・補完させない）。性別・年代は渡さない */
+function pfForAI(){
+  pfMigrate();
+  const keep=function(v){ return v && v!=="回答しない" ? v : undefined; };
+  const arr=function(a){ a=(a||[]).filter(function(x){ return x!=="回答しない"; }); return a.length?a:undefined; };
+  const o={life_status:keep(S.life_status), leave_duration: S.life_status==="休職中" ? keep(S.leave_duration) : undefined,
+    support_now:arr(S.support_use), support_past: S.support_use.indexOf("回答しない")<0 && S.support_past ? true : undefined,
+    confidant:keep(S.confidant), time_slots:arr(S.time_slots)};
+  Object.keys(o).forEach(function(k){ if(o[k]===undefined) delete o[k]; });
+  return o;
 }
 
 /* ── 心の地図タブ（プロフィール → 心の地図 → 最近見えてきたこと → 7つの視点 → AIミニセッション） ── */
@@ -2601,7 +2655,7 @@ function renderLog(){
   document.getElementById("logBody").innerHTML=
     profileCard()+`
     <div class="card"><h3>基本情報</h3><p style="margin:0;font-size:13.5px">
-      ニックネーム：${S.nickname||"—"}／年代：${S.age_range||"—"}／性別：${S.gender||"—"}<br>現在の状況：${S.life_status||"—"}<br>サポートの利用状況：${(S.support_use||[]).join("・")||"—"}</p></div>
+      ニックネーム：${S.nickname||"—"}／年代：${S.age_range||"—"}／性別：${S.gender||"—"}<br>現在の状況：${S.life_status||"—"}<br>サポートの利用状況：${(S.support_use||[]).concat(S.support_past?["過去に利用したことがある"]:[]).join("・")||"—"}${S.life_status==="休職中"&&S.leave_duration?"（休職して"+S.leave_duration+"）":""}<br>相談できる人：${S.confidant||"—"}<br>取り組みやすい時間帯：${(S.time_slots||[]).join("・")||"—"}</p></div>
     <div class="card"><h3>いまの状況</h3><p style="margin:0;font-size:13.5px">${S.current_status||"—"}<br>
       <span style="color:var(--muted)">${S.current_concerns.join("・")||"—"}</span></p></div>
     <div class="card"><h3>少し先に目指すこと</h3><p style="margin:0">${S.direction_goal||"—"}</p></div>
@@ -3270,7 +3324,7 @@ function msCtx(){
     nickname:S.nickname||"",
     intake:{state:S.current_status||"", topic:(S.current_concerns||[])[0]||"", want:S.direction_goal||""},
     today_mood:todayMood()||"",
-    profile:{life_status:S.life_status||"", support_use:S.support_use||[]},   // 提案の内容やペースを考える補助。診断・判断には使わない
+    profile:pfForAI(),   // 提案の内容やペースを考える参考。これだけで性格・状態・方針を決めない。回答しないは渡さない
     current_action: cur ? {title:cur.title, plan:planLabel()} : null,
     past:{
       first_scene:S.iv_scene||"",
@@ -3598,7 +3652,7 @@ const AR_BURDEN=["回数が多い","1回の時間が長い","やり方が難し�
 function arContext(){
   const a=curAct(), from=S.cycle?Date.parse(S.cycle.cycle_started_at):0;
   const logs=S.act_logs.filter(function(l){ return l.action_id===S.act_id && Date.parse(l.at)>=from; });
-  return {action_id:S.act_id, title:a?a.title:"", plan:a?planLabel():"", count:logs.length,
+  return {action_id:S.act_id, title:a?a.title:"", plan:a?planLabel():"", count:logs.length, profile:pfForAI(),
     feelings:logs.map(function(l){ return l.feeling; }), today:todayMood(), map_seen:mapCount(), period: isFirst()?"この3日":"今週"};
 }
 function arStart(){
@@ -3746,7 +3800,7 @@ function otReply(v){
   aiTalk(v).then(function(r){ if(!MINI || MINI.id!==sid) return; done(r?esc(r.reply).replace(/\n/g,"<br>"):otRuleReply(v), r?"gemini":"rule"); });
 }
 function aiTalk(v){
-  const A=window.KokoniMiniAI, ctx={nickname:S.nickname||"", topic:MINI.ot.topic,
+  const A=window.KokoniMiniAI, ctx={nickname:S.nickname||"", topic:MINI.ot.topic, profile:pfForAI(),
     turns:MINI.ot.turns.map(function(t){ return {role:t.role, text:t.role==="user"?t.text:t.text.replace(/<[^>]+>/g," ")}; }),
     past:{confirmed_patterns:insights().confirmed.filter(function(c){ return c.type==="pattern"; }).slice(-3).map(function(c){ return c.text; }),
       first_scene:S.iv_scene||"", recent_notes:dsAll().filter(function(r){ return r.optional_note; }).slice(-3).map(function(r){ return r.optional_note; })}};
