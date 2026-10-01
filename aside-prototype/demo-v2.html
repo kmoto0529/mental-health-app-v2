@@ -1574,7 +1574,7 @@ function renderHome(){
     <div class="sprout" aria-hidden="true">🌱</div></div>`;
 
   if(ready){
-    /* 優先順：今週の小さな一歩 → 心の地図 → 今日の状態 → テーマ → 最近わかったこと → ふりかえり */
+    /* 優先順：今週の小さな一歩 → 心の地図 → 今日の状態 → テーマ → ふりかえり */
     h+=stepCard()+mapHomeCard()+dailyCard()
       +`<div class="hcard tap" onclick="openTheme()"><div class="k">🎯 今週のテーマ<span class="go">›</span></div>
           <div class="v">${themeText()}</div><div class="s">kokoniと一緒に見つけたテーマ</div></div>`;
@@ -1586,11 +1586,6 @@ function renderHome(){
   }
 
   if(!ready) h+=dailyCard();
-  h+=`<div class="subgrid">
-      <div class="hcard tap" onclick="go('talk')"><div class="k">💬</div><div class="v">今日は話すだけにする</div><div class="s">今の気持ちを言葉にしてみましょう</div></div>
-      <div class="hcard tap" onclick="go('map')"><div class="k">📗</div><div class="v">最近わかったこと</div><div class="s">${(function(){
-        const f=mapFeed(1)[0]; return f ? esc(f.text) : "これから一緒に見つけていきます"; })()}</div></div>
-    </div>`;
   if(letterArrived()) h+=`<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span>
     <div style="flex:1"><div class="k">大塚さんから</div><div class="v">心理士から手紙が届いています</div></div>
     <span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>`;
