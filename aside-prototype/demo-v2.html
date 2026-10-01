@@ -330,6 +330,41 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .ltwarn{font-size:12.5px;margin:8px 0 0}
 .chk.dis{opacity:.5;cursor:default}
 .opt-l{font-size:10.5px;font-weight:700;color:var(--muted);margin-left:6px}
+/* マイページ */
+.myhead{display:flex;align-items:center;gap:12px;margin:6px 18px 8px}
+.myhead .av{flex:0 0 48px;height:48px;border-radius:50%;background:var(--g-pale-2);border:1px solid var(--teal-line);display:flex;align-items:center;justify-content:center;font-size:22px}
+.myhead b{font-size:17px;color:var(--ink)}
+.myhead p{margin:2px 0 0;font-size:12px;color:var(--ink2)}
+.mypf{display:flex;justify-content:space-between;align-items:center;width:calc(100% - 36px);margin:0 18px 6px;background:var(--paper);border:1px solid var(--teal-line);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14px;font-weight:700;color:var(--teal-deep);cursor:pointer}
+.mypf small{font-size:11px;color:var(--muted);font-weight:700;margin-right:4px}
+.mysec{margin:16px 18px 0}
+.myh{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin:0 4px 6px}
+.mybox{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.myrow{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;border-top:1px solid var(--line);padding:12px 14px;text-align:left;font-family:inherit;cursor:pointer;color:var(--ink)}
+.mybox>.myrow:first-child{border-top:none}
+.myrow .ic{flex:0 0 22px;font-size:16px;text-align:center}
+.myrow .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.myrow .tx b{font-size:14px;font-weight:700}
+.myrow .tx small{font-size:11px;color:var(--muted);margin-top:1px}
+.myrow .chev{color:var(--muted);font-weight:700}
+.myrow.soon{cursor:default}
+.myrow.soon .tx b{color:var(--muted)}
+.soon-tag{font-size:10px;font-weight:700;color:var(--muted);border:1px solid var(--line-input);border-radius:99px;padding:1px 8px;white-space:nowrap}
+.myrow .tog{flex:0 0 36px;height:20px;border-radius:99px;background:var(--line-input);position:relative;opacity:.6}
+.myrow .tog i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--paper)}
+.myrow .tog.on{background:var(--teal)}
+.myrow .tog.on i{left:18px}
+.myver{text-align:center;font-size:11px;color:var(--muted);margin:22px 0 8px}
+.mysub{margin:4px 18px 0}
+.mysub h2{font-size:18px;margin:0 0 6px;color:var(--ink)}
+.mysub .lede{line-height:1.8;margin-bottom:10px}
+.myinfo{padding:11px 14px;border-top:1px solid var(--line)}
+.mybox>.myinfo:first-child{border-top:none}
+.myinfo .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.myinfo .t b{font-size:13.5px;color:var(--ink)}
+.myinfo .st{font-size:10.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.myinfo .st.on{color:var(--teal-deep)}
+.myinfo .d{font-size:12.5px;line-height:1.75;color:var(--ink2);margin-top:2px}
 /* はなす */
 .talkhead{padding:6px 22px 4px}
 .talkhead h2{font-size:19px;line-height:1.6;margin:0 0 8px;color:var(--ink)}
@@ -694,7 +729,7 @@ function go(id){
   if(id==="home") renderHome();
   if(id==="map"){ MAPED=null; S.kiroku=S.kiroku_next||"map"; S.kiroku_next=null; renderMap(); }
   if(id==="gate") renderGate();
-  if(id==="log") renderLog();
+  if(id==="log"){ S.my_view=null; renderLog(); }
   if(id==="talk") renderTalk();
   sync(); window.scrollTo(0,0);
 }
@@ -754,9 +789,9 @@ function renderFlow(){
       <p>kokoni は、あなたのペースで<br>こころのセルフケアをサポートします。</p>
       <div class="checks">
         <div class="chk ${S.agree_terms?"on":""}" onclick="S.agree_terms=!S.agree_terms;renderFlow()">
-          <span class="bx">${S.agree_terms?"✓":""}</span><span><a>利用規約</a>に同意する</span></div>
+          <span class="bx">${S.agree_terms?"✓":""}</span><span>${TERMS_URL?`<a href="${TERMS_URL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">利用規約</a>`:"<a>利用規約</a>"}に同意する</span></div>
         <div class="chk ${S.agree_privacy?"on":""}" onclick="S.agree_privacy=!S.agree_privacy;renderFlow()">
-          <span class="bx">${S.agree_privacy?"✓":""}</span><span><a>プライバシーポリシー</a>に同意する</span></div>
+          <span class="bx">${S.agree_privacy?"✓":""}</span><span>${PRIVACY_URL?`<a href="${PRIVACY_URL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">プライバシーポリシー</a>`:"<a>プライバシーポリシー</a>"}に同意する</span></div>
       </div>
       <button class="btn" ${S.agree_terms&&S.agree_privacy?"":"disabled"} onclick="startApp()">kokoni をはじめる</button>
     </div>`;
@@ -834,8 +869,9 @@ function supportItems(catId){
     return r.active && (r.category===catId || (r.also_show_in||[]).indexOf(catId)>=0);
   });
 }
-function openSupportList(){
-  logSafety("safety_resource_list_opened",{});
+function openSupportList(from){
+  S.support_from = from || null;
+  logSafety("safety_resource_list_opened", from ? {from:from} : {});
   document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
   document.getElementById("s-support").classList.add("active");
   S.screen="support";
@@ -855,9 +891,11 @@ function renderSupportList(openId){
     if(strong){ if(a.category_id==="unsafe_now") return -1; if(b.category_id==="unsafe_now") return 1; }
     return a.order-b.order;
   });
-  let h='<div class="pagehead"><button class="back" onclick="backToSafety()">‹</button><span></span></div>'
+  const sf=S.support_from, back = sf==="mypage" ? "go('log')" : sf==="gate" ? "go('gate')" : "backToSafety()";
+  let h='<div class="pagehead"><button class="back" onclick="'+back+'">‹</button><span></span></div>'
     +'<div style="padding:4px 18px 0"><h2 style="font-size:20px;margin-bottom:8px">いま相談できるところ</h2>'
-    +'<p class="lede" style="line-height:1.85">話したいと思ったときに使える窓口があります。<br>今の状況に近いものから選んでください。</p></div>';
+    +'<p class="lede" style="line-height:1.85">話したいと思ったときに使える窓口があります。<br>今の状況に近いものから選んでください。</p>'
+    +(sf?'<p class="lede" style="line-height:1.8;margin-top:6px;font-size:12.5px">大塚さんへのふりかえりのレターは、緊急の相談窓口ではありません。<br>今すぐつらいときは、ここにある窓口に相談してください。</p>':'')+'</div>';
   cats.forEach(function(c){
     const emph = strong && c.category_id==="unsafe_now";
     const items=supportItems(c.category_id);
@@ -886,7 +924,7 @@ function renderSupportList(openId){
     });
     h+='</div>';
   });
-  h+='<div style="padding:8px 18px 24px"><button class="btn ghost" onclick="safeReturn(\'resource_list\')">kokoniに戻る</button></div>'
+  h+='<div style="padding:8px 18px 24px"><button class="btn ghost" onclick="'+(sf?back:"safeReturn('resource_list')")+'">'+(sf==="mypage"?"マイページに戻る":sf==="gate"?"ふりかえりに戻る":"kokoniに戻る")+'</button></div>'
     +'<div id="supportDebug"></div>';
   document.getElementById("supportBody").innerHTML=h;
   renderSafetyDebug("supportDebug");
@@ -2651,19 +2689,136 @@ function mapPut(id,v){
   S.map_log.push({block:id, at:S.map[id].at});
   MAPED=null; renderMap(); window.scrollTo(0,0);
 }
-function renderLog(){
-  document.getElementById("logBody").innerHTML=
-    profileCard()+`
-    <div class="card"><h3>基本情報</h3><p style="margin:0;font-size:13.5px">
-      ニックネーム：${S.nickname||"—"}／年代：${S.age_range||"—"}／性別：${S.gender||"—"}<br>現在の状況：${S.life_status||"—"}<br>サポートの利用状況：${(S.support_use||[]).concat(S.support_past?["過去に利用したことがある"]:[]).join("・")||"—"}${S.life_status==="休職中"&&S.leave_duration?"（休職して"+S.leave_duration+"）":""}<br>相談できる人：${S.confidant||"—"}<br>取り組みやすい時間帯：${(S.time_slots||[]).join("・")||"—"}</p></div>
-    <div class="card"><h3>いまの状況</h3><p style="margin:0;font-size:13.5px">${S.current_status||"—"}<br>
-      <span style="color:var(--muted)">${S.current_concerns.join("・")||"—"}</span></p></div>
-    <div class="card"><h3>少し先に目指すこと</h3><p style="margin:0">${S.direction_goal||"—"}</p></div>
-    <div class="card"><h3>今週やってみること</h3><p style="margin:0">${S.first_action||"—"}
-      ${S.action_adjusted_flag?'<span class="tag">やりやすく調整済み</span>':""}</p></div>`;
+/* ══════════════════════════════════════════════════════════════
+   マイページ ＝ 自分の情報と、kokoniの利用環境を管理する場所
+   （自己理解・日々の記録はきろく、いまの一歩はホーム。ここに同じものを置かない）
+   - プロフィールは心の地図と同じデータ・同じ編集モーダル
+   - 未実装の機能は「準備中」として押せない。操作できるように見せかけない
+   ══════════════════════════════════════════════════════════════ */
+const APP_VERSION="0.1.0 / Prototype";
+/* 利用規約・プライバシーポリシーの URL。初回の同意画面と同じものを参照する（未設定の間は準備中） */
+const TERMS_URL="", PRIVACY_URL="";
+/* 問い合わせ先。決まるまで空（架空の連絡先は作らない） */
+const CONTACT_URL="";
+/* 通知（初期設定。通知の仕組みは未実装のため、表示だけで切り替えはできない） */
+const NOTIFY_DEFAULTS=[{id:"review",k:"ふりかえりが利用できるようになったとき",on:true},{id:"letter",k:"心理士から手紙が届いたとき",on:true},{id:"daily",k:"今日の状態を記録するリマインド",on:false}];
+
+function myRow(ic,t,sub,fn,soon){
+  return '<button class="myrow'+(soon?' soon':'')+'" '+(soon?'disabled aria-disabled="true"':'onclick="'+fn+'"')+'>'
+    +'<span class="ic">'+ic+'</span><span class="tx"><b>'+t+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</span>'
+    +(soon?'<span class="soon-tag">準備中</span>':'<span class="chev">›</span>')+'</button>';
 }
-/* マイページのプロフィール：心の地図と同じデータ・同じ編集画面（二重管理しない） */
-function profileCard(){ return profileMini(); }
+function mySec(t,rows){ return '<div class="mysec"><div class="myh">'+t+'</div><div class="mybox">'+rows.join("")+'</div></div>'; }
+function myGo(v){ S.my_view=v; renderLog(); window.scrollTo(0,0); }
+function myBack(){ return '<div class="pagehead" style="padding-top:4px"><button class="back" onclick="myGo(null)">‹</button><span class="lede">マイページ</span></div>'; }
+
+function renderLog(){
+  const el=document.getElementById("logBody"), v=S.my_view;
+  if(v==="notify") return el.innerHTML=myNotify();
+  if(v==="ai") return el.innerHTML=myAi();
+  if(v==="data") return el.innerHTML=myData();
+  if(v==="share") return el.innerHTML=myShare();
+  if(v==="account") return el.innerHTML=myAccount();
+  if(v==="guide") return el.innerHTML=myGuide();
+  const pct=pfPct();
+  el.innerHTML=
+    '<div class="myhead"><div class="av" aria-hidden="true">🌱</div><div style="min-width:0">'
+    +'<b>'+esc(S.nickname||"ゲスト")+'さん</b><p>kokoniをご利用いただきありがとうございます。</p></div></div>'
+    +'<button class="mypf" onclick="openProfile()"><span>プロフィールの確認・編集</span><span class="pcta"><small>入力状況 '+pct+'%</small> ›</span></button>'
+    +mySec("利用設定",[
+      myRow("🔔","通知の設定","ふりかえり・手紙・毎日の記録の通知","myGo('notify')"),
+      myRow("🧭","AIのパーソナライズ設定","AIが参考にしている情報を確認する","myGo('ai')")])
+    +mySec("プライバシー・データ管理",[
+      myRow("🗂","保存されている情報の確認","kokoniに残っている情報の一覧","myGo('data')"),
+      myRow("✉️","心理士への共有履歴・同意の確認","いつ、何を共有したか","myGo('share')"),
+      myRow("🛠","データ・アカウントの管理","データの削除・アカウントの削除","myGo('account')")])
+    +mySec("ヘルプ・アプリについて",[
+      myRow("📗","kokoniの使い方","5つの機能をかんたんに","myGo('guide')"),
+      myRow("☎️","相談できる窓口","いつでも見られます","openSupportList('mypage')"),
+      myRow("📄","利用規約",TERMS_URL?"":"文書の公開準備中", TERMS_URL?"window.open('"+TERMS_URL+"','_blank')":"", !TERMS_URL),
+      myRow("🔒","プライバシーポリシー",PRIVACY_URL?"":"文書の公開準備中", PRIVACY_URL?"window.open('"+PRIVACY_URL+"','_blank')":"", !PRIVACY_URL),
+      myRow("💬","お問い合わせ",CONTACT_URL?"":"問い合わせ先の準備中", CONTACT_URL?"window.open('"+CONTACT_URL+"','_blank')":"", !CONTACT_URL)])
+    +'<div class="myver">ver. '+APP_VERSION+'</div>';
+}
+
+/* 通知：未実装なので切り替えられない。初期設定の想定だけを見せる */
+function myNotify(){
+  return myBack()+'<div class="mysub"><h2>通知の設定</h2>'
+    +'<p class="lede">通知の仕組みは準備中です。<b>いまは通知は届きません。</b><br>使えるようになったときの初期設定は、次のとおりです。</p>'
+    +'<div class="mybox">'+NOTIFY_DEFAULTS.map(function(n){ return '<div class="myrow soon" aria-disabled="true"><span class="tx"><b>'+n.k+'</b></span>'
+      +'<span class="tog'+(n.on?' on':'')+'" aria-label="'+(n.on?'初期設定：オン':'初期設定：オフ')+'"><i></i></span></div>'; }).join("")+'</div>'
+    +'<p class="lede" style="margin-top:10px">ふりかえりの日や手紙は、いまはホームとふりかえりタブでお知らせしています。</p></div>';
+}
+/* AIが参考にしている情報（実際の参照に合わせて表示。使っていないものは「まだ使っていません」） */
+function myAi(){
+  const pf=pfForAI(), pfKeys=Object.keys(pf);
+  const rows=[
+    {k:"プロフィール", used:true, d: pfKeys.length ? "現在の状況・サポート・相談できる人・時間帯のうち、答えた項目（"+pfKeys.length+"つ）。「回答しない」は使いません。年代・性別は使いません" : "まだ答えた項目はありません", fix:"openProfile()", fixT:"確認・編集する"},
+    {k:"最初に答えた3つの質問", used:true, d:"今の気持ち・気になっていること・変えてみたいこと", fix:"", fixT:""},
+    {k:"心の地図", used:true, d:"あなたが確かめた流れ（"+insights().confirmed.filter(function(c){ return c.type==="pattern"; }).length+"件）。まだ確かめていない見方は使いません", fix:"S.kiroku_next='map';go('map')", fixT:"心の地図を見る"},
+    {k:"気持ちの記録", used:true, d:"今日の状態と、最近のメモ（はなすで少し話すときに3件まで）", fix:"openMoodLog()", fixT:"気持ちの記録を見る"},
+    {k:"やってみたことの記録", used:true, d:"今の一歩と、最近やってみた記録（5件まで）", fix:"S.kiroku_next='mood';go('map')", fixT:"きろくを見る"},
+    {k:"過去のふりかえり", used:false, d:"いまは使っていません", fix:"", fixT:""}
+  ];
+  return myBack()+'<div class="mysub"><h2>AIのパーソナライズ設定</h2>'
+    +'<p class="lede">はなす・心の地図でAIが参考にしている情報です。<br>AIは、これらだけであなたのことを決めつけません。</p>'
+    +'<div class="mybox">'+rows.map(function(r){ return '<div class="myinfo"><div class="t"><b>'+r.k+'</b><span class="st'+(r.used?' on':'')+'">'+(r.used?'参考にしています':'まだ使っていません')+'</span></div>'
+      +'<div class="d">'+esc(r.d)+'</div>'+(r.fix?'<button class="dslink" style="margin-top:4px" onclick="'+r.fix+'">'+r.fixT+' ›</button>':'')+'</div>'; }).join("")+'</div>'
+    +'<div class="mybox" style="margin-top:10px">'+myRow("⚙️","参考にする情報を選ぶ","情報ごとにオン・オフする（準備中）","",true)+'</div></div>';
+}
+/* 保存されている情報（このデモでは、この端末のブラウザの中だけ） */
+function myData(){
+  const I=insights(), pct=pfPct();
+  const rows=[
+    ["基本プロフィール", "入力状況 "+pct+"%"],
+    ["最初に答えた3つの質問", S.current_status ? "回答あり" : "まだありません"],
+    ["心の地図", "見えてきたこと "+mapCount()+" / "+MAP_N+"・あなたが確かめたこと "+I.confirmed.length+"件・確かめ中の見方 "+I.working.length+"件"],
+    ["気持ちの記録", dsAll().length+"件（メモつき "+dsAll().filter(function(r){ return r.optional_note; }).length+"件）"],
+    ["AIとの会話（はなす）", S.mini_sessions.length+"回"],
+    ["やってみたことの記録", S.act_logs.length+"件"],
+    ["ふりかえり", S.reviews.length+"回（共有 "+S.reviews.filter(function(r){ return r.shared; }).length+"回）"]
+  ];
+  return myBack()+'<div class="mysub"><h2>保存されている情報の確認</h2>'
+    +'<p class="lede">kokoniに残っている情報の一覧です。</p>'
+    +'<div class="mybox">'+rows.map(function(r){ return '<div class="myinfo"><div class="t"><b>'+r[0]+'</b></div><div class="d">'+esc(r[1])+'</div></div>'; }).join("")+'</div>'
+    +'<p class="lede" style="margin-top:10px">※ このデモでは、情報はこの端末のブラウザの中だけにあり、ページを再読み込みすると消えます。</p></div>';
+}
+/* 心理士への共有履歴・同意の確認（レター本文と手紙はふりかえりタブで見る） */
+function myShare(){
+  const L=S.reviews.slice().reverse();
+  const items=function(sel){ const n={state:"今の状態・テーマ",action:"試してみたこと",reflection:"本人の振り返り",note:"気づいたこと"};
+    return Object.keys(n).filter(function(k){ return sel&&sel[k]; }).map(function(k){ return n[k]; }).join("・"); };
+  return myBack()+'<div class="mysub"><h2>心理士への共有履歴・同意の確認</h2>'
+    +'<div class="mybox"><div class="myinfo"><div class="t"><b>共有のしくみ</b></div><div class="d">'
+    +'最初の3日、そのあとは1週間ごとに、あなたが選んだ内容を200文字までのレターにまとめ、確認してから大塚さんに共有できます。<br>'
+    +'送るのは、確認画面に表示した文だけです。共有しない回もえらべます。<br>'
+    +'プロフィール・会話の全文・毎日のメモは、自動では共有されません。<br>'
+    +'レターは緊急の相談窓口ではありません。</div></div></div>'
+    +'<div class="myh" style="margin:16px 4px 6px">これまでの共有</div>'
+    +(L.length ? '<div class="mybox">'+L.map(function(r){ const d=new Date(Date.parse(r.completed_at));
+        return '<div class="myinfo"><div class="t"><b>'+(d.getMonth()+1)+'/'+d.getDate()+' '+(r.cycle_type==="first"?"最初の3日":"1週間")+'のふりかえり</b>'
+          +'<span class="st'+(r.shared?' on':'')+'">'+(r.shared?'共有した':'共有していない')+'</span></div>'
+          +'<div class="d">'+(r.shared ? '共有した内容：'+(items(r.share_select)||'—')+(r.ask?'・相談したいこと':'')+(r.letter?'（'+r.letter.chars+'文字）':'') : 'kokoniの中だけに保存しています')+'</div></div>'; }).join("")+'</div>'
+      : '<div class="mybox"><div class="myinfo"><div class="d">まだふりかえりはありません。</div></div></div>')
+    +'<button class="btn ghost" style="margin-top:12px" onclick="go(\'gate\')">レターと手紙は「ふりかえり」で見る</button></div>';
+}
+function myAccount(){
+  return myBack()+'<div class="mysub"><h2>データ・アカウントの管理</h2>'
+    +'<p class="lede">以下は準備中です。いまは操作できません。</p>'
+    +'<div class="mybox">'+myRow("🗑","保存データの削除","","",true)+myRow("👋","アカウントの削除","","",true)+'</div>'
+    +'<p class="lede" style="margin-top:10px">※ このデモでは、ページを再読み込みすると、すべての情報が消えます。</p></div>';
+}
+/* kokoniの使い方（かんたんなガイド） */
+function myGuide(){
+  const G=[["🌱","今週の小さな一歩","ホームに出ている、今週試してみることです。できる日だけで大丈夫です。合わなければ変えられます。"],
+    ["💬","はなす","AIと一緒に、最近のことを整理したり、今週の一歩を見直したり、気持ちを少し話したりできます。"],
+    ["🗺","心の地図","話したことや試したことから、あなたのパターンが少しずつ見えてくる地図です。完成するものではありません。"],
+    ["🌤","気持ちの記録","1日1回を目安に、今の気分を10秒で残せます。きろくで、気持ちの変化を見返せます。"],
+    ["✉️","ふりかえりと心理士への共有","最初は3日後、そのあとは1週間ごとにふりかえります。内容を確認してから、大塚さんに共有できます（共有しなくてもかまいません）。"]];
+  return myBack()+'<div class="mysub"><h2>kokoniの使い方</h2>'
+    +'<div class="mybox">'+G.map(function(g){ return '<div class="myinfo"><div class="t"><b>'+g[0]+' '+g[1]+'</b></div><div class="d">'+g[2]+'</div></div>'; }).join("")+'</div></div>';
+}
+
 /* ══════════════════════════════════════════════════════════════
    週次サイクル・週次ふりかえり・ふりかえりタブ
    - 初回の行動確定で first サイクル（3日）を開始。初回ふりかえり後、次の一歩を決めたら regular（7日）へ
@@ -2918,7 +3073,7 @@ function gatePreview(){
     +'<button class="btn ghost" style="margin-top:9px" onclick="completeReview(false)">今回は共有しない</button>'
     +'<button class="linkbtn" onclick="rvNext(\'share\')">‹ 共有する内容を選びなおす</button></div>'
     +'<div class="foot">送るのは、この画面に表示している文だけです。<br>会話の全文・毎日のメモ・プロフィールは送りません。<br>共有しなくても、ふりかえりは kokoni の中に残ります。<br>'
-    +'<b>このレターは、緊急の相談窓口ではありません。</b><br>今すぐつらいときは、<a style="color:var(--teal-deep)" onclick="openSupportList()">相談できる窓口</a>を見てください。</div>';
+    +'<b>このレターは、緊急の相談窓口ではありません。</b><br>今すぐつらいときは、<a style="color:var(--teal-deep);cursor:pointer" onclick="openSupportList(\'gate\')">相談できる窓口</a>を見てください。</div>';
 }
 function rvLetterInput(el){
   const rv=rvInit(); rv.letter=el.value; rv.letter_edited=true;
