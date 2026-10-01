@@ -1588,12 +1588,15 @@ function showLetter(){
   S.letterSeen=true; go("home");
   setTimeout(()=>{
     document.getElementById("homeBody").insertAdjacentHTML("afterbegin",
-    `<div class="card warm"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:8px">💌 この数日で見えてきたこと</div>
-      <p style="color:var(--ink);line-height:1.95;margin:0">${S.nickname||"ここに"}さん<br><br>
-      この数日で、ひとつ見えてきたことがあります。<br><br>
-      <b>${S.ai_conversation_summary||"しんどさは、特定の場面のあとに強くなりやすい"}</b> ようでした。<br><br>
-      よかったら、見にきてください。<br><br>kokoni</p>
-      <button class="btn ghost" style="margin-top:14px" onclick="go('map')">最近わかったことを見る</button></div>`);
+    /* AIは見立てを言い切らない（9/22「生みの苦しみ」）。本人の言葉を引用して、地図に書くかは本人に渡す */
+    (function(){
+      const r=mapRecent()[0], quote = r ? r.text : (S.iv_scene||"");
+      return `<div class="card warm"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:8px">💌 この数日のこと</div>
+      <p style="color:var(--ink);line-height:1.95;margin:0">${esc(S.nickname||"ここに")}さん<br><br>
+      ${quote ? (r?"この数日で、心の地図にこう書いてくれました。":"最初に、こんな場面のことを話してくれました。")+"<br><br><b>「"+esc(quote)+"」</b><br><br>"
+               +"読み返してみて、いまも同じ感じがしますか。<br>変わってきたところがあれば、書き足してみてください。"
+             : "この数日、ここに来てくれてありがとうございます。<br>話してくれた言葉は、心の地図の材料として集めています。"}<br><br>kokoni</p>
+      <button class="btn ghost" style="margin-top:14px" onclick="go('map')">心の地図を見る</button></div>`; })());
     window.scrollTo(0,0);
   },80);
 }
@@ -1656,7 +1659,10 @@ function renderMap(){
     + (recent.length ? recent.map(function(e){ return '<div class="row"><div class="k">'+e.k+'</div><div class="v">'+esc(e.text)+'</div></div>'; }).join("")
         : '<div class="row"><div class="k">書いたこと</div><div class="v" style="color:var(--muted)">まだありません</div></div>')
     + (next ? '<button class="btn" style="margin-top:12px" onclick="openMapEditor(\''+next.id+'\')">「'+next.k+'」を一緒に探す</button>'
-            + '<div class="lede" style="margin:8px 0 0;text-align:center">1回に1つずつで十分です</div>' : '')
+            + '<div class="lede" style="margin:8px 0 0;text-align:center">1回に1つずつで十分です</div>'
+            /* 材料がまだ少ないとき：AIミニセッションで話すと材料が集まる */
+            : (S.mini_sessions.length ? '' : '<div class="lede" style="margin:12px 0 8px">地図の材料は、話してくれた言葉から集まります。</div>'
+              + '<button class="btn ghost" onclick="openMini(\'map\')">AIと少し整理してみる</button>'))
     + '</div>'
     + '<div class="mgrid">'+MAP_BLOCKS.map(mapBlockHtml).join("")+'</div>'
     + '<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。<br>'
@@ -2269,10 +2275,10 @@ function miniDone(){
   S.mini_sessions.push(Object.assign({session_id:"MS-"+(S.mini_sessions.length+1), at:nowIso(), source:MINI.from, summary:summary}, a));
   miniSay("整理してくれてありがとうございます。<br><br>"+summary,function(){
     document.getElementById("miniTray").innerHTML='<button class="btn" onclick="miniBack()">'
-      +(MINI.from==="gate"?"次の一歩を決めに戻る":"ホームに戻る")+'</button>';
+      +({gate:"次の一歩を決めに戻る", map:"心の地図に戻る"}[MINI.from]||"ホームに戻る")+'</button>';
   });
 }
-function miniBack(){ go(MINI && MINI.from==="gate" ? "gate" : "home"); }
+function miniBack(){ go(MINI && (MINI.from==="gate"||MINI.from==="map") ? MINI.from : "home"); }
 
 function pastReviews(){
   const cur=S.cycle?S.cycle.weekly_cycle_id:"";
