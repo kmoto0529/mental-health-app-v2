@@ -314,6 +314,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .tl .l{font-size:13.5px;font-weight:700;color:var(--ink)}
 .tl .n{font-size:12.5px;line-height:1.7;color:var(--ink2);margin-top:1px}
 .tlsep{color:var(--teal-line);font-size:10px;margin:2px 0 2px 52px}
+/* 引き継ぎレター */
+.ltbox{background:var(--paper2);border:1px solid var(--accent-line);border-radius:14px;padding:12px}
+.lth{font-size:12px;font-weight:800;color:var(--accent);margin-bottom:8px}
+.ltbox textarea{width:100%;box-sizing:border-box;font-size:14px;line-height:1.8;background:var(--paper)}
+.ltcnt{text-align:right;font-size:12px;font-weight:700;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.ltcnt.over,.ltwarn{color:var(--warn)}
+.ltwarn{font-size:12.5px;margin:8px 0 0}
+.chk.dis{opacity:.5;cursor:default}
+.opt-l{font-size:10.5px;font-weight:700;color:var(--muted);margin-left:6px}
 /* はなす */
 .talkhead{padding:6px 22px 4px}
 .talkhead h2{font-size:19px;line-height:1.6;margin:0 0 8px;color:var(--ink)}
@@ -588,7 +597,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <section id="s-gate" class="screen">
     <div class="pagehead"><b style="font-size:16px" id="gateTitle">ふりかえり ── 週に1回</b><span></span></div>
     <div class="lstate" id="lstate" style="margin-top:10px">
-      <span data-s="before">まとめを送る</span><span data-s="waiting">読んでもらう</span><span data-s="arrived">手紙が届く</span>
+      <span data-s="before">レターを送る</span><span data-s="waiting">読んでもらう</span><span data-s="arrived">手紙が届く</span>
     </div><div id="gateBody"></div></section>
 
   <section id="s-log" class="screen">
@@ -2643,7 +2652,7 @@ function startCycle(type){
     weekly_review_status:"locked",
     action_id:S.act_id
   };
-  S.rv={fix:{}, edit:{}, note:"", self:"", selfShare:false, fq:{}, themeEdit:""};
+  S.rv={step:"form", ans:{}, self:"", ask:"", sel:{state:true, action:true, reflection:true, note:false}, fq:{}};
 }
 function isFirst(){ return !!S.cycle && S.cycle.cycle_type==="first"; }
 function refreshCycle(){
@@ -2720,7 +2729,7 @@ function renderGate(){
     ? `<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span><div style="flex:1"><div class="k">大塚さんから</div>
         <div class="v">心理士から手紙が届いています</div></div><span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>` : "";
   if(c.weekly_review_status==="locked") b.innerHTML=banner+gateLocked(c);
-  else if(c.weekly_review_status==="available") b.innerHTML=banner+(isFirst()?gateFirstForm():gateReviewForm());
+  else if(c.weekly_review_status==="available") b.innerHTML=banner+gateReviewFlow();
   else b.innerHTML=banner+gateCompleted(r);
   b.innerHTML += pastReviews();
   if(r && r.letter_status==="arrived") r.letter_read=true;   // ふりかえりで表示した＝読んだ
@@ -2734,155 +2743,185 @@ function gateLocked(c){
     <p style="font-size:13.5px;line-height:1.9;color:var(--ink2);margin:10px 0 16px">${first
       ? "最初の3日を過ごしたら、<br>今のやり方が自分に合っていそうか、<br>一緒に見なおしてみましょう。"
       : "次のふりかえりは <b>"+mdw(Date.parse(c.review_available_at))+"</b> です。<br>この1週間の様子をためて、<br>一緒にふりかえります。<br><span style=\"font-size:12.5px;color:var(--muted)\">"+DOW[REVIEW_DOW]+"曜日に送ると、大塚さんのお返事は"+LETTER_DAYS+"日ほどで届きます。</span>"}</p>
-    <button class="btn" disabled>まとめを送る</button>
+    <button class="btn" disabled>ふりかえりをする</button>
     <p class="lede" style="margin-top:8px">その日になると、ふりかえりと送信ができるようになります。</p></div>`;
 }
-/* ふりかえり可能：AIのまとめを確認・修正 → 共有する内容を選ぶ → 送る／送らずに保存 */
-function gateReviewForm(){
-  const rv=S.rv;
-  return `<div class="card"><h3>この1週間をふりかえります</h3>
-    <p class="lede" style="margin-bottom:14px">すぷらんがまとめました。ちがうところは直してください。<br>大塚さんに送りたくない項目は「送らない」を選べます。</p>
-    ${reviewRows().map(r=>`<div class="sum ${rv.fix[r.id]===3?"dropped":""}">
-      <div class="k">${r.k}</div><div class="v">${r.v}</div>
-      <div class="fix"><button class="${rv.fix[r.id]===1?"sel":""}" onclick="fixSum('${r.id}',1)">そのとおり</button>
-      <button class="${rv.fix[r.id]===2?"sel":""}" onclick="fixSum('${r.id}',2)">すこし違う</button>
-      <button class="${rv.fix[r.id]===3?"sel":""}" onclick="fixSum('${r.id}',3)">送らない</button></div>
-      ${rv.fix[r.id]===2?`<div class="edit"><div class="hint">どこが違いましたか。書き直してください。</div>
-        <textarea oninput="S.rv.edit['${r.id}']=this.value" placeholder="（例）後半は少し戻っていました">${rv.edit[r.id]||""}</textarea></div>`:""}
-      </div>`).join("")}
-
-    <div class="askbox"><h4>自分のふりかえり</h4>
-      <div class="hint">この1週間をふりかえって、思ったことを書いておけます。<br>書かなくても大丈夫です。</div>
-      <textarea maxlength="400" oninput="S.rv.self=this.value" placeholder="うまくまとまっていなくて大丈夫です。">${rv.self}</textarea>
-      <div class="fix" style="margin-top:8px"><button class="${rv.selfShare?"sel":""}" onclick="S.rv.selfShare=!S.rv.selfShare;renderGate()">大塚さんにも見せる</button></div></div>
-
-    <div class="askbox"><h4>大塚さんに聞いてみたいこと</h4>
-      <div class="hint">まとめとは別に、そのまま届きます。<br>書かなくても大丈夫です。</div>
-      <textarea id="askIn" maxlength="400" oninput="S.rv.note=this.value;document.getElementById('askCnt').textContent=this.value.length+' / 400'"
-        placeholder="うまくまとまっていなくて大丈夫です。">${rv.note}</textarea>
-      <div class="cnt" id="askCnt">${rv.note.length} / 400</div></div>
-
-    <button class="btn" style="margin-top:14px" onclick="completeReview(true)">まとめを送る</button>
-    <button class="btn ghost" style="margin-top:9px" onclick="completeReview(false)">大塚さんには送らず、自分用に保存する</button></div>
-  <div class="foot">※ AIのまとめを、そのまま心理士へは送りません。<br>
-  あなたが「送る」と決めたものだけが、大塚さんに届きます。<br>送らなくても、ふりかえりは kokoni の中に残ります。</div>`;
-}
-function fixSum(id,v){ S.rv.fix[id]=v; renderGate(); }
-
-/* ── 最初のふりかえり（3日） ─────────────────────────────
-   効果ではなく「やれたか・負担・合っていそうか・テーマのずれ」を確かめる */
-const FIRST_Q=[
-  {id:"done",   k:"どのくらいやれたか", q:"今週の小さな一歩は、<br>どのくらいやってみることができましたか？",
-   o:["まだできていない","1回やってみた","何回かやってみた","思ったよりできた"]},
-  {id:"feel",   k:"やってみてどうだったか", q:"やってみて、どうでしたか？",
-   o:["やりやすかった","思ったより難しかった","少し気持ちが動いた","まだよくわからない"]},
-  {id:"burden", k:"負担", q:"やってみて、負担はどうでしたか？",
-   o:["ちょうどよかった","少し大変だった","かなり大変だった","まだわからない"]},
-  {id:"fit",    k:"合っていそうか", q:"やってみて、<br>自分に合っていそうだと感じましたか？",
-   o:["このまま続けてみたい","少し調整したい","別のやり方も見てみたい","まだよくわからない"]},
-  {id:"theme",  k:"テーマについて", q:"今週のテーマは、<br>今の自分に合っていそうですか？",
-   o:["だいたい合っている","少し違う気がする","まだわからない"]}
-];
 function miniInCycle(){
   if(!S.cycle) return null;
   const from=Date.parse(S.cycle.cycle_started_at);
   return S.mini_sessions.filter(function(m){ return Date.parse(m.at)>=from; }).slice(-1)[0]||null;
 }
-/* 心理士に共有できるまとめ。会話の全文ではなく、構造化した要約 */
-function firstRows(){
-  const d=cycleData(), m=miniInCycle();
-  const rows=[
-    {id:"intake", k:"最初に話したこと", v:"今の状態："+(S.current_status||"—")+"<br>気になっていること："+((S.current_concerns||[])[0]||"—")
-      +"<br>少し変わったら楽になりそうなこと："+(S.direction_goal||"—")},
-    {id:"theme", k:"今週のテーマ", v: themeText()},
-    {id:"action", k:"試したこと", v: "「"+d.action.title+"」（目安："+d.action.plan+"）<br>この3日でやってみた回数："+d.action.count+"回"},
-    {id:"reaction", k:"やってみたあとの反応", v: d.action.feelings.length ? countText(d.action.feelings) : "まだ記録はありません。"}
-  ];
-  if(m) rows.push({id:"mini", k:"AIと整理したこと", v: m.summary});
-  return rows.concat(mapRow());
+/* ══════════════════════════════════════════════════════════════
+   ふりかえり → 引き継ぎレター（初回3日・通常7日で共通）
+   ① 選択式3問＋任意の気づき（実施ログは自動で表示。本人の申告とは別に保持）
+   ② 共有する内容を選ぶ（3項目は選択済み）＋「大塚さんに聞いてみたいこと」（80字まで）
+   ③ レター全文をプレビュー・編集（見出し込み200字まで）→ 共有する／今回は共有しない
+   - レターは回答と実施記録だけから組み立てる（架空の内容を足さない）。本人が書いた相談は意味を変えず・切らない
+   - 自動で共有しないもの：AIとの会話全文・毎日のメモ全文・プロフィール・心の地図の詳細・未確認の仮説
+   - 送るのはプレビューに表示した文だけ。1サイクル1回まで
+   ══════════════════════════════════════════════════════════════ */
+const LETTER_LIMIT=200, ASK_LIMIT=80;   // 運用検証用の上限（定数）
+const RV_Q=[
+  {id:"tried", k:"どのくらい試せたか", q:"どのくらい試せましたか？", o:["まだできていない","1回やってみた","何回かやってみた","思ったよりできた"]},
+  {id:"feel",  k:"やってみてどうだったか", q:"やってみてどうでしたか？", o:["やりやすかった","少し負担があった","かなり負担があった","まだよくわからない"]},
+  {id:"next",  k:"次はどうしてみたいか", q:"次はどうしてみたいですか？", o:["このまま続けたい","少し調整したい","別のやり方を見てみたい","まだよくわからない"]}
+];
+const LT_ITEMS=[{id:"state",k:"今の状態"},{id:"action",k:"試したこと"},{id:"reflection",k:"振り返り"},{id:"note",k:"気づいたこと"}];
+function lcount(t){ return Array.from(String(t||"").replace(/\r?\n/g,"")).length; }   // 改行は数えない
+function rvInit(){
+  const rv=S.rv=S.rv||{};
+  rv.step=rv.step||"form"; rv.ans=rv.ans||{}; rv.self=rv.self||""; rv.ask=rv.ask||"";
+  rv.sel=rv.sel||{state:true, action:true, reflection:true, note:false};
+  return rv;
 }
-function fq(id,i){ S.rv.fq[id]=i; renderGate(); }
-function gateFirstForm(){
-  const rv=S.rv, d=cycleData();
-  const qcard=function(x){
-    return '<div class="sum"><div class="v" style="font-weight:700;color:var(--ink);margin-bottom:8px">'+x.q+'</div>'
-      +(x.id==="done"?'<div class="hint" style="font-size:12px;color:var(--muted);margin-bottom:8px">記録では、この3日で '+d.action.count+'回 やってみています。</div>':'')
-      +'<div class="opts">'+x.o.map(function(o,i){ return '<button class="opt'+(rv.fq[x.id]===i?' sel':'')+'" onclick="fq(\''+x.id+'\','+i+')">'+o+'</button>'; }).join("")+'</div>'
-      +(x.id==="theme"&&rv.fq.theme===1?'<div class="edit"><div class="hint">どのあたりが違いそうですか。書かなくても大丈夫です。</div>'
-        +'<textarea oninput="S.rv.themeEdit=this.value" placeholder="（例）仕事より、家のことの方が気になっている">'+rv.themeEdit+'</textarea></div>':'')
-      +'</div>';
+/* ── レターの各項目（実在データからだけ作る） ── */
+function ltState(){
+  const c=S.cycle, from=c?Date.parse(c.cycle_started_at):0;
+  const moods=dsAll().filter(function(r){ return Date.parse(r.recorded_at)>=from; }).map(function(r){ return dsLabel(r.daily_state); });
+  const tp=(S.current_concerns||[])[0], topic = tp && IV_TOPIC_P[tp] && tp!=="まだわからない" && tp!=="その他" ? IV_TOPIC_P[tp]+"が気になっていて、" : "";
+  const st = moods.length ? "「"+modeOf(moods)+"」の記録が多い" : (IV_STATE_P[S.current_status]||"");
+  return {full:topic+st+"。", short:(st||topic.replace(/、$/,""))+"。"};
+}
+function modeOf(a){ const m={}; a.forEach(function(v){ m[v]=(m[v]||0)+1; }); return Object.keys(m).sort(function(x,y){ return m[y]-m[x]; })[0]; }
+function ltAction(){
+  const d=cycleData(), t=d.action.title||S.first_action||"";
+  return {full:"「"+t+"」。実施記録"+d.action.count+"回。", short:"「"+(t.length>14?t.slice(0,14)+"…":t)+"」"+d.action.count+"回。", count:d.action.count};
+}
+function ltReflection(a){
+  const parts=[a.tried, a.feel, a.next].filter(Boolean);
+  return {full:parts.join("。")+(parts.length?"。":""), short:[a.feel,a.next].filter(Boolean).join("。")+"。"};
+}
+/* 見出しつきの本文。収まらなければ要約側だけを短くする（本人の相談・気づきは触らない） */
+function buildLetter(){
+  const rv=rvInit(), a=rv.ans, sel=rv.sel;
+  const ask=(rv.ask||"").trim() || ({"少し調整したい":"今のやり方を、少し調整してもよいか相談したいです。","別のやり方を見てみたい":"別のやり方に変えてもよいか相談したいです。"}[a.next]||"");
+  const S1=ltState(), A1=ltAction(), R1=ltReflection(a), note=(rv.self||"").trim();
+  const make=function(lv){
+    const L=[];
+    if(sel.state && (lv<2?S1.full:S1.short)) L.push("今の状態："+(lv<2?S1.full:S1.short));
+    if(sel.action) L.push("試したこと："+(lv<1?A1.full:A1.short));
+    if(sel.reflection && R1.full!=="。") L.push("振り返り："+(lv<3?R1.full:R1.short));
+    if(sel.note && note) L.push("気づいたこと："+note);
+    if(ask) L.push("相談したいこと："+ask);
+    return L.join("\n");
   };
-  const ready=rv.fq.fit!==undefined;
-  return `<div class="card"><h3>最初の3日をふりかえってみましょう</h3>
-    <p class="lede" style="margin-bottom:14px">うまくできたかどうかではなく、<br>この方法が自分に合いそうだったかを<br>一緒に見てみます。</p>
-    ${FIRST_Q.map(qcard).join("")}
-    <div class="askbox"><h4>やってみて気づいたこと</h4>
-      <div class="hint">小さなことで大丈夫です。書かなくても大丈夫です。</div>
-      <textarea maxlength="400" oninput="S.rv.self=this.value" placeholder="（例）夜より朝の方がやりやすかった">${rv.self}</textarea></div></div>
-
-  <div class="card"><h3>この3日間のまとめ</h3>
-    <p class="lede" style="margin-bottom:14px">すぷらんがまとめました。ちがうところは直してください。<br>共有したくない項目は「送らない」を選べます。</p>
-    ${firstRows().map(r=>`<div class="sum ${rv.fix[r.id]===3?"dropped":""}">
-      <div class="k">${r.k}</div><div class="v">${r.v}</div>
-      <div class="fix"><button class="${rv.fix[r.id]===1?"sel":""}" onclick="fixSum('${r.id}',1)">そのとおり</button>
-      <button class="${rv.fix[r.id]===2?"sel":""}" onclick="fixSum('${r.id}',2)">すこし違う</button>
-      <button class="${rv.fix[r.id]===3?"sel":""}" onclick="fixSum('${r.id}',3)">送らない</button></div>
-      ${rv.fix[r.id]===2?`<div class="edit"><div class="hint">どこが違いましたか。書き直してください。</div>
-        <textarea oninput="S.rv.edit['${r.id}']=this.value">${rv.edit[r.id]||""}</textarea></div>`:""}
-      </div>`).join("")}
-    <div class="askbox"><h4>大塚さんに聞いてみたいこと</h4>
-      <div class="hint">共有する場合だけ、まとめと一緒に届きます。書かなくても大丈夫です。</div>
-      <textarea maxlength="400" oninput="S.rv.note=this.value" placeholder="うまくまとまっていなくて大丈夫です。">${rv.note}</textarea></div></div>
-
-  <div class="card"><h3>この3日間のふりかえりを、<br>心理士にも共有しますか？</h3>
-    <p class="lede" style="margin-bottom:12px">共有しなくても、ふりかえりは kokoni の中に残ります。</p>
-    ${ready?"":'<p class="lede" style="color:var(--accent);margin-bottom:10px">「自分に合っていそうか」だけ選んでから進んでください。</p>'}
-    <button class="btn" ${ready?"":"disabled"} onclick="completeReview(true)">共有する</button>
-    <button class="btn ghost" style="margin-top:9px" ${ready?"":"disabled"} onclick="completeReview(false)">今回は共有しない</button></div>`;
+  let t=make(0); for(let lv=1; lv<=3 && lcount(t)>LETTER_LIMIT; lv++) t=make(lv);
+  return {text:t, ask_generated: !(rv.ask||"").trim() && !!ask, sections:{state:S1.full, action:A1.full, reflection:R1.full, note:note, ask:ask}};
 }
 
-/* ふりかえりの完了。共有するかどうかに関係なく保存し、このサイクルは completed にする */
+/* ── ふりかえりの画面（3ステップ） ── */
+function gateReviewFlow(){
+  const rv=rvInit(), first=isFirst();
+  if(rv.step==="share") return gateShare();
+  if(rv.step==="preview") return gatePreview();
+  const d=cycleData(), ready=RV_Q.every(function(x){ return rv.ans[x.id]; });
+  return '<div class="card"><h3>'+(first?'最初の3日をふりかえってみましょう':'この1週間をふりかえってみましょう')+'</h3>'
+    +'<p class="lede" style="margin-bottom:14px">'+(first?'うまくできたかどうかではなく、<br>この方法が自分に合いそうだったかを<br>一緒に見てみます。':'うまくできたかどうかより、<br>この1週間のやり方が合っていたかを見てみます。')+'</p>'
+    +RV_Q.map(function(x){ return '<div class="sum"><div class="v" style="font-weight:700;color:var(--ink);margin-bottom:8px">'+x.q+'</div>'
+      +(x.id==="tried"?'<div class="hint" style="font-size:12px;color:var(--muted);margin-bottom:8px">記録では、'+(first?'この3日':'この1週間')+'で '+d.action.count+'回 やってみています。</div>':'')
+      +'<div class="opts">'+x.o.map(function(o){ return '<button class="opt'+(rv.ans[x.id]===o?' sel':'')+'" onclick="rvPick(\''+x.id+'\',\''+o+'\')">'+o+'</button>'; }).join("")+'</div></div>'; }).join("")
+    +'<div class="askbox"><h4>やってみて気づいたこと<span class="opt-l">任意</span></h4>'
+    +'<div class="hint">小さなことで大丈夫です。書かなくても大丈夫です。</div>'
+    +'<textarea id="rvSelf" maxlength="200" oninput="S.rv.self=this.value" placeholder="（例）夜より朝の方がやりやすかった">'+esc(rv.self)+'</textarea></div>'
+    +(ready?'':'<p class="lede" style="color:var(--accent);margin:10px 0 0">3つの質問を選んでから進んでください。</p>')
+    +'<button class="btn" style="margin-top:12px" '+(ready?'':'disabled')+' onclick="rvNext(\'share\')">次へ</button></div>';
+}
+function rvPick(id,o){ rvInit().ans[id]=o; const y=window.scrollY; renderGate(); window.scrollTo(0,y); }
+function rvNext(step){
+  const rv=rvInit(), el=document.getElementById("rvSelf"); if(el) rv.self=el.value;
+  const ak=document.getElementById("rvAsk"); if(ak) rv.ask=ak.value;
+  if((rv.self && RISK_RE.test(rv.self)) || (rv.ask && RISK_RE.test(rv.ask))){ openSafety("free_text","unspecified"); return; }
+  if(step==="preview"){ const L=buildLetter(); rv.letter=L.text; rv.letter_meta=L; rv.letter_edited=false; }
+  rv.step=step; renderGate(); window.scrollTo(0,0);
+}
+function gateShare(){
+  const rv=rvInit(), hasNote=!!(rv.self||"").trim();
+  return '<div class="card"><h3>共有する内容を選ぶ</h3>'
+    +'<p class="lede" style="margin-bottom:12px">選んだ内容だけを使って、大塚さんへの短いレターをつくります。</p>'
+    +LT_ITEMS.map(function(it){ const dis = it.id==="note" && !hasNote, on=rv.sel[it.id] && !dis;
+      return '<div class="chk'+(on?' on':'')+(dis?' dis':'')+'" '+(dis?'':'onclick="rvSel(\''+it.id+'\')"')+'><span class="bx">'+(on?'✓':'')+'</span>'
+        +'<span>'+(it.id==="note"?'その他、共有したい気づき'+(dis?'<span class="opt-l">気づいたことが未記入</span>':''):({state:"今の状態・テーマ",action:"試してみたこと",reflection:"本人の振り返り"}[it.id]))+'</span></div>'; }).join("")
+    +'</div>'
+    +'<div class="askbox" style="margin:0 18px"><h4>大塚さんに聞いてみたいこと</h4>'
+    +'<div class="hint">一番相談したいことを、ひとつだけ残してみましょう。<br>書かなくても大丈夫です。</div>'
+    +'<textarea id="rvAsk" maxlength="'+ASK_LIMIT+'" oninput="S.rv.ask=this.value;document.getElementById(\'askCnt\').textContent=lcount(this.value)+\' / '+ASK_LIMIT+'文字\'"'
+    +' placeholder="例：まだ取り組めていないのですが、もう少し簡単な方法に変えてもよいでしょうか？">'+esc(rv.ask)+'</textarea>'
+    +'<div class="cnt" id="askCnt">'+lcount(rv.ask)+' / '+ASK_LIMIT+'文字</div></div>'
+    +'<div style="margin:14px 18px 0"><button class="btn" onclick="rvNext(\'preview\')">共有レターをつくる</button>'
+    +'<button class="linkbtn" onclick="rvNext(\'form\')">‹ 質問にもどる</button></div>';
+}
+function rvSel(id){ const rv=rvInit(), ak=document.getElementById("rvAsk"); if(ak) rv.ask=ak.value; rv.sel[id]=!rv.sel[id]; renderGate(); }
+function gatePreview(){
+  const rv=rvInit(), n=lcount(rv.letter), over=n>LETTER_LIMIT;
+  return '<div class="card"><h3>大塚さんに共有する内容を確認しましょう</h3>'
+    +'<p class="lede" style="margin-bottom:12px">送る内容は、自由に直せます。<br>共有したくないことは外しても大丈夫です。</p>'
+    +'<div class="ltbox"><div class="lth">✉️ 大塚さんへの共有レター</div>'
+    +'<textarea id="ltText" rows="8" oninput="rvLetterInput(this)">'+esc(rv.letter)+'</textarea>'
+    +'<div class="ltcnt'+(over?' over':'')+'" id="ltCnt">'+n+' / '+LETTER_LIMIT+'文字</div></div>'
+    +'<p class="ltwarn" id="ltWarn"'+(over?'':' hidden')+'>200文字を超えています。「相談したいこと」や「気づいたこと」を少し短くしてください。</p>'
+    +(rv.letter_meta && rv.letter_meta.ask_generated?'<p class="lede" style="font-size:12px;margin:8px 0 0">※「相談したいこと」は、次にどうしたいかの答えから入れています。違えば直してください。</p>':'')
+    +'<button class="btn" id="ltSendBtn" style="margin-top:14px" '+(over||!n?'disabled':'')+' onclick="completeReview(true)">この内容を大塚さんに共有する</button>'
+    +'<button class="btn ghost" style="margin-top:9px" onclick="completeReview(false)">今回は共有しない</button>'
+    +'<button class="linkbtn" onclick="rvNext(\'share\')">‹ 共有する内容を選びなおす</button></div>'
+    +'<div class="foot">送るのは、この画面に表示している文だけです。<br>会話の全文・毎日のメモ・プロフィールは送りません。<br>共有しなくても、ふりかえりは kokoni の中に残ります。<br>'
+    +'<b>このレターは、緊急の相談窓口ではありません。</b><br>今すぐつらいときは、<a style="color:var(--teal-deep)" onclick="openSupportList()">相談できる窓口</a>を見てください。</div>';
+}
+function rvLetterInput(el){
+  const rv=rvInit(); rv.letter=el.value; rv.letter_edited=true;
+  const n=lcount(el.value), over=n>LETTER_LIMIT;
+  const c=document.getElementById("ltCnt"); c.textContent=n+" / "+LETTER_LIMIT+"文字"; c.classList.toggle("over",over);
+  document.getElementById("ltWarn").hidden=!over; document.getElementById("ltSendBtn").disabled=over||!n;
+}
+
+/* ふりかえりの完了。共有するかどうかに関係なく保存し、このサイクルは completed にする（1サイクル1回まで） */
 function completeReview(share){
   const c=refreshCycle();
-  if(!c || c.weekly_review_status!=="available" || curReview()) return;   // 1サイクル1回まで
-  const first=c.cycle_type==="first", d=cycleData(), rv=S.rv;
-  if(first && rv.fq.fit===undefined) return;
-  const toItem=function(r){ return {id:r.id, k:r.k, v:r.v, fix:rv.fix[r.id]||0, edit:rv.edit[r.id]||"", shared: share && rv.fix[r.id]!==3}; };
-  let items=(first?firstRows():reviewRows()).map(toItem), answers=null;
-  if(first){
-    answers={};
-    FIRST_Q.forEach(function(x){
-      const v=rv.fq[x.id]; if(v===undefined) return;
-      answers[x.id]=x.o[v];
-      items.push({id:"fq_"+x.id, k:x.k, v:x.o[v]+(x.id==="theme"&&v===1&&rv.themeEdit?"<br>"+rv.themeEdit:""), fix:0, edit:"", shared:share});
-    });
-    if(rv.themeEdit) answers.theme_edit=rv.themeEdit;
-  }
+  if(!c || c.weekly_review_status!=="available" || curReview()) return;
+  const rv=rvInit(), d=cycleData();
+  if(!rv.letter){ const L=buildLetter(); rv.letter=L.text; rv.letter_meta=L; }   // 互換：直接呼ばれたとき
+  const text=(rv.letter||"").trim();
+  if(share && (lcount(text)>LETTER_LIMIT || !text)) return;
+  if(share && RISK_RE.test(text)){ openSafety("free_text","unspecified"); return; }
+  const sec=(rv.letter_meta||{}).sections||{};
+  /* 心理士側の表示順：相談したいこと → 今の状態 → 試したこと → 振り返り（本人が編集した場合は全文を正とする） */
+  const letter = share ? {text:text, chars:lcount(text), edited:!!rv.letter_edited, parsed:parseLetter(text)} : null;
+  const ans=rv.ans||{};
+  const legacyFit={"このまま続けたい":"このまま続けてみたい","少し調整したい":"少し調整したい","別のやり方を見てみたい":"別のやり方も見てみたい","まだよくわからない":"まだよくわからない"}[ans.next];
   S.reviews.push({
     review_id:"RV-"+c.weekly_cycle_id, weekly_cycle_id:c.weekly_cycle_id, cycle_type:c.cycle_type, completed_at:nowIso(),
-    shared:share, items:items, first_answers:answers,
-    moods:d.moods, talk_count:d.talk_count, action:d.action,
-    mini_session_id: first && miniInCycle() ? miniInCycle().session_id : null,
-    self_reflection:rv.self,
-    /* 最初のふりかえりの「気づいたこと」は共有内容に含める。週次の「自分のふりかえり」は本人が選んだときだけ */
-    self_shared: share && !!rv.self && (first || rv.selfShare),
-    note: share ? rv.note : "",
+    shared:share, answers:{tried:ans.tried||"", feel:ans.feel||"", next:ans.next||""},
+    action_log:{action_id:d.action.action_id, title:d.action.title, count:d.action.count},   // 実施ログ（本人の申告とは別）
+    self_reflection:rv.self||"", share_select:Object.assign({},rv.sel), ask:(rv.ask||"").trim(),
+    letter:letter, sections:sec,
+    first_answers: c.cycle_type==="first" ? {fit:legacyFit, tried:ans.tried, feel:ans.feel} : null,
+    items:[], moods:d.moods, talk_count:d.talk_count, action:d.action,
+    mini_session_id: c.cycle_type==="first" && miniInCycle() ? miniInCycle().session_id : null,
+    note: share ? (rv.ask||"").trim() : "",
     letter_status: share ? "waiting" : null, letter_read:false,
-    /* 手紙の目安。送った日から LETTER_DAYS 日（火曜に送れば木曜） */
     letter_due_at: share ? new Date(dayStart(nowMs())+LETTER_DAYS*DAY).toISOString() : null
   });
   c.weekly_review_status="completed";
   go("gate");
 }
-function reviewView(r){
-  return r.items.map(function(it){
-    return '<div class="sum'+(it.shared||!r.shared?'':' dropped')+'"><div class="k">'+it.k
-      +(it.fix===2?' <span class="tag">直した</span>':'')+(r.shared&&!it.shared?' <span class="tag">送っていない</span>':'')+'</div>'
-      +'<div class="v">'+(it.fix===2&&it.edit?it.edit:it.v)+'</div></div>';
-  }).join("")
-  + (r.self_reflection?'<div class="sum"><div class="k">自分のふりかえり'+(r.self_shared?'':' <span class="tag">自分用</span>')+'</div><div class="v" style="white-space:pre-wrap">'+r.self_reflection+'</div></div>':'')
-  + (r.note?'<div class="sum"><div class="k">大塚さんに聞いてみたいこと</div><div class="v" style="white-space:pre-wrap">'+r.note+'</div></div>':'');
+/* 送った本文を見出しで分ける（心理士側の並べ替え用）。見出しのない行は「その他」 */
+function parseLetter(t){
+  const map={"今の状態":"state","試したこと":"action","振り返り":"reflection","気づいたこと":"note","相談したいこと":"ask"}, out={state:"",action:"",reflection:"",note:"",ask:"",other:""};
+  String(t).split(/\r?\n/).forEach(function(line){ const m=/^(今の状態|試したこと|振り返り|気づいたこと|相談したいこと)[：:]\s*(.*)$/.exec(line.trim());
+    if(m) out[map[m[1]]]=m[2]; else if(line.trim()) out.other+=(out.other?"\n":"")+line.trim(); });
+  return out;
 }
+function reviewView(r){
+  const a=r.answers||{};
+  let h='';
+  if(r.letter) h+='<div class="sum"><div class="k">大塚さんに送ったレター（'+r.letter.chars+'文字）</div><div class="v" style="white-space:pre-wrap">'+esc(r.letter.text)+'</div></div>';
+  if(a.tried||a.feel||a.next) h+='<div class="sum"><div class="k">ふりかえりの答え'+(r.shared?'':' <span class="tag">自分用</span>')+'</div><div class="v">'+[a.tried,a.feel,a.next].filter(Boolean).map(esc).join("／")+'</div></div>';
+  if(r.action_log) h+='<div class="sum"><div class="k">実施記録</div><div class="v">「'+esc(r.action_log.title||"")+'」'+r.action_log.count+'回</div></div>';
+  if(r.self_reflection) h+='<div class="sum"><div class="k">気づいたこと</div><div class="v" style="white-space:pre-wrap">'+esc(r.self_reflection)+'</div></div>';
+  /* 以前の形式のふりかえり */
+  (r.items||[]).forEach(function(it){ h+='<div class="sum"><div class="k">'+it.k+'</div><div class="v">'+(it.fix===2&&it.edit?it.edit:it.v)+'</div></div>'; });
+  return h || '<div class="sum"><div class="v">—</div></div>';
+}
+
 /* 手紙の本文（デモ。実際は心理士が書いたものが届く） */
 function letterHtml(r){
   const body = r.letter_text ? esc(r.letter_text).replace(/\n/g,"<br>")
@@ -3826,29 +3865,18 @@ function renderPro(){
       <div class="mt">1週目 ／ 初期セットアップ ${S.setup_status==="completed"?"完了":"未完了"}</div></div><div class="go">開く →</div></div>`;
   } else {
     b.innerHTML=`<button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="proView='list';stopTimer();renderPro()">← 一覧へ</button>
-    <div class="pcols"><div><div class="pcard"><h3>初期セットアップの結果</h3>
-      <p class="note">本人が選んだもの。ふりかえりの前に自動でまとまります。</p>
-      <div class="pitem"><span class="k">いまの状況</span>${S.current_status||"—"}</div>
-      <div class="pitem"><span class="k">気になっていること</span>${S.current_concerns.join("・")||"—"}</div>
-      <div class="pitem"><span class="k">AIの整理（本人確認：${S.ai_confirm||"—"}）</span>${S.ai_conversation_summary||"—"}</div>
-      <div class="pitem"><span class="k">少し先の方向</span>${S.direction_goal||"—"}</div>
-      <div class="pitem"><span class="k">今週の一歩</span>${S.first_action||"—"} ${S.action_adjusted_flag?"（調整済み）":""}</div>
-      <div class="pitem"><span class="k">難しい日は</span>${S.plan_b_text||"—"}</div></div>
+    <div class="pcols"><div>
       ${(function(){
-        /* 本人が「送る」を選んだふりかえりだけが届く。「送らない」で保存したものは心理士側に出さない */
-        const rv=S.reviews.filter(function(r){ return r.shared; }).slice(-1)[0];
-        if(!rv) return `<div class="pcard"><h3>今週のまとめ</h3><p class="note">まだ届いたまとめはありません。</p></div>`;
-        const sent=rv.items.filter(function(it){ return it.shared; }), dropped=rv.items.length-sent.length;
-        return `<div class="pcard"><h3>今週のまとめ（本人が確認済み）</h3>
-        <p class="note">本人が「送る」と決めたものだけが届いています。訂正があれば訂正後を表示します。</p>
-        ${sent.map(function(it){ return `<div class="pitem"><span class="k">${it.k}${it.fix===2?"（本人が訂正）":""}</span>${it.fix===2&&it.edit?it.edit:it.v}</div>`; }).join("")}
-        ${rv.self_shared?`<div class="pitem"><span class="k">本人のふりかえり</span>${rv.self_reflection}</div>`:""}
-        ${dropped?`<div class="pitem"><span class="k">本人が送らなかった項目</span>${dropped}件あります（内容は届きません）</div>`:""}
-        </div>
-        ${rv.note ? `<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7">
-          <h3 style="color:#8a6a2a">本人から届いた相談</h3>
-          <p class="note">まとめとは別に、本人が自由に書いたものです。</p>
-          <div class="pitem" style="white-space:pre-wrap">${rv.note}</div></div>` : ""}`;
+        /* 本人がプレビューで確認・編集して「共有する」を選んだレターだけ。会話全文・毎日のメモ・プロフィール・心の地図の詳細は出さない */
+        const rv=S.reviews.filter(function(r){ return r.shared && r.letter; }).slice(-1)[0];
+        if(!rv) return '<div class="pcard"><h3>届いたレター</h3><p class="note">まだ届いたレターはありません。本人が共有を選んだときだけ届きます。</p></div>';
+        const P=rv.letter.parsed||{}, row=function(k,v){ return v?'<div class="pitem"><span class="k">'+k+'</span>'+esc(v)+'</div>':''; };
+        return '<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7"><h3 style="color:#8a6a2a">本人が相談したいこと</h3>'
+          +(P.ask?'<div class="pitem" style="white-space:pre-wrap">'+esc(P.ask)+'</div>':'<p class="note">相談の記入はありません。</p>')+'</div>'
+          +'<div class="pcard"><h3>引き継ぎレター（'+rv.letter.chars+'文字）</h3>'
+          +'<p class="note">'+(rv.cycle_type==="first"?"最初の3日":"この1週間")+'のふりかえり。本人が確認・編集して送った内容だけです。</p>'
+          +row("今の状態・テーマ",P.state)+row("試したこと",P.action)+row("本人の振り返り",P.reflection)+row("気づいたこと",P.note)+row("本人の追記",P.other)
+          +'<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:#6b7a85">送られた全文</summary><div class="pitem" style="white-space:pre-wrap">'+esc(rv.letter.text)+'</div></details></div>';
       })()}
       </div>
     <div>${proLetterCard()}</div></div>
