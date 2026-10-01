@@ -424,6 +424,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <button class="hideable" onclick="advanceDays(1)">+1日</button>
   <button class="hideable" onclick="advanceToReview()">ふりかえりの日へ</button>
   <button class="hideable" onclick="openMini('home')">ミニセッション</button>
+  <button class="hideable" id="aiBtn" onclick="toggleAi()">AI: OFF</button>
   <button class="hideable" onclick="openSafety('demo','some')">リスク検知</button>
   <button class="hideable" onclick="location.reload()">最初から</button>
   <span class="sp"></span>
@@ -498,6 +499,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 </div>
 
 <div id="modalRoot"></div>
+<script src="js/kokoni-mini-ai.js"></script>
 
 <script>
 const S = {
@@ -2634,7 +2636,83 @@ function msFeelDone(){
   if(s.be.indexOf(-1)>=0 && (o.be||"").trim()) d.behavior.push(o.be.trim());
   const said=[].concat(d.thought.map(function(t){ return "『"+t+"』"; }),d.emotion,d.body,d.behavior);
   msMe(said.length ? said.join("・") : "うまく選べなかった");
-  MINI.hyp=msBuildHyp(); MINI.stage="confirm"; msSave("partial", true); msRun();
+  const rule=msBuildHyp();
+  if(!aiOn()){ MINI.hyp=rule; MINI.stage="confirm"; msSave("partial", true); msRun(); return; }
+  /* Gemini で仮説をつくる。失敗・タイムアウト・検証NGならルールの仮説に戻す */
+  const sid=MINI.id;
+  document.getElementById("miniTray").innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
+  msAiHyp(rule).then(function(h){
+    if(!MINI || MINI.id!==sid) return;   // 途中でやめた・安全対応に移った
+    MINI.hyp=h; MINI.stage="confirm"; msSave("partial", true); msRun();
+  });
+}
+
+/* ── Gemini 連携（デモ） ─────────────────────────────────
+   /api/gemini-proxy（招待コード必須・キーはサーバー側）。js/kokoni-mini-ai.js のプロンプトと検証を使う */
+const AI_KEY="kokoni_demo_ai";
+let AI_CFG=(function(){ try{ return JSON.parse(localStorage.getItem(AI_KEY)||"{}"); }catch(_){ return {}; } })();
+if(new URLSearchParams(location.search).get("ai")==="1") AI_CFG.on=true;
+function aiOn(){ return !!(AI_CFG.on && AI_CFG.code && window.KokoniMiniAI); }
+function aiSaveCfg(){ try{ localStorage.setItem(AI_KEY, JSON.stringify(AI_CFG)); }catch(_){} }
+function aiBtnSync(){ const b=document.getElementById("aiBtn"); if(!b) return;
+  b.textContent = aiOn() ? "AI: ON" : "AI: OFF"; b.classList.toggle("on", aiOn()); }
+function toggleAi(){
+  if(!aiOn()){
+    if(location.protocol==="file:"){ alert("AIは公開URL（Vercel）でのみ動きます。ファイルを直接開いた場合はルールで動きます。"); return; }
+    if(!AI_CFG.code){ const c=prompt("AIを使うには、β版の招待コードを入力してください。"); if(!c) return; AI_CFG.code=c.trim(); }
+    AI_CFG.on=true;
+  } else AI_CFG.on=false;
+  aiSaveCfg(); aiBtnSync();
+}
+/* AIに渡すのは、アプリが実際に持っている情報だけ */
+function msCtx(){
+  const d=MINI.d, I=insights(), cur=curAct();
+  return {
+    nickname:S.nickname||"",
+    intake:{state:S.current_status||"", topic:(S.current_concerns||[])[0]||"", want:S.direction_goal||""},
+    today_mood:todayMood()||"",
+    current_action: cur ? {title:cur.title, plan:planLabel()} : null,
+    past:{
+      first_scene:S.iv_scene||"",
+      confirmed_patterns:I.confirmed.filter(function(c){ return c.type==="pattern" && c.session_id!==MINI.id; }).slice(-3).map(function(c){ return c.text; }),
+      action_logs:S.act_logs.slice(-5).map(function(l){ return {title:l.title, feeling:l.feeling}; }),
+      past_coping:S.mini_sessions.filter(function(m){ return m.id!==MINI.id && m.coping; }).slice(-2).map(function(m){ return m.coping; })
+    },
+    session:{situation:d.situation, thought:d.thought, emotion:d.emotion, body:d.body, behavior:d.behavior}
+  };
+}
+function msAiHyp(rule){
+  const A=window.KokoniMiniAI, ctx=msCtx(), pr=A.buildPrompt(ctx), t0=Date.now();
+  const ctl=window.AbortController ? new AbortController() : null;
+  const timer=setTimeout(function(){ if(ctl) ctl.abort(); }, 15000);
+  const fallback=function(reason){ rule.source="rule"; rule.ai_fallback=reason; if(DEBUG) console.warn("[mini-ai] fallback:",reason); return rule; };
+  return fetch("/api/gemini-proxy",{method:"POST", signal:ctl?ctl.signal:undefined,
+      headers:{"Content-Type":"application/json","X-Invite-Code":AI_CFG.code},
+      body:JSON.stringify({model:A.model, systemPrompt:pr.systemPrompt, messages:[{role:"user",content:pr.user}],
+        temperature:A.gen.temperature, maxTokens:A.gen.maxTokens, thinkingBudget:A.gen.thinkingBudget, responseMimeType:A.gen.responseMimeType})})
+    .then(function(res){
+      if(res.status===401||res.status===403){ AI_CFG.code=""; AI_CFG.on=false; aiSaveCfg(); aiBtnSync(); throw new Error("invite_code_rejected"); }
+      if(!res.ok) throw new Error("http_"+res.status);
+      return res.json();
+    })
+    .then(function(j){
+      clearTimeout(timer);
+      const v=A.validate(j.text||"", ctx);
+      if(!v.ok) return fallback(v.reason);
+      const o=v.out;
+      /* つなぎ（過去情報）はAIが書かないことがある。そのときはルールのつなぎ（実在データから作る）を使う */
+      const ruleLink = !o.link && rule.link;
+      const ev = ruleLink ? o.evidence.concat(rule.evidence.filter(function(e){ return /^前に|^「.*」のあと「|^最初に/.test(e); })).slice(0,6) : o.evidence;
+      return Object.assign({}, rule, {
+        mech:o.mechanism, said:esc(o.said), link: ruleLink ? rule.link : esc(o.link),
+        text:o.hypothesis.replace(/^もしかすると[、,]?s*/,""), flow:o.flow.join(" → "), ai_flow:o.flow,
+        evidence:ev, ai_policy:o.policy,
+        confidence:Math.round(Math.min(0.9,(o.confidence+rule.confidence)/2)*100)/100,
+        repeated: rule.repeated && rule.mech===o.mechanism,
+        source:"gemini", ai:{model:A.model, ms:Date.now()-t0, link_source: ruleLink ? "rule" : o.link_source}
+      });
+    })
+    .catch(function(e){ clearTimeout(timer); return fallback(e && e.name==="AbortError" ? "timeout" : String(e && e.message || e)); });
 }
 
 /* ── 仮説をつくる（デモはルール。本番は LLM が同じ構造を返す） ──────────────
@@ -2688,7 +2766,8 @@ function msShowHyp(){
     +esc(h.text)+"<br><br>"
     +(h.confidence<0.5 ? "少し確認してみてもいいですか？<br>" : "")+"この見方は近そうですか？",function(){
     document.getElementById("miniFlow").insertAdjacentHTML("beforeend",
-      '<div style="margin:-4px 18px 6px"><button class="whybtn" onclick="msWhy()">どうしてそう考えたの？</button></div>');
+      '<div style="margin:-4px 18px 6px;display:flex;gap:10px;align-items:center"><button class="whybtn" onclick="msWhy()">どうしてそう考えたの？</button>'
+      +(AI_CFG.on ? '<span class="tag" style="margin:0">'+(h.source==="gemini" ? "AI（Gemini）" : "ルール"+(h.ai_fallback?"（"+esc(h.ai_fallback)+"）":""))+'</span>' : '')+'</div>');
     msTray('<div class="opts row">'+MS_CONFIRM.map(function(o,i){ return '<button class="opt" onclick="msConfirm('+i+')">'+o+'</button>'; }).join("")+'</div>');
   });
 }
@@ -2785,7 +2864,8 @@ function msCopeDone(skip){
 function msEdu(){
   const h=MINI.hyp, M=MS_MECH[h.mech], d=MINI.d;
   const flow = h.status==="rejected" ? (h.revised?h.revised.flow:"") : h.flow;
-  MINI.policy = h.status==="rejected" && !h.revised ? MS_MECH.general.policy : M.policy.replace("{s}",d.situation);
+  MINI.policy = h.status==="rejected" ? (h.revised ? M.policy.replace("{s}",d.situation) : MS_MECH.general.policy)
+              : (h.ai_policy || M.policy.replace("{s}",d.situation));
   msSay("ひとつ、知っておいてほしいことがあります。<br><br>"
     +"しんどさが続く時は、出来事そのものだけではなく、<br>そのときの「考え」や「行動」がくり返されることで、<br>つらさが続くことがあります。"
     +(flow ? "<br><br>今のお話では、<br>『"+esc(flow)+"』<br>という流れを、少し見直してみるのがよさそうです。" : ""),function(){
@@ -2861,7 +2941,8 @@ function msSave(status,keepDraft){
       coping:d.coping, coping_effect:d.effect, goal:S.direction_goal||"", support: pos ? d.coping : [],
       pattern_hypothesis: h ? (h.status==="rejected" ? (h.revised?h.revised.flow:"") : h.flow) : "",
       confidence: h ? h.confidence : 0, evidence: h ? h.evidence : [], user_confirmed: h ? h.user_confirmed : false },
-    hypothesis: h ? {text:h.text, flow:h.flow, mech:h.mech, evidence:h.evidence, confidence:h.confidence, answer:h.answer, status:h.status, user_text:h.user_text} : null,
+    hypothesis: h ? {text:h.text, flow:h.flow, mech:h.mech, evidence:h.evidence, confidence:h.confidence, answer:h.answer, status:h.status, user_text:h.user_text,
+      source:h.source||"rule", ai:h.ai||null, ai_fallback:h.ai_fallback||null} : null,
     policy:MINI.policy||"", proposed_actions:MINI.proposals||[], chosen_action:MINI.chosen||null, kept_action:MINI.kept||null
   };
   rec.summary=[["場面",rec.scene],["浮かんだこと",rec.thought],["気持ち・身体",rec.feeling],["そのあと",rec.behavior],
@@ -3015,6 +3096,7 @@ function stopTimer(){ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; }
 
 /* 行動マスターを読み込んでから起動する */
 Promise.all([loadActionMaster(),loadSupportResources()]).then(function(){
+  aiBtnSync();
   if(DEBUG) console.log("action-master:", (AM.actions||[]).length, "actions loaded");
   renderFlow();
   document.getElementById("nav").hidden=true;
