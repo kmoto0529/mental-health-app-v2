@@ -365,6 +365,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .myinfo .st{font-size:10.5px;font-weight:700;color:var(--muted);white-space:nowrap}
 .myinfo .st.on{color:var(--teal-deep)}
 .myinfo .d{font-size:12.5px;line-height:1.75;color:var(--ink2);margin-top:2px}
+/* kokoniからのおたより */
+.hrow.otay{background:linear-gradient(160deg,#FFFDF6,#F7EFDF);border-color:var(--accent-line)}
+.hrow.otay .k{color:var(--accent)}
+.otgo{align-self:center;font-size:12.5px;font-weight:800;color:var(--accent);white-space:nowrap}
+.otlab{display:flex;justify-content:space-between;font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:10px}
+.otlab span{color:var(--muted);font-weight:700}
+.otnote{font-size:11px;line-height:1.7;color:var(--muted);border-top:1px dashed var(--accent-line);margin-top:12px;padding-top:8px}
+.otrow{border-top:1px solid var(--line);padding:9px 0;cursor:pointer}
+.otrow .t{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.otrow .t b{color:var(--ink)}
+.otrow .t span{font-size:10.5px;font-weight:700;color:var(--muted)}
+.otrow .t span.new{color:var(--accent)}
+.otrow .p{font-size:12.5px;color:var(--ink2);margin-top:2px}
 /* はなす */
 .talkhead{padding:6px 22px 4px}
 .talkhead h2{font-size:19px;line-height:1.6;margin:0 0 8px;color:var(--ink)}
@@ -605,7 +618,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <b>DEMO</b>
   <button id="sideBtn" onclick="toggleSide()">心理士側</button>
   <button class="hideable" onclick="skipSetup()">セットアップ済みへ</button>
-  <button class="hideable" onclick="showLetter()">AIレター</button>
+  <button class="hideable" onclick="demoOtayori()">おたよりの日へ</button>
   <button class="hideable" onclick="demoLetterArrived()">手紙が届いた</button>
   <button class="hideable" onclick="advanceDays(1)">+1日</button>
   <button class="hideable" onclick="advanceToReview()">ふりかえりの日へ</button>
@@ -697,7 +710,8 @@ const S = {
   setup_status:"not_started", setup_completed_at:null, entered:false,
   act_id:"", act_duration:0, act_frequency:"", act_timing:"", act_adjusted:false,
   act_input:"", act_feeling:"", act_logs:[], iv_exclude:[], iv_scene:"", iv_offered:[], profileOpen:false,
-  step:"a1", screen:"flow", side:"user", letterSeen:false,
+  step:"a1", screen:"flow", side:"user",
+  otayori:[],   // kokoniからのおたより（AI）。大塚さんの手紙（reviews[].letter_*）とは別データ
   timerId:null, timer:0,
   /* 初回の「一緒に決める」で今週の行動を確定したら true。「一緒に決める」を押しただけでは true にしない */
   initial_plan_completed:false,
@@ -1723,7 +1737,7 @@ function skipSetup(){
 /* ══════════════════════════════════════════════════════════════
    Home ── 今週の現在地がわかるダッシュボード
    優先順：今週の小さな一歩 → 今週のテーマ → 今日の状態 → 話す／最近わかったこと
-          → 週1回のふりかえり → AIレター
+          → 週1回のふりかえり（おたよりは新着のときだけ、一歩の下に小さく）
    過去の詳細は、きろく・心の地図・ふりかえりに任せる（Home には載せない）
    ══════════════════════════════════════════════════════════════ */
 function greeting(){
@@ -1732,6 +1746,7 @@ function greeting(){
 }
 function renderHome(){
   const ready=S.initial_plan_completed;
+  otCheck();
   let h=`<div class="hhead"><div class="txt"><div class="g">${greeting()}</div>
       ${S.nickname?`<b>${S.nickname}さん</b>`:""}
       <div class="sub">今日も、ここに来てくれてありがとうございます。<br>あなたのペースで、少しずつで大丈夫です。</div></div>
@@ -1739,7 +1754,7 @@ function renderHome(){
 
   if(ready){
     /* 優先順：今週の小さな一歩 → 心の地図 → 今日の状態 → テーマ → ふりかえり */
-    h+=stepCard()+mapHomeCard()+dailyCard()
+    h+=stepCard()+otHomeCard()+mapHomeCard()+dailyCard()
       +`<div class="hcard tap" onclick="openTheme()"><div class="k">🎯 今週のテーマ<span class="go">›</span></div>
           <div class="v">${themeText()}</div><div class="s">kokoniと一緒に見つけたテーマ</div></div>`;
   } else {
@@ -1755,9 +1770,6 @@ function renderHome(){
     <span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>`;
   h+=recallCard();
   if(!ready) h+=`</div>`;
-  h+=`<div class="hcard quiet${S.letterSeen?" tap":""}" ${S.letterSeen?'onclick="showLetter()"':""}>
-      <div class="k" style="color:var(--muted)">💌 AIレター</div>
-      <div class="s" style="margin:0;line-height:1.7">毎週のふりかえりにあわせて、<br>kokoniからのレターをお届けします。</div></div>`;
   document.getElementById("homeBody").innerHTML=h;
 }
 /* ══════════════════════════════════════════════════════════════
@@ -2175,21 +2187,141 @@ function recallCard(){
     + btn
   + "</div>";
 }
-function showLetter(){
-  S.letterSeen=true; go("home");
-  setTimeout(()=>{
-    document.getElementById("homeBody").insertAdjacentHTML("afterbegin",
-    /* AIは見立てを言い切らない（9/22「生みの苦しみ」）。本人の言葉を引用して、地図に書くかは本人に渡す */
-    (function(){
-      const r=mapRecent()[0], quote = r ? r.text : (S.iv_scene||"");
-      return `<div class="card warm"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:8px">💌 この数日のこと</div>
-      <p style="color:var(--ink);line-height:1.95;margin:0">${esc(S.nickname||"ここに")}さん<br><br>
-      ${quote ? (r?"この数日で、心の地図にこう書いてくれました。":"最初に、こんな場面のことを話してくれました。")+"<br><br><b>「"+esc(quote)+"」</b><br><br>"
-               +"読み返してみて、いまも同じ感じがしますか。<br>変わってきたところがあれば、書き足してみてください。"
-             : "この数日、ここに来てくれてありがとうございます。<br>話してくれた言葉は、心の地図の材料として集めています。"}<br><br>kokoni</p>
-      <button class="btn ghost" style="margin-top:14px" onclick="go('map')">心の地図を見る</button></div>`; })());
-    window.scrollTo(0,0);
-  },80);
+/* ══════════════════════════════════════════════════════════════
+   kokoniからのおたより（AIが書く短い便り。大塚さんからの手紙とは別のもの・別のデータ）
+   - 届く日：初回3日サイクル＝Day2（Day0＝一歩を決めた日）／通常サイクル＝Day2・Day5（Day1＝開始日）
+     ふりかえりの日以降の枠は出さない（skipped）。日付はローカル日付・サイクル開始日が基準
+   - 同じサイクル・同じ枠は1通だけ。何日か開かなくても、届くのは最新の1枠だけ（古い枠は skipped）
+   - 文面は TYPE A（以前話したこと）／B（小さな気づき）／C（一歩への再訪）。本文は OTAYORI_LIMIT 字まで
+   - 文面をつくる（otCompose）と表示（otCard / openOtayori）は分ける。AI生成に差し替えるときは otCompose を置き換える
+   - 読んだだけで、行動の実施や心の地図の更新にはしない。危険語を含む記録は参照せず、その枠は出さない
+   ══════════════════════════════════════════════════════════════ */
+const OTAYORI_LIMIT=200;
+function otAll(){ S.otayori=S.otayori||[]; return S.otayori; }
+function otSlots(c){
+  const d0=dayStart(Date.parse(c.cycle_started_at)), rev=dayStart(Date.parse(c.review_available_at));
+  const defs = c.cycle_type==="first" ? [["D2",2]] : [["D2",1],["D5",4]];   // 通常は開始日が Day1
+  return defs.map(function(x){ const day=d0+x[1]*DAY; return {slot:x[0], day:day, skip: day>=rev}; });
+}
+/* 届く日になった枠を確かめる。最新の1枠だけ作り、それより前の未作成の枠は skipped にする */
+function otCheck(){
+  const c=S.cycle; if(!c || !S.initial_plan_completed) return null;
+  const today=dayStart(nowMs()), have=function(slot){ return otAll().some(function(o){ return o.cycle_id===c.weekly_cycle_id && o.slot===slot; }); };
+  const due=otSlots(c).filter(function(s){ return s.day<=today && !have(s.slot); });
+  if(!due.length) return null;
+  const latest=due[due.length-1];
+  due.slice(0,-1).forEach(function(s){ otAll().push({letter_id:otId(), user_id:DS_USER, cycle_id:c.weekly_cycle_id, slot:s.slot, status:"skipped", reason:"newer_slot", scheduled_at:new Date(s.day+8*3600000).toISOString()}); });
+  if(latest.skip){ otAll().push({letter_id:otId(), user_id:DS_USER, cycle_id:c.weekly_cycle_id, slot:latest.slot, status:"skipped", reason:"after_review", scheduled_at:new Date(latest.day+8*3600000).toISOString()}); return null; }
+  const ref=otRef(c);
+  if(ref.risk){ otAll().push({letter_id:otId(), user_id:DS_USER, cycle_id:c.weekly_cycle_id, slot:latest.slot, status:"skipped", reason:"risk_in_records", scheduled_at:new Date(latest.day+8*3600000).toISOString()}); return null; }
+  const out=otCompose(otType(c,ref), ref, c);
+  const rec={letter_id:otId(), user_id:DS_USER, cycle_id:c.weekly_cycle_id, cycle_type:c.cycle_type, slot:latest.slot, letter_type:out.type,
+    scheduled_at:new Date(latest.day+8*3600000).toISOString(), generated_at:nowIso(), content:out.content, title:out.title,
+    reference_data:out.used, cta_type:out.cta, read_at:null, status:"generated", source:"rule"};
+  otAll().push(rec); return rec;
+}
+let OT_SEQ=0; function otId(){ OT_SEQ++; return "OT_"+Date.now().toString(36)+"_"+OT_SEQ; }
+/* 参照するのは実在する記録だけ */
+function otRef(c){
+  const from=Date.parse(c.cycle_started_at);
+  const recs=dsAll().filter(function(r){ return Date.parse(r.recorded_at)>=from; }).sort(function(a,b){ return Date.parse(a.recorded_at)-Date.parse(b.recorded_at); });
+  const logs=S.act_logs.filter(function(l){ return l.action_id===S.act_id && Date.parse(l.at)>=from; });
+  const notes=recs.filter(function(r){ return r.optional_note; });
+  const risk = recs.some(function(r){ return r.optional_note && RISK_RE.test(r.optional_note); });
+  const last3=recs.slice(-3), heavy = last3.length>=2 && last3.filter(function(r){ return dsLevel(r.daily_state)===0; }).length>=2;
+  return {recs:recs, logs:logs, notes:notes, risk:risk, heavy:heavy, action:curAct(), scene:S.iv_scene||"",
+    topic:(S.current_concerns||[])[0]||"", prev:otAll().filter(function(o){ return o.status!=="skipped"; }).slice(-1)[0]||null};
+}
+function otType(c,ref){
+  if(c.cycle_type==="first") return "A";
+  if(ref.heavy) return "B";                                   // つらい記録が続くときは、行動を促さない
+  const want = !ref.logs.length ? "C" : (ref.recs.length>=2 ? "B" : "A");
+  if(ref.prev && ref.prev.letter_type===want && want!=="C") return want==="B" ? (ref.logs.length?"A":"C") : "B";   // 同じ型が続かないように
+  return want;
+}
+function otCut(t,n){ t=String(t||""); return t.length>n ? t.slice(0,n)+"…" : t; }
+function otyPick(list,prev){ const used=(prev&&prev.content)||""; return list.filter(function(x){ return used.indexOf(x)<0; })[0] || list[0]; }
+/* 文面（ルール）。①以前の話・今の取り組み ②実際の記録の事実 ③小さな気づき・見方 ④次につながる言葉 */
+function otCompose(type,ref,c){
+  const a=ref.action, title=a?a.title:"", used={}, L=[];
+  let cta="home";
+  if(type==="A"){
+    if(ref.scene){ L.push("最初に「"+otCut(ref.scene,30)+"」と話してくれましたね。"); used.first_scene=true; }
+    else if(ref.topic && IV_TOPIC_P[ref.topic] && ref.topic!=="まだわからない"){ L.push("最初に、"+IV_TOPIC_P[ref.topic]+"が気になっていると話してくれましたね。"); used.intake_topic=ref.topic; }
+    if(title){ L.push((c.cycle_type==="first"?"この3日は":"今週は")+"「"+otCut(title,20)+"」を試してみることにしました。"); used.action=title; }
+    const left=Math.round((dayStart(Date.parse(c.review_available_at))-dayStart(nowMs()))/DAY);
+    L.push((left<=1?"明日は":left+"日後は")+(c.cycle_type==="first"?"最初の":"")+"ふりかえりです。やってみてどうだったか、まだ試せていなくても、そのまま教えてくださいね。");
+    cta="review";
+  } else if(type==="B"){
+    const r=ref.recs, f=r[0], z=r[r.length-1];
+    if(ref.heavy){
+      L.push("この数日、「しんどい」と残してくれた記録が続いていますね。");
+      L.push("無理に何かをしなくても大丈夫です。ここに気持ちを残してくれるだけでも、十分だと思います。");
+      used.recent_states=r.slice(-3).map(function(x){ return dsLabel(x.daily_state); });
+    } else {
+      if(f && z && f!==z && dsLabel(f.daily_state)!==dsLabel(z.daily_state)) L.push("この数日の気持ちの記録を見ると、はじめは「"+dsLabel(f.daily_state)+"」、"+(isoDate(Date.parse(z.recorded_at))===isoDate(nowMs()-DAY)?"昨日":"最近")+"は「"+dsLabel(z.daily_state)+"」と残してくれていました。");
+      else if(z) L.push("この数日、「"+dsLabel(z.daily_state)+"」と残してくれていましたね。");
+      used.states=r.map(function(x){ return dsLabel(x.daily_state); });
+      const n=ref.notes.slice(-1)[0];
+      if(n){ L.push("メモには「"+otCut(n.optional_note,30)+"」ともありましたね。"); used.note=n.record_id; }
+      L.push(otyPick(["自分にとって、どんな時間が少し助けになっているのか。そんなことも、一緒に見つけていけたらと思います。",
+        "記録を残してくれたことで、少しずつ自分の波が見えてきています。","気持ちの動きを、また一緒に見ていけたらと思います。"],ref.prev));
+    }
+    cta="mood";
+  } else {
+    if(title){ L.push((c.cycle_type==="first"?"この3日は":"今週は")+"「"+otCut(title,20)+"」を試してみることにしましたね。"); used.action=title; }
+    L.push("この期間の記録は、まだありません。");
+    const m=a && a.minimum_duration ? a.minimum_duration : 1;
+    L.push("もし少し余裕があれば、今日は"+m+"分だけでも試してみませんか。まとまらなくても大丈夫です。今のやり方が難しければ、一緒に変えていくこともできます。");
+    used.log_count=0; cta="step";
+  }
+  let body=L.join("");
+  if(Array.from(body).length>OTAYORI_LIMIT) body=Array.from(body).slice(0,OTAYORI_LIMIT-1).join("")+"…";
+  const titles={A:"以前話してくれたこと", B:"この数日の気持ちのこと", C:"今週の一歩のこと"};
+  return {type:type, content:body, title:titles[type], cta:cta, used:used};
+}
+const OT_CTA={review:["最初のふりかえりへ",function(){ go("gate"); }], mood:["気持ちの変化を見る",function(){ openMoodLog(); }], step:["今週の一歩を見てみる",function(){ go("home"); }]};
+function otCtaLabel(o){ return o.cta_type==="review" ? (o.cycle_type==="first"?"最初のふりかえりへ":"ふりかえりへ") : OT_CTA[o.cta_type][0]; }
+function otUnread(){ return otAll().filter(function(o){ return o.status==="generated"; }).slice(-1)[0]||null; }
+
+/* Home：新着のときだけ、小さな通知カード（本文は出さない） */
+function otHomeCard(){
+  const o=otUnread(); if(!o) return "";
+  return '<div class="hrow otay tap" onclick="openOtayori(\''+o.letter_id+'\')"><span class="ic">💌</span>'
+    +'<div style="flex:1;min-width:0"><div class="k">kokoniからのおたより</div><div class="v">この数日のあなたへ、小さなおたよりが届きました。</div></div>'
+    +'<span class="otgo">おたよりを読む ›</span></div>';
+}
+/* 詳細（モーダル）。開いたら既読。CTAは1つだけ */
+function openOtayori(id){
+  const o=otAll().filter(function(x){ return x.letter_id===id; })[0]; if(!o) return;
+  if(o.status==="generated"){ o.status="read"; o.read_at=nowIso(); }
+  const d=new Date(Date.parse(o.scheduled_at||o.generated_at));
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="otClose()"><div class="modal" style="padding:10px" onclick="event.stopPropagation()">'
+    +'<div class="card warm" style="margin:0"><div class="otlab">💌 kokoniからのおたより<span>'+(d.getMonth()+1)+'/'+d.getDate()+'</span></div>'
+    +'<p style="color:var(--ink);line-height:1.95;margin:0">'+esc(S.nickname||"ここに")+'さんへ<br><br>'+esc(o.content)+'<br><br>kokoni</p>'
+    +'<div class="otnote">このおたよりは、あなたの記録をもとにkokoni（AI）が書いたものです。大塚さんからの手紙ではありません。</div></div>'
+    +'<button class="btn" style="margin:10px 0 6px" onclick="otCta(\''+o.letter_id+'\')">'+otCtaLabel(o)+'</button>'
+    +'<button class="linkbtn" onclick="otClose()">閉じる</button></div></div>';
+}
+function otCta(id){ const o=otAll().filter(function(x){ return x.letter_id===id; })[0]; closeWhy(); if(o && OT_CTA[o.cta_type]) OT_CTA[o.cta_type][1](); }
+function otClose(){ closeWhy(); rerender(); }
+/* ふりかえりタブ：おたよりの一覧（手紙・共有とは別のセクション） */
+function otList(){
+  const L=otAll().filter(function(o){ return o.status==="generated"||o.status==="read"; }).slice().reverse();
+  if(!L.length) return "";
+  return '<div class="card"><h3>kokoniからのおたより</h3><p class="lede" style="margin:2px 0 8px">kokoni（AI）があなたの記録をもとに書いた、短いおたよりです。</p>'
+    +L.map(function(o){ const d=new Date(Date.parse(o.scheduled_at||o.generated_at));
+      return '<div class="otrow tap" onclick="openOtayori(\''+o.letter_id+'\')"><div class="t"><b>'+(d.getMonth()+1)+'/'+d.getDate()+' '+esc(o.title||"おたより")+'</b>'
+        +'<span class="'+(o.status==="generated"?'new':'')+'">'+(o.status==="generated"?'未読':'既読')+'</span></div>'
+        +'<div class="p">'+esc(otCut(o.content,36))+'</div></div>'; }).join("")+'</div>';
+}
+/* デモ用：次のおたよりの日まで時計を進める */
+function demoOtayori(){
+  const c=S.cycle; if(!c) return;
+  const today=dayStart(nowMs()), have=function(slot){ return otAll().some(function(o){ return o.cycle_id===c.weekly_cycle_id && o.slot===slot; }); };
+  const next=otSlots(c).filter(function(s){ return !have(s.slot) && !s.skip; })[0];
+  if(next && next.day>today) S.clock_offset+=next.day-today;
+  go("home");
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2701,7 +2833,7 @@ const TERMS_URL="", PRIVACY_URL="";
 /* 問い合わせ先。決まるまで空（架空の連絡先は作らない） */
 const CONTACT_URL="";
 /* 通知（初期設定。通知の仕組みは未実装のため、表示だけで切り替えはできない） */
-const NOTIFY_DEFAULTS=[{id:"review",k:"ふりかえりが利用できるようになったとき",on:true},{id:"letter",k:"心理士から手紙が届いたとき",on:true},{id:"daily",k:"今日の状態を記録するリマインド",on:false}];
+const NOTIFY_DEFAULTS=[{id:"review",k:"ふりかえりが利用できるようになったとき",on:true},{id:"letter",k:"心理士から手紙が届いたとき",on:true},{id:"daily",k:"今日の状態を記録するリマインド",on:false},{id:"otayori",k:"kokoniからのおたより",on:false}];
 
 function myRow(ic,t,sub,fn,soon){
   return '<button class="myrow'+(soon?' soon':'')+'" '+(soon?'disabled aria-disabled="true"':'onclick="'+fn+'"')+'>'
@@ -2927,6 +3059,7 @@ function mapRow(){
 
 function renderGate(){
   const c=refreshCycle(), b=document.getElementById("gateBody"), r=curReview();
+  otCheck();
   if(!c) return showLock("gate");
   document.getElementById("gateTitle").textContent = isFirst() ? "ふりかえり ── 最初の3日" : "ふりかえり ── 週に1回";
   const ls=document.getElementById("lstate");
@@ -2940,7 +3073,7 @@ function renderGate(){
   if(c.weekly_review_status==="locked") b.innerHTML=banner+gateLocked(c);
   else if(c.weekly_review_status==="available") b.innerHTML=banner+gateReviewFlow();
   else b.innerHTML=banner+gateCompleted(r);
-  b.innerHTML += pastReviews();
+  b.innerHTML += pastReviews() + otList();
   if(r && r.letter_status==="arrived") r.letter_read=true;   // ふりかえりで表示した＝読んだ
 }
 /* ふりかえり前：残り日数だけ見せ、作成・送信はできない */
