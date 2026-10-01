@@ -296,6 +296,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .draftcard h2{font-size:19px;margin:10px 0 6px;line-height:1.55}
 .draftcard .draft{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
 .draftcard .later{opacity:.7;border-style:dashed}
+.draftcard .dtext{font-size:13.5px;line-height:1.9;color:var(--ink2);margin:8px 0 0}
+.draftcard .dlist{margin:6px 0 0;padding-left:20px;font-size:13.5px;line-height:1.9;color:var(--ink)}
+.draftcard .dsep{border:none;border-top:1px dashed var(--teal-line);margin:16px 0 12px}
+.draftcard .dhead{font-size:16px;font-weight:800;line-height:1.6;color:var(--ink)}
+.draftcard .dnext{font-size:14px;font-weight:800;line-height:1.75;color:var(--teal-deep);margin:12px 0 0;text-align:center}
+.draftcard .drow .k{flex-basis:112px}
 .layer .mine{font-size:14px;line-height:1.75;color:var(--ink);font-weight:700}
 .layer .mgo{font-size:12px;font-weight:800;color:var(--teal-deep);margin-top:8px}
 .layer.loop .mgo{color:var(--accent)}
@@ -1116,8 +1122,9 @@ function ivOpts(list,fn){
 }
 function ivNext(){ S.iv++; ivRender(); }
 
-/* 初回の3ステップ：① 3問に答える（呼び方・安全確認を含む） ② 仮の心の地図 ③ 今の一歩 */
-const IV_STEPS=["3問に答える","仮の心の地図","今の一歩"];
+/* 初回の3ステップ（ユーザー向けの言葉）：① 今のことを教える（3問・呼び方・安全確認） ② 自分のことを知る（最初の心の地図） ③ 今週の一歩
+   「仮の心の地図」という概念はステップ名では出さない */
+const IV_STEPS=["今のことを教える","自分のことを知る","今週の一歩"];
 function ivStepNo(){ return S.iv<=5 ? 1 : (S.iv<=7 ? 2 : 3); }
 function renderIvSteps(){
   const el=document.getElementById("ivSteps"); if(!el) return;
@@ -1171,22 +1178,32 @@ function ivRender(){
     break;
 
   /* ⑤ 整理（診断も断定もしない。言い換えと方向の確認だけ） */
-  /* ⑤ 仮の心の地図。3つの答えから作る最初の下書き（言い切らない）。ここで AIミニセッションには入らない */
+  /* ⑤ 自分のことを知る：心の地図とは何かを先に短く説明 → 3つの答えから見えた最初の下書き（言い切らない）
+       → この地図をもとに今週の一歩へ。内部状態は draft。ここで AIミニセッションには入らない */
   case 6:
     S.ai_conversation_summary = S.iv_scene || (IV_TOPIC_P[S.current_concerns[0]]+"について、"+IV_WANT_P[S.direction_goal]+"ところから始める");
     ivSay(S.iv_scene_asked ? "教えてくれてありがとう。<br>地図に、ひとつ書き足しました。"
-                           : "教えてくれてありがとう、"+nick()+"さん。<br>3つの答えから、最初の地図の下書きができました。",function(){
+                           : "教えてくれてありがとう、"+nick()+"さん。",function(){
+      const first=!S.iv_scene_asked;
       document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
-        '<div class="draftcard"><div style="display:flex;align-items:center;gap:12px">'+mapArt(64)
-        +'<div><div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 2 ／ 仮の心の地図</div>'
-        +'<h2>仮の心の地図が<br>できました</h2></div></div>'
-        +'<p style="font-size:13.5px;line-height:1.85;margin:6px 0 0">3つの答えから、今のあなたの状態をもとにした<b>最初の地図の下書き</b>が見えてきました。</p>'
+        '<div class="draftcard">'
+        +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 2 ／ 自分のことを知る</div>'
+        /* 心の地図とは何か（初見でも分かるように、地図を見せる前に説明する） */
+        +(first ? '<h2>少しずつ、自分のことを<br>知っていきましょう</h2>'
+          +'<p class="dtext">kokoniでは、</p>'
+          +'<ul class="dlist"><li>どんな時にしんどくなりやすいか</li><li>どんなことを考えやすいか</li><li>何をすると少し楽になるか</li></ul>'
+          +'<p class="dtext">を、話したことや試したことから<br>少しずつ整理していきます。<br>それをkokoniでは、<b>「心の地図」</b>と呼んでいます。</p>'
+          +'<p class="dtext">地図が少しずつ見えてくるほど、<br>あなたに合った「次の一歩」を<br>一緒に考えやすくなります。</p>'
+          +'<hr class="dsep">' : '')
+        +'<div style="display:flex;align-items:center;gap:12px;margin-top:4px">'+mapArt(56)
+        +'<div class="dhead">3つの答えから、<br>最初の心の地図が<br>少し見えてきました</div></div>'
         +'<div class="draft">'+draftHtml(false)+'</div>'
         +'<div class="draft later"><div class="drow"><div class="k">これから見えてくること</div>'
-        +'<div class="v" style="color:var(--muted);font-size:13px">浮かびやすい考え・気持ちの動き・支えになるもの…<br>話したり、試したりするうちに見えてきます。</div></div></div>'
-        +'<p style="font-size:12.5px;line-height:1.85;color:var(--ink2);margin:0">これはまだ仮のものです。会話や記録を通じて、少しずつ育っていきます。<br>この地図をもとに、次の一歩を提案していきます。</p></div>');
-      tray.innerHTML='<button class="btn" onclick="ivToStep()">この地図で一歩を考える</button>'
-        +(S.iv_scene_asked?'':'<button class="btn ghost" style="margin-top:9px" onclick="ivMoreMap()">もう少し地図をつくる</button>');
+        +'<div class="v" style="color:var(--muted);font-size:13px">これからの会話や記録で、<br>少しずつ見えてきます。</div></div></div>'
+        +'<p class="dtext">いまはまだ、3つの答えから見えた<b>最初の下書き</b>です。<br>これから話したことや、やってみたことを通して、<br>少しずつあなたらしい地図に育っていきます。</p>'
+        +'<p class="dnext">この地図をもとに、<br>今週の一歩を一緒に考えます。</p></div>');
+      tray.innerHTML='<button class="btn" onclick="ivToStep()">今週の一歩を考える</button>'
+        +(S.iv_scene_asked?'':'<button class="linkbtn" onclick="ivMoreMap()">もう少し地図をつくる</button>');
       window.scrollTo(0,document.body.scrollHeight);
     });
     break;
@@ -1256,7 +1273,7 @@ function ivScene(skip){
   if(S.iv_scene && RISK_RE.test(S.iv_scene)){ S.iv=5; openSafety("free_text","unspecified"); return; }   // 戻ったら仮の地図から
   S.iv=6; ivRender();   // 仮の心の地図に戻る（場面が書き足される）
 }
-function ivToStep(){ ivMe("この地図で一歩を考える"); S.iv=8; ivRender(); }
+function ivToStep(){ ivMe("今週の一歩を考える"); S.iv=8; ivRender(); }
 function ivMoreMap(){ ivMe("もう少し地図をつくる"); S.iv=7; ivRender(); }
 /* ── 提案候補は「置き換え」ではなく「追加」していく ─────────────
    S.iv_offered に提示済みを積み、最大6件まで。重複は出さない。 */
@@ -1814,15 +1831,21 @@ function mapFeed(n){
 }
 function mapRecent(){ return mapFeed(2).filter(function(r){ return r.mine; }); }
 
-/* 3問の答えから作る「仮の心の地図」。言い切らず「〜ようです」で置く */
+/* 3問の答えから作る最初の心の地図（内部では draft）。日常の言葉で、言い切らず「〜ようです」で置く */
+const IV_WANT_D={"気持ちを少し軽くしたい":"気持ちの重さを、少しずつ軽くしていきたいようです",
+  "頭の中を整理したい":"頭の中にあることを、少しずつ整理していきたいようです",
+  "少し動けるようになりたい":"少しずつ、動けるようになっていきたいようです",
+  "生活リズムを整えたい":"生活のリズムを、少しずつ整えていきたいようです",
+  "人との関わりを楽にしたい":"人との関わりを、少し楽にしていきたいようです",
+  "自分のことを理解したい":"自分のパターンに、少しずつ気づいていきたいようです"};
 function draftRows(){
   const st=S.current_status, tp=(S.current_concerns||[])[0], wt=S.direction_goal;
   const rows=[];
-  if(st) rows.push({k:"今の状態", v:(IV_STATE_P[st]||st)+"ようです"});
-  if(tp) rows.push({k:"今の関心・テーマ", v: tp==="まだわからない" ? "まだ言葉にならない何かが、気になっているようです"
+  if(st) rows.push({k:"いまの気持ち", v:(IV_STATE_P[st]||st)+"ようです"});
+  if(tp) rows.push({k:"気になっていること", v: tp==="まだわからない" ? "まだ言葉にならない何かが、気になっているようです"
                                          : (IV_TOPIC_P[tp]||tp)+"が、いま心を占めているようです"});
-  if(wt) rows.push({k:"変えたいこと", v: wt==="まだわからない" ? "まずは、いまの状態をそのまま眺めてみたいようです"
-                                         : (IV_WANT_P[wt]||wt)+"ことから、始めてみたいようです"});
+  if(wt) rows.push({k:"これから変えてみたいこと", v: wt==="まだわからない" ? "まずは、いまの状態をそのまま眺めてみたいようです"
+                                         : (IV_WANT_D[wt]||wt)});
   return rows;
 }
 function draftHtml(compact){
