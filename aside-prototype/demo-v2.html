@@ -266,6 +266,16 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .stepcard .desc{font-size:13.5px;line-height:1.75;color:var(--ink2);margin-bottom:8px}
 .chips2{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
 .chips2 span{font-size:12px;font-weight:700;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:3px 10px}
+/* 初回：まず3日試す */
+.trycard{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r);padding:18px;margin:12px 0}
+.trycard h2{font-size:18.5px;line-height:1.55;margin:8px 0 8px}
+.trycard p{font-size:13.5px;line-height:1.85;color:var(--ink2);margin:0 0 8px}
+.tryflow{list-style:none;margin:10px 0 0;padding:10px 12px;background:var(--paper);border:1px solid var(--line);border-radius:12px;counter-reset:t}
+.tryflow li{display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:12.5px;line-height:1.6;color:var(--ink2);position:relative}
+.tryflow li b{flex:0 0 58px;font-size:11.5px;color:var(--teal-deep)}
+.tryflow li.tf-opt b{color:var(--muted)}
+.tryflow li+li::before{content:"↓";position:absolute;left:20px;top:-9px;font-size:9px;color:var(--teal-line)}
+.daytag{margin-left:8px;font-size:10.5px;font-weight:700;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:1px 8px}
 /* 今日の状態・気持ちの記録 */
 :root{--ds0:#C4836F;--ds1:#D2A653;--ds2:#9DB3A3;--ds3:#7FA05F}
 .dscard .k{flex-wrap:wrap}
@@ -913,11 +923,11 @@ function actReason(r){
   const kw=(r.why||[]).filter(function(w){ return w.indexOf("場面の言葉")===0; })[0];
   if(kw && S.iv_scene){
     const s=S.iv_scene.length>22 ? S.iv_scene.slice(0,22)+"…" : S.iv_scene;
-    return "「"+s+"」と話してくれたので提案しています。";
+    return "最初の心の地図で「"+esc(s)+"」という場面が見えてきたため、まず試しやすい方法として提案しています。";
   }
   if((r.a.match&&r.a.match.want||[]).indexOf(S.direction_goal)>=0)
-    return "「"+S.direction_goal+"」と答えてくれたので提案しています。";
-  return "「"+((S.current_concerns||[])[0]||"いまの状態")+"」について答えてくれたので提案しています。";
+    return "今の心の地図で、「"+S.direction_goal+"」と見えてきたため、まず試しやすい方法として提案しています。";
+  return "今の心の地図で、「"+((S.current_concerns||[])[0]||"いまの状態")+"」が気になっていると見えてきたため、まず試しやすい方法として提案しています。";
 }
 
 /* ── パーソナライズ（頻度・時間・やり方）─────────────────────
@@ -1271,9 +1281,25 @@ function ivRender(){
 
   /* ⑦ 今週の一歩を提案。候補は必ず行動マスターの中から選ぶ（新規生成はしない）
        「他も見てみる」は置き換えではなく追加。前の候補も選べるまま残す */
+  /* ⑦ 「おすすめ」ではなく「まず3日だけ試す方法を選ぶ」。3日後に見直せること・共有は任意であることを先に見せる */
   case 8: {
     if(!S.iv_offered.length) addOffers();
-    ivSay("この地図をもとに考えると、<br>今週ならこんなことから始められそうです。<br><br>無理なくできそうなものを1つ選んでみませんか？",
+    const flow=document.getElementById("ivFlow");
+    if(!S.iv_try_intro){
+      S.iv_try_intro=true;
+      flow.insertAdjacentHTML("beforeend",'<div class="trycard">'
+        +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 3 ／ 今週の一歩</div>'
+        +'<h2>最初の3日で、<br>ひとつ試してみましょう</h2>'
+        +'<p>今の心の地図から、<br>まず試しやすそうな方法をいくつか選びました。</p>'
+        +'<p>どれが一番合うかを、今ここで決めなくても大丈夫です。<br>まずは3日だけ、「これならできそう」と思うものを試してみましょう。</p>'
+        +'<ol class="tryflow">'
+        +'<li><b>今日</b><span>やってみることを決める</span></li>'
+        +'<li><b>3日間</b><span>無理のない範囲で試してみる</span></li>'
+        +'<li><b>3日後</b><span>自分に合っていそうか、一緒にふりかえる</span></li>'
+        +'<li class="tf-opt"><b>必要なら</b><span>その内容を心理士にも共有できる</span></li>'
+        +'</ol></div>');
+    }
+    ivSay("無理なくできそうなものを<br>1つ選んでみませんか？<br><span style=\"font-size:12.5px;color:var(--muted)\">合わなければ、3日後に変えることができます。</span>",
       function(){ renderOffers(tray); });
     break; }
 
@@ -1281,23 +1307,23 @@ function ivRender(){
   case 9:
     tray.innerHTML="";
     document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
-      '<div class="card warm" style="margin:12px 0"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:6px">今週やってみること</div>'
+      '<div class="card warm" style="margin:12px 0"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:6px">まず3日、試してみること</div>'
       +'<h2 style="font-size:18px;line-height:1.7;margin:0">'+curAct().title+'</h2>'
       +'<p class="lede" style="margin:8px 0 0">目安：'+planLabel()+'</p></div>');
-    ivSay("これなら、<br>今週どのくらいできそうですか？",function(){ ivOpts(["難しそう","たぶんできそう","できそう"],"ivFeas"); });
+    ivSay("これなら、<br>3日間の中で、どのくらいできそうですか？",function(){ ivOpts(["難しそう","たぶんできそう","できそう"],"ivFeas"); });
     break;
 
   /* ⑩ 確定。ここで初回体験は終了。年代・性別は聞かずにホームへ戻す */
   case 10:
-    ivSay("ありがとう。<br>今週は、これでいきましょう。",function(){
+    ivSay("ありがとう。<br>まずはこの方法を、3日間の中で<br>無理のない範囲で試してみましょう。",function(){
       const a=curAct();
       tray.innerHTML='<div class="card tint" style="margin:0;text-align:center">'
         +'<div style="font-size:30px;line-height:1;margin-bottom:8px">🌱</div>'
-        +'<div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;margin-bottom:10px">今週、一緒にやってみること</div>'
+        +'<div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;margin-bottom:10px">まず3日、試してみること</div>'
         +'<h2 style="font-size:19px;line-height:1.75;margin-bottom:10px">'+a.title+'</h2>'
         +'<p class="lede" style="margin-bottom:14px">目安：'+planLabel()+'</p>'
-        +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">完璧にできなくても大丈夫です。<br>やってみてどうだったかを、<br>また一緒にふりかえりましょう。</p>'
-        +'<button class="btn" onclick="completeSetup()">これでやってみる</button></div>'
+        +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">できない日があっても大丈夫です。<br>3日後に、自分に合っていそうかを一緒にふりかえります。<br>必要なら、その内容を心理士にも共有できます。</p>'
+        +'<button class="btn" onclick="completeSetup()">まず3日、試してみる</button></div>'
         +debugPanel();
       window.scrollTo(0,document.body.scrollHeight);
     });
@@ -1817,6 +1843,13 @@ function openTheme(){
 
 /* 今週の進捗。cadence_type と今の頻度に合わせて出し方を変える（すべて「◯/3回」にはしない） */
 function weekProgress(){
+  const p=weekProgress0(); if(!p || !isFirst()) return p;
+  const f=function(t){ return typeof t==="string" ? t.replace(/今週の分/g,"この3日の分").replace(/今週やった日/g,"この3日でやった日").replace(/今週(?=\d)/g,"この3日で").replace(/今週/g,"この3日").replace("/ 7日","/ 3日") : t; };
+  const q=Object.assign({},p,{k:f(p.k), n:f(p.n), note:f(p.note)});
+  if(p.pips && p.pips.length===7) q.pips=p.pips.slice(0,3);   // 毎日の行動は3日分で見せる
+  return q;
+}
+function weekProgress0(){
   const a=act(S.act_id); if(!a) return null;
   const from=S.cycle?Date.parse(S.cycle.cycle_started_at):0;
   const logs=S.act_logs.filter(function(l){ return l.action_id===S.act_id && Date.parse(l.at)>=from; });
@@ -1835,11 +1868,19 @@ function weekProgress(){
     note: n>=target ? "今週の目安に届きました。" : "できる日だけで大丈夫です。"};
 }
 /* いちばん大きく見せるカード */
+/* 初回3日の進み具合（Day n / 3）。「毎日やらないと失敗」とは見せない */
+function firstDayTag(){
+  if(!isFirst() || S.cycle.weekly_review_status!=="locked") return "";
+  const n=Math.min(3, Math.floor((dayStart(nowMs())-dayStart(Date.parse(S.cycle.cycle_started_at)))/DAY)+1);
+  return '<span class="daytag">Day '+n+' / 3</span>';
+}
 function stepCard(){
   const a=curAct(), p=weekProgress();
   return `<div class="stepcard">
-    <div class="lab">🌱 今週の小さな一歩</div>
-    <div class="intro">忙しい毎日の中でも、少し心が軽くなるような一歩です。できそうなときに、試してみましょう。</div>
+    <div class="lab">🌱 今週の小さな一歩${firstDayTag()}</div>
+    <div class="intro">${isFirst() && S.cycle.weekly_review_status==="locked"
+      ? "まずは3日、試してみる期間です。<br>3日間の中で、できそうなときに試してみましょう。3日後に一緒に見直します。"
+      : "忙しい毎日の中でも、少し心が軽くなるような一歩です。できそうなときに、試してみましょう。"}</div>
     <h2>${a?a.title:(S.first_action||"—")}</h2>
     ${a?`<div class="desc">${a.short_description}</div>
     <div class="chips2"><span>⏱ 1回${S.act_duration}分</span><span>🗓 ${isTrigger(a)?freqText(S.act_frequency,a):S.act_frequency+(S.act_frequency==="毎日"?"":"くらい")}</span></div>`
@@ -1890,9 +1931,10 @@ function recallCard(){
   const c=refreshCycle();
   const C=2*Math.PI*31;
   const first=isFirst();
-  const title = first ? "最初のふりかえり" : "週1回のふりかえり";
+  let title = first ? "最初のふりかえり" : "週1回のふりかえり";
+  if(first && c && c.weekly_review_status==="locked") title="最初のふりかえりまで あと"+daysLeft()+"日";
   let lab="—", unit="", off=C, dd="", wd="", btn;
-  let desc = first ? "最初の3日を過ごしたら、今のやり方が自分に合っていそうか、一緒に見なおしてみましょう。"
+  let desc = first ? "3日間の中で試してみたら、この方法が自分に合っていそうか、一緒に見なおしてみましょう。"
                    : "毎週"+DOW[REVIEW_DOW]+"曜日に、この1週間の気持ちや動きを<br>kokoniと一緒に見なおします。";
   const len = c ? c.cycle_length_days : 7;
   if(!c){
@@ -2474,6 +2516,8 @@ function fixSum(id,v){ S.rv.fix[id]=v; renderGate(); }
 const FIRST_Q=[
   {id:"done",   k:"どのくらいやれたか", q:"今週の小さな一歩は、<br>どのくらいやってみることができましたか？",
    o:["まだできていない","1回やってみた","何回かやってみた","思ったよりできた"]},
+  {id:"feel",   k:"やってみてどうだったか", q:"やってみて、どうでしたか？",
+   o:["やりやすかった","思ったより難しかった","少し気持ちが動いた","まだよくわからない"]},
   {id:"burden", k:"負担", q:"やってみて、負担はどうでしたか？",
    o:["ちょうどよかった","少し大変だった","かなり大変だった","まだわからない"]},
   {id:"fit",    k:"合っていそうか", q:"やってみて、<br>自分に合っていそうだと感じましたか？",
@@ -2512,7 +2556,7 @@ function gateFirstForm(){
   };
   const ready=rv.fq.fit!==undefined;
   return `<div class="card"><h3>最初の3日をふりかえってみましょう</h3>
-    <p class="lede" style="margin-bottom:14px">うまくできたかどうかより、<br>今のやり方が自分に合っていそうかを一緒に見てみます。</p>
+    <p class="lede" style="margin-bottom:14px">うまくできたかどうかではなく、<br>この方法が自分に合いそうだったかを<br>一緒に見てみます。</p>
     ${FIRST_Q.map(qcard).join("")}
     <div class="askbox"><h4>やってみて気づいたこと</h4>
       <div class="hint">小さなことで大丈夫です。書かなくても大丈夫です。</div>
@@ -2532,7 +2576,7 @@ function gateFirstForm(){
       <div class="hint">共有する場合だけ、まとめと一緒に届きます。書かなくても大丈夫です。</div>
       <textarea maxlength="400" oninput="S.rv.note=this.value" placeholder="うまくまとまっていなくて大丈夫です。">${rv.note}</textarea></div></div>
 
-  <div class="card"><h3>この3日間のふりかえりを、<br>担当の心理士に共有しますか？</h3>
+  <div class="card"><h3>この3日間のふりかえりを、<br>心理士にも共有しますか？</h3>
     <p class="lede" style="margin-bottom:12px">共有しなくても、ふりかえりは kokoni の中に残ります。</p>
     ${ready?"":'<p class="lede" style="color:var(--accent);margin-bottom:10px">「自分に合っていそうか」だけ選んでから進んでください。</p>'}
     <button class="btn" ${ready?"":"disabled"} onclick="completeReview(true)">共有する</button>
