@@ -388,6 +388,48 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .maplock .cd b{font-size:20px}
 .tcard.locked{background:var(--paper2);border-style:dashed}
 .tcard.locked h3{color:var(--ink2)}
+/* Home（シンプル版） */
+.hhead2{padding:16px 20px 4px}
+.hhead2 .nm{display:block;font-size:24px;color:var(--ink);font-weight:800;letter-spacing:.02em}
+.hhead2 .spk{display:flex;align-items:center;gap:8px;margin-top:6px}
+.sp-s{width:56px;height:56px;object-fit:contain;flex:0 0 56px}
+.bub2{position:relative;background:var(--paper);border:1px solid var(--teal-line);border-radius:16px;padding:8px 12px;font-size:13.5px;font-weight:700;color:var(--teal-deep);line-height:1.5;max-width:240px}
+.bub2::before{content:"";position:absolute;left:-7px;top:50%;margin-top:-6px;border:6px solid transparent;border-right-color:var(--teal-line);border-left:0}
+.bub2::after{content:"";position:absolute;left:-5px;top:50%;margin-top:-5px;border:5px solid transparent;border-right-color:var(--paper);border-left:0}
+.stepcard.v2{text-align:center;padding-top:14px}
+.stepcard.v2 .sc-top{display:flex;justify-content:space-between;align-items:center}
+.stepcard.v2 .daypill{font-size:11.5px;font-weight:800;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:3px 10px}
+.stepcard.v2 .sc-art{display:block;width:120px;height:120px;object-fit:contain;margin:6px auto 0}
+.stepcard.v2 h2{font-size:21px;line-height:1.5;margin:4px 0 8px;text-wrap:balance}
+.stepcard.v2 .chips2{justify-content:center;margin-bottom:12px}
+.stepcard.v2 .sc-sep{border-top:1px solid var(--teal-line);margin:18px -4px 14px}
+.dsv2{text-align:left}
+.dsv2 .dq{font-size:13.5px;font-weight:800;color:var(--ink2);margin-bottom:8px}
+.dsbtns.sm .dsb{padding:7px 2px 6px;font-size:10.5px;background:var(--paper)}
+.dsv2 .memo{display:block;margin:8px auto 0;font-size:12px;color:var(--muted)}
+.dsv2 textarea{margin-top:8px}
+.dsrowc{display:flex;align-items:center;gap:8px}
+.dsrowc .now{font-size:14.5px;font-weight:800;color:var(--ink)}
+.dsrowc .at{font-size:11.5px;font-weight:700;color:var(--teal-deep)}
+.dsrowc .dslink{margin:0 0 0 auto;font-size:12px}
+.dsacts{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+.dsacts .dslink{font-size:12px}
+.dsfull2{font-size:11.5px;color:var(--muted);margin-top:8px}
+.pauselink{display:block;margin:14px auto 0!important;font-size:11px!important;color:var(--muted)!important}
+.hcard2{display:flex;align-items:center;gap:12px;width:calc(100% - 36px);margin:10px 18px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);padding:12px 14px;text-align:left;font-family:inherit;cursor:pointer;color:var(--ink);box-shadow:var(--shadow)}
+.hcard2 .ic2{flex:0 0 28px;font-size:20px;text-align:center}
+.hcard2 .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.hcard2 .tx b{font-size:15px}
+.hcard2 .tx small{font-size:12px;color:var(--muted);margin-top:1px}
+.hcard2 .tx .big{font-size:22px;color:var(--teal-deep)}
+.hcard2 .chev{color:var(--muted);font-weight:800;font-size:18px}
+.hcard2.lockd{background:var(--paper2);border-style:dashed}
+.hcard2.lockd .tx b{color:var(--ink2)}
+.hcard2.fresh{border-color:var(--teal);background:var(--teal-soft)}
+.sp-xs{width:52px;height:52px;object-fit:contain;flex:0 0 52px}
+.hcard2.col{flex-wrap:wrap;cursor:default}
+.hcard2.col .btn{flex:1 1 100%;margin:4px 0 0}
+.hcard2.today{border-color:var(--accent-line);background:linear-gradient(160deg,#FFFDF6,#F7EFDF)}
 /* kokoniからのおたより */
 .hrow.otay{background:linear-gradient(160deg,#FFFDF6,#F7EFDF);border-color:var(--accent-line)}
 .hrow.otay .k{color:var(--accent)}
@@ -1746,12 +1788,134 @@ function greeting(){
   const h=new Date(nowMs()).getHours();
   return h>=5&&h<11 ? "おはようございます" : (h>=11&&h<18 ? "こんにちは" : "こんばんは");
 }
+/* ══════════════════════════════════════════════════════════════
+   Home（シンプル版）── 5秒で「今日はこれをやる／気持ちもここで残せる／ふりかえりまであと○日」
+   ① 名前＋すぷらんの一言 ② 今日の一歩（一歩＋今日の気持ち） ③ 心の地図 ④ ふりかえりまでのカウントダウン
+   - 説明文は短く、すぷらんの一言と絵に置きかえる。詳しい説明は実施画面・きろくへ
+   - すぷらんの一言は状態で決まる固定の短文（毎回AIで長文を作らない。気持ちを推測して言わせない）
+   - 画像は assets/suplan/opt（透過PNG・420px）だけを使う
+   ══════════════════════════════════════════════════════════════ */
+const SP_IMG={base:"opt/base.png", thinking:"opt/thinking.png", relieved:"opt/relieved.png", watering:"opt/watering.png",
+  bulb:"opt/bulb.png", heart:"opt/heart.png", thanks:"opt/thanks.png", happy:"opt/happy.png"};
+function spSrc(k){ return "assets/suplan/"+(SP_IMG[k]||SP_IMG.base); }
+/* 一歩の種類に合う絵（該当がなければ通常のすぷらん） */
+function actArt(a){
+  if(!a) return "base";
+  return {THINK:"thinking", CALM:"relieved", ACT:"watering", SOLVE:"bulb", CONNECT:"heart", KIND:"thanks"}[a.category_id] || "base";
+}
+/* すぷらんの一言（状態だけで決める。2行以内） */
+function suplanLine(){
+  if(S.action_status==="paused") return "今日は、ゆっくりで大丈夫";
+  const ph=appPhase();
+  if(ph==="first_review_available"||ph==="regular_review_available") return "今日は、ふりかえりの日だよ";
+  if(ph==="next_action_selection") return "次の一歩を、一緒に決めよう";
+  if(ph==="first_cycle_active") return "今日は、この一歩をやってみよう";
+  return "今日も、できるところからいこう";
+}
+function homeHead(){
+  return '<div class="hhead2"><b class="nm">'+esc(S.nickname||"ゲスト")+'さん</b>'
+    +'<div class="spk"><img class="sp-s" src="'+spSrc("base")+'" alt="すぷらん" width="56" height="56">'
+    +'<div class="bub2" id="spLine">'+suplanLine()+'</div></div></div>';
+}
+/* 何日目か（開始日を1日目。ふりかえりの日はその旨） */
+function cycleDayLabel(){
+  const c=S.cycle; if(!c) return "";
+  if(c.weekly_review_status!=="locked") return "ふりかえりの日";
+  const n=Math.min(c.cycle_length_days, Math.floor((dayStart(nowMs())-dayStart(Date.parse(c.cycle_started_at)))/DAY)+1);
+  return n+"/"+c.cycle_length_days+"日目";
+}
+/* 実施条件のチップ（短く） */
+function planChips(a){
+  if(!a) return "";
+  const f = isTrigger(a) ? "必要なときに" : S.act_frequency;
+  return '<div class="chips2"><span>⏱ '+S.act_duration+'分</span><span>🗓 '+esc(f)+'</span></div>';
+}
+function firstDayTag(){ return ""; }   // 日数は右上のバッジに集約
+function stepCard(){
+  const a=curAct(), paused=S.action_status==="paused";
+  return '<div class="stepcard v2">'
+    +'<div class="sc-top"><span class="lab">🌱 今日の一歩</span><span class="daypill">'+cycleDayLabel()+'</span></div>'
+    +'<img class="sc-art" src="'+spSrc(actArt(a))+'" alt="" width="120" height="120">'
+    +'<h2>'+(a?esc(a.title):esc(S.first_action||"—"))+'</h2>'
+    +planChips(a)
+    +(paused ? '<div class="pausebox">いまはお休み中です</div><button class="btn" onclick="resumeAction()">また試してみる</button>'
+             : '<button class="btn" '+(a?'':'disabled')+' onclick="openAction()">やってみる →</button>')
+    +'<div class="sc-sep"></div>'
+    +dailyCard()
+    +(paused?'':'<button class="linkbtn pauselink" onclick="openPause()">つらいときは、お休みもできます</button>')
+    +'</div>';
+}
+/* 今日の気持ち（同じカードの中・1タップ・メモは開かない） */
+function dailyCard(){
+  const recs=todayRecs(), r=todayDs(), u=S.ds_ui, n=recs.length;
+  const faces=function(fn){ return '<div class="dsbtns sm">'+DAILY.map(function(d){
+    return '<button class="dsb" style="--c:'+d.c+'" onclick="'+fn+'(\''+d.code+'\')">'+face(d.lv,26)+'<span>'+d.v+'</span></button>'; }).join("")+'</div>'; };
+  if(!r){
+    const pre = u && u.mode==="pre_note";
+    return '<div class="dsv2"><div class="dq">今日の気持ちは？</div>'+faces("setDaily")
+      +(pre ? '<textarea id="dsNote" rows="2" maxlength="200" placeholder="会議のあと少し疲れた。でも帰り道で少し落ち着いた。">'+esc(u.note||"")+'</textarea>'
+              +'<div class="dshint" style="text-align:left">気持ちを選ぶと、メモと一緒に残ります</div>'
+            : '<button class="dslink memo" onclick="S.ds_ui={mode:\'pre_note\'};renderHome()">✏️ メモを書く（任意）</button>')
+      +'</div>';
+  }
+  if(u && u.mode==="add") return '<div class="dsv2"><div class="dq">今はどんな感じ？</div>'+faces("setDaily")
+    +'<button class="dslink" onclick="dsCancel()">やめる</button></div>';
+  if(u && u.mode==="edit" && (u.where||"home")==="home"){ const er=dsById(u.id); if(er) return '<div class="dsv2">'+dsEditForm(er,"home")+'</div>'; }
+  let h='<div class="dsv2 done"><div class="dsrowc">'+face(dsLevel(r.daily_state),24)
+    +'<span class="now">'+(n>1?'今は':'今日は')+'「'+dsLabel(r.daily_state)+'」</span>'
+    +'<span class="at">✓ '+hm(r.recorded_at)+'</span>'
+    +'<button class="dslink" onclick="dsStartEdit(\''+r.record_id+'\')">編集</button></div>';
+  if(u && u.mode==="note" && u.id===r.record_id)
+    h+=dsNoteBox(r.optional_note,"")+'<div class="dsrow"><button class="btn sm" onclick="dsSave()">メモを残す</button><button class="dslink" onclick="dsCancel()">やめる</button></div>';
+  else if(r.optional_note) h+='<div class="dsnote">'+esc(r.optional_note)+'</div>';
+  h+='<div class="dsacts">'
+    +(!r.optional_note && !(u && u.mode==="note") ? '<button class="dslink" onclick="S.ds_ui={mode:\'note\',id:\''+r.record_id+'\'};renderHome()">✏️ メモを書く</button>' : '')
+    +(n<DS_MAX_PER_DAY ? '<button class="dslink" onclick="dsStartAdd()">＋ 今の気持ちも残す</button>' : '<span class="dsfull2">今日は3つ残しました</span>')
+    +'</div>';
+  return h+'</div>';
+}
+/* 気持ちを記録（メモを先に書いていれば一緒に）。メモ欄は自動では開かない */
+function setDaily(code){
+  const pre = S.ds_ui && S.ds_ui.mode==="pre_note", el=document.getElementById("dsNote"), note = pre && el ? el.value.trim() : "";
+  const r=dsCreate(dsCode(code)||code); if(!r){ renderHome(); return; }
+  S.ds_ui=null;
+  if(note){ r.optional_note=note; if(RISK_RE.test(note)){ openSafety("free_text","unspecified"); return; } }
+  renderHome();
+}
+/* 心の地図（初回はロック・あと○日。解放後は入口だけ） */
+function mapHomeCard(){
+  const art='<img class="sp-xs" src="'+spSrc("watering")+'" alt="" width="52" height="52">';
+  if(!mapUnlocked()){
+    const c=S.cycle, avail=c && c.weekly_review_status!=="locked";
+    return '<button class="hcard2 lockd" onclick="mapLockInfo()"><span class="ic2">🔒</span><span class="tx"><b>心の地図</b>'
+      +'<small>'+(avail?'ふりかえりのあとに使えます':'あと'+daysLeft()+'日で使えます')+'</small></span>'+art+'</button>';
+  }
+  const fresh=!S.map_unlock_seen;
+  return '<button class="hcard2'+(fresh?' fresh':'')+'" onclick="S.map_unlock_seen=true;S.kiroku_next=\'map\';go(\'map\')"><span class="ic2">🗺</span><span class="tx"><b>心の地図</b>'
+    +(fresh?'<small>使えるようになりました</small>':'')+'</span>'+art+'<span class="chev">›</span></button>';
+}
+function mapLockInfo(){
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>🔒 心の地図</h3><p>最初のふりかえりが終わると使えます。<br>まずは今の一歩を試してみましょう。</p>'
+    +'<button class="btn" onclick="closeWhy()">わかりました</button></div></div>';
+}
+/* ふりかえりまでのカウントダウン（短く） */
+function recallCard(){
+  const c=refreshCycle(); if(!c) return "";
+  const first=c.cycle_type==="first", st=c.weekly_review_status;
+  if(st==="available") return '<div class="hcard2 col today"><span class="ic2">📅</span><span class="tx"><b>今日がふりかえりの日</b></span>'
+    +'<button class="btn" onclick="go(\'gate\')">ふりかえりをはじめる →</button></div>';
+  if(st==="completed") return '<div class="hcard2 col today"><span class="ic2">📅</span><span class="tx"><b>次の一歩を決めましょう</b></span>'
+    +'<button class="btn" onclick="go(\'gate\')">次の一歩を決める →</button></div>';
+  return '<div class="hcard2 cd" onclick="go(\'gate\')"><span class="ic2">📅</span><span class="tx"><small>'+(first?'最初のふりかえりまで':'次のふりかえりまで')+'</small>'
+    +'<b class="big">あと'+daysLeft()+'日</b></span></div>';
+}
+
 function renderHome(){
   const ready=S.initial_plan_completed;
   otCheck();
-  let h=`<div class="hhead"><div class="txt"><div class="g">${greeting()}</div>
-      ${S.nickname?`<b>${S.nickname}さん</b>`:""}
-      <div class="sub">今日も、ここに来てくれてありがとうございます。<br>あなたのペースで、少しずつで大丈夫です。</div></div>
+  let h = ready ? homeHead() : `<div class="hhead"><div class="txt"><div class="g">${greeting()}</div>
+      ${S.nickname?`<b>${S.nickname}さん</b>`:""}</div>
     <div class="sprout" aria-hidden="true">🌱</div></div>`;
 
   if(ready){
@@ -1837,10 +2001,6 @@ function dsCreate(code){
   dsAll().push(r); return r;
 }
 /* 未回答時の4択／「＋ 今の気持ちも残す」の4択。押した時点で記録完了 → 任意のメモ欄 */
-function setDaily(code){
-  const r=dsCreate(dsCode(code)||code); if(!r){ renderHome(); return; }
-  S.ds_ui={mode:"note", id:r.record_id}; renderHome();
-}
 function dsStartAdd(){ if(dsCount(isoDate(nowMs()))<DS_MAX_PER_DAY){ S.ds_ui={mode:"add"}; renderHome(); } }
 function dsStartEdit(id,where){ const r=dsById(id); if(!r) return; S.ds_ui={mode:"edit", id:id, code:r.daily_state, where:where||"home"}; dsRerender(where); }
 function dsCancel(where){ S.ds_ui=null; dsRerender(where); }
@@ -1877,33 +2037,6 @@ function dsEditForm(r,where){
 
 /* ── Home のカード ─────────────────────────────────────
    未回答＝答える意味と軽さ／回答後＝最新1件・時刻・メモ・編集・追加・きろくへ（縦に長くしない） */
-function dailyCard(){
-  const recs=todayRecs(), r=todayDs(), u=S.ds_ui, n=recs.length;
-  if(!r) return '<div class="hcard dscard"><div class="k">🌤 今日の気持ち<span class="dsfreq">1日1回を目安に</span></div>'
-    +'<div class="dsdesc">今日の気持ちも残してみませんか？<br>10秒で記録できます。やってみなくても、気持ちだけ残せます。</div>'
-    +dsButtons("", "setDaily")+'<div class="dshint">必要ならメモも残せます</div></div>';
-  const head='<div class="k">🌤 今日の気持ち'+(n>1?'<span class="dsfreq">今日 '+n+'件</span>':'')+'</div>';
-  /* 追加：今はどんな感じですか？ */
-  if(u && u.mode==="add") return '<div class="hcard dscard">'+head
-    +'<div class="dsnow" style="margin-bottom:4px"><span>今はどんな感じですか？</span></div>'
-    +'<div class="dsdesc">さっきと気持ちが変わっていたら、今の状態も残してみましょう。</div>'
-    +dsButtons("", "setDaily")+'<button class="dslink" onclick="dsCancel()">やめる</button></div>';
-  /* 編集（Home から） */
-  if(u && u.mode==="edit" && (u.where||"home")==="home"){ const er=dsById(u.id); if(er) return '<div class="hcard dscard">'+head+dsEditForm(er,"home")+'</div>'; }
-  const lv=dsLevel(r.daily_state), prev=recs.slice(0,-1);
-  let h='<div class="hcard dscard done">'+head
-    +'<div class="dsnow">'+face(lv,24)+'<span>'+(n>1?'今は':'今日は')+'「'+dsLabel(r.daily_state)+'」</span>'
-    +'<button class="dslink dsedit-btn" onclick="dsStartEdit(\''+r.record_id+'\')">編集する</button></div>'
-    +'<div class="dsok2">✓ '+hm(r.recorded_at)+'に記録しました'+(r.edited_at?'（編集済み）':'')+'</div>';
-  if(u && u.mode==="note" && u.id===r.record_id)
-    h+=dsNoteBox(r.optional_note,"何か残しておきますか？<br>今の気持ちや、今日あったことを一言だけでも。")
-      +'<div class="dsrow"><button class="btn sm" onclick="dsSave()">メモを残す</button><button class="dslink" onclick="dsCancel()">今はいい</button></div>';
-  else if(r.optional_note) h+='<div class="dsnote">'+esc(r.optional_note)+'</div>';
-  if(prev.length) h+='<div class="dsprev">'+prev.map(function(p){ return '<span>'+hm(p.recorded_at)+' '+face(dsLevel(p.daily_state),14)+dsLabel(p.daily_state)+'</span>'; }).join("")+'</div>';
-  h+= n<DS_MAX_PER_DAY ? '<button class="dsadd" onclick="dsStartAdd()">＋ 今の気持ちも残す</button>'
-     : '<div class="dsfull">今日は3つの気持ちを残しました。<br>また明日、今の気持ちを教えてくださいね。</div>';
-  return h+'<button class="dsgo" onclick="openMoodLog()">気持ちの変化は「きろく」で見返せます ›</button></div>';
-}
 
 /* ── きろく ／ 気持ちの記録 ───────────────────────────── */
 function openMoodLog(){ S.kiroku_next="mood"; S.mood_day=isoDate(nowMs()); go("map"); }
@@ -2079,11 +2212,6 @@ function weekProgress0(){
 }
 /* いちばん大きく見せるカード */
 /* 初回3日の進み具合（Day n / 3）。「毎日やらないと失敗」とは見せない */
-function firstDayTag(){
-  if(!isFirst() || S.cycle.weekly_review_status!=="locked") return "";
-  const n=Math.min(3, Math.floor((dayStart(nowMs())-dayStart(Date.parse(S.cycle.cycle_started_at)))/DAY)+1);
-  return '<span class="daytag">Day '+n+' / 3</span>';
-}
 /* 「ほかのやり方を考える」。候補は行動マスターから（同じ目的のより簡単な行動を先頭に）。変えるかは本人が決める */
 function openAlt(mode){
   const next = mode==="next";   // ふりかえり後：選んだら7日サイクルへ
@@ -2190,42 +2318,7 @@ function skipToRegular(){
 }
 
 /* ── Home の3枚：今日の一歩／心の地図／次のふりかえり ──────────────── */
-function stepCard(){
-  const a=curAct(), p=weekProgress(), paused=S.action_status==="paused";
-  return `<div class="stepcard">
-    <div class="lab">🌱 今日の一歩${firstDayTag()}</div>
-    <h2>${a?a.title:(S.first_action||"—")}</h2>
-    ${a?`<div class="desc">${a.short_description}</div>
-    <div class="chips2"><span>⏱ 目安${S.act_duration}分</span><span>🗓 ${isTrigger(a)?freqText(S.act_frequency,a):S.act_frequency+(S.act_frequency==="毎日"?"":"くらい")}</span></div>`:``}
-    ${paused
-      ? `<div class="pausebox">いまは、この一歩をお休みしています。<br>記録やふりかえりの日はそのままです。</div>
-         <button class="btn" onclick="resumeAction()">また試してみる</button>`
-      : `${p?`<div class="prog sm"><span class="k">${p.k}</span><span class="n" id="stepProg">${p.n}</span></div>`:""}
-         <button class="btn" ${a?"":"disabled"} onclick="openAction()">やってみる</button>`}
-    ${dailyCard()}
-    ${paused?"":`<button class="linkbtn pauselink" onclick="openPause()">今はつらいので、少しお休みする</button>`}
-  </div>`;
-}
 /* 心の地図カード：初回3日はロック → 解放の案内（1回だけ）→ 通常 */
-function mapHomeCard(){
-  const n=mapCount();
-  if(!mapUnlocked()){
-    return '<div class="mapcard locked"><div class="top"><span class="lk2" aria-hidden="true">🔒</span><div style="min-width:0"><div class="lab">🗺 心の地図</div>'
-      +'<h3>最初のふりかえり後に<br>使えるようになります。</h3></div></div>'
-      +'<p class="why" style="margin:10px 0 0">まずは今の一歩を試してみましょう。</p></div>';
-  }
-  if(!S.map_unlock_seen){
-    return '<div class="mapcard"><div class="top">'+mapArt(56)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
-      +'<h3>心の地図が使えるようになりました</h3></div></div>'
-      +'<p class="why">これまでの話や記録から、<br>自分のことをもう少し深く知っていきましょう。</p>'
-      +'<button class="btn" onclick="S.map_unlock_seen=true;S.kiroku_next=\'map\';go(\'map\')">心の地図をひろげる</button></div>';
-  }
-  return '<div class="mapcard"><div class="top">'+mapArt(56)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
-    +'<h3>心の地図をもう少しひろげる</h3><div class="cnt">見えてきたこと <b>'+n+'</b>/'+MAP_N+'</div></div></div>'
-    +'<p class="why">話したことや試したことから、<br>自分のパターンを少しずつ見つけていきます。</p>'
-    +'<div class="two"><button class="btn" onclick="openMini(\'home\')">少し話してみる</button>'
-    +'<button class="btn ghost" onclick="S.kiroku_next=\'map\';go(\'map\')">地図を見る</button></div></div>';
-}
 /* 初回3日のあいだ、きろく ＞ 心の地図 はロック表示 */
 function mapLockedHtml(){
   const c=S.cycle, left=c?daysLeft():3;
@@ -2283,51 +2376,6 @@ function startHereCard(){
   </div>`;
 }
 /* 週1回のふりかえり。日付・残り日数・状態はすべて S.cycle から出す（ふりかえりタブと同じ値） */
-function recallCard(){
-  const c=refreshCycle();
-  const C=2*Math.PI*31;
-  const first=isFirst();
-  let title = first ? "最初のふりかえり" : "次のふりかえり";
-  let lab="—", unit="", off=C, dd="", wd="", btn;
-  let desc = first ? "3日間試してみたら、今のやり方が自分に合いそうか、一緒に見直します。"
-                   : "毎週"+DOW[REVIEW_DOW]+"曜日に、この1週間の気持ちや動きを<br>kokoniと一緒に見なおします。";
-  const len = c ? c.cycle_length_days : 7;
-  if(!c){
-    desc="一緒に決めたあとに表示されます。";
-    btn="<button class=\"btn\" disabled>ふりかえりをはじめる</button>";
-  } else {
-    const st=c.weekly_review_status, left=daysLeft(), start=Date.parse(c.cycle_started_at), now=nowMs();
-    off=C*(1-Math.min(1,(now-start)/(len*DAY)));
-    if(st==="locked"){ lab=String(left); unit="<span class=\"u\">日後</span>";
-      btn="<button class=\"btn\" disabled>ふりかえりは"+left+"日後に開きます</button>"; }
-    else if(st==="available"){ lab="今日";
-      btn="<button class=\"btn\" onclick=\"go('gate')\">ふりかえりをはじめる</button>"; }
-    else { lab="✓"; off=0;
-      desc = "ふりかえりが終わりました。<br>次の1週間の一歩を決めましょう。";
-      btn = "<button class=\"btn\" onclick=\"go('gate')\">次の一歩を決める</button>"; }
-    /* サイクル開始の翌日〜ふりかえりの日を並べる（初回3日／通常7日） */
-    const today=dayKey(now);
-    for(let i=1;i<=len;i++){
-      const t=start+i*DAY, d=new Date(t);
-      wd+="<div class=\"wd\">"+["日","月","火","水","木","金","土"][d.getDay()]+"</div>";
-      const cls = dayKey(t)===today ? "today" : (i===len ? (st==="completed"?"done":"gate") : (t<now ? "past" : ""));
-      dd+="<div class=\"d "+cls+"\">"+d.getDate()+"</div>";
-    }
-  }
-  return "<div class=\"recall\">"
-    + "<div class=\"top\">"
-    +   "<div class=\"ring\"><svg width=\"74\" height=\"74\">"
-    +     "<circle cx=\"37\" cy=\"37\" r=\"31\" fill=\"none\" stroke=\"#EBE6D6\" stroke-width=\"6\"></circle>"
-    +     "<circle cx=\"37\" cy=\"37\" r=\"31\" fill=\"none\" stroke=\"#7FA05F\" stroke-width=\"6\" stroke-linecap=\"round\""
-    +     " stroke-dasharray=\""+C.toFixed(1)+"\" stroke-dashoffset=\""+off.toFixed(1)+"\"></circle>"
-    +   "</svg><div class=\"cnt\"><span class=\"n\" id=\"recallLeft\">"+lab+"</span>"+unit+"</div></div>"
-    +   "<div><h3>"+title+"</h3>"
-    +   "<p class=\"desc\">"+desc+"</p></div>"
-    + "</div>"
-    + (dd ? "<div class=\"week\" style=\"grid-template-columns:repeat("+len+",1fr)\">"+wd+dd+"</div>" : "")
-    + btn
-  + "</div>";
-}
 /* ══════════════════════════════════════════════════════════════
    kokoniからのおたより（AIが書く短い便り。大塚さんからの手紙とは別のもの・別のデータ）
    - 届く日：初回3日サイクル＝Day2（Day0＝一歩を決めた日）／通常サイクル＝Day2・Day5（Day1＝開始日）
