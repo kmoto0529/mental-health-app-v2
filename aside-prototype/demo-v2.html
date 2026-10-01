@@ -227,6 +227,55 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .layer.res h4{color:var(--accent)}
 .layer ul li{margin-bottom:2px}
 .layer.tap{cursor:pointer}
+.layer.dim{background:var(--paper2);box-shadow:none}
+.layer.dim h4{color:var(--muted)}
+/* 心の地図：芽のまわりに7つの視点 */
+.mapart{flex:0 0 auto;display:block}
+.mhero{display:flex;align-items:center;gap:14px}
+.mhero h3{margin:0;font-size:17px;line-height:1.5}
+.mpips{display:flex;gap:5px;margin-top:8px}
+.mpips i{width:16px;height:6px;border-radius:99px;background:var(--teal-line)}
+.mpips i.on{background:var(--teal)}
+.sech{display:flex;align-items:baseline;gap:8px;margin:20px 22px 8px;font-size:12.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em}
+.sech span{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0}
+.drow{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.drow:first-child{border-top:none;padding-top:0}
+.drow .k{flex:0 0 92px;font-size:11.5px;font-weight:800;color:var(--teal-deep);line-height:1.6}
+.drow .v{flex:1;min-width:0;font-size:14px;line-height:1.7;color:var(--ink)}
+.found{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);margin:0 18px 9px;padding:12px 14px}
+.found.tap{cursor:pointer}
+.found .k{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:var(--teal-deep)}
+.found .k span{color:var(--muted);font-weight:700}
+.found .v{font-size:14.5px;line-height:1.7;color:var(--ink);margin-top:3px}
+.found .s{font-size:11px;color:var(--muted);margin-top:3px}
+.mapcta{margin:16px 18px 4px}
+.mapcard{background:linear-gradient(160deg,#FFFDF6,#F3F0E2);border:1px solid var(--accent-line);border-radius:var(--r-m);margin:12px 18px;padding:16px;box-shadow:var(--shadow)}
+.mapcard .top{display:flex;align-items:center;gap:12px}
+.mapcard .lab{font-size:11.5px;font-weight:800;color:var(--accent);letter-spacing:.04em}
+.mapcard h3{margin:3px 0 0;font-size:16.5px;line-height:1.55;color:var(--ink)}
+.mapcard .cnt{font-size:12.5px;color:var(--ink2);margin-top:4px}
+.mapcard .cnt b{font-size:16px;color:var(--teal-deep)}
+.mapcard .draft{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.mapcard .ex{display:inline-block;font-size:10.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:1px 8px;margin-left:6px}
+.mapcard .why{font-size:13.5px;line-height:1.85;color:var(--ink2);margin:12px 0}
+.mapcard .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.mapcard .two .btn{margin:0;padding-left:8px;padding-right:8px;font-size:14px}
+.mapcard .found{margin:0}
+.card.draft{padding:14px 16px}
+.stepcard .intro{font-size:12.5px;line-height:1.75;color:var(--ink2);margin-top:6px}
+.stepcard .desc{font-size:13.5px;line-height:1.75;color:var(--ink2);margin-bottom:8px}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.chips2 span{font-size:12px;font-weight:700;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:3px 10px}
+/* 初回の3ステップ */
+.isteps{display:flex;gap:6px;padding:12px 18px 4px}
+.isteps div{flex:1;min-width:0;text-align:center;font-size:11px;font-weight:700;color:var(--muted)}
+.isteps div i{display:block;height:4px;border-radius:99px;background:var(--teal-line);margin-bottom:5px}
+.isteps div.on{color:var(--teal-deep)}
+.isteps div.on i,.isteps div.done i{background:var(--teal)}
+.draftcard{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r);padding:20px 18px;margin:12px 0}
+.draftcard h2{font-size:19px;margin:10px 0 6px;line-height:1.55}
+.draftcard .draft{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+.draftcard .later{opacity:.7;border-style:dashed}
 .layer .mine{font-size:14px;line-height:1.75;color:var(--ink);font-weight:700}
 .layer .mgo{font-size:12px;font-weight:800;color:var(--teal-deep);margin-top:8px}
 .layer.loop .mgo{color:var(--accent)}
@@ -370,8 +419,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <section id="s-map" class="screen">
     <div class="pagehead"><b style="font-size:16px">きろく ／ 心の地図</b><span></span></div>
     <div id="mapBody" style="margin-top:12px"></div>
-    <div class="foot">この地図は、あなたと一緒に少しずつ作っていくものです。<br>
-    <span class="tag">完成度%・埋まり具合の数値は出していません（要件定義の「出さないもの」）</span></div></section>
+    <div class="foot">この地図は完成するものではなく、<br>あなたと一緒に少しずつ育っていくものです。</div></section>
 
   <section id="s-gate" class="screen">
     <div class="pagehead"><b style="font-size:16px" id="gateTitle">ふりかえり ── 週に1回</b><span></span></div>
@@ -386,7 +434,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <section id="s-act" class="screen"><div id="actBody"></div></section>
 
   <!-- AIミニセッション（任意）。困る場面・考え・気持ち・行動・対処・望む姿を整理する -->
-  <section id="s-mini" class="screen"><div class="pagehead"><button class="back" onclick="miniBack()">‹</button><span class="lede">AIと少し整理する</span></div>
+  <section id="s-mini" class="screen"><div class="pagehead"><button class="back" onclick="miniBack()">‹</button><span class="lede" id="miniTitle">少し話して、地図をひろげる</span></div>
     <div id="miniFlow" style="margin-top:10px"></div><div class="tray" id="miniTray"></div></section>
 
   <!-- 初回の行動確定前に、はなす・ふりかえり・行動の実施を押したときの案内 -->
@@ -1023,6 +1071,7 @@ function beginSetup(){
   document.getElementById("nav").hidden=false;
   document.getElementById("flow").innerHTML=
     '<div class="pagehead"><button class="back" onclick="go(\'home\')">‹</button><span class="lede">これからのことを決める</span></div>'
+    +'<div class="isteps" id="ivSteps"></div>'
     +'<div style="margin-top:10px" id="ivFlow"></div><div class="tray" id="ivTray"></div>';
   ivRender();
 }
@@ -1046,8 +1095,17 @@ function ivOpts(list,fn){
 }
 function ivNext(){ S.iv++; ivRender(); }
 
+/* 初回の3ステップ：① 3問に答える（呼び方・安全確認を含む） ② 仮の心の地図 ③ 今の一歩 */
+const IV_STEPS=["3問に答える","仮の心の地図","今の一歩"];
+function ivStepNo(){ return S.iv<=5 ? 1 : (S.iv<=7 ? 2 : 3); }
+function renderIvSteps(){
+  const el=document.getElementById("ivSteps"); if(!el) return;
+  const n=ivStepNo();
+  el.innerHTML=IV_STEPS.map(function(t,i){ return '<div class="'+(i+1===n?'on':(i+1<n?'done':''))+'"><i></i>'+(i+1)+'. '+t+'</div>'; }).join("");
+}
 function ivRender(){
   const tray=document.getElementById("ivTray"); if(!tray) return;
+  renderIvSteps();
   switch(S.iv){
 
   /* ① 呼び方 */
@@ -1092,15 +1150,29 @@ function ivRender(){
     break;
 
   /* ⑤ 整理（診断も断定もしない。言い換えと方向の確認だけ） */
+  /* ⑤ 仮の心の地図。3つの答えから作る最初の下書き（言い切らない）。ここで AIミニセッションには入らない */
   case 6:
-    ivSay("教えてくれてありがとう、"+nick()+"さん。<br><br>"
-      +"今は"+IV_TOPIC_P[S.current_concerns[0]]+"が頭を占めていて、"+IV_STATE_P[S.current_status]+"んですね。<br><br>"
-      +"まずは、"+IV_WANT_P[S.direction_goal]+"ところから始めるのがよさそうです。",ivNext);
+    S.ai_conversation_summary = S.iv_scene || (IV_TOPIC_P[S.current_concerns[0]]+"について、"+IV_WANT_P[S.direction_goal]+"ところから始める");
+    ivSay(S.iv_scene_asked ? "教えてくれてありがとう。<br>地図に、ひとつ書き足しました。"
+                           : "教えてくれてありがとう、"+nick()+"さん。<br>3つの答えから、最初の地図の下書きができました。",function(){
+      document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
+        '<div class="draftcard"><div style="display:flex;align-items:center;gap:12px">'+mapArt(64)
+        +'<div><div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 2 ／ 仮の心の地図</div>'
+        +'<h2>仮の心の地図が<br>できました</h2></div></div>'
+        +'<p style="font-size:13.5px;line-height:1.85;margin:6px 0 0">3つの答えから、今のあなたの状態をもとにした<b>最初の地図の下書き</b>が見えてきました。</p>'
+        +'<div class="draft">'+draftHtml(false)+'</div>'
+        +'<div class="draft later"><div class="drow"><div class="k">これから見えてくること</div>'
+        +'<div class="v" style="color:var(--muted);font-size:13px">浮かびやすい考え・気持ちの動き・支えになるもの…<br>話したり、試したりするうちに見えてきます。</div></div></div>'
+        +'<p style="font-size:12.5px;line-height:1.85;color:var(--ink2);margin:0">これはまだ仮のものです。会話や記録を通じて、少しずつ育っていきます。<br>この地図をもとに、次の一歩を提案していきます。</p></div>');
+      tray.innerHTML='<button class="btn" onclick="ivToStep()">この地図で一歩を考える</button>'
+        +(S.iv_scene_asked?'':'<button class="btn ghost" style="margin-top:9px" onclick="ivMoreMap()">もう少し地図をつくる</button>');
+      window.scrollTo(0,document.body.scrollHeight);
+    });
     break;
 
   /* ⑥ 最近の場面をひとつだけ（自由記述は原則ここだけ・深掘りしない） */
   case 7:
-    ivSay("最近、"+IV_TOPIC_P[S.current_concerns[0]]+"で<br>特にしんどかった場面を1つだけ<br>教えてもらえますか？<br><br>うまく書けなくても大丈夫です。",function(){
+    ivSay("では、もうひとつだけ。<br>最近、"+IV_TOPIC_P[S.current_concerns[0]]+"で<br>特にしんどかった場面を1つだけ<br>教えてもらえますか？<br><br>うまく書けなくても大丈夫です。",function(){
       tray.innerHTML='<div class="card" style="margin:0">'
         +'<textarea id="ivScene" rows="4" placeholder="例）夜ベッドに入ってから、明日の仕事のことをずっと考えてしまう"'
         +' style="width:100%;box-sizing:border-box">'+(S.iv_scene||"")+'</textarea>'
@@ -1114,7 +1186,7 @@ function ivRender(){
        「他も見てみる」は置き換えではなく追加。前の候補も選べるまま残す */
   case 8: {
     if(!S.iv_offered.length) addOffers();
-    ivSay("話してくれてありがとう。<br><br>今の話から、今週ならこんなことから始められそうです。<br><br>無理なくできそうなものを1つ選んでみませんか？",
+    ivSay("この地図をもとに考えると、<br>今週ならこんなことから始められそうです。<br><br>無理なくできそうなものを1つ選んでみませんか？",
       function(){ renderOffers(tray); });
     break; }
 
@@ -1159,11 +1231,12 @@ function ivScene(skip){
   const el=document.getElementById("ivScene");
   S.iv_scene = skip ? "" : (el?el.value.trim():"");
   ivMe((skip||!S.iv_scene) ? "今は思いつかない" : S.iv_scene);
-  S.ai_conversation_summary = S.iv_scene ? S.iv_scene
-    : (IV_TOPIC_P[S.current_concerns[0]]+"について、"+IV_WANT_P[S.direction_goal]+"ところから始める");
-  if(S.iv_scene && RISK_RE.test(S.iv_scene)){ openSafety("free_text","unspecified"); return; }
-  ivNext();
+  S.iv_scene_asked=true;
+  if(S.iv_scene && RISK_RE.test(S.iv_scene)){ S.iv=5; openSafety("free_text","unspecified"); return; }   // 戻ったら仮の地図から
+  S.iv=6; ivRender();   // 仮の心の地図に戻る（場面が書き足される）
 }
+function ivToStep(){ ivMe("この地図で一歩を考える"); S.iv=8; ivRender(); }
+function ivMoreMap(){ ivMe("もう少し地図をつくる"); S.iv=7; ivRender(); }
 /* ── 提案候補は「置き換え」ではなく「追加」していく ─────────────
    S.iv_offered に提示済みを積み、最大6件まで。重複は出さない。 */
 const OFFER_MAX=6;
@@ -1410,11 +1483,12 @@ function renderHome(){
   const ready=S.initial_plan_completed, mood=todayMood();
   let h=`<div class="hhead"><div class="txt"><div class="g">${greeting()}</div>
       ${S.nickname?`<b>${S.nickname}さん</b>`:""}
-      <div class="sub">今日も、ここに来てくれてありがとうございます。</div></div>
+      <div class="sub">今日も、ここに来てくれてありがとうございます。<br>あなたのペースで、少しずつで大丈夫です。</div></div>
     <div class="sprout" aria-hidden="true">🌱</div></div>`;
 
   if(ready){
-    h+=stepCard()
+    /* 優先順：今週の小さな一歩 → 心の地図 → テーマ → 今日の状態 → 最近わかったこと → ふりかえり */
+    h+=stepCard()+mapHomeCard()
       +`<div class="hcard tap" onclick="openTheme()"><div class="k">🎯 今週のテーマ<span class="go">›</span></div>
           <div class="v">${themeText()}</div><div class="s">kokoniと一緒に見つけたテーマ</div></div>`;
   } else {
@@ -1430,8 +1504,7 @@ function renderHome(){
     <div class="subgrid">
       <div class="hcard tap" onclick="go('talk')"><div class="k">💬</div><div class="v">今日は話すだけにする</div><div class="s">今の気持ちを言葉にしてみましょう</div></div>
       <div class="hcard tap" onclick="go('map')"><div class="k">📗</div><div class="v">最近わかったこと</div><div class="s">${(function(){
-        const r=mapRecent()[0]; if(r) return esc(r.text);
-        return mapNextBlock() ? "話してくれた言葉がたまっています" : "これから一緒に見つけていきます"; })()}</div></div>
+        const f=mapFeed(1)[0]; return f ? esc(f.text) : "これから一緒に見つけていきます"; })()}</div></div>
     </div>`;
   if(letterArrived()) h+=`<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span>
     <div style="flex:1"><div class="k">大塚さんから</div><div class="v">心理士から手紙が届いています</div></div>
@@ -1494,8 +1567,11 @@ function stepCard(){
   const a=curAct(), p=weekProgress();
   return `<div class="stepcard">
     <div class="lab">🌱 今週の小さな一歩</div>
+    <div class="intro">忙しい毎日の中でも、少し心が軽くなるような一歩です。できそうなときに、試してみましょう。</div>
     <h2>${a?a.title:(S.first_action||"—")}</h2>
-    <div class="plan">目安：${a?planLabel():"—"}</div>
+    ${a?`<div class="desc">${a.short_description}</div>
+    <div class="chips2"><span>⏱ 1回${S.act_duration}分</span><span>🗓 ${isTrigger(a)?freqText(S.act_frequency,a):S.act_frequency+(S.act_frequency==="毎日"?"":"くらい")}</span></div>`
+      :`<div class="plan">目安：—</div>`}
     ${p?`<div class="prog"><div class="row"><span class="k">${p.k}</span><span class="n" id="stepProg">${p.n}</span></div>
       ${p.pips?`<div class="pips">${p.pips.map(function(on){ return '<i class="'+(on?"on":"")+'"></i>'; }).join("")}</div>`:""}
       <div class="note" style="margin-top:${p.pips?8:0}px">${p.note}</div></div>`:""}
@@ -1636,47 +1712,15 @@ function tPick(i){
   if(ti===3 && i<2) ti=7; else ti++;
   stepTalk();
 }
-function renderMap(){
-  /* 初回前も閲覧できる。まだ空の状態として見せる */
-  if(!S.initial_plan_completed){
-    const blocks=["心が動きやすい場面","浮かびやすい考え","感情・身体の反応","取りやすい行動","繰り返しやすいパターン","試して分かったこと","自分を支えてくれるもの","背景にあるもの"];
-    document.getElementById("mapBody").innerHTML =
-      '<div class="mapsum"><h3>これから一緒に作っていく地図です</h3>'
-      + '<div class="lede" style="line-height:1.9">これから一緒に、あなたの心の地図を少しずつ作っていきます。<br>'
-      + 'やってみたことや話したことから、少しずつ書き足されていきます。</div></div>'
-      + '<div class="mgrid">'+blocks.map(function(t,i){
-          return '<div class="layer'+(i>=4?' wide':'')+'" style="opacity:.6"><h4>'+t+'</h4>'
-            +'<div style="font-size:13px;color:var(--muted)">まだ空白です</div></div>'; }).join("")+'</div>'
-      + '<div style="margin:14px 18px"><button class="btn" onclick="resumeSetup()">一緒に決める</button></div>';
-    return;
-  }
-  if(MAPED) return renderMapEditor();
-  const next=mapNextBlock(), recent=mapRecent();
-  document.getElementById("mapBody").innerHTML =
-    '<div class="mapsum"><h3>あなたの言葉で、少しずつ</h3>'
-    + '<div class="lede" style="line-height:1.85">すぷらんは、あなたが話してくれた言葉を集めておきます。<br>'
-    +   'まとめて言葉にするのは、あなたです。</div>'
-    + (recent.length ? recent.map(function(e){ return '<div class="row"><div class="k">'+e.k+'</div><div class="v">'+esc(e.text)+'</div></div>'; }).join("")
-        : '<div class="row"><div class="k">書いたこと</div><div class="v" style="color:var(--muted)">まだありません</div></div>')
-    + (next ? '<button class="btn" style="margin-top:12px" onclick="openMapEditor(\''+next.id+'\')">「'+next.k+'」を一緒に探す</button>'
-            + '<div class="lede" style="margin:8px 0 0;text-align:center">1回に1つずつで十分です</div>'
-            /* 材料がまだ少ないとき：AIミニセッションで話すと材料が集まる */
-            : (S.mini_sessions.length ? '' : '<div class="lede" style="margin:12px 0 8px">地図の材料は、話してくれた言葉から集まります。</div>'
-              + '<button class="btn ghost" onclick="openMini(\'map\')">AIと少し整理してみる</button>'))
-    + '</div>'
-    + '<div class="mgrid">'+MAP_BLOCKS.map(mapBlockHtml).join("")+'</div>'
-    + '<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。<br>'
-    +   '<span class="tag">AIは本人の言葉を集めて問いかけるだけ。地図の文は本人が書く（9/22「生みの苦しみ」への対応）</span></div>';
-}
-
 /* ══════════════════════════════════════════════════════════════
-   心の地図 ──「途中まで一緒に言葉を探し、本人が仕上げる」
-   - AIは完成した見立てを出さない。出すのは ①本人が話した言葉（材料） ②問い ③書き出しの文 だけ
-   - 書くのは本人。書かなくてもよい（「いまは書かない」）
-   - 材料は 初回の対話・AIミニセッション・行動の記録・今日の状態 から集める（AIが作った文は混ぜない）
+   心の地図 ──「少しずつ自分が見えてくる」場所
+   - 7つの視点。完成はしない（7/7でも「ここから深めていきます」）
+   - 見えてきた＝本人が話した・記録した言葉がある、または本人が自分の言葉で書いた
+   - AIが足すのは、本人の言葉を並べること・つなげて「〜かもしれません」と仮に置くことまで
+   - 文として仕上げたいときは、カードから本人が自分の言葉で書ける（9/22「生みの苦しみ」）
    - 「背景にあるもの」（縦断的な層）は PoC では扱わない
    ══════════════════════════════════════════════════════════════ */
-let MAPED=null;   // 編集中のブロック {id, draft, slots}
+let MAPED=null;   // 編集中の視点 {id, draft, slots}
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 const MAP_BLOCKS=[
   {id:"scene",    k:"心が動きやすい場面", cls:"",
@@ -1685,68 +1729,183 @@ const MAP_BLOCKS=[
   {id:"thought",  k:"浮かびやすい考え", cls:"",
    q:"そのとき、頭の中ではどんな言葉が流れていそうですか？<br>自分の口ぐせのように書いてみてください。", stem:"そういうとき、「＿＿＿」と考えやすい。",
    words:["また失敗する","迷惑をかけている","ちゃんとしなきゃ","どうせ無理","自分だけが遅れている"]},
-  {id:"feeling",  k:"感情・身体の反応", cls:"",
+  {id:"feeling",  k:"気持ち・身体の反応", cls:"",
    q:"気持ちや体には、どんなことが起きていますか？<br>ぴったりの言葉がなければ、近いもので大丈夫です。", stem:"そのとき、気持ちは＿＿＿、体は＿＿＿。",
    words:["不安","焦り","落ち込み","イライラ","むなしさ","胸が苦しい","体が重い","眠れない","肩がこわばる"]},
   {id:"behavior", k:"取りやすい行動", cls:"",
    q:"そのあと、どうすることが多いですか？<br>良い・悪いは考えなくて大丈夫です。", stem:"そういうとき、わたしは＿＿＿ことが多い。",
    words:["スマホを見る","布団から出られない","後回しにする","人を避ける","がんばりすぎる"]},
-  {id:"pattern",  k:"繰り返しやすいパターン", cls:"loop wide", pattern:true,
-   q:"これまで書いた言葉をつなげると、どう流れていそうですか？<br>つながらなければ、つなげなくて大丈夫です。"},
+  {id:"pattern",  k:"繰り返しやすい流れ", cls:"loop wide", pattern:true,
+   q:"これまで話してくれた言葉をつなげると、どう流れていそうですか？<br>つながらなければ、つなげなくて大丈夫です。"},
   {id:"tried",    k:"試して分かったこと", cls:"good wide",
    q:"やってみた記録を並べてみました。<br>やってみて、自分について分かったことはありますか？", stem:"＿＿＿をすると、わたしは＿＿＿。",
    words:["少し楽になる","変わらない日もある","朝のほうがやりやすい","短いほうが続く"]},
   {id:"support",  k:"自分を支えてくれるもの", cls:"res wide",
    q:"しんどいとき、少しでも支えになっているものはありますか？<br>人・場所・時間・もの、なんでも大丈夫です。", stem:"わたしを支えてくれているのは、＿＿＿。",
-   words:["家族","友人","散歩","音楽","眠ること","ペット"]},
-  {id:"background", k:"背景にあるもの", cls:"locked wide", locked:true}
+   words:["家族","友人","散歩","音楽","眠ること","ペット"]}
 ];
+const MAP_N=MAP_BLOCKS.length;
 function mapBlock(id){ return MAP_BLOCKS.filter(function(b){ return b.id===id; })[0]; }
 function fmtMD(iso){ const d=new Date(Date.parse(iso)); return (d.getMonth()+1)+"/"+d.getDate(); }
-/* 本人が話した・記録した言葉だけを集める（AIが作った文は入れない） */
+/* 本人が話した・記録した言葉を集める。src は出どころ、at は見えてきた日 */
 function mapMaterials(id){
-  const out=[], add=function(t,src){ t=(t||"").trim(); if(t && !out.some(function(o){ return o.t===t; })) out.push({t:t,src:src}); };
+  const out=[], add=function(t,src,at){ t=(t||"").trim(); if(t && !out.some(function(o){ return o.t===t; })) out.push({t:t,src:src,at:at||null}); };
   const miniKey={scene:"scene",thought:"thought",feeling:"feeling",behavior:"behavior",support:"coping"}[id];
-  if(id==="scene") add(S.iv_scene,"最初に話した場面");
-  S.mini_sessions.forEach(function(m){ if(miniKey) add(m[miniKey],"AIと整理（"+fmtMD(m.at)+"）"); });
-  if(id==="thought") S.act_logs.forEach(function(l){ if(l.input && UI_FAMILY[l.app_type]==="write") add(l.input,"「"+l.title+"」で書いたこと（"+fmtMD(l.at)+"）"); });
+  if(id==="scene") add(S.iv_scene,"最初に話した場面",S.setup_completed_at);
+  S.mini_sessions.forEach(function(m){ if(miniKey) add(m[miniKey],"少し話したこと（"+fmtMD(m.at)+"）",m.at); });
+  if(id==="thought") S.act_logs.forEach(function(l){ if(l.input && UI_FAMILY[l.app_type]==="write") add(l.input,"「"+l.title+"」で書いたこと（"+fmtMD(l.at)+"）",l.at); });
   if(id==="feeling"){
-    const n=S.mood_logs.filter(function(m){ return m.v==="しんどい"; }).length;
-    if(n) add("「しんどい」と記録した日："+n+"日","今日の状態");
+    const sh=S.mood_logs.filter(function(m){ return m.v==="しんどい"; });
+    if(sh.length) add("「しんどい」と記録した日が"+sh.length+"日あります","今日の状態",sh[sh.length-1].at);
+  }
+  if(id==="pattern"){
+    /* 同じ回に話してくれた「場面・考え・気持ち・行動」のうち2つ以上を、本人の言葉のままつなぐ */
+    S.mini_sessions.forEach(function(m){
+      const ch=["scene","thought","feeling","behavior"].map(function(k){ return m[k]; }).filter(Boolean);
+      if(ch.length>=2) add(ch.join(" → "),"少し話したこと（"+fmtMD(m.at)+"）",m.at);
+    });
   }
   if(id==="tried"){
-    const by={};
-    S.act_logs.forEach(function(l){ (by[l.title]=by[l.title]||[]).push(l.feeling); });
-    Object.keys(by).forEach(function(t){ add("「"+t+"」のあと："+countText(by[t]),"やってみた記録"); });
+    const by={}, last={};
+    S.act_logs.forEach(function(l){ (by[l.title]=by[l.title]||[]).push(l.feeling); last[l.title]=l.at; });
+    Object.keys(by).forEach(function(t){ add("「"+t+"」のあと："+countText(by[t]),"やってみた記録",last[t]); });
   }
   return out;
 }
 function mapEntry(id){ return (S.map||{})[id]; }
-function mapRecent(){
-  return Object.keys(S.map||{}).map(function(id){ return Object.assign({id:id,k:mapBlock(id).k},S.map[id]); })
-    .sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); }).slice(0,2);
+function mapSeen(id){ return !!mapEntry(id) || mapMaterials(id).length>0; }
+function mapCount(){ return MAP_BLOCKS.filter(function(b){ return mapSeen(b.id); }).length; }
+/* 心の地図を「つくり始めた」か。初回3問だけ（＋場面）の段階はまだ下書き */
+function mapStarted(){
+  return Object.keys(S.map||{}).length>0
+    || S.mini_sessions.some(function(m){ return MINI_Q.some(function(x){ return m[x.id]; }); });
 }
-/* 次に一緒に探すブロック：材料があって、まだ本人が書いていないもの（パターンは2つ以上書いてから） */
-function mapNextBlock(){
-  const written=Object.keys(S.map||{}).length;
-  return MAP_BLOCKS.filter(function(b){
-    if(b.locked || mapEntry(b.id)) return false;
-    if(b.pattern) return written>=2;
-    return mapMaterials(b.id).length>0;
-  })[0]||null;
+/* 最近見えてきたこと（新しい順）。本人が書いた言葉を優先して1視点1件 */
+function mapFeed(n){
+  const rows=[];
+  MAP_BLOCKS.forEach(function(b){
+    const e=mapEntry(b.id);
+    if(e) return rows.push({id:b.id,k:b.k,text:e.text,at:e.at,mine:true});
+    const m=mapMaterials(b.id).filter(function(x){ return x.at; }).slice(-1)[0];
+    if(m) rows.push({id:b.id,k:b.k,text:m.t,at:m.at,mine:false});
+  });
+  return rows.sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); }).slice(0,n||3);
+}
+function mapRecent(){ return mapFeed(2).filter(function(r){ return r.mine; }); }
+
+/* 3問の答えから作る「仮の心の地図」。言い切らず「〜ようです」で置く */
+function draftRows(){
+  const st=S.current_status, tp=(S.current_concerns||[])[0], wt=S.direction_goal;
+  const rows=[];
+  if(st) rows.push({k:"今の状態", v:(IV_STATE_P[st]||st)+"ようです"});
+  if(tp) rows.push({k:"今の関心・テーマ", v: tp==="まだわからない" ? "まだ言葉にならない何かが、気になっているようです"
+                                         : (IV_TOPIC_P[tp]||tp)+"が、いま心を占めているようです"});
+  if(wt) rows.push({k:"変えたいこと", v: wt==="まだわからない" ? "まずは、いまの状態をそのまま眺めてみたいようです"
+                                         : (IV_WANT_P[wt]||wt)+"ことから、始めてみたいようです"});
+  return rows;
+}
+function draftHtml(compact){
+  return draftRows().map(function(r){
+    return '<div class="drow"><div class="k">'+r.k+'</div><div class="v">'+esc(r.v)+'</div></div>'; }).join("")
+    + (S.iv_scene && !compact ? '<div class="drow"><div class="k">心が動きやすい場面</div><div class="v">「'+esc(S.iv_scene)+'」</div></div>' : '');
+}
+
+/* 7つの視点を芽のまわりに置いた小さな図。見えてきた視点ほど葉がひろがる */
+function mapArt(size){
+  const s=size||88, c=s/2, R=s*0.36, r=s*0.105;
+  let h='<svg class="mapart" width="'+s+'" height="'+s+'" viewBox="0 0 '+s+' '+s+'" aria-hidden="true">'
+    +'<circle cx="'+c+'" cy="'+c+'" r="'+(R+r+2)+'" fill="var(--g-pale-2)" stroke="var(--teal-line)" stroke-dasharray="3 4"></circle>';
+  MAP_BLOCKS.forEach(function(b,i){
+    const a=-Math.PI/2+i*2*Math.PI/MAP_N, x=c+R*Math.cos(a), y=c+R*Math.sin(a), on=mapSeen(b.id);
+    h+='<line x1="'+c+'" y1="'+c+'" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="'+(on?'var(--teal)':'var(--teal-line)')+'" stroke-width="1.4"></line>'
+      +'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+(on?'var(--teal)':'var(--paper)')+'" stroke="'+(on?'var(--teal-deep)':'var(--teal-line)')+'" stroke-width="1.2"></circle>';
+  });
+  return h+'<circle cx="'+c+'" cy="'+c+'" r="'+(r*1.25).toFixed(1)+'" fill="var(--accent-soft)" stroke="var(--accent-line)"></circle>'
+    +'<text x="'+c+'" y="'+(c+r*0.55).toFixed(1)+'" text-anchor="middle" font-size="'+(r*1.5).toFixed(1)+'">🌱</text></svg>';
+}
+function mapPips(){
+  return '<div class="mpips">'+MAP_BLOCKS.map(function(b){ return '<i class="'+(mapSeen(b.id)?'on':'')+'"></i>'; }).join("")+'</div>';
+}
+/* 進み具合の言葉。7/7でも「完成」とは言わない */
+function mapStatusText(n){
+  if(n>=MAP_N) return {h:"7つの視点が見えてきました", s:"ここからは、少しずつ深めていきます。<br>見えてきたことは、これからも増えていきます。"};
+  if(n===0) return {h:"これから、少しずつ見えてきます", s:"話したことや、やってみたことから<br>地図がひろがっていきます。"};
+  return {h:"見えてきたこと "+n+"/"+MAP_N, s:"話したことや、やってみたことから<br>少しずつ見えてきています。"};
+}
+
+function renderMap(){
+  const body=document.getElementById("mapBody");
+  /* 初回前も閲覧できる。まだこれからの状態として見せる */
+  if(!S.initial_plan_completed){
+    body.innerHTML='<div class="mapsum"><div class="mhero">'+mapArt(84)+'<div><h3>心の地図を、一緒に<br>少しずつひろげていきましょう</h3>'
+      +'<div class="lede" style="margin:4px 0 0">最初に3つの質問に答えると、<br>地図の下書きができます。</div></div></div></div>'
+      +'<div class="mgrid">'+MAP_BLOCKS.map(function(b){ return '<div class="layer '+(b.cls.indexOf("wide")>=0?'wide':'')+'" style="opacity:.6"><h4>'+b.k+'</h4>'
+        +'<div class="sub" style="margin:0">まだこれから</div></div>'; }).join("")+'</div>'
+      +'<div style="margin:14px 18px"><button class="btn" onclick="resumeSetup()">一緒に決める</button></div>';
+    return;
+  }
+  if(MAPED) return renderMapEditor();
+  const n=mapCount(), st=mapStatusText(n), feed=mapFeed(3), full=n>=MAP_N;
+  body.innerHTML =
+    '<div class="mapsum"><div class="mhero">'+mapArt(92)+'<div style="min-width:0">'
+    + '<div class="lede" style="margin:0 0 4px">心の地図を、一緒に少しずつひろげていきましょう</div>'
+    + '<h3 id="mapHead">'+st.h+'</h3>'+mapPips()+'</div></div>'
+    + '<div class="lede" style="line-height:1.85;margin:10px 0 0">'+st.s+'</div></div>'
+
+    + '<div class="sech">はじめに話してくれたこと<span>最初の下書き</span></div>'
+    + '<div class="card draft" style="margin-top:0">'+draftHtml(false)+'</div>'
+
+    + '<div class="sech">最近見えてきたこと</div>'
+    + (feed.length ? feed.map(function(f){
+        return '<div class="found tap" onclick="openMapEditor(\''+f.id+'\')"><div class="k">'+f.k+'<span>'+fmtMD(f.at)+'</span></div>'
+          +'<div class="v">'+(f.mine?esc(f.text):'「'+esc(f.text)+'」')+'</div>'
+          +'<div class="s">'+(f.mine?'あなたの言葉':(f.id==="pattern"?'こんな流れがあるのかもしれません':'話してくれたことから'))+'</div></div>'; }).join("")
+      : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">少し話してみると、ここに見えてきたことが並びます。</div></div>')
+
+    + '<div class="sech">7つの視点</div>'
+    + '<div class="mgrid">'+MAP_BLOCKS.map(mapBlockHtml).join("")+'</div>'
+
+    + '<div class="mapcta"><button class="btn" onclick="openMini(\'map\')">'+(full?'少し話して、地図を深める':'少し話して、地図をひろげる')+'</button>'
+    + '<div class="lede" style="margin-top:8px;text-align:center">話したことから、見えてくることが増えていきます。<br>カードを押すと、自分の言葉で書き足せます。</div></div>'
+    + '<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。</div>';
 }
 function mapBlockHtml(b){
-  if(b.locked) return '<div class="layer locked wide"><h4>'+b.k+'</h4>'
-    +'<div style="font-size:13px">ここは、いまは扱いません。<br>もっと深く見ていくときは、担当の心理士と一緒に。</div></div>';
-  const e=mapEntry(b.id), mats=b.pattern?[]:mapMaterials(b.id);
-  let body;
-  if(e) body='<div class="mine">'+esc(e.text)+'</div><div class="sub" style="margin:6px 0 0">あなたの言葉（'+fmtMD(e.at)+'）</div>';
-  else if(b.pattern) body='<div class="sub" style="margin:0">ほかの場所に2つ以上書いたら、つなげてみられます。</div>';
-  else if(mats.length) body='<div class="sub" style="margin:0">話してくれた言葉が '+mats.length+' つあります</div>';
-  else body='<div class="sub" style="margin:0">まだ空白です</div>';
-  const can = e || (b.pattern ? Object.keys(S.map||{}).length>=2 : mats.length>0);
-  return '<div class="layer '+b.cls+(can?' tap':'')+'"'+(can?' onclick="openMapEditor(\''+b.id+'\')"':'')+'><h4>'+b.k+'</h4>'+body
-    +(can?'<div class="mgo">'+(e?'書き直す':'一緒に探す')+' ›</div>':'')+'</div>';
+  const e=mapEntry(b.id), mats=mapMaterials(b.id);
+  let inner;
+  if(e) inner='<div class="mine">'+esc(e.text)+'</div><div class="sub" style="margin:6px 0 0">あなたの言葉（'+fmtMD(e.at)+'）</div>';
+  else if(mats.length) inner='<ul>'+mats.slice(-2).map(function(m){ return '<li>'+esc(m.t)+'</li>'; }).join("")+'</ul>'
+    +(b.pattern?'<div class="sub" style="margin:6px 0 0">こんな流れがあるのかもしれません</div>':'');
+  else inner='<div class="sub" style="margin:0">まだこれから</div>';
+  const can = !!e || mats.length>0 || (b.pattern && ["scene","thought","feeling","behavior"].filter(mapSeen).length>=2);
+  return '<div class="layer '+b.cls+(can?' tap':'')+(mapSeen(b.id)?'':' dim')+'"'+(can?' onclick="openMapEditor(\''+b.id+'\')"':'')+'><h4>'+b.k+'</h4>'+inner
+    +(can?'<div class="mgo">'+(e?'書き直す':'自分の言葉にしてみる')+' ›</div>':'')+'</div>';
+}
+
+/* ホームの心の地図カード。状態で3段階に変わる
+   未作成（3問の下書きだけ）→ つくり始めた（n/7）→ 7つの視点が見えてきた（深めていく） */
+function mapHomeCard(){
+  const n=mapCount(), full=n>=MAP_N;
+  if(!mapStarted()){
+    if(S.map_later) return '<div class="hrow tap" onclick="S.map_later=false;renderHome()"><span class="ic">🗺</span>'
+      +'<div style="flex:1"><div class="k">心の地図</div><div class="v">心の地図は、いつでもつくれます</div></div>'
+      +'<span style="align-self:center;font-size:13px;font-weight:800;color:var(--teal-deep)">ひらく ›</span></div>';
+    return '<div class="mapcard"><div class="top">'+mapArt(64)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
+      +'<h3>次は、心の地図をつくれます</h3></div></div>'
+      +'<div class="lede" style="margin:10px 0 6px">3つの答えから、こんなことが見えてきました。<span class="ex">一例です</span></div>'
+      +'<div class="draft">'+draftHtml(true)+'</div>'
+      +'<p class="why">心の地図をつくると、<br>あなたに合う一歩を考えやすくなります。</p>'
+      +'<button class="btn" onclick="openMini(\'home\')">心の地図をつくる</button>'
+      +'<button class="linkbtn" onclick="S.map_later=true;renderHome()">あとでやる</button></div>';
+  }
+  const f=mapFeed(1)[0];
+  return '<div class="mapcard"><div class="top">'+mapArt(64)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
+    +'<h3>'+(full?'7つの視点が見えてきました':'あなたに合うやり方を、<br>もう少し見つける')+'</h3>'
+    +(full?'<div class="lede" style="margin:2px 0 0">ここからは、少しずつ深めていきます</div>'
+          :'<div class="cnt">見えてきたこと <b>'+n+'</b>/'+MAP_N+'</div>'+mapPips())+'</div></div>'
+    +(f?'<div class="found" style="margin:12px 0 0"><div class="k">最近見えてきたこと<span>'+fmtMD(f.at)+'</span></div>'
+        +'<div class="v">'+(f.mine?esc(f.text):'「'+esc(f.text)+'」')+'</div></div>':'')
+    +'<div class="two"><button class="btn" onclick="openMini(\'home\')">'+(full?'少し話して、地図を深める':'少し話してみる')+'</button>'
+    +'<button class="btn ghost" onclick="go(\'map\')">'+(full?'心の地図を見る':'地図を見る')+'</button></div></div>';
 }
 
 function openMapEditor(id){
@@ -1773,10 +1932,10 @@ function renderMapEditor(){
     const src=[["scene","場面"],["thought","考え"],["feeling","気持ち・体"],["behavior","行動"]];
     h+=say(b.q)
       +'<div class="card">'+src.map(function(p,i){
-          const e=mapEntry(p[0]);
+          const e=mapEntry(p[0]), w=e?e.text:((mapMaterials(p[0]).slice(-1)[0]||{}).t||"");
           return '<div class="fld" style="margin-bottom:6px"><label>'+p[1]+'</label>'
-            +(e?'<div class="lede" style="margin:-2px 0 6px">あなたの言葉：'+esc(e.text)+'</div>':'')
-            +'<input type="text" class="patIn" value="'+esc(MAPED.slots[i])+'" placeholder="'+(e?'短く言いかえる':'わからなければ空けておく')+'" oninput="MAPED.slots['+i+']=this.value"></div>'
+            +(w?'<div class="lede" style="margin:-2px 0 6px">'+(e?'あなたの言葉':'話してくれたこと')+'：'+esc(w)+'</div>':'')
+            +'<input type="text" class="patIn" value="'+esc(MAPED.slots[i])+'" placeholder="'+(w?'短く言いかえる':'わからなければ空けておく')+'" oninput="MAPED.slots['+i+']=this.value"></div>'
             +(i<3?'<div style="text-align:center;color:var(--accent);font-weight:800">↓</div>':'');
         }).join("")
       +'<button class="btn" style="margin-top:12px" onclick="saveMapPattern()">地図に書く</button>'
@@ -2238,7 +2397,11 @@ function openMini(from){
   document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
   document.getElementById("s-mini").classList.add("active"); S.screen="mini";
   document.getElementById("miniFlow").innerHTML=""; sync();
-  miniSay("少しだけ、最近のことを一緒に整理してみませんか。<br>答えにくいものは、とばして大丈夫です。",miniAsk);
+  MINI.before=mapCount();
+  document.getElementById("miniTitle").textContent = from==="gate" ? "AIと少し整理する" : (MINI.before>=MAP_N ? "少し話して、地図を深める" : "少し話して、地図をひろげる");
+  /* ※ 会話の中身は仮（固定の6問）。役割＝心の地図を具体化し、行動提案を本人に合わせていく */
+  miniSay(from==="gate" ? "少しだけ、最近のことを一緒に整理してみませんか。<br>答えにくいものは、とばして大丈夫です。"
+    : "少し話しながら、心の地図をひろげていきましょう。<br>話してくれたことから、あなたに合う一歩も考えやすくなります。<br><br>答えにくいものは、とばして大丈夫です。",miniAsk);
 }
 function miniSay(m,then){
   const tray=document.getElementById("miniTray");
@@ -2273,9 +2436,13 @@ function miniDone(){
   const a=MINI.a;
   const summary=MINI_Q.filter(function(x){ return a[x.id]; }).map(function(x){ return x.k+"："+a[x.id]; }).join("<br>") || "（今回は、とばした項目だけでした）";
   S.mini_sessions.push(Object.assign({session_id:"MS-"+(S.mini_sessions.length+1), at:nowIso(), source:MINI.from, summary:summary}, a));
-  miniSay("整理してくれてありがとうございます。<br><br>"+summary,function(){
-    document.getElementById("miniTray").innerHTML='<button class="btn" onclick="miniBack()">'
+  const after=mapCount(), grew=after-MINI.before;
+  miniSay("話してくれてありがとうございます。<br><br>"+summary
+    +(grew>0 ? "<br><br>心の地図に、新しく見えてきたことがあります。" : (after>0 ? "<br><br>心の地図が、少し深まりました。" : "")),function(){
+    const back='<button class="btn'+(MINI.from==="map"?'':' ghost')+'" style="margin-top:9px" onclick="miniBack()">'
       +({gate:"次の一歩を決めに戻る", map:"心の地図に戻る"}[MINI.from]||"ホームに戻る")+'</button>';
+    document.getElementById("miniTray").innerHTML = MINI.from==="map" ? back
+      : '<button class="btn" onclick="go(\'map\')">心の地図を見る</button>'+back;
   });
 }
 function miniBack(){ go(MINI && (MINI.from==="gate"||MINI.from==="map") ? MINI.from : "home"); }
