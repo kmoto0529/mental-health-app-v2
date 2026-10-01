@@ -365,6 +365,29 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .myinfo .st{font-size:10.5px;font-weight:700;color:var(--muted);white-space:nowrap}
 .myinfo .st.on{color:var(--teal-deep)}
 .myinfo .d{font-size:12.5px;line-height:1.75;color:var(--ink2);margin-top:2px}
+/* 今日の一歩（気持ちの記録を中に・優先度を下げる）／ロック */
+.stepcard .dscard{background:none;border:none;border-top:1px dashed var(--teal-line);border-radius:0;box-shadow:none;margin:16px 0 0;padding:14px 0 0}
+.stepcard .dscard .k{color:var(--ink2)}
+.stepcard .dsdesc{font-size:12.5px}
+.stepcard .dsb{padding:6px 2px 5px;font-size:11px;background:var(--paper)}
+.stepcard .dsb svg{width:24px;height:24px}
+.stepcard .dsgo{font-size:12px}
+.stepcard .prog.sm{display:flex;justify-content:space-between;align-items:baseline;background:none;border:none;padding:4px 0 10px;margin:0}
+.stepcard .prog.sm .k{font-size:12px;color:var(--muted);font-weight:700}
+.stepcard .prog.sm .n{font-size:13px;font-weight:800;color:var(--teal-deep)}
+.pausebox{background:var(--paper2);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.75;color:var(--ink2);margin:6px 0 10px}
+.pauselink{font-size:11.5px!important;color:var(--muted)!important;margin-top:10px!important}
+.mapcard.locked{background:var(--paper2);border-style:dashed}
+.mapcard.locked h3{color:var(--ink2);font-size:15px}
+.lk2{flex:0 0 44px;height:44px;border-radius:50%;background:var(--paper);border:1px dashed var(--line-input);display:flex;align-items:center;justify-content:center;font-size:20px}
+.maplock{background:var(--paper2);border:1px dashed var(--line-input);border-radius:var(--r-m);margin:14px 18px;padding:24px 20px;text-align:center}
+.maplock .lk3{font-size:30px;line-height:1;margin-bottom:8px}
+.maplock h3{margin:0 0 10px;font-size:17px;color:var(--ink)}
+.maplock p{font-size:13.5px;line-height:1.85;color:var(--ink2);margin:0}
+.maplock .cd{margin-top:14px;font-size:13px;font-weight:700;color:var(--teal-deep)}
+.maplock .cd b{font-size:20px}
+.tcard.locked{background:var(--paper2);border-style:dashed}
+.tcard.locked h3{color:var(--ink2)}
 /* kokoniからのおたより */
 .hrow.otay{background:linear-gradient(160deg,#FFFDF6,#F7EFDF);border-color:var(--accent-line)}
 .hrow.otay .k{color:var(--accent)}
@@ -626,7 +649,8 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <button class="hideable" onclick="seedDaily()">記録サンプル</button>
   <button class="hideable" id="aiBtn" onclick="toggleAi()">AI: OFF</button>
   <button class="hideable" onclick="openSafety('demo','some')">リスク検知</button>
-  <button class="hideable" onclick="location.reload()">最初から</button>
+  <button class="hideable" onclick="skipToRegular()">2周目へ</button>
+  <button class="hideable" onclick="resetDemo()">最初から</button>
   <span class="sp"></span>
   <span id="statusLab" style="opacity:.7"></span>
   <button class="tog" onclick="document.getElementById('demobar').classList.toggle('min')">▾</button>
@@ -758,7 +782,7 @@ function toggleSide(){
   window.scrollTo(0,0);
 }
 function sync(){
-  refreshCycle();
+  refreshCycle(); saveState();
   document.getElementById("statusLab").textContent="setup: "+S.setup_status
     +(S.cycle ? " / "+S.cycle.weekly_cycle_id+": "+S.cycle.weekly_review_status : "")
     +(S.clock_offset ? " / +"+Math.round(S.clock_offset/DAY)+"日" : "");
@@ -905,7 +929,7 @@ function renderSupportList(openId){
     if(strong){ if(a.category_id==="unsafe_now") return -1; if(b.category_id==="unsafe_now") return 1; }
     return a.order-b.order;
   });
-  const sf=S.support_from, back = sf==="mypage" ? "go('log')" : sf==="gate" ? "go('gate')" : "backToSafety()";
+  const sf=S.support_from, back = sf==="mypage" ? "go('log')" : sf==="gate" ? "go('gate')" : sf==="home" ? "go('home')" : "backToSafety()";
   let h='<div class="pagehead"><button class="back" onclick="'+back+'">‹</button><span></span></div>'
     +'<div style="padding:4px 18px 0"><h2 style="font-size:20px;margin-bottom:8px">いま相談できるところ</h2>'
     +'<p class="lede" style="line-height:1.85">話したいと思ったときに使える窓口があります。<br>今の状況に近いものから選んでください。</p>'
@@ -938,7 +962,7 @@ function renderSupportList(openId){
     });
     h+='</div>';
   });
-  h+='<div style="padding:8px 18px 24px"><button class="btn ghost" onclick="'+(sf?back:"safeReturn('resource_list')")+'">'+(sf==="mypage"?"マイページに戻る":sf==="gate"?"ふりかえりに戻る":"kokoniに戻る")+'</button></div>'
+  h+='<div style="padding:8px 18px 24px"><button class="btn ghost" onclick="'+(sf?back:"safeReturn('resource_list')")+'">'+(sf==="mypage"?"マイページに戻る":sf==="gate"?"ふりかえりに戻る":sf==="home"?"ホームに戻る":"kokoniに戻る")+'</button></div>'
     +'<div id="supportDebug"></div>';
   document.getElementById("supportBody").innerHTML=h;
   renderSafetyDebug("supportDebug");
@@ -1075,11 +1099,11 @@ function actReason(r){
   const kw=(r.why||[]).filter(function(w){ return w.indexOf("場面の言葉")===0; })[0];
   if(kw && S.iv_scene){
     const s=S.iv_scene.length>22 ? S.iv_scene.slice(0,22)+"…" : S.iv_scene;
-    return "最初の心の地図で「"+esc(s)+"」という場面が見えてきたため、まず試しやすい方法として提案しています。";
+    return "「"+esc(s)+"」と話してくれたので、まず試しやすい方法として提案しています。";
   }
   if((r.a.match&&r.a.match.want||[]).indexOf(S.direction_goal)>=0)
-    return "今の心の地図で、「"+S.direction_goal+"」と見えてきたため、まず試しやすい方法として提案しています。";
-  return "今の心の地図で、「"+((S.current_concerns||[])[0]||"いまの状態")+"」が気になっていると見えてきたため、まず試しやすい方法として提案しています。";
+    return "今のお話で、「"+S.direction_goal+"」と話してくれたので、まず試しやすい方法として提案しています。";
+  return "今のお話で、「"+((S.current_concerns||[])[0]||"いまの状態")+"」が気になっていると話してくれたので、まず試しやすい方法として提案しています。";
 }
 
 /* ── パーソナライズ（頻度・時間・やり方）─────────────────────
@@ -1335,8 +1359,8 @@ function ivNext(){ S.iv++; ivRender(); }
 
 /* 初回の3ステップ（ユーザー向けの言葉）：① 今のことを教える（3問・呼び方・安全確認） ② 自分のことを知る（最初の心の地図） ③ 今週の一歩
    「仮の心の地図」という概念はステップ名では出さない */
-const IV_STEPS=["今のことを教える","自分のことを知る","今週の一歩"];
-function ivStepNo(){ return S.iv<=5 ? 1 : (S.iv<=7 ? 2 : 3); }
+const IV_STEPS=["今のことを教える","一歩をえらぶ","試し方を決める"];
+function ivStepNo(){ return S.iv<=5 ? 1 : (S.iv<=8 ? 2 : 3); }
 function renderIvSteps(){
   const el=document.getElementById("ivSteps"); if(!el) return;
   const n=ivStepNo();
@@ -1391,32 +1415,10 @@ function ivRender(){
   /* ⑤ 整理（診断も断定もしない。言い換えと方向の確認だけ） */
   /* ⑤ 自分のことを知る：心の地図とは何かを先に短く説明 → 3つの答えから見えた最初の下書き（言い切らない）
        → この地図をもとに今週の一歩へ。内部状態は draft。ここで AIミニセッションには入らない */
+  /* ⑤ 3問の答えは心の地図の初期データとして内部に残す（画面には出さない）→ そのまま一歩の候補へ */
   case 6:
     S.ai_conversation_summary = S.iv_scene || (IV_TOPIC_P[S.current_concerns[0]]+"について、"+IV_WANT_P[S.direction_goal]+"ところから始める");
-    ivSay(S.iv_scene_asked ? "教えてくれてありがとう。<br>地図に、ひとつ書き足しました。"
-                           : "教えてくれてありがとう、"+nick()+"さん。",function(){
-      const first=!S.iv_scene_asked;
-      document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
-        '<div class="draftcard">'
-        +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 2 ／ 自分のことを知る</div>'
-        /* 心の地図とは何か（初見でも分かるように、地図を見せる前に説明する） */
-        +(first ? '<h2>少しずつ、自分のことを<br>知っていきましょう</h2>'
-          +'<p class="dtext">kokoniでは、</p>'
-          +'<ul class="dlist"><li>どんな時にしんどくなりやすいか</li><li>どんなことを考えやすいか</li><li>何をすると少し楽になるか</li></ul>'
-          +'<p class="dtext">を、話したことや試したことから<br>少しずつ整理していきます。<br>それをkokoniでは、<b>「心の地図」</b>と呼んでいます。</p>'
-          +'<p class="dtext">地図が少しずつ見えてくるほど、<br>あなたに合った「次の一歩」を<br>一緒に考えやすくなります。</p>'
-          +'<hr class="dsep">' : '')
-        +'<div style="display:flex;align-items:center;gap:12px;margin-top:4px">'+mapArt(56)
-        +'<div class="dhead">3つの答えから、<br>最初の心の地図が<br>少し見えてきました</div></div>'
-        +'<div class="draft">'+draftHtml(false)+'</div>'
-        +'<div class="draft later"><div class="drow"><div class="k">これから見えてくること</div>'
-        +'<div class="v" style="color:var(--muted);font-size:13px">これからの会話や記録で、<br>少しずつ見えてきます。</div></div></div>'
-        +'<p class="dtext">いまはまだ、3つの答えから見えた<b>最初の下書き</b>です。<br>これから話したことや、やってみたことを通して、<br>少しずつあなたらしい地図に育っていきます。</p>'
-        +'<p class="dnext">この地図をもとに、<br>今週の一歩を一緒に考えます。</p></div>');
-      tray.innerHTML='<button class="btn" onclick="ivToStep()">今週の一歩を考える</button>'
-        +(S.iv_scene_asked?'':'<button class="linkbtn" onclick="ivMoreMap()">もう少し地図をつくる</button>');
-      window.scrollTo(0,document.body.scrollHeight);
-    });
+    S.iv=8; ivRender();
     break;
 
   /* ⑥ 最近の場面をひとつだけ（自由記述は原則ここだけ・深掘りしない） */
@@ -1440,9 +1442,9 @@ function ivRender(){
     if(!S.iv_try_intro){
       S.iv_try_intro=true;
       flow.insertAdjacentHTML("beforeend",'<div class="trycard">'
-        +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 3 ／ 今週の一歩</div>'
+        +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 2 ／ 一歩をえらぶ</div>'
         +'<h2>最初の3日で、<br>ひとつ試してみましょう</h2>'
-        +'<p>今の心の地図から、<br>まず試しやすそうな方法をいくつか選びました。</p>'
+        +'<p>今のお話をもとに、<br>まず試しやすそうな方法を考えました。</p>'
         +'<p>どれが一番合うかを、今ここで決めなくても大丈夫です。<br>まずは3日だけ、「これならできそう」と思うものを試してみましょう。</p>'
         +'<ol class="tryflow">'
         +'<li><b>今日</b><span>やってみることを決める</span></li>'
@@ -1682,8 +1684,8 @@ function ivReselect(echo){
 /* 今週の行動を確定＝初回セットアップ完了。ここで初めて機能を開放し、週次サイクルを始める */
 function completeSetup(){
   S.setup_status="completed"; S.setup_completed_at=nowIso();
-  S.initial_plan_completed=true;
-  if(!S.cycle) startCycle("first");   // 初回だけ3日で最初のふりかえりへ
+  S.initial_plan_completed=true; S.action_status="active"; S.action_confirmed_at=nowIso();
+  if(!S.cycle) startCycle("first");   // 初回だけ3日で最初のふりかえりへ（この時点から一歩は変えられない）
   go("home");
 }
 function openHome(){ go("home"); }
@@ -1753,23 +1755,18 @@ function renderHome(){
     <div class="sprout" aria-hidden="true">🌱</div></div>`;
 
   if(ready){
-    /* 優先順：今週の小さな一歩 → 心の地図 → 今日の状態 → テーマ → ふりかえり */
-    h+=stepCard()+otHomeCard()+mapHomeCard()+dailyCard()
-      +`<div class="hcard tap" onclick="openTheme()"><div class="k">🎯 今週のテーマ<span class="go">›</span></div>
-          <div class="v">${themeText()}</div><div class="s">kokoniと一緒に見つけたテーマ</div></div>`;
+    /* 3枚：今日の一歩（＋今日の気持ち）→ 心の地図 → 次のふりかえり。テーマ・最近わかったことは出さない */
+    h+=stepCard()+otHomeCard()
+      +(letterArrived()?`<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span>
+        <div style="flex:1"><div class="k">大塚さんから</div><div class="v">大塚さんからの手紙が届いています</div></div>
+        <span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>`:"")
+      +mapHomeCard()+recallCard();
   } else {
-    /* 初回前の主役は「一緒に決める」。ほかは見えるが未設定・操作不可 */
+    /* 初回前の主役は「一緒に決める」。ほかは見えるが操作できない */
     h+=startHereCard()+`<div class="prelock" onclick="showLock('home')">
-      <div class="hcard"><div class="k">🌱 今週の小さな一歩</div><div class="v" style="color:var(--muted)">一緒に決めたあとに表示されます</div></div>
-      <div class="hcard"><div class="k">🎯 今週のテーマ</div><div class="v" style="color:var(--muted)">—</div></div>`;
+      <div class="hcard"><div class="k">🌱 今日の一歩</div><div class="v" style="color:var(--muted)">一緒に決めたあとに表示されます</div></div>
+      <div class="hcard"><div class="k">🗺 心の地図</div><div class="v" style="color:var(--muted)">最初のふりかえり後に使えるようになります</div></div></div>`;
   }
-
-  if(!ready) h+=dailyCard();
-  if(letterArrived()) h+=`<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span>
-    <div style="flex:1"><div class="k">大塚さんから</div><div class="v">心理士から手紙が届いています</div></div>
-    <span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>`;
-  h+=recallCard();
-  if(!ready) h+=`</div>`;
   document.getElementById("homeBody").innerHTML=h;
 }
 /* ══════════════════════════════════════════════════════════════
@@ -1882,10 +1879,10 @@ function dsEditForm(r,where){
    未回答＝答える意味と軽さ／回答後＝最新1件・時刻・メモ・編集・追加・きろくへ（縦に長くしない） */
 function dailyCard(){
   const recs=todayRecs(), r=todayDs(), u=S.ds_ui, n=recs.length;
-  if(!r) return '<div class="hcard dscard"><div class="k">🌤 今日の状態<span class="dsfreq">1日1回を目安に</span></div>'
-    +'<div class="dsdesc">今日の気分を、10秒だけ残してみませんか？<br>少しずつ記録すると、自分の気分の波が見えてきます。</div>'
+  if(!r) return '<div class="hcard dscard"><div class="k">🌤 今日の気持ち<span class="dsfreq">1日1回を目安に</span></div>'
+    +'<div class="dsdesc">今日の気持ちも残してみませんか？<br>10秒で記録できます。やってみなくても、気持ちだけ残せます。</div>'
     +dsButtons("", "setDaily")+'<div class="dshint">必要ならメモも残せます</div></div>';
-  const head='<div class="k">🌤 今日の状態'+(n>1?'<span class="dsfreq">今日 '+n+'件</span>':'')+'</div>';
+  const head='<div class="k">🌤 今日の気持ち'+(n>1?'<span class="dsfreq">今日 '+n+'件</span>':'')+'</div>';
   /* 追加：今はどんな感じですか？ */
   if(u && u.mode==="add") return '<div class="hcard dscard">'+head
     +'<div class="dsnow" style="margin-bottom:4px"><span>今はどんな感じですか？</span></div>'
@@ -2087,27 +2084,10 @@ function firstDayTag(){
   const n=Math.min(3, Math.floor((dayStart(nowMs())-dayStart(Date.parse(S.cycle.cycle_started_at)))/DAY)+1);
   return '<span class="daytag">Day '+n+' / 3</span>';
 }
-function stepCard(){
-  const a=curAct(), p=weekProgress();
-  return `<div class="stepcard">
-    <div class="lab">🌱 今週の小さな一歩${firstDayTag()}</div>
-    <div class="intro">${isFirst() && S.cycle.weekly_review_status==="locked"
-      ? "まずは3日、試してみる期間です。<br>3日間の中で、できそうなときに試してみましょう。3日後に一緒に見直します。"
-      : "忙しい毎日の中でも、少し心が軽くなるような一歩です。できそうなときに、試してみましょう。"}</div>
-    <h2>${a?a.title:(S.first_action||"—")}</h2>
-    ${a?`<div class="desc">${a.short_description}</div>
-    <div class="chips2"><span>⏱ 1回${S.act_duration}分</span><span>🗓 ${isTrigger(a)?freqText(S.act_frequency,a):S.act_frequency+(S.act_frequency==="毎日"?"":"くらい")}</span></div>`
-      :`<div class="plan">目安：—</div>`}
-    ${p?`<div class="prog"><div class="row"><span class="k">${p.k}</span><span class="n" id="stepProg">${p.n}</span></div>
-      ${p.pips?`<div class="pips">${p.pips.map(function(on){ return '<i class="'+(on?"on":"")+'"></i>'; }).join("")}</div>`:""}
-      <div class="note" style="margin-top:${p.pips?8:0}px">${p.note}</div></div>`:""}
-    <button class="btn" ${a?"":"disabled"} onclick="openAction()">やってみる</button>
-    <button class="linkbtn" onclick="openMini('home','action_review')">ほかのやり方を考える</button>
-  </div>`;
-}
 /* 「ほかのやり方を考える」。候補は行動マスターから（同じ目的のより簡単な行動を先頭に）。変えるかは本人が決める */
 function openAlt(mode){
-  const next = mode==="next";   // 最初のふりかえり後：選んだら7日サイクルへ
+  const next = mode==="next";   // ふりかえり後：選んだら7日サイクルへ
+  if(!next || !canChangeAction()) return showActionLock();
   const cur=act(S.act_id), ids=[];
   if(cur && cur.easier_action_id && act(cur.easier_action_id)) ids.push(cur.easier_action_id);
   scoreActions().forEach(function(r){ if(ids.length<3 && r.id!==S.act_id && ids.indexOf(r.id)<0) ids.push(r.id); });
@@ -2120,11 +2100,174 @@ function openAlt(mode){
     +'<button class="btn ghost" style="margin-top:12px" onclick="closeWhy()">'+(next?"戻る":"今のまま続ける")+'</button></div></div>';
 }
 function changeAction(id,next){
+  if(!canChangeAction()) return showActionLock();
   setPlan(id); S.first_action=act(id).title; S.action_adjusted_flag=false;
   if(S.cycle) S.cycle.action_id=id;
   if(next) return firstNext("change");
   closeWhy(); renderHome();
 }
+
+/* ══════════════════════════════════════════════════════════════
+   サイクルの状態とロック ──「まずは一つ決めて、3日間試す。振り返ってから、次の一歩を考える。」
+   - 1サイクル1つの一歩。サイクルの途中では変えない（自動でも、手動でも）。変えられるのはふりかえりのあとだけ
+   - 心の地図（詳細・更新・深めるミニセッション・地図からの再提案）は、最初のふりかえりが終わるまでロック
+     解放条件はふりかえりの完了だけ（心理士への共有は関係ない）
+   - 例外：負担やつらさがあるときは、いつでも「少しお休みする」を選べる（サイクルはやり直さない）
+   - ロックの判定は表示ではなく状態（appPhase）から。状態はこの端末に保存し、再読み込みしても戻らない
+   ══════════════════════════════════════════════════════════════ */
+function appPhase(){
+  if(!S.initial_plan_completed) return "onboarding";
+  const c=refreshCycle(); if(!c) return "onboarding";
+  const st=c.weekly_review_status, first=c.cycle_type==="first";
+  if(st==="locked") return first ? "first_cycle_active" : "regular_cycle_active";
+  if(st==="available") return first ? "first_review_available" : "regular_review_available";
+  return "next_action_selection";   // ふりかえり完了 → 次の一歩を決める
+}
+/* 一歩を変えられるのは、ふりかえりが終わって次の一歩を決めるときだけ */
+function canChangeAction(){ return appPhase()==="next_action_selection"; }
+/* 心の地図は、最初のふりかえりが終わったら使える（共有したかどうかは関係ない） */
+function mapUnlocked(){
+  return S.reviews.some(function(r){ return r.cycle_type==="first"; })
+      || (S.cycles||[]).some(function(c){ return c.cycle_type==="first"; })      // 以前の形式：すでに通常サイクルにいる
+      || (S.cycle && S.cycle.cycle_type==="regular");
+}
+function actionLocked(){ return !!S.initial_plan_completed && !canChangeAction(); }
+/* 一歩を変えようとしたとき（どこから来ても同じ案内） */
+function showActionLock(){
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>🌱 今は、この一歩を試している期間です</h3>'
+    +'<p>次のふりかえりで、続けるか、別の方法にするかを一緒に考えましょう。</p>'
+    +'<p style="font-size:12.5px;color:var(--muted)">続けるのがつらいときは、少しお休みすることもできます。</p>'
+    +'<button class="btn" onclick="closeWhy()">このまま続ける</button>'
+    +'<button class="btn ghost" style="margin-top:8px" onclick="openPause()">少しお休みする</button></div></div>';
+}
+/* 少しお休みする：実施を強制しない。サイクル・記録はそのまま。いつでも再開できる */
+function openPause(){
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>この一歩を、少しお休みしますか？</h3>'
+    +'<p>お休みしても、これまでの記録はそのまま残ります。ふりかえりの日も変わりません。<br>ふりかえりで、一緒に見直しましょう。</p>'
+    +'<p style="font-size:12.5px;color:var(--muted)">つらさが強いときは、<a style="color:var(--teal-deep);cursor:pointer;text-decoration:underline" onclick="closeWhy();openSupportList(\'home\')">相談できる窓口</a>も使ってください。</p>'
+    +'<button class="btn" onclick="pauseAction()">お休みする</button>'
+    +'<button class="btn ghost" style="margin-top:8px" onclick="closeWhy()">やめる</button></div></div>';
+}
+function pauseAction(){ S.action_status="paused"; S.action_paused_at=nowIso(); S.action_pauses=(S.action_pauses||[]).concat([{at:nowIso(), action_id:S.act_id}]); closeWhy(); go("home"); }
+function resumeAction(){ S.action_status="active"; renderHome(); }
+/* サイクルの途中で見えてきた「次に試すとよさそうなこと」は、次のふりかえりの候補として残すだけ */
+function saveCandidate(kind,id,source){
+  S.next_candidates=(S.next_candidates||[]).filter(function(c){ return !(c.kind===kind && c.action_id===id); })
+    .concat([{kind:kind, action_id:id||S.act_id, source:source, at:nowIso(), cycle_id:S.cycle?S.cycle.weekly_cycle_id:null}]);
+}
+
+/* ── 状態の保存（この端末のブラウザ）。再読み込み・タブ移動・再訪でロックや一歩が戻らないように ── */
+const STATE_KEY="kokoni_demo_state_v1";
+const STATE_SKIP=["timerId","timer","pf","safe_ctx","screen","step"];
+function saveState(){
+  if(!S.entered) return;
+  try{ const o={}; Object.keys(S).forEach(function(k){ if(STATE_SKIP.indexOf(k)<0) o[k]=S[k]; });
+    localStorage.setItem(STATE_KEY, JSON.stringify({v:1, saved_at:new Date().toISOString(), S:o})); }catch(_){}
+}
+function loadState(){
+  try{ const raw=localStorage.getItem(STATE_KEY); if(!raw) return false;
+    const j=JSON.parse(raw); if(!j || !j.S || !j.S.entered) return false;
+    Object.keys(j.S).forEach(function(k){ S[k]=j.S[k]; });
+    /* 新しく増えた項目を補う（以前の保存データとの互換） */
+    S.action_status=S.action_status||"active"; S.next_candidates=S.next_candidates||[];
+    return true; }catch(_){ return false; }
+}
+/* 「最初から」：この端末の保存も消してから始め直す（消したことと実際の状態を一致させる） */
+function resetDemo(){ try{ localStorage.removeItem(STATE_KEY); }catch(_){} window.__kokoniReset=true; location.reload(); }
+window.addEventListener("pagehide", function(){ if(!window.__kokoniReset) saveState(); });
+document.addEventListener("visibilitychange", function(){ if(document.visibilityState==="hidden" && !window.__kokoniReset) saveState(); });
+
+/* デモ用：最初のふりかえりまで済ませて、2周目（7日）にいる状態にする */
+function skipToRegular(){
+  if(!S.initial_plan_completed) skipSetup();
+  if(S.cycle && S.cycle.cycle_type==="first"){
+    advanceToReview(); rvInit(); S.rv.ans={tried:"何回かやってみた", feel:"やりやすかった", next:"このまま続けたい"};
+    completeReview(false); nextStep("keep");
+  }
+  go("home");
+}
+
+/* ── Home の3枚：今日の一歩／心の地図／次のふりかえり ──────────────── */
+function stepCard(){
+  const a=curAct(), p=weekProgress(), paused=S.action_status==="paused";
+  return `<div class="stepcard">
+    <div class="lab">🌱 今日の一歩${firstDayTag()}</div>
+    <h2>${a?a.title:(S.first_action||"—")}</h2>
+    ${a?`<div class="desc">${a.short_description}</div>
+    <div class="chips2"><span>⏱ 目安${S.act_duration}分</span><span>🗓 ${isTrigger(a)?freqText(S.act_frequency,a):S.act_frequency+(S.act_frequency==="毎日"?"":"くらい")}</span></div>`:``}
+    ${paused
+      ? `<div class="pausebox">いまは、この一歩をお休みしています。<br>記録やふりかえりの日はそのままです。</div>
+         <button class="btn" onclick="resumeAction()">また試してみる</button>`
+      : `${p?`<div class="prog sm"><span class="k">${p.k}</span><span class="n" id="stepProg">${p.n}</span></div>`:""}
+         <button class="btn" ${a?"":"disabled"} onclick="openAction()">やってみる</button>`}
+    ${dailyCard()}
+    ${paused?"":`<button class="linkbtn pauselink" onclick="openPause()">今はつらいので、少しお休みする</button>`}
+  </div>`;
+}
+/* 心の地図カード：初回3日はロック → 解放の案内（1回だけ）→ 通常 */
+function mapHomeCard(){
+  const n=mapCount();
+  if(!mapUnlocked()){
+    return '<div class="mapcard locked"><div class="top"><span class="lk2" aria-hidden="true">🔒</span><div style="min-width:0"><div class="lab">🗺 心の地図</div>'
+      +'<h3>最初のふりかえり後に<br>使えるようになります。</h3></div></div>'
+      +'<p class="why" style="margin:10px 0 0">まずは今の一歩を試してみましょう。</p></div>';
+  }
+  if(!S.map_unlock_seen){
+    return '<div class="mapcard"><div class="top">'+mapArt(56)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
+      +'<h3>心の地図が使えるようになりました</h3></div></div>'
+      +'<p class="why">これまでの話や記録から、<br>自分のことをもう少し深く知っていきましょう。</p>'
+      +'<button class="btn" onclick="S.map_unlock_seen=true;S.kiroku_next=\'map\';go(\'map\')">心の地図をひろげる</button></div>';
+  }
+  return '<div class="mapcard"><div class="top">'+mapArt(56)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
+    +'<h3>心の地図をもう少しひろげる</h3><div class="cnt">見えてきたこと <b>'+n+'</b>/'+MAP_N+'</div></div></div>'
+    +'<p class="why">話したことや試したことから、<br>自分のパターンを少しずつ見つけていきます。</p>'
+    +'<div class="two"><button class="btn" onclick="openMini(\'home\')">少し話してみる</button>'
+    +'<button class="btn ghost" onclick="S.kiroku_next=\'map\';go(\'map\')">地図を見る</button></div></div>';
+}
+/* 初回3日のあいだ、きろく ＞ 心の地図 はロック表示 */
+function mapLockedHtml(){
+  const c=S.cycle, left=c?daysLeft():3;
+  return '<div class="maplock"><div class="lk3" aria-hidden="true">🔒</div><h3>心の地図</h3>'
+    +'<p>最初のふりかえりが終わると、使えるようになります。<br><br>まずは今の一歩を試してみましょう。<br>話したことや、やってみたことから、<br>少しずつ自分のことを知っていけます。</p>'
+    +'<div class="cd">'+(c && c.weekly_review_status==="available" ? '今日、最初のふりかえりができます' : '最初のふりかえりまで あと<b>'+left+'</b>日')+'</div>'
+    +(c && c.weekly_review_status==="available" ? '<button class="btn" style="margin-top:12px" onclick="go(\'gate\')">ふりかえりをはじめる</button>' : '')
+    +'</div>';
+}
+
+/* ── ふりかえりのあと：次の1週間の一歩を決める（初回・通常で共通） ── */
+function nextCard(r){
+  const ans=(r.answers||{}), near={"このまま続けたい":"keep","少し調整したい":"adjust","別のやり方を見てみたい":"change"}[ans.next]
+    || {"このまま続けてみたい":"keep","少し調整したい":"adjust","別のやり方も見てみたい":"change"}[(r.first_answers||{}).fit];
+  const tag=function(k){ return near===k?' <span class="tag">ふりかえりの答えに近いもの</span>':''; };
+  const cand=(S.next_candidates||[]).filter(function(c){ return r.weekly_cycle_id ? c.cycle_id===r.weekly_cycle_id : true; });
+  const cTag=function(kind){ return cand.some(function(c){ return c.kind===kind || (kind==="adjust" && (c.kind==="freq"||c.kind==="dur")); }) ? ' <span class="tag">途中で残した候補あり</span>' : ''; };
+  const m=miniInCycle();
+  return (m && m.summary && (!r.mini_session_id || r.mini_session_id!==m.session_id)
+      ? '<div class="card"><h3>AIと整理したこと</h3><div class="sum"><div class="v">'+m.summary+'</div></div></div>' : "")
+    +(r.shared && r.letter_status!=="arrived" ? '<p class="lede" style="margin:0 18px 8px">大塚さんの手紙を待たずに、次の一歩を決めても大丈夫です。</p>' : '')
+    +'<div class="card"><h3>次の1週間の一歩を決めましょう</h3>'
+    +'<p class="lede" style="margin-bottom:12px">ここまで試してみたことをもとに、<br>次の1週間をどう過ごすか、一緒に考えてみましょう。</p>'
+    +'<div class="opts">'
+    +'<button class="opt" style="text-align:left" onclick="nextStep(\'keep\')">今の一歩を続ける'+tag("keep")+'</button>'
+    +'<button class="opt" style="text-align:left" onclick="openAdjustNext()">頻度・時間を調整する'+tag("adjust")+cTag("adjust")+'</button>'
+    +'<button class="opt" style="text-align:left" onclick="openAlt(\'next\')">別の一歩を試す'+tag("change")+cTag("change")+'</button>'
+    +'</div>'
+    +'<button class="linkbtn" onclick="openMini(\'gate\')">AIともう少し整理してから決める</button></div>';
+}
+/* 次のサイクルへ（7日）。ふりかえりが終わっているときだけ。お休み中なら再開する */
+function nextStep(kind){
+  if(!canChangeAction()) return;
+  closeWhy();
+  S.next_candidates=(S.next_candidates||[]).filter(function(c){ return c.cycle_id!==S.cycle.weekly_cycle_id; });
+  S.action_status="active"; S.action_confirmed_at=nowIso();
+  startCycle("regular"); go("home");
+}
+
+/* 互換：以前の呼び名 */
+function firstNextCard(r){ return nextCard(r); }
+function firstNext(k){ nextStep(k); }
 
 /* 初回ホームの「まずはここから」── 登録の催促ではなく、これからを一緒に決める入口 */
 function startHereCard(){
@@ -2144,10 +2287,9 @@ function recallCard(){
   const c=refreshCycle();
   const C=2*Math.PI*31;
   const first=isFirst();
-  let title = first ? "最初のふりかえり" : "週1回のふりかえり";
-  if(first && c && c.weekly_review_status==="locked") title="最初のふりかえりまで あと"+daysLeft()+"日";
+  let title = first ? "最初のふりかえり" : "次のふりかえり";
   let lab="—", unit="", off=C, dd="", wd="", btn;
-  let desc = first ? "3日間の中で試してみたら、この方法が自分に合っていそうか、一緒に見なおしてみましょう。"
+  let desc = first ? "3日間試してみたら、今のやり方が自分に合いそうか、一緒に見直します。"
                    : "毎週"+DOW[REVIEW_DOW]+"曜日に、この1週間の気持ちや動きを<br>kokoniと一緒に見なおします。";
   const len = c ? c.cycle_length_days : 7;
   if(!c){
@@ -2161,9 +2303,8 @@ function recallCard(){
     else if(st==="available"){ lab="今日";
       btn="<button class=\"btn\" onclick=\"go('gate')\">ふりかえりをはじめる</button>"; }
     else { lab="✓"; off=0;
-      desc = first ? "最初のふりかえりは完了しました。<br>次の一歩を決めましょう。" : "今週のふりかえりは完了しました。";
-      btn = first ? "<button class=\"btn\" onclick=\"go('gate')\">次の一歩を決める</button>"
-                  : "<button class=\"btn ghost\" onclick=\"go('gate')\">ふりかえりを見る</button>"; }
+      desc = "ふりかえりが終わりました。<br>次の1週間の一歩を決めましょう。";
+      btn = "<button class=\"btn\" onclick=\"go('gate')\">次の一歩を決める</button>"; }
     /* サイクル開始の翌日〜ふりかえりの日を並べる（初回3日／通常7日） */
     const today=dayKey(now);
     for(let i=1;i<=len;i++){
@@ -2272,7 +2413,7 @@ function otCompose(type,ref,c){
     if(title){ L.push((c.cycle_type==="first"?"この3日は":"今週は")+"「"+otCut(title,20)+"」を試してみることにしましたね。"); used.action=title; }
     L.push("この期間の記録は、まだありません。");
     const m=a && a.minimum_duration ? a.minimum_duration : 1;
-    L.push("もし少し余裕があれば、今日は"+m+"分だけでも試してみませんか。まとまらなくても大丈夫です。今のやり方が難しければ、一緒に変えていくこともできます。");
+    L.push("もし少し余裕があれば、今日は"+m+"分だけでも試してみませんか。まとまらなくても大丈夫です。今のやり方が難しければ、次のふりかえりで一緒に見直せます。");
     used.log_count=0; cta="step";
   }
   let body=L.join("");
@@ -2457,6 +2598,7 @@ function renderMap(){
   const body=document.getElementById("mapBody");
   kirokuTabs();
   if(S.kiroku==="mood") return renderMoodLog();
+  if(S.initial_plan_completed && !mapUnlocked()){ MAPED=null; body.innerHTML=mapLockedHtml(); return; }
   /* 初回前も閲覧できる。まだこれからの状態として見せる */
   if(!S.initial_plan_completed){
     body.innerHTML='<div class="mapsum"><div class="mhero">'+mapArt(84)+'<div><h3>心の地図を、一緒に<br>少しずつひろげていきましょう</h3>'
@@ -2725,34 +2867,9 @@ function renderMoodLog(){
     +'<div class="mapcta"><button class="btn ghost" onclick="S.kiroku=\'map\';renderMap();window.scrollTo(0,0)">心の地図でくわしく見る</button></div>';
 }
 
-/* ホームの心の地図カード。状態で3段階に変わる
-   未作成（3問の下書きだけ）→ つくり始めた（n/7）→ 7つの視点が見えてきた（深めていく） */
-function mapHomeCard(){
-  const n=mapCount(), full=n>=MAP_N;
-  if(!mapStarted()){
-    if(S.map_later) return '<div class="hrow tap" onclick="S.map_later=false;renderHome()"><span class="ic">🗺</span>'
-      +'<div style="flex:1"><div class="k">心の地図</div><div class="v">心の地図は、いつでもつくれます</div></div>'
-      +'<span style="align-self:center;font-size:13px;font-weight:800;color:var(--teal-deep)">ひらく ›</span></div>';
-    return '<div class="mapcard"><div class="top">'+mapArt(64)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
-      +'<h3>次は、心の地図をつくれます</h3></div></div>'
-      +'<div class="lede" style="margin:10px 0 6px">3つの答えから、こんなことが見えてきました。<span class="ex">一例です</span></div>'
-      +'<div class="draft">'+draftHtml(true)+'</div>'
-      +'<p class="why">心の地図をつくると、<br>あなたに合う一歩を考えやすくなります。</p>'
-      +'<button class="btn" onclick="openMini(\'home\')">心の地図をつくる</button>'
-      +'<button class="linkbtn" onclick="S.map_later=true;renderHome()">あとでやる</button></div>';
-  }
-  const f=mapFeed(1)[0];
-  return '<div class="mapcard"><div class="top">'+mapArt(64)+'<div style="min-width:0"><div class="lab">🗺 心の地図</div>'
-    +'<h3>'+(full?'7つの視点が見えてきました':'あなたに合うやり方を、<br>もう少し見つける')+'</h3>'
-    +(full?'<div class="lede" style="margin:2px 0 0">ここからは、少しずつ深めていきます</div>'
-          :'<div class="cnt">見えてきたこと <b>'+n+'</b>/'+MAP_N+'</div>'+mapPips())+'</div></div>'
-    +(f?'<div class="found" style="margin:12px 0 0"><div class="k">最近見えてきたこと<span>'+fmtMD(f.at)+'</span></div>'
-        +'<div class="v">'+(f.mine?esc(f.text):'「'+esc(f.text)+'」')+'</div></div>':'')
-    +'<div class="two"><button class="btn" onclick="openMini(\'home\')">'+(full?'少し話して、地図を深める':'少し話してみる')+'</button>'
-    +'<button class="btn ghost" onclick="go(\'map\')">'+(full?'心の地図を見る':'地図を見る')+'</button></div></div>';
-}
 
 function openMapEditor(id){
+  if(!mapUnlocked()) return;
   const e=mapEntry(id);
   MAPED={id:id, draft:e?e.text:"", slots:e&&e.slots?e.slots.slice():["","","",""]};
   renderMap(); window.scrollTo(0,0);
@@ -2913,7 +3030,7 @@ function myData(){
   return myBack()+'<div class="mysub"><h2>保存されている情報の確認</h2>'
     +'<p class="lede">kokoniに残っている情報の一覧です。</p>'
     +'<div class="mybox">'+rows.map(function(r){ return '<div class="myinfo"><div class="t"><b>'+r[0]+'</b></div><div class="d">'+esc(r[1])+'</div></div>'; }).join("")+'</div>'
-    +'<p class="lede" style="margin-top:10px">※ このデモでは、情報はこの端末のブラウザの中だけにあり、ページを再読み込みすると消えます。</p></div>';
+    +'<p class="lede" style="margin-top:10px">※ このデモでは、情報はこの端末のブラウザの中に保存されます（ほかの端末やサーバーには送りません）。</p></div>';
 }
 /* 心理士への共有履歴・同意の確認（レター本文と手紙はふりかえりタブで見る） */
 function myShare(){
@@ -2936,11 +3053,15 @@ function myShare(){
 }
 function myAccount(){
   return myBack()+'<div class="mysub"><h2>データ・アカウントの管理</h2>'
-    +'<p class="lede">以下は準備中です。いまは操作できません。</p>'
-    +'<div class="mybox">'+myRow("🗑","保存データの削除","","",true)+myRow("👋","アカウントの削除","","",true)+'</div>'
-    +'<p class="lede" style="margin-top:10px">※ このデモでは、ページを再読み込みすると、すべての情報が消えます。</p></div>';
+    +'<p class="lede">アカウントの削除は準備中です。</p>'
+    +'<div class="mybox">'+myRow("🗑","この端末に保存したデータを消す","記録・会話・ふりかえりをすべて消して、最初から始めます","myConfirmReset()")+myRow("👋","アカウントの削除","","",true)+'</div></div>';
 }
 /* kokoniの使い方（かんたんなガイド） */
+function myConfirmReset(){
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>この端末のデータを消しますか？</h3><p>記録・会話・ふりかえり・プロフィールが、この端末からすべて消えます。元には戻せません。</p>'
+    +'<button class="btn" onclick="resetDemo()">消して最初から始める</button><button class="btn ghost" style="margin-top:8px" onclick="closeWhy()">やめる</button></div></div>';
+}
 function myGuide(){
   const G=[["🌱","今週の小さな一歩","ホームに出ている、今週試してみることです。できる日だけで大丈夫です。合わなければ変えられます。"],
     ["💬","はなす","AIと一緒に、最近のことを整理したり、今週の一歩を見直したり、気持ちを少し話したりできます。"],
@@ -3300,34 +3421,12 @@ function gateCompleted(r){
   }
   if(r.shared && r.letter_status==="arrived") h+=letterHtml(r);
   h+=`<div class="card"><h3>${r.shared?"送った内容":"ふりかえりの内容"}</h3>${reviewView(r)}</div>`;
-  h+= first ? firstNextCard(r)
-    : `<div class="card"><h3>次の1週間</h3>
-      <p class="lede" style="margin-bottom:12px">今週やってみたこと：${cycleData().action.title}<br>次の1週間も、ここから続けていきます。</p>
-      <button class="btn" onclick="nextCycle()">次の1週間へ進む</button></div>`;
+  h+= nextCard(r);
   return h;
-}
-/* 最初のふりかえりのあと：次の一歩を決める。決めた時点で7日サイクルへ */
-function firstNextCard(r){
-  const fit=(r.first_answers||{}).fit, m=miniInCycle();
-  const near={"このまま続けてみたい":"keep","少し調整したい":"adjust","別のやり方も見てみたい":"change","まだよくわからない":"mini"}[fit];
-  const tag=function(k){ return near===k?' <span class="tag">ふりかえりの答えに近いもの</span>':''; };
-  return (m && (!r.mini_session_id || r.mini_session_id!==m.session_id)
-      ? `<div class="card"><h3>AIと整理したこと</h3><div class="sum"><div class="v">${m.summary}</div></div></div>` : "")
-    +`<div class="card"><h3>次の一歩を決めましょう</h3>
-    <p class="lede" style="margin-bottom:12px">最初の一歩は、まず試してみる仮の一歩です。<br>今の自分に合う形を選んでください。<br>ここから、1週間ごとのふりかえりになります。</p>
-    <div class="opts">
-      <button class="opt" style="text-align:left" onclick="firstNext('keep')">今のやり方を続ける${tag("keep")}</button>
-      <button class="opt" style="text-align:left" onclick="openAdjustNext()">回数や時間を調整する${tag("adjust")}</button>
-      <button class="opt" style="text-align:left" onclick="openAlt('next')">別のやり方に変える${tag("change")}</button>
-      <button class="opt" style="text-align:left" onclick="openMini('gate')">AIともう少し整理してから決める${tag("mini")}</button>
-    </div></div>`;
-}
-function firstNext(kind){
-  if(!S.cycle || S.cycle.cycle_type!=="first" || S.cycle.weekly_review_status!=="completed") return;
-  closeWhy(); startCycle("regular"); go("home");
 }
 /* 回数・時間の調整。行動マスターの範囲内（下限まで）だけ */
 function openAdjustNext(){
+  if(!canChangeAction()) return showActionLock();
   const o=adjustOptions(), opts=[];
   if(o.freq) opts.push({f:o.freq.f, d:o.freq.d});
   if(o.dur) opts.push({f:o.dur.f, d:o.dur.d});
@@ -3344,10 +3443,10 @@ function applyNextPlan(i){
   if(p.f!==S.act_frequency) adjDone("frequency");
   if(p.d!==S.act_duration) adjDone("duration");
   S.act_frequency=p.f; S.act_duration=p.d;
-  firstNext("adjust");
+  nextStep("adjust");
 }
 /* 次のサイクルへ（通常の7日）。いまは同じ行動を続ける（次週の行動を決めるUIは今後） */
-function nextCycle(){ if(S.cycle && S.cycle.weekly_review_status==="completed"){ startCycle("regular"); go("home"); } }
+function nextCycle(){ nextStep("keep"); }
 /* ══════════════════════════════════════════════════════════════
    AIミニセッション（任意・5〜7分）
    目的：少ない回答から「場面・考え・気持ち・行動」のつながりを整理し、仮説を返して本人と確かめ、
@@ -3410,6 +3509,12 @@ function msNew(from){
 const MS_TITLE={explore:"最近のことを整理する", action_review:"今週の一歩を見直す", open_talk:"今の気持ちを少し話す"};
 function openMini(from,mode){
   mode=mode||"explore";
+  if(mode==="explore" && !mapUnlocked()){   // 心の地図を深めるミニセッションは、最初のふりかえりまでロック
+    document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+      +'<h3>🔒 最初のふりかえりのあとに使えます</h3><p>まずは今の一歩を試してみましょう。話したことや、やってみたことから、少しずつ自分のことを知っていけます。</p>'
+      +'<button class="btn" onclick="closeWhy()">わかりました</button></div></div>';
+    return;
+  }
   closeWhy();
   document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
   document.getElementById("s-mini").classList.add("active"); S.screen="mini";
@@ -3856,14 +3961,18 @@ function msChoose(i){
   MINI.stage="compare"; msSteps();
   msSay("今の一歩は「"+esc(cur.title)+"」です。<br>今回のお話から、「"+esc(a.title)+"」も合いそうです。<br><br>どちらにしますか？",function(){
     msTray('<div class="opts"><button class="opt" onclick="msKeep()">今の一歩を続ける</button>'
-      +'<button class="opt" onclick="msSwitch(\''+id+'\')">新しい一歩に変える</button></div>');
+      +(canChangeAction() ? '<button class="opt" onclick="msSwitch(\''+id+'\')">新しい一歩に変える</button>'
+                          : '<button class="opt" onclick="msCandidate(\''+id+'\')">次のふりかえりの候補に残す</button>')+'</div>'
+      +(canChangeAction()?'':'<p class="lede" style="margin-top:8px">今は、この一歩を試している期間です。変えるかどうかは、次のふりかえりで一緒に考えましょう。</p>'));
   });
 }
 function changeActionSilently(id){
+  if(!canChangeAction()) return false;   // サイクルの途中では変えない
   setPlan(id); S.first_action=act(id).title; S.action_adjusted_flag=false;
   if(S.cycle) S.cycle.action_id=id;
 }
 function msKeep(){ msMe("今の一歩を続ける"); MINI.kept=S.act_id; MINI.chosen=null; MINI.stage="done"; msRun(); }
+function msCandidate(id){ msMe("次のふりかえりの候補に残す"); saveCandidate("change",id,"explore"); MINI.candidate=id; MINI.kept=S.act_id; MINI.stage="done"; msRun(); }
 function msSwitch(id){ msMe("新しい一歩に変える"); MINI.chosen=id; changeActionSilently(id); MINI.stage="done"; msRun(); }
 
 /* ── 保存 ─────────────────────────────────────────
@@ -3926,6 +4035,11 @@ function renderTalk(){
     +talkCard("💬","今の気持ちを少し話す","何から話したらいいかわからなくても大丈夫。今の気持ちから、ゆっくり始めましょう。","決めなくてOK","少し話してみる","open_talk","");
 }
 function talkCard(ic,t,d,time,cta,mode,note){
+  const lockMap = mode==="explore" && !mapUnlocked();
+  if(lockMap) return '<div class="tcard locked"><div class="top"><span class="ic">🔒</span><div style="min-width:0"><h3>'+t+'</h3>'
+    +'<div class="time">最初のふりかえりのあとに使えるようになります</div></div></div><p>'+d+'</p>'
+    +'<button class="btn" disabled>'+cta+'</button></div>';
+  if(mode==="action_review" && actionLocked()) note=(note?note+'<br>':'')+'<span style="color:var(--muted);font-weight:400">一歩を変えるのは、次のふりかえりのときです</span>';
   return '<div class="tcard"><div class="top"><span class="ic">'+ic+'</span><div style="min-width:0"><h3>'+t+'</h3>'
     +'<div class="time">⏱ '+time+'</div></div></div><p>'+d+'</p>'
     +(note?'<div class="note">'+note+'</div>':'')
@@ -3959,7 +4073,7 @@ function arAns(i){
   if(i===0) return msSay("続けやすそうなんですね。"+(MINI.ar.count?"<br>記録を見ても、試してこられています。":"")+"<br>このまま続けてみましょうか。",function(){ arExit("keep"); });
   if(i===1) return msSay("どのあたりが負担になっていそうですか？",function(){
     msTray('<div class="opts">'+AR_BURDEN.map(function(o,j){ return '<button class="opt" onclick="arBurden('+j+')">'+o+'</button>'; }).join("")+'</div>'); });
-  if(i===2) return msSay("別のやり方も見てみましょう。<br>今の心の地図から、試しやすそうなものを選びます。",function(){ arExit("change"); });
+  if(i===2) return msSay(actionLocked() ? "別のやり方が合いそうなんですね。" : "別のやり方も見てみましょう。<br>今の心の地図から、試しやすそうなものを選びます。",function(){ arExit("change"); });
   msSay("まだ判断しなくて大丈夫です。<br>数回やってみてから、ふりかえりで一緒に見てみましょう。",function(){ arExit("keep"); });
 }
 function arBurden(j){
@@ -3972,6 +4086,12 @@ function arBurden(j){
 }
 /* 出口：4つの選び方。おすすめは目印だけ（決めるのは本人） */
 function arExit(rec){
+  if(canChangeAction()){
+    MINI.ar.rec=rec;
+    return msSay("ふりかえりが終わっているので、次の一歩は「ふりかえり」で決められます。",function(){
+      msTray('<button class="btn" onclick="go(\'gate\')">次の一歩を決めに行く</button><button class="btn ghost" style="margin-top:9px" onclick="arApply(\'keep\')">今の一歩のまま続ける</button>'); });
+  }
+  if(actionLocked()) return arExitLocked(rec);
   const o=adjustOptions(), a=curAct(), tag=function(k){ return rec===k?' <span class="tag">今の話に近いもの</span>':''; };
   MINI.ar.rec=rec;
   let h='<div class="opts">'
@@ -3981,7 +4101,23 @@ function arExit(rec){
   h+='<button class="opt" style="text-align:left" onclick="arApply(\'change\')">別の一歩を試す'+tag("change")+'</button></div>';
   msTray(h);
 }
+/* サイクルの途中：見直したいことは次のふりかえりの候補に残す。いまの一歩は変えない */
+function arExitLocked(rec){
+  MINI.ar.rec=rec;
+  const lab={freq:"頻度を減らす",dur:"1回の時間を短くする",change:"別の一歩を試す",keep:"やり方を見直す"}[rec]||"やり方を見直す";
+  msSay("今は、この一歩を試している期間です。<br>次のふりかえりで、続けるか、別の方法にするかを一緒に考えましょう。",function(){
+    msTray('<div class="opts">'
+      +'<button class="opt" style="text-align:left" onclick="arApply(\'keep\')">今の一歩を続ける</button>'
+      +'<button class="opt" style="text-align:left" onclick="arCandidate(\''+(rec==="keep"?"change":rec)+'\')">次のふりかえりで「'+lab+'」を考える<div class="sub2">候補として残します</div></button>'
+      +'<button class="opt" style="text-align:left" onclick="openPause()">少しお休みする</button></div>');
+  });
+}
+function arCandidate(kind){
+  const before={action_id:S.act_id, title:(curAct()||{}).title, frequency:S.act_frequency, duration:S.act_duration};
+  msMe("次のふりかえりで考える"); saveCandidate(kind, kind==="change"?null:S.act_id, "action_review"); arDone("candidate",before);
+}
 function arApply(k){
+  if(k!=="keep" && !canChangeAction()) return arExitLocked(k);
   const o=adjustOptions(), before={action_id:S.act_id, title:(curAct()||{}).title, frequency:S.act_frequency, duration:S.act_duration};
   if(k==="keep"){ msMe("今の一歩を続ける"); return arDone("keep",before); }
   if(k==="freq" && o.freq){ msMe("頻度を減らす"); S.act_frequency=o.freq.f; adjDone("frequency"); return arDone("freq",before); }
@@ -4017,8 +4153,9 @@ function arDone(k,before){
   S.mini_sessions.push({id:MINI.id, session_id:MINI.id, mode:"action_review", at:MINI.started_at, source:MINI.from, status:"completed",
     context:MINI.ar, answer:MINI.ar.answer||"", burden:MINI.ar.burden||"", recommended:MINI.ar.rec||"", decision:k,
     action_before:before, action_after:{action_id:S.act_id, title:a?a.title:"", frequency:S.act_frequency, duration:S.act_duration},
-    summary:"今週の一歩の見直し："+esc(MINI.ar.answer||"")+"／"+({keep:"続ける",freq:"頻度を減らした",dur:"時間を短くした",change:"別の一歩に変えた"}[k])});
-  const m = k==="keep" ? "では、今の一歩をそのまま続けましょう。<br>できる日だけで大丈夫です。"
+    summary:"今週の一歩の見直し："+esc(MINI.ar.answer||"")+"／"+({keep:"続ける",freq:"頻度を減らした",dur:"時間を短くした",change:"別の一歩に変えた",candidate:"次のふりかえりの候補に残した"}[k])});
+  const m = k==="candidate" ? "次のふりかえりの候補として残しました。<br>それまでは、できる日だけで大丈夫です。"
+    : k==="keep" ? "では、今の一歩をそのまま続けましょう。<br>できる日だけで大丈夫です。"
     : "今週の一歩を<br><b>「"+esc(a.title)+"」</b>（"+esc(planLabel())+"）<br>にしました。<br>できる日だけで大丈夫です。";
   MINI.stage="done";
   msSay(m,function(){ msTray(arBackBtns()); });
@@ -4105,7 +4242,7 @@ function otEndAsk(){
   const said=MINI.ot.turns.some(function(t){ return t.role==="user"; });
   msSay("今日はここまでにしますか？",function(){
     msTray('<div class="opts"><button class="opt" onclick="otFinish()">今日はここまで</button>'
-      +(said?'<button class="opt" onclick="otToExplore()">今の話を少し整理する</button><button class="opt" onclick="otToMap()">心の地図に残す</button>':'')+'</div>');
+      +(said && mapUnlocked()?'<button class="opt" onclick="otToExplore()">今の話を少し整理する</button><button class="opt" onclick="otToMap()">心の地図に残す</button>':'')+'</div>');
   });
 }
 function otSave(status){
@@ -4177,7 +4314,8 @@ function msDone(){
       +'<ol class="msnew">'+items.map(function(it){ return '<li><div class="k">'+it[0]+'</div><div class="v">'+it[1]+'</div></li>'; }).join("")+'</ol>'
       +(working?'<div class="lede" style="margin-top:6px">「'+esc(h.text)+'」という見方は、まだ確かめ中として地図に置いておきます。</div>':'')
       +(MINI.chosen?'<div class="lede" style="margin-top:8px">今週の一歩を「'+esc(act(MINI.chosen).title)+'」に変えました。</div>'
-        :(MINI.kept?'<div class="lede" style="margin-top:8px">今週の一歩は、そのまま続けます。</div>':''))
+        :(MINI.candidate?'<div class="lede" style="margin-top:8px">「'+esc(act(MINI.candidate).title)+'」は、次のふりかえりの候補として残しました。今の一歩はそのまま続けます。</div>'
+        :(MINI.kept?'<div class="lede" style="margin-top:8px">今週の一歩は、そのまま続けます。</div>':'')))
       +'</div>');
     msTray('<button class="btn" onclick="go(\'map\')">更新した地図を見る</button>'
       +'<button class="btn ghost" style="margin-top:9px" onclick="miniBack()">'+(MINI.from==="gate"?"次の一歩を決めに戻る":"ホームに戻る")+'</button>');
@@ -4274,6 +4412,8 @@ function stopTimer(){ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; }
 Promise.all([loadActionMaster(),loadSupportResources()]).then(function(){
   aiBtnSync();
   if(DEBUG) console.log("action-master:", (AM.actions||[]).length, "actions loaded");
+  /* この端末に保存した状態があれば、そこから再開する（ロック・一歩・記録は戻らない） */
+  if(loadState()){ go("home"); return; }
   renderFlow();
   document.getElementById("nav").hidden=true;
 });
