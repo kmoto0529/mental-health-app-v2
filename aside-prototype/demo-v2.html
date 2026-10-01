@@ -266,6 +266,49 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .stepcard .desc{font-size:13.5px;line-height:1.75;color:var(--ink2);margin-bottom:8px}
 .chips2{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
 .chips2 span{font-size:12px;font-weight:700;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:3px 10px}
+/* 今日の状態・気持ちの記録 */
+:root{--ds0:#C4836F;--ds1:#D2A653;--ds2:#9DB3A3;--ds3:#7FA05F}
+.dscard .k{flex-wrap:wrap}
+.dsfreq,.dsok{margin-left:auto;font-size:10.5px;font-weight:700;border-radius:99px;padding:2px 9px}
+.dsfreq{color:var(--muted);background:var(--paper2);border:1px solid var(--line)}
+.dsok{color:var(--teal-deep);background:var(--teal-soft)}
+.dsdesc{font-size:13.5px;line-height:1.8;color:var(--ink2);margin:2px 0 10px}
+.dsbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dsb{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--paper);border:1.5px solid var(--line-input);border-radius:14px;
+  padding:9px 2px 8px;cursor:pointer;font-family:inherit;color:var(--ink2);font-size:11.5px;font-weight:700;line-height:1.3}
+.dsb:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.dsb.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--paper));color:var(--ink)}
+.dscard.done .dsb:not(.sel){opacity:.55}
+.dshint{font-size:11.5px;color:var(--muted);margin-top:8px;text-align:center}
+.dsnow{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:var(--ink);margin:2px 0 10px}
+.dsnote{background:var(--paper2);border-radius:12px;padding:9px 12px;font-size:13.5px;line-height:1.7;color:var(--ink);margin-top:10px}
+.dsedit{margin-top:10px}
+.dsq{font-size:12.5px;line-height:1.7;color:var(--ink2);margin-bottom:6px}
+.dsrow{display:flex;align-items:center;gap:12px;margin-top:8px}
+.btn.sm{width:auto;padding:9px 16px;font-size:13.5px;margin:0}
+.dslink{background:none;border:none;padding:0;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--teal-deep);cursor:pointer;font-family:inherit}
+.dsrow .dslink{margin:0}
+.dsgo{display:block;width:100%;background:none;border:none;border-top:1px dashed var(--line);margin-top:12px;padding:10px 0 0;
+  font-size:12.5px;font-weight:700;color:var(--teal-deep);text-align:left;cursor:pointer;font-family:inherit}
+.ktabs{display:flex;gap:6px;margin:10px 18px 0;background:var(--paper2);border:1px solid var(--line);border-radius:99px;padding:4px}
+.ktabs button{flex:1;border:none;background:none;border-radius:99px;padding:8px 0;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
+.ktabs button.on{background:var(--paper);color:var(--teal-deep);box-shadow:var(--shadow)}
+.moodchart{display:block;width:100%;height:auto}
+.chartnote{display:flex;align-items:center;gap:6px;justify-content:flex-end;font-size:10.5px;color:var(--muted);margin:2px 6px 0}
+.chartnote i{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block}
+.wknav{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:0}
+.wknav button{background:none;border:1px solid var(--line);border-radius:8px;width:26px;height:24px;cursor:pointer;color:var(--teal-deep);font-family:inherit}
+.wknav button:disabled{opacity:.35;cursor:default}
+.dsai{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r-m);margin:10px 18px;padding:14px 16px}
+.dsai .lab{font-size:11.5px;font-weight:800;color:var(--teal-deep)}
+.dsai .v{font-size:14px;line-height:1.85;color:var(--ink);margin-top:4px}
+.dsai .s{font-size:11px;color:var(--muted);margin-top:6px}
+.dsai.muted{background:var(--paper2);border-style:dashed;font-size:13px;color:var(--muted)}
+.memo{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);margin:0 18px 9px;padding:12px 14px}
+.memo .top{display:flex;align-items:center;gap:7px;font-size:12.5px}
+.memo .top b{color:var(--ink)}
+.memo .top span{color:var(--muted);font-size:12px}
+.memo .v{font-size:14px;line-height:1.75;color:var(--ink);margin-top:6px}
 /* AIミニセッション */
 .stopbtn{background:none;border:1px solid var(--teal-line);border-radius:99px;padding:5px 11px;font-size:12px;font-weight:700;color:var(--teal-deep);cursor:pointer;font-family:inherit;white-space:nowrap}
 .msform{padding:16px}
@@ -424,6 +467,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <button class="hideable" onclick="advanceDays(1)">+1日</button>
   <button class="hideable" onclick="advanceToReview()">ふりかえりの日へ</button>
   <button class="hideable" onclick="openMini('home')">ミニセッション</button>
+  <button class="hideable" onclick="seedDaily()">記録サンプル</button>
   <button class="hideable" id="aiBtn" onclick="toggleAi()">AI: OFF</button>
   <button class="hideable" onclick="openSafety('demo','some')">リスク検知</button>
   <button class="hideable" onclick="location.reload()">最初から</button>
@@ -444,9 +488,10 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
     <div id="talkFlow"></div><div class="tray" id="talkTray"></div></section>
 
   <section id="s-map" class="screen">
-    <div class="pagehead"><b style="font-size:16px">きろく ／ 心の地図</b><span></span></div>
+    <div class="pagehead"><b style="font-size:16px">きろく</b><span></span></div>
+    <div class="ktabs" id="kTabs"></div>
     <div id="mapBody" style="margin-top:12px"></div>
-    <div class="foot">この地図は完成するものではなく、<br>あなたと一緒に少しずつ育っていくものです。</div></section>
+    <div class="foot" id="mapFoot">この地図は完成するものではなく、<br>あなたと一緒に少しずつ育っていくものです。</div></section>
 
   <section id="s-gate" class="screen">
     <div class="pagehead"><b style="font-size:16px" id="gateTitle">ふりかえり ── 週に1回</b><span></span></div>
@@ -514,7 +559,9 @@ const S = {
   /* 初回の「一緒に決める」で今週の行動を確定したら true。「一緒に決める」を押しただけでは true にしない */
   initial_plan_completed:false,
   /* 週次サイクル。Home の「週1回のふりかえり」カードと「ふりかえり」タブは、どちらもこの S.cycle だけを見る */
-  cycle:null, cycles:[], reviews:[], rv:null, mood_logs:[], talk_logs:[],
+  cycle:null, cycles:[], reviews:[], rv:null, talk_logs:[],
+  daily_states:[],   // 今日の状態（daily check）。Action記録 act_logs とは別データ
+  kiroku:"map",      // きろくタブ：map（心の地図）／mood（気持ちの記録）
   mini_sessions:[],   // AIミニセッション（任意）の構造化された要約。ふりかえりから参照する
   map:{}, map_log:[],   // 心の地図。本人が書いた言葉だけ（block_id → {text, at, history}）
   clock_offset:0   // デモ用の時計送り（ms）。日付計算はすべて nowMs() 経由
@@ -536,7 +583,7 @@ function go(id){
   const nav=document.getElementById("nav");
   S.entered=true; nav.hidden=false; nav.classList.remove("locked");
   if(id==="home") renderHome();
-  if(id==="map"){ MAPED=null; renderMap(); }
+  if(id==="map"){ MAPED=null; S.kiroku=S.kiroku_next||"map"; S.kiroku_next=null; renderMap(); }
   if(id==="gate") renderGate();
   if(id==="log") renderLog();
   if(id==="talk") startTalk();
@@ -1520,15 +1567,15 @@ function greeting(){
   return h>=5&&h<11 ? "おはようございます" : (h>=11&&h<18 ? "こんにちは" : "こんばんは");
 }
 function renderHome(){
-  const ready=S.initial_plan_completed, mood=todayMood();
+  const ready=S.initial_plan_completed;
   let h=`<div class="hhead"><div class="txt"><div class="g">${greeting()}</div>
       ${S.nickname?`<b>${S.nickname}さん</b>`:""}
       <div class="sub">今日も、ここに来てくれてありがとうございます。<br>あなたのペースで、少しずつで大丈夫です。</div></div>
     <div class="sprout" aria-hidden="true">🌱</div></div>`;
 
   if(ready){
-    /* 優先順：今週の小さな一歩 → 心の地図 → テーマ → 今日の状態 → 最近わかったこと → ふりかえり */
-    h+=stepCard()+mapHomeCard()
+    /* 優先順：今週の小さな一歩 → 心の地図 → 今日の状態 → テーマ → 最近わかったこと → ふりかえり */
+    h+=stepCard()+mapHomeCard()+dailyCard()
       +`<div class="hcard tap" onclick="openTheme()"><div class="k">🎯 今週のテーマ<span class="go">›</span></div>
           <div class="v">${themeText()}</div><div class="s">kokoniと一緒に見つけたテーマ</div></div>`;
   } else {
@@ -1538,10 +1585,8 @@ function renderHome(){
       <div class="hcard"><div class="k">🎯 今週のテーマ</div><div class="v" style="color:var(--muted)">—</div></div>`;
   }
 
-  h+=`<div class="hcard"><div class="k">🌤 今日の状態</div>
-      <div class="v" style="font-size:14px">今日はどんな感じですか？</div>
-      <div class="mood">${MOODS.map(t=>`<button class="${mood===t?"sel":""}" onclick="setMood('${t}')">${t}</button>`).join("")}</div></div>
-    <div class="subgrid">
+  if(!ready) h+=dailyCard();
+  h+=`<div class="subgrid">
       <div class="hcard tap" onclick="go('talk')"><div class="k">💬</div><div class="v">今日は話すだけにする</div><div class="s">今の気持ちを言葉にしてみましょう</div></div>
       <div class="hcard tap" onclick="go('map')"><div class="k">📗</div><div class="v">最近わかったこと</div><div class="s">${(function(){
         const f=mapFeed(1)[0]; return f ? esc(f.text) : "これから一緒に見つけていきます"; })()}</div></div>
@@ -1556,15 +1601,207 @@ function renderHome(){
       <div class="s" style="margin:0;line-height:1.7">毎週のふりかえりにあわせて、<br>kokoniからのレターをお届けします。</div></div>`;
   document.getElementById("homeBody").innerHTML=h;
 }
-/* 今日の状態。週次ふりかえりの「今週の状態」に使う（1日1件、押し直したら上書き） */
-const MOODS=["しんどい","あまり","ふつう","すこし楽"];
+/* ══════════════════════════════════════════════════════════════
+   今日の状態（daily check）
+   - その日の全体的な気分を、1日1回くらい・10秒で残す。日々の波や傾向を見るためのベースデータ
+   - Action記録（act_logs：行動をやってどうだったか）とは別データ。日付（date）で将来つなげられる
+   - Home を開いたとき未回答ならやさしく促す。時間は固定しない。押し直し・メモの編集ができる
+   - S.daily_states: [{date:"YYYY-MM-DD", daily_state, optional_note, recorded_at, edited_at}]
+   ══════════════════════════════════════════════════════════════ */
+const DAILY=[{v:"しんどい",lv:0,c:"var(--ds0)"},{v:"少ししんどい",lv:1,c:"var(--ds1)"},{v:"ふつう",lv:2,c:"var(--ds2)"},{v:"少し楽",lv:3,c:"var(--ds3)"}];
+const MOODS=DAILY.map(function(d){ return d.v; });
 function dayKey(ms){ const d=new Date(ms); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
-function todayMood(){ const k=dayKey(nowMs()); const m=S.mood_logs.filter(function(x){ return dayKey(Date.parse(x.at))===k; })[0]; return m?m.v:""; }
-function setMood(v){
-  const k=dayKey(nowMs());
-  S.mood_logs=S.mood_logs.filter(function(x){ return dayKey(Date.parse(x.at))!==k; });
-  S.mood_logs.push({at:nowIso(), v:v}); renderHome();
+function isoDate(ms){ const d=new Date(ms); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function dateMs(iso){ const p=iso.split("-"); return new Date(+p[0],+p[1]-1,+p[2]).getTime(); }
+function dsLevel(v){ const x=DAILY.filter(function(d){ return d.v===v; })[0]; return x?x.lv:-1; }
+function dsOf(date){ return (S.daily_states||[]).filter(function(r){ return r.date===date; })[0]||null; }
+function todayDs(){ return dsOf(isoDate(nowMs())); }
+function todayMood(){ const r=todayDs(); return r?r.daily_state:""; }
+function mdW(ms){ const d=new Date(ms); return (d.getMonth()+1)+"/"+d.getDate()+"（"+DOW[d.getDay()]+"）"; }
+
+/* やさしい表情のアイコン（4段階） */
+function face(lv,s,x,y){
+  s=s||28; const c=DAILY[lv].c;
+  const m=["M9 20 Q14 15.5 19 20","M9.5 19.2 Q14 17.4 18.5 19.2","M10 18.6 L18 18.6","M9 17 Q14 21.6 19 17"][lv];
+  return '<svg class="face" '+(x!=null?'x="'+x+'" y="'+y+'" ':'')+'width="'+s+'" height="'+s+'" viewBox="0 0 28 28" aria-hidden="true">'
+    +'<circle cx="14" cy="14" r="12.5" style="fill:'+c+';opacity:.22"></circle>'
+    +'<circle cx="14" cy="14" r="12.5" style="fill:none;stroke:'+c+';stroke-width:1.6"></circle>'
+    +'<circle cx="10" cy="12" r="1.4" style="fill:var(--ink)"></circle><circle cx="18" cy="12" r="1.4" style="fill:var(--ink)"></circle>'
+    +'<path d="'+m+'" style="fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round"></path></svg>';
 }
+
+function setDaily(v){
+  const date=isoDate(nowMs()), r=dsOf(date);
+  S.daily_states=S.daily_states||[];
+  if(r){ if(r.daily_state!==v){ r.daily_state=v; r.edited_at=nowIso(); } }
+  else { S.daily_states.push({date:date, daily_state:v, optional_note:"", recorded_at:nowIso(), edited_at:null}); S.ds_note_open=true; }
+  renderHome();
+}
+function saveDailyNote(){
+  const r=todayDs(), el=document.getElementById("dsNote"); if(!r||!el) return;
+  const t=el.value.trim();
+  if(r.optional_note!==t){ if(r.optional_note) r.edited_at=nowIso(); r.optional_note=t; }
+  S.ds_note_open=false;
+  if(t && RISK_RE.test(t)){ openSafety("free_text","unspecified"); return; }   // メモでも安全対応を優先
+  renderHome();
+}
+function dailyNoteOpen(open){ S.ds_note_open=open; renderHome(); }
+
+/* Home のカード。未回答＝答える意味と軽さを伝える／回答後＝記録済み・メモ・見返せる導線 */
+function dailyCard(){
+  const r=todayDs();
+  const btns='<div class="dsbtns">'+DAILY.map(function(d){
+    const on=r&&r.daily_state===d.v;
+    return '<button class="dsb'+(on?' sel':'')+'" style="--c:'+d.c+'" aria-pressed="'+(on?'true':'false')+'" onclick="setDaily(\''+d.v+'\')">'+face(d.lv,30)+'<span>'+d.v+'</span></button>'; }).join("")+'</div>';
+  if(!r) return '<div class="hcard dscard"><div class="k">🌤 今日の状態<span class="dsfreq">1日1回くらいで大丈夫です</span></div>'
+    +'<div class="dsdesc">今日の気持ちを、10秒だけ残してみませんか？<br>少しずつ記録すると、自分の気分の波が見えてきます。</div>'
+    +btns+'<div class="dshint">必要ならメモも残せます</div></div>';
+  const note=r.optional_note||"";
+  let mid;
+  if(S.ds_note_open) mid='<div class="dsedit"><div class="dsq">何か残しておきますか？<br>今の気持ちや、今日あったことを一言だけでも。</div>'
+    +'<textarea id="dsNote" rows="2" maxlength="200" placeholder="会議のあと少し疲れた。でも帰り道で少し落ち着いた。">'+esc(note)+'</textarea>'
+    +'<div class="dsrow"><button class="btn sm" onclick="saveDailyNote()">'+(note?'保存する':'メモを残す')+'</button>'
+    +'<button class="dslink" onclick="dailyNoteOpen(false)">'+(note?'やめる':'今はいい')+'</button></div></div>';
+  else if(note) mid='<div class="dsnote">'+esc(note)+'</div><button class="dslink" onclick="dailyNoteOpen(true)">編集する</button>';
+  else mid='<button class="dslink" onclick="dailyNoteOpen(true)">＋ メモを残す（任意）</button>';
+  return '<div class="hcard dscard done"><div class="k">🌤 今日の状態<span class="dsok">✓ 記録しました</span></div>'
+    +'<div class="dsnow">'+face(dsLevel(r.daily_state),22)+'<span>今日は「'+r.daily_state+'」</span></div>'
+    +btns+'<div class="dshint" style="margin-top:6px">押し直すと、今日の記録を変えられます</div>'+mid
+    +'<button class="dsgo" onclick="openMoodLog()">気持ちの変化は「きろく」で見返せます ›</button></div>';
+}
+
+/* ── きろく ／ 気持ちの記録 ───────────────────────────── */
+function openMoodLog(){ S.kiroku_next="mood"; go("map"); }
+function kirokuTabs(){
+  const el=document.getElementById("kTabs"); if(!el) return;
+  el.innerHTML=[["map","心の地図"],["mood","気持ちの記録"]].map(function(t){
+    return '<button class="'+(S.kiroku===t[0]?'on':'')+'" onclick="S.kiroku=\''+t[0]+'\';MAPED=null;renderMap();window.scrollTo(0,0)">'+t[1]+'</button>'; }).join("");
+  const f=document.getElementById("mapFoot"); if(f) f.hidden = S.kiroku==="mood";
+}
+function weekStart(ms){ const d0=dayStart(ms), w=(new Date(d0).getDay()+6)%7; return d0-w*DAY; }   // 月曜はじまり
+function weekDays(off){
+  const ws=weekStart(nowMs())+off*7*DAY;
+  return [0,1,2,3,4,5,6].map(function(i){ const ms=ws+i*DAY+12*3600000; return {ms:ms, date:isoDate(ms), r:dsOf(isoDate(ms))}; });
+}
+/* 1週間の推移。顔アイコンの4段と、日ごとの点を線でつなぐ（記録のない日は線を切る） */
+function moodChart(days){
+  const W=340, X0=46, X1=326, Y=function(lv){ return 22+(3-lv)*38; }, X=function(i){ return X0+i*(X1-X0)/6; };
+  const today=isoDate(nowMs());
+  let g='';
+  DAILY.forEach(function(d){ g+='<line x1="'+(X0-12)+'" y1="'+Y(d.lv)+'" x2="'+(X1+10)+'" y2="'+Y(d.lv)+'" style="stroke:var(--line);stroke-width:1"></line>'+face(d.lv,22,4,Y(d.lv)-11); });
+  days.forEach(function(d,i){
+    if(d.date===today) g+='<rect x="'+(X(i)-15)+'" y="6" width="30" height="172" rx="10" style="fill:var(--g-pale-2)"></rect>';
+  });
+  let seg=[];
+  const flush=function(){ if(seg.length>1) g+='<polyline points="'+seg.join(" ")+'" style="fill:none;stroke:var(--teal);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;opacity:.75"></polyline>'; seg=[]; };
+  days.forEach(function(d,i){ if(d.r) seg.push(X(i)+","+Y(dsLevel(d.r.daily_state))); else flush(); }); flush();
+  days.forEach(function(d,i){
+    if(d.r){ const lv=dsLevel(d.r.daily_state);
+      g+='<circle cx="'+X(i)+'" cy="'+Y(lv)+'" r="7" style="fill:'+DAILY[lv].c+';stroke:var(--paper);stroke-width:2.5"><title>'+mdW(d.ms)+' '+d.r.daily_state+'</title></circle>';
+      if(d.r.optional_note) g+='<circle cx="'+(X(i)+7)+'" cy="'+(Y(lv)-7)+'" r="2.6" style="fill:var(--accent)"></circle>';
+    }
+    const dt=new Date(d.ms);
+    g+='<text x="'+X(i)+'" y="188" text-anchor="middle" style="font-size:11px;font-weight:700;fill:'+(d.date===today?'var(--teal-deep)':'var(--ink2)')+'">'+DOW[dt.getDay()]+'</text>'
+      +'<text x="'+X(i)+'" y="202" text-anchor="middle" style="font-size:10px;fill:var(--muted)">'+(dt.getMonth()+1)+'/'+dt.getDate()+'</text>';
+  });
+  return '<svg class="moodchart" viewBox="0 0 '+W+' 208" role="img" aria-label="今週の気持ちの変化">'+g+'</svg>';
+}
+/* 今週のふりかえり：事実ベースの短い要約（断定しない） */
+function weekSummary(days,off){
+  const rec=days.filter(function(d){ return d.r; }), n=rec.length;
+  if(n<3) return '<div class="dsai muted">あと'+(3-n)+'日分たまると、今週のふりかえりが表示されます。</div>';
+  const lv=rec.map(function(d){ return dsLevel(d.r.daily_state); });
+  const half=Math.floor(n/2), a1=avg(lv.slice(0,half)), a2=avg(lv.slice(n-half)), diff=a2-a1;
+  const low=lv.filter(function(x){ return x<=1; }).length, mode=modeLabel(rec.map(function(d){ return d.r.daily_state; }));
+  let t=(off?"この週は":"今週は")+n+"日、気持ちを残してくれました。<br>";
+  if(diff>=0.7) t+="前半は「"+(lv.slice(0,half).indexOf(0)>=0?"しんどい":"少ししんどい")+"」日が多く、後半は少し落ち着いた日が増えていたようです。";
+  else if(diff<=-0.7) t+="後半にかけて、しんどさを感じる日が少し増えていたようです。<br>無理のないペースで大丈夫です。";
+  else if(Math.max.apply(null,lv)-Math.min.apply(null,lv)<=1) t+="大きな波は少なく、「"+mode+"」の日が多い週だったようです。";
+  else t+="日によって、気分に波があったようです。"+(low?"<br>「しんどい」「少ししんどい」と感じた日は"+low+"日ありました。":"");
+  return '<div class="dsai"><div class="lab">🌱 kokoniからの気づき</div><div class="v">'+t+'</div>'
+    +'<div class="s">記録した内容から、事実をまとめています。</div></div>';
+}
+function avg(a){ return a.length ? a.reduce(function(x,y){ return x+y; },0)/a.length : 0; }
+function modeLabel(a){ const m={}; a.forEach(function(v){ m[v]=(m[v]||0)+1; }); return Object.keys(m).sort(function(x,y){ return m[y]-m[x]; })[0]; }
+
+/* 最近見えてきたこと：記録が重なって見えてきた傾向（仮説）。心の地図には自動で入れない
+   1) メモに人との予定・仕事のやりとりがあった日の状態 2) 今の一歩をやった日とそうでない日 3) 曜日 */
+const DS_PEOPLE=/会議|面談|上司|同僚|打ち合わせ|予定|飲み会|人と会|人と話|職場の人|取引先/;
+function dsInsights(){
+  const all=(S.daily_states||[]).slice().sort(function(a,b){ return a.date<b.date?-1:1; }), out=[];
+  if(all.length<5) return {n:all.length, items:out};
+  const L=function(r){ return dsLevel(r.daily_state); };
+  const ppl=all.filter(function(r){ return r.optional_note && DS_PEOPLE.test(r.optional_note); }), oth=all.filter(function(r){ return ppl.indexOf(r)<0; });
+  if(ppl.length>=2){
+    const ap=avg(ppl.map(L)), ao=avg(oth.map(L)), lowN=ppl.filter(function(r){ return L(r)<=1; }).length;
+    if(ap<=1.4 && ao-ap>=0.5) out.push({t:"人と関わる予定があった日に、疲れが出やすいかもしれません。",
+      d:"会議や面談、人と会う予定があった日に、「少ししんどい」「しんどい」と感じることが多いようです。",
+      ev:["メモに人との予定ややりとりがあった日："+ppl.length+"日（うち"+lowN+"日が「少ししんどい」「しんどい」）","そうでない日は、「ふつう」「少し楽」の日が比較的多い"]});
+    else if(ap>=2 && ap-ao>=0.5) out.push({t:"人と話した日は、少し楽に感じることがあるようです。",
+      d:"人と関わった日に、「ふつう」「少し楽」と感じることが多いようです。", ev:["メモに人とのやりとりがあった日："+ppl.length+"日"]});
+  }
+  const cur=curAct();
+  if(cur){
+    const done={}; S.act_logs.filter(function(l){ return l.action_id===S.act_id; }).forEach(function(l){ done[isoDate(Date.parse(l.at))]=1; });
+    const dd=all.filter(function(r){ return done[r.date]; }), nd=all.filter(function(r){ return !done[r.date]; });
+    if(dd.length>=2 && nd.length>=2 && avg(dd.map(L))-avg(nd.map(L))>=0.5)
+      out.push({t:"「"+cur.title+"」をやった日は、少し楽な日が多いようです。", d:"今の一歩が、あなたに合っているのかもしれません。",
+        ev:["「"+cur.title+"」をやった日："+dd.length+"日","やった日の気持ちは、やらなかった日より少し楽な傾向"]});
+  }
+  if(all.length>=8){
+    const by={}; all.forEach(function(r){ const w=new Date(dateMs(r.date)).getDay(); (by[w]=by[w]||[]).push(L(r)); });
+    const tot=avg(all.map(L)), worst=Object.keys(by).filter(function(w){ return by[w].length>=2; }).sort(function(a,b){ return avg(by[a])-avg(by[b]); })[0];
+    if(worst!=null && tot-avg(by[worst])>=0.7) out.push({t:DOW[worst]+"曜日は、しんどさを感じやすいかもしれません。",
+      d:DOW[worst]+"曜日の記録は、ほかの日より「しんどい」寄りのことが多いようです。", ev:[DOW[worst]+"曜日の記録："+by[worst].length+"日"]});
+  }
+  return {n:all.length, items:out};
+}
+let DS_INS=[];
+function renderMoodLog(){
+  const off=S.mood_week||0, days=weekDays(off), body=document.getElementById("mapBody");
+  const ins=dsInsights(); DS_INS=ins.items;
+  const notes=(S.daily_states||[]).filter(function(r){ return r.optional_note; }).sort(function(a,b){ return a.date<b.date?1:-1; });
+  const shown=S.memo_all?notes:notes.slice(0,3);
+  const range=mdW(days[0].ms)+" 〜 "+mdW(days[6].ms);
+  body.innerHTML=
+    '<div class="mapsum"><h3>気持ちの記録</h3><div class="lede" style="margin:4px 0 0;line-height:1.85">毎日の気分を少しずつ残すと、<br>自分の波や傾向が見えてきます。</div></div>'
+    +'<div class="sech" style="justify-content:space-between">'+(off===0?'今週の気持ちの変化':'気持ちの変化')
+      +'<span class="wknav"><button onclick="S.mood_week=(S.mood_week||0)-1;renderMap()" aria-label="前の週">‹</button>'+range
+      +'<button onclick="S.mood_week=Math.min(0,(S.mood_week||0)+1);renderMap()" '+(off===0?'disabled':'')+' aria-label="次の週">›</button></span></div>'
+    +'<div class="card" style="margin-top:0;padding:12px 10px 8px">'+moodChart(days)
+    +'<div class="chartnote"><i></i>メモを残した日</div></div>'
+    +weekSummary(days,off)
+    +(!(S.daily_states||[]).length ? '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">まだ記録はありません。<br>ホームの「今日の状態」から、10秒で残せます。</div></div>' : '')
+    +'<div class="sech">残したメモ</div>'
+    +(notes.length ? shown.map(function(r){ const lv=dsLevel(r.daily_state);
+        return '<div class="memo"><div class="top">'+face(lv,20)+'<b>'+mdW(dateMs(r.date))+'</b><span>'+r.daily_state+'</span></div>'
+          +'<div class="v">「'+esc(r.optional_note)+'」</div></div>'; }).join("")
+        +(notes.length>3?'<button class="dslink" style="margin:0 18px 6px" onclick="S.memo_all=!S.memo_all;renderMap()">'+(S.memo_all?'閉じる':'すべて見る（'+notes.length+'件）')+'</button>':'')
+      : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">「今日の状態」を残すときに、一言メモも残せます。</div></div>')
+    +'<div class="sech">最近見えてきたこと</div>'
+    +(ins.items.length ? '<div class="lede" style="margin:-2px 22px 8px">これまでの記録から、こんな傾向が見えてきました。</div>'
+        +ins.items.map(function(x,i){ return '<div class="found"><div class="v" style="font-weight:700">'+esc(x.t)+'</div>'
+          +'<div class="s" style="font-size:12.5px;line-height:1.7;color:var(--ink2)">'+esc(x.d)+'</div>'
+          +'<button class="whybtn" style="margin-top:6px" onclick="msWhy({evidence:DS_INS['+i+'].ev})">どうしてそう思ったの？</button></div>'; }).join("")
+      : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">'
+        +(ins.n<5 ? '記録が5日分ほどたまると、ここに傾向が見えてきます。（いま'+ins.n+'日分）' : 'まだはっきりした傾向は見えていません。<br>もう少し記録がたまると、見えてくるかもしれません。')+'</div></div>')
+    +'<div class="mapcta"><button class="btn ghost" onclick="S.kiroku=\'map\';renderMap();window.scrollTo(0,0)">心の地図でくわしく見る</button>'
+    +'<div class="lede" style="margin-top:8px;text-align:center">ここで見えてきたことは、まだ仮の見方です。<br>心の地図には、あなたが確かめてから加えていきます。</div></div>';
+}
+
+/* デモ用：過去9日分の記録サンプル（メモつき）。今日の分は入れない */
+function seedDaily(){
+  const rows=[[9,"少ししんどい","朝から会議が続いて、夕方にはぐったりしていた。"],[8,"ふつう",""],[7,"少し楽","休みの日。散歩して少し気分が晴れた。"],
+    [6,"しんどい","上司との面談のあと、ずっと考えてしまった。うまく話せなかったのが気になっている。"],[5,"少ししんどい","人と会う予定が続いて疲れた。"],
+    [4,"ふつう",""],[3,"少し楽","友達と話したら少し楽になった。やっぱり話を聞いてもらうと気持ちが軽くなる。"],
+    [2,"ふつう","今日はゆっくり過ごせた。まだ少し疲れはあるけど、昨日より気持ちは落ち着いている。"],[1,"少ししんどい","打ち合わせが長引いて疲れた。"]];
+  S.daily_states=(S.daily_states||[]).filter(function(r){ return r.date===isoDate(nowMs()); });
+  rows.forEach(function(x){ const ms=nowMs()-x[0]*DAY, at=new Date(dayStart(ms)+20*3600000).toISOString();
+    S.daily_states.push({date:isoDate(ms), daily_state:x[1], optional_note:x[2], recorded_at:at, edited_at:null, sample:true}); });
+  if(S.screen==="map") S.kiroku_next=S.kiroku;
+  rerender();
+}
+
 
 /* 今週のテーマ＝「なぜ今週これに取り組むか」。初回対話の Q2（気になっていること）と Q3（変えたいこと）から */
 function themeText(){
@@ -1795,8 +2032,8 @@ function mapMaterials(id){
   S.mini_sessions.forEach(function(m){ if(miniKey) add(m[miniKey],"少し話したこと（"+fmtMD(m.at)+"）",m.at); });
   if(id==="thought") S.act_logs.forEach(function(l){ if(l.input && UI_FAMILY[l.app_type]==="write") add(l.input,"「"+l.title+"」で書いたこと（"+fmtMD(l.at)+"）",l.at); });
   if(id==="feeling"){
-    const sh=S.mood_logs.filter(function(m){ return m.v==="しんどい"; });
-    if(sh.length) add("「しんどい」と記録した日が"+sh.length+"日あります","今日の状態",sh[sh.length-1].at);
+    const sh=(S.daily_states||[]).filter(function(r){ return r.daily_state==="しんどい"; });
+    if(sh.length) add("「しんどい」と記録した日が"+sh.length+"日あります","今日の状態",sh[sh.length-1].recorded_at);
   }
   if(id==="pattern"){
     /* 本人が「近い」と確かめた流れ、または本人が自分の言葉で直した流れだけ。確かめ中の見方は入れない */
@@ -1881,6 +2118,8 @@ function mapStatusText(n){
 
 function renderMap(){
   const body=document.getElementById("mapBody");
+  kirokuTabs();
+  if(S.kiroku==="mood") return renderMoodLog();
   /* 初回前も閲覧できる。まだこれからの状態として見せる */
   if(!S.initial_plan_completed){
     body.innerHTML='<div class="mapsum"><div class="mhero">'+mapArt(84)+'<div><h3>心の地図を、一緒に<br>少しずつひろげていきましょう</h3>'
@@ -2143,7 +2382,7 @@ function cycleData(){
   const inC=function(l){ const t=Date.parse(l.at); return t>=from && t<=to; };
   const acts=S.act_logs.filter(inC), a=curAct();
   return {
-    moods:S.mood_logs.filter(inC).map(function(m){ return m.v; }),
+    moods:(S.daily_states||[]).filter(function(r){ const t=dateMs(r.date)+12*3600000; return t>=dayStart(from) && t<=to; }).map(function(r){ return r.daily_state; }),
     talk_count:S.talk_logs.filter(inC).length,
     action:{ action_id:S.act_id, title:a?a.title:S.first_action, plan:a?planLabel():"",
       count:acts.filter(function(l){ return l.action_id===S.act_id; }).length,
