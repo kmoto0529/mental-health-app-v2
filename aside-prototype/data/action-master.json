@@ -1,6 +1,6 @@
 {
-  "master_version": "0.2",
-  "updated_at": "2026-09-30",
+  "master_version": "0.3",
+  "updated_at": "2026-10-01",
   "note": "行動マスター。介入内容は固定・パーソナライズは可変。将来は CSV/Sheets → Supabase → 心理士編集画面へ移行する。画面やロジックは action_id 経由でのみ参照すること。",
   "categories": [
     { "category_id": "THINK",   "category_name": "考えを整理する",     "order": 1 },
@@ -8,7 +8,8 @@
     { "category_id": "CALM",    "category_name": "気持ちを落ち着ける", "order": 3 },
     { "category_id": "SOLVE",   "category_name": "問題を整理する",     "order": 4 },
     { "category_id": "CONNECT", "category_name": "人とつながる",       "order": 5 },
-    { "category_id": "KIND",    "category_name": "自分に優しくする",   "order": 6 }
+    { "category_id": "KIND",    "category_name": "自分に優しくする",   "order": 6 },
+    { "category_id": "OBSERVE", "category_name": "記録して眺める",     "order": 7 }
   ],
   "actions": [
     {
@@ -16,8 +17,8 @@
       "category_id": "THINK",
       "category_name": "考えを整理する",
       "title": "今の考えを書き出してみる",
-      "short_description": "頭の中にあることを、そのまま外に出して整理します。",
-      "purpose": "頭の中にある考えを一度外に出して整理する。",
+      "short_description": "頭の中にあることを、そのまま外に出してみます。整理されなくても大丈夫です。",
+      "purpose": "頭の中にある考えや気持ちを、まず外に出す（外在化）。整理されるのは結果であって目的ではない（9/22 大塚さん）。",
       "recommended_for": ["考えが止まらない", "頭の中がごちゃごちゃしている", "何が不安なのかわからない"],
       "caution": "書きながらつらさが強くなったら、途中でやめてよいと伝える。",
       "difficulty": 1,
@@ -754,6 +755,37 @@
       },
       "status": "published",
       "version": "0.2"
+    },
+    {
+      "action_id": "ACTION_025",
+      "category_id": "OBSERVE",
+      "category_name": "記録して眺める",
+      "title": "1日の気分と過ごし方を記録する",
+      "short_description": "1日の中で、何をしていて、どんな気分だったかをつけていきます。",
+      "purpose": "気分と行動のつながりを、本人が自分の記録から見つける（行動記録表・セルフモニタリング）。",
+      "recommended_for": ["休み始めたばかり", "1日の過ごし方がばらばら", "何をすると楽になるかわからない"],
+      "caution": "空白の時間帯を責めない。書けない日は気分だけ、または何も書かなくてよいと伝える。出典：9/22 大塚さん「休職し始めの人には特に」。",
+      "difficulty": 1,
+      "app_type": "activity_log",
+      "instruction": "朝から夜まで、だいたいの時間帯ごとに「していたこと」と「気分」をつけてみましょう。思い出せないところは空けておいて大丈夫です。",
+      "reflection": "並べてみて、気分が少し違った時間帯はありましたか。",
+      "cadence_type": "daily",
+      "default_frequency": "毎日",
+      "default_duration": 5,
+      "minimum_frequency": "週3回",
+      "minimum_duration": 3,
+      "adjustable_fields": ["frequency", "duration", "content"],
+      "simpler_version": { "title": "朝・昼・夜の気分だけつける", "instruction": "していたことは書かなくて大丈夫です。朝・昼・夜の気分だけ選んでみましょう。" },
+      "easier_action_id": null,
+      "cta_label": "記録する",
+      "match": {
+        "want": ["自分のことを理解したい", "生活リズムを整えたい", "少し動けるようになりたい"],
+        "topic": ["生活・体調", "自分自身のこと", "まだわからない"],
+        "state": ["かなりしんどい", "少ししんどい", "波がある", "うまく言えない"],
+        "keywords": ["休職", "休んで", "生活", "一日", "起き", "寝", "だらだら", "何もできない"]
+      },
+      "status": "published",
+      "version": "0.3"
     }
   ],
   "cadence_note": "cadence_type: daily=習慣として練習 / scheduled=週に数回 / trigger_based=特定の状況で行う（default_frequency は状況の文言） / one_off=今週1回。頻度・時間の調整は minimum_* の範囲内のみ。simpler_version と easier_action_id は v0.2 の仮登録（心理士レビュー前）。"

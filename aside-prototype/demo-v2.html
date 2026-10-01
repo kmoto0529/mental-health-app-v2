@@ -823,8 +823,11 @@ const UI_FAMILY={
   muscle_relaxation:"timer", activity_timer:"timer",
   guided_journal:"write", self_compassion:"write", message_draft:"write",
   problem_solving:"step", task_breakdown:"step",
-  activity_planner:"plan", connection_planner:"plan", mood_experiment:"plan"
+  activity_planner:"plan", connection_planner:"plan", mood_experiment:"plan",
+  activity_log:"log"
 };
+/* 行動記録表（9/22 大塚さん「24時間で気分をつける」）。デモは時間帯6つに簡略化。1時間刻みにするかは 10/2 で確認 */
+const LOG_SLOTS=["朝（〜9時）","午前","昼","午後","夕方","夜"], LOG_SLOTS_SIMPLE=["朝","昼","夜"];
 const STEPS={
   problem_solving:["いま困っていることを書く","自分で変えられそうな部分を選ぶ","今日できる一歩を1つ決める"],
   task_breakdown:["気が重いことを1つ書く","最初のひとかけらに分ける","5分でできる形にする"]
@@ -892,6 +895,18 @@ function renderAction(phase){
       +'<div class="fld"><label>どのくらいやるか</label><input type="text" id="actHow" placeholder="例）5分"></div>'
       +'<button class="btn" onclick="saveActPlan()">これで決める</button></div>';
   }
+  else if(phase==="log"){
+    const simple=S.act_simpler===S.act_id, slots=simple?LOG_SLOTS_SIMPLE:LOG_SLOTS;
+    window.__LOG=slots.map(function(){ return {what:"",mood:""}; });
+    h=head+'<div class="card">'
+      +'<div class="aibadge"><span class="dot"></span>'+a.title+'</div>'
+      +'<p style="font-size:14px;line-height:1.9;margin:10px 0 4px">'+a.instruction+'</p></div>'
+      +slots.map(function(sl,i){ return '<div class="card" style="margin-top:10px">'
+        +'<div style="font-size:12px;font-weight:800;color:var(--teal-deep);margin-bottom:6px">'+sl+'</div>'
+        +(simple?'':'<input type="text" class="logWhat" placeholder="していたこと（空けておいてもOK）" oninput="__LOG['+i+'].what=this.value" style="margin-bottom:8px">')
+        +'<div class="opts row">'+MOODS.map(function(m){ return '<button class="opt logMood" data-i="'+i+'" onclick="logMood('+i+',this,\''+m+'\')">'+m+'</button>'; }).join("")+'</div></div>'; }).join("")
+      +'<div style="margin:12px 18px"><button class="btn" onclick="saveActLog()">保存する</button></div>';
+  }
   else if(phase==="done"){
     stopActTimer();
     h=head+'<div class="card tint" style="text-align:center">'
@@ -924,6 +939,16 @@ function saveActInput(){
 function saveActSteps(){
   S.act_input=[].slice.call(document.querySelectorAll(".actStep")).map(function(t,i){
     return "STEP"+(i+1)+": "+t.value; }).join(" / ");
+  renderAction("done");
+}
+function logMood(i,el,m){
+  const L=window.__LOG[i]; L.mood = L.mood===m ? "" : m;
+  document.querySelectorAll('.logMood[data-i="'+i+'"]').forEach(function(b){ b.classList.toggle("sel", b.textContent===L.mood); });
+}
+function saveActLog(){
+  const slots=S.act_simpler===S.act_id?LOG_SLOTS_SIMPLE:LOG_SLOTS;
+  S.act_input=window.__LOG.map(function(L,i){
+    return (L.what||L.mood) ? slots[i]+"："+(L.what||"—")+(L.mood?"（"+L.mood+"）":"") : ""; }).filter(Boolean).join(" / ");
   renderAction("done");
 }
 function saveActPlan(){
