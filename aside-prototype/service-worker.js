@@ -8,7 +8,7 @@
  * バージョンを上げる度にキャッシュ破棄して新しい資産に切り替わる。
  */
 
-const CACHE_VERSION = 'moyanomori-v0.9.96-beta.39';
+const CACHE_VERSION = 'moyanomori-v0.9.96-beta.40';
 const CORE_ASSETS = [
   './',
   './index.html',

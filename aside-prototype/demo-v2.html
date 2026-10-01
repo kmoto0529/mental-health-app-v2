@@ -388,6 +388,24 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .maplock .cd b{font-size:20px}
 .tcard.locked{background:var(--paper2);border-style:dashed}
 .tcard.locked h3{color:var(--ink2)}
+/* すぷらん（アバター・吹き出し）／大塚さん（人物アイコン） */
+.bubble .who img.av{width:22px;height:22px;object-fit:contain;border-radius:50%;background:var(--g-pale-2)}
+.bubble .who{font-weight:700;color:var(--teal-deep)}
+.sp-m{width:72px;height:72px;object-fit:contain;flex:0 0 72px}
+.sp-xxs{width:34px;height:34px;object-fit:contain;flex:0 0 34px}
+.talkhead .spk,.spq{display:flex;align-items:center;gap:10px}
+.spq{margin:10px 18px 0}
+.tnote{font-size:11.5px!important;color:var(--muted)!important;margin-top:8px!important}
+.sp-ot{display:block;width:56px;height:56px;object-fit:contain;margin:-4px auto 4px}
+.mapcta2 .sp-xs{float:right;margin:-4px -4px 0 6px}
+.psyh{display:flex;align-items:center;gap:8px;font-size:12px;color:#5c4a2a;margin-bottom:10px}
+.psyic{width:26px;height:26px;border-radius:50%;background:#efe6d6;border:1px solid #e1d3b7;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 26px}
+.psyic.sm{width:20px;height:20px;font-size:11px;flex:0 0 20px;margin-right:4px;vertical-align:middle}
+.roles{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 6px;margin:6px 18px 0;font-size:11.5px;font-weight:700;color:var(--ink2)}
+.roles>span{display:inline-flex;align-items:center;gap:3px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:3px 9px}
+.roles>span small{font-size:10px;color:var(--muted);font-weight:700;margin-left:3px}
+.roles i{font-style:normal;color:var(--teal-line)}
+.roles .sp-xxs{width:20px;height:20px;flex:0 0 20px}
 /* Home（シンプル版） */
 .hhead2{padding:16px 20px 4px}
 .hhead2 .nm{display:block;font-size:24px;color:var(--ink);font-weight:800;letter-spacing:.02em}
@@ -430,7 +448,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .hcard2.col{flex-wrap:wrap;cursor:default}
 .hcard2.col .btn{flex:1 1 100%;margin:4px 0 0}
 .hcard2.today{border-color:var(--accent-line);background:linear-gradient(160deg,#FFFDF6,#F7EFDF)}
-/* kokoniからのおたより */
+/* すぷらんからのおたより */
 .hrow.otay{background:linear-gradient(160deg,#FFFDF6,#F7EFDF);border-color:var(--accent-line)}
 .hrow.otay .k{color:var(--accent)}
 .otgo{align-self:center;font-size:12.5px;font-weight:800;color:var(--accent);white-space:nowrap}
@@ -706,7 +724,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
     <div class="foot">※ デモです。AIの応答はあらかじめ用意したもので、実際の生成は行っていません。</div></section>
 
   <section id="s-talk" class="screen">
-    <div class="pagehead"><b style="font-size:16px">はなす</b><span></span></div>
+    <div class="pagehead"><b style="font-size:16px">すぷらんとはなす</b><span></span></div>
     <div id="talkBody"></div></section>
 
   <section id="s-map" class="screen">
@@ -728,7 +746,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <section id="s-act" class="screen"><div id="actBody"></div></section>
 
   <!-- AIミニセッション（任意）。困る場面・考え・気持ち・行動・対処・望む姿を整理する -->
-  <section id="s-mini" class="screen"><div class="pagehead"><button class="back" onclick="msStop()" aria-label="今日はここまで">‹</button><span class="lede" id="miniTitle" style="flex:1">少し話して、心の地図をひろげる</span><button class="stopbtn" onclick="msStop()">今日はここまで</button></div><div class="isteps" id="miniSteps"></div>
+  <section id="s-mini" class="screen"><div class="pagehead"><button class="back" onclick="msStop()" aria-label="今日はここまで">‹</button><span class="lede" id="miniTitle" style="flex:1">すぷらんと地図をひろげる</span><button class="stopbtn" onclick="msStop()">今日はここまで</button></div><div class="isteps" id="miniSteps"></div>
     <div id="miniFlow" style="margin-top:10px"></div><div class="tray" id="miniTray"></div>
     <div class="msfoot" id="miniFoot" hidden><button class="stopbtn" onclick="msStop()">今日はここまで（ここまでの内容は保存されます）</button></div></section>
 
@@ -777,7 +795,7 @@ const S = {
   act_id:"", act_duration:0, act_frequency:"", act_timing:"", act_adjusted:false,
   act_input:"", act_feeling:"", act_logs:[], iv_exclude:[], iv_scene:"", iv_offered:[], profileOpen:false,
   step:"a1", screen:"flow", side:"user",
-  otayori:[],   // kokoniからのおたより（AI）。大塚さんの手紙（reviews[].letter_*）とは別データ
+  otayori:[],   // すぷらんからのおたより（AI）。大塚さんの手紙（reviews[].letter_*）とは別データ
   timerId:null, timer:0,
   /* 初回の「一緒に決める」で今週の行動を確定したら true。「一緒に決める」を押しただけでは true にしない */
   initial_plan_completed:false,
@@ -1383,7 +1401,7 @@ function ivSay(m,then){
   const flow=document.getElementById("ivFlow"), tray=document.getElementById("ivTray");
   tray.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
   setTimeout(function(){
-    flow.insertAdjacentHTML("beforeend",'<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">'+m+'</div></div>');
+    flow.insertAdjacentHTML("beforeend",'<div class="bubble">'+spWho()+'<div class="txt">'+spTone(m)+'</div></div>');
     window.scrollTo(0,document.body.scrollHeight);
     then();
   },430);
@@ -1415,7 +1433,8 @@ function ivRender(){
 
   /* ① 呼び方 */
   case 0:
-    ivSay("はじめに、なんとお呼びしたらいいですか？",function(){
+    S.sp_intro_seen=true;
+    ivSay(SP_INTRO+"<br><br>はじめに、なんて呼んだらいい？",function(){
       tray.innerHTML='<div class="card" style="margin:0">'
         +'<div class="fld" style="margin-bottom:8px"><input type="text" id="ivNick" placeholder="例）もと" maxlength="12" value="'+S.nickname+'"'
         +' oninput="document.getElementById(\'ivNickBtn\').disabled=!this.value.trim()"></div>'
@@ -1486,13 +1505,13 @@ function ivRender(){
       flow.insertAdjacentHTML("beforeend",'<div class="trycard">'
         +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 2 ／ 一歩をえらぶ</div>'
         +'<h2>最初の3日で、<br>ひとつ試してみましょう</h2>'
-        +'<p>今のお話をもとに、<br>まず試しやすそうな方法を考えました。</p>'
+        +'<p><b>すぷらんからの提案</b>：今のお話をもとに、<br>まず試しやすそうな方法を考えたよ。</p>'
         +'<p>どれが一番合うかを、今ここで決めなくても大丈夫です。<br>まずは3日だけ、「これならできそう」と思うものを試してみましょう。</p>'
         +'<ol class="tryflow">'
         +'<li><b>今日</b><span>やってみることを決める</span></li>'
         +'<li><b>3日間</b><span>無理のない範囲で試してみる</span></li>'
         +'<li><b>3日後</b><span>自分に合っていそうか、一緒にふりかえる</span></li>'
-        +'<li class="tf-opt"><b>必要なら</b><span>その内容を心理士にも共有できる</span></li>'
+        +'<li class="tf-opt"><b>必要なら</b><span>臨床心理士の大塚さんにも共有できる</span></li>'
         +'</ol></div>');
     }
     ivSay("無理なくできそうなものを<br>1つ選んでみませんか？<br><span style=\"font-size:12.5px;color:var(--muted)\">合わなければ、3日後に変えることができます。</span>",
@@ -1922,7 +1941,7 @@ function renderHome(){
     /* 3枚：今日の一歩（＋今日の気持ち）→ 心の地図 → 次のふりかえり。テーマ・最近わかったことは出さない */
     h+=stepCard()+otHomeCard()
       +(letterArrived()?`<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span>
-        <div style="flex:1"><div class="k">大塚さんから</div><div class="v">大塚さんからの手紙が届いています</div></div>
+        <div style="flex:1"><div class="k">大塚さんから</div><div class="v">大塚さんから手紙が届きました</div></div>
         <span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>`:"")
       +mapHomeCard()+recallCard();
   } else {
@@ -2338,7 +2357,7 @@ function nextCard(r){
   const cTag=function(kind){ return cand.some(function(c){ return c.kind===kind || (kind==="adjust" && (c.kind==="freq"||c.kind==="dur")); }) ? ' <span class="tag">途中で残した候補あり</span>' : ''; };
   const m=miniInCycle();
   return (m && m.summary && (!r.mini_session_id || r.mini_session_id!==m.session_id)
-      ? '<div class="card"><h3>AIと整理したこと</h3><div class="sum"><div class="v">'+m.summary+'</div></div></div>' : "")
+      ? '<div class="card"><h3>すぷらんと整理したこと</h3><div class="sum"><div class="v">'+m.summary+'</div></div></div>' : "")
     +(r.shared && r.letter_status!=="arrived" ? '<p class="lede" style="margin:0 18px 8px">大塚さんの手紙を待たずに、次の一歩を決めても大丈夫です。</p>' : '')
     +'<div class="card"><h3>次の1週間の一歩を決めましょう</h3>'
     +'<p class="lede" style="margin-bottom:12px">ここまで試してみたことをもとに、<br>次の1週間をどう過ごすか、一緒に考えてみましょう。</p>'
@@ -2347,7 +2366,7 @@ function nextCard(r){
     +'<button class="opt" style="text-align:left" onclick="openAdjustNext()">頻度・時間を調整する'+tag("adjust")+cTag("adjust")+'</button>'
     +'<button class="opt" style="text-align:left" onclick="openAlt(\'next\')">別の一歩を試す'+tag("change")+cTag("change")+'</button>'
     +'</div>'
-    +'<button class="linkbtn" onclick="openMini(\'gate\')">AIともう少し整理してから決める</button></div>';
+    +'<button class="linkbtn" onclick="openMini(\'gate\')">すぷらんともう少し整理してから決める</button></div>';
 }
 /* 次のサイクルへ（7日）。ふりかえりが終わっているときだけ。お休み中なら再開する */
 function nextStep(kind){
@@ -2377,7 +2396,7 @@ function startHereCard(){
 }
 /* 週1回のふりかえり。日付・残り日数・状態はすべて S.cycle から出す（ふりかえりタブと同じ値） */
 /* ══════════════════════════════════════════════════════════════
-   kokoniからのおたより（AIが書く短い便り。大塚さんからの手紙とは別のもの・別のデータ）
+   すぷらんからのおたより（AIが書く短い便り。大塚さんからの手紙とは別のもの・別のデータ）
    - 届く日：初回3日サイクル＝Day2（Day0＝一歩を決めた日）／通常サイクル＝Day2・Day5（Day1＝開始日）
      ふりかえりの日以降の枠は出さない（skipped）。日付はローカル日付・サイクル開始日が基準
    - 同じサイクル・同じ枠は1通だけ。何日か開かなくても、届くのは最新の1枠だけ（古い枠は skipped）
@@ -2464,7 +2483,7 @@ function otCompose(type,ref,c){
     L.push("もし少し余裕があれば、今日は"+m+"分だけでも試してみませんか。まとまらなくても大丈夫です。今のやり方が難しければ、次のふりかえりで一緒に見直せます。");
     used.log_count=0; cta="step";
   }
-  let body=L.join("");
+  let body=spTone(L.join(""));
   if(Array.from(body).length>OTAYORI_LIMIT) body=Array.from(body).slice(0,OTAYORI_LIMIT-1).join("")+"…";
   const titles={A:"以前話してくれたこと", B:"この数日の気持ちのこと", C:"今週の一歩のこと"};
   return {type:type, content:body, title:titles[type], cta:cta, used:used};
@@ -2476,8 +2495,8 @@ function otUnread(){ return otAll().filter(function(o){ return o.status==="gener
 /* Home：新着のときだけ、小さな通知カード（本文は出さない） */
 function otHomeCard(){
   const o=otUnread(); if(!o) return "";
-  return '<div class="hrow otay tap" onclick="openOtayori(\''+o.letter_id+'\')"><span class="ic">💌</span>'
-    +'<div style="flex:1;min-width:0"><div class="k">kokoniからのおたより</div><div class="v">この数日のあなたへ、小さなおたよりが届きました。</div></div>'
+  return '<div class="hrow otay tap" onclick="openOtayori(\''+o.letter_id+'\')"><img class="sp-xxs" src="assets/suplan/opt/happy.png" alt="" width="34" height="34">'
+    +'<div style="flex:1;min-width:0"><div class="k">すぷらんからのおたより</div><div class="v">この数日のあなたへ、小さなおたよりが届きました。</div></div>'
     +'<span class="otgo">おたよりを読む ›</span></div>';
 }
 /* 詳細（モーダル）。開いたら既読。CTAは1つだけ */
@@ -2486,9 +2505,9 @@ function openOtayori(id){
   if(o.status==="generated"){ o.status="read"; o.read_at=nowIso(); }
   const d=new Date(Date.parse(o.scheduled_at||o.generated_at));
   document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="otClose()"><div class="modal" style="padding:10px" onclick="event.stopPropagation()">'
-    +'<div class="card warm" style="margin:0"><div class="otlab">💌 kokoniからのおたより<span>'+(d.getMonth()+1)+'/'+d.getDate()+'</span></div>'
-    +'<p style="color:var(--ink);line-height:1.95;margin:0">'+esc(S.nickname||"ここに")+'さんへ<br><br>'+esc(o.content)+'<br><br>kokoni</p>'
-    +'<div class="otnote">このおたよりは、あなたの記録をもとにkokoni（AI）が書いたものです。大塚さんからの手紙ではありません。</div></div>'
+    +'<div class="card warm" style="margin:0"><img class="sp-ot" src="assets/suplan/opt/happy.png" alt="" width="56" height="56"><div class="otlab">💌 すぷらんからのおたより<span>'+(d.getMonth()+1)+'/'+d.getDate()+'</span></div>'
+    +'<p style="color:var(--ink);line-height:1.95;margin:0">'+esc(S.nickname||"ここに")+'さんへ<br><br>'+esc(o.content)+'<br><br>すぷらんより</p>'
+    +'<div class="otnote">このおたよりは、あなたの記録をもとにすぷらん（AI）が書いたものです。臨床心理士の大塚さんからの手紙ではありません。</div></div>'
     +'<button class="btn" style="margin:10px 0 6px" onclick="otCta(\''+o.letter_id+'\')">'+otCtaLabel(o)+'</button>'
     +'<button class="linkbtn" onclick="otClose()">閉じる</button></div></div>';
 }
@@ -2498,7 +2517,7 @@ function otClose(){ closeWhy(); rerender(); }
 function otList(){
   const L=otAll().filter(function(o){ return o.status==="generated"||o.status==="read"; }).slice().reverse();
   if(!L.length) return "";
-  return '<div class="card"><h3>kokoniからのおたより</h3><p class="lede" style="margin:2px 0 8px">kokoni（AI）があなたの記録をもとに書いた、短いおたよりです。</p>'
+  return '<div class="card"><h3>すぷらんからのおたより</h3><p class="lede" style="margin:2px 0 8px">すぷらん（AI）があなたの記録をもとに書いた、短いおたよりです。</p>'
     +L.map(function(o){ const d=new Date(Date.parse(o.scheduled_at||o.generated_at));
       return '<div class="otrow tap" onclick="openOtayori(\''+o.letter_id+'\')"><div class="t"><b>'+(d.getMonth()+1)+'/'+d.getDate()+' '+esc(o.title||"おたより")+'</b>'
         +'<span class="'+(o.status==="generated"?'new':'')+'">'+(o.status==="generated"?'未読':'既読')+'</span></div>'
@@ -2522,6 +2541,21 @@ function demoOtayori(){
    - 「背景にあるもの」（縦断的な層）は PoC では扱わない
    ══════════════════════════════════════════════════════════════ */
 let MAPED=null;   // 編集中の視点 {id, draft, slots}
+/* すぷらんの口調：やさしく、親しみやすく。断定・評価・過剰な励ましはしない（文末だけをそろえる） */
+const SP_TONE=[[/ありがとうございました/g,"ありがとう"],[/ありがとうございます/g,"ありがとう"],
+  [/かもしれません。/g,"かもしれないね。"],[/かもしれません/g,"かもしれない"],
+  [/んですね/g,"んだね"],[/のですね/g,"んだね"],[/ですね。/g,"だね。"],[/ですね/g,"だね"],
+  [/大丈夫です。/g,"大丈夫だよ。"],[/大丈夫です/g,"大丈夫"],
+  [/みませんか？/g,"みない？"],[/ませんか？/g,"ない？"],[/みませんか。/g,"みない？"],[/ませんか。/g,"ない？"],
+  [/もらえますか？/g,"もらえる？"],[/ありますか？/g,"ある？"],[/いますか？/g,"いる？"],[/できますか？/g,"できる？"],
+  [/でしたか？/g,"だった？"],[/ですか？/g,"？"],
+  [/いきましょう/g,"いこう"],[/しましょう/g,"しよう"],[/みましょう/g,"みよう"],[/決めましょう/g,"決めよう"],[/考えましょう/g,"考えよう"],
+  [/くださいね/g,"ね"],[/ください。/g,"ね。"],
+  [/くれていましたね/g,"くれていたね"],[/くれましたね/g,"くれたね"],[/ありましたね/g,"あったね"],[/しましたね/g,"したね"],[/いましたね/g,"いたね"],
+  [/ありません。/g,"ないよ。"],[/しました。/g,"したよ。"],[/ています。/g,"ているよ。"],[/できます。/g,"できるよ。"],[/せます。/g,"せるよ。"],[/なります。/g,"なるよ。"],[/いきます。/g,"いくよ。"],[/([^い])です。/g,"$1だよ。"]];
+function spTone(t){ let x=String(t); SP_TONE.forEach(function(r){ x=x.replace(r[0],r[1]); }); return x; }
+function spWho(k){ return '<div class="who"><img class="av" src="assets/suplan/opt/'+(k||"base")+'.png" alt="" width="22" height="22">すぷらん</div>'; }
+const SP_INTRO="こんにちは、すぷらんだよ。<br>わたしはAIで、気持ちの整理を一緒に手伝うよ。";
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 const MAP_BLOCKS=[
   {id:"scene",    k:"心が動きやすい場面", cls:"",
@@ -2794,16 +2828,16 @@ function renderMapMain(body){
           +'<div class="s">'+(feed.mine?'あなたが確かめたこと':(feed.id==="pattern"?'一緒に確かめた流れ':'話してくれたことから'))+'</div></div>'
         : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">少し話してみると、ここに見えてきたことが出てきます。</div></div>')
       +(work ? '<details class="mfold"><summary>まだ確かめ中の見方が'+insights().working.length+'つあります</summary>'
-          +'<div class="found working" style="margin:8px 0 0"><div class="k">kokoniの仮の見方<span>'+fmtMD(work.at)+'</span></div>'
+          +'<div class="found working" style="margin:8px 0 0"><div class="k">すぷらんの仮の見方<span>'+fmtMD(work.at)+'</span></div>'
           +'<div class="v">'+esc(work.hyp||work.text)+'</div>'
           +'<button class="whybtn" onclick="msWhy(insights().working['+insights().working.indexOf(work)+'])">どうしてそう考えたの？</button></div></details>' : '')
       +'<div class="sech">7つの視点</div>'
       +'<div class="vgrid">'+MAP_BLOCKS.map(mapBlockHtml).join("")+'</div>'
       +'<details class="mfold"><summary>最初の心の地図（3つの答え）</summary><div class="card draft" style="margin:8px 0 0">'+draftHtml(false)+'</div></details>';
   }
-  h+='<div class="mapcta2"><h3>'+(full?'心の地図を深める':'心の地図をもう少しひろげる')+'</h3>'
-    +'<p>少し話すと、あなたの考え方や行動のパターンが、<br>もう少し見えてくるかもしれません。</p>'
-    +'<button class="btn" onclick="openMini(\'map\')">'+(full?'少し話して、地図を深める':'少し話してみる')+'</button></div>'
+  h+='<div class="mapcta2"><img class="sp-xs" src="assets/suplan/opt/watering.png" alt="" width="52" height="52"><h3>'+(full?'すぷらんと地図を深める':'すぷらんと地図をひろげる')+'</h3>'
+    +'<p>少し話すと、考え方や行動のパターンが、<br>もう少し見えてくるかもしれないね。</p>'
+    +'<button class="btn" onclick="openMini(\'map\')">すぷらんと話してみる</button></div>'
     +'<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。</div>';
   body.innerHTML=h;
 }
@@ -2934,7 +2968,7 @@ function mapIns(i){
 function mapUseStem(){ const b=mapBlock(MAPED.id); MAPED.draft=b.stem; renderMap(); }
 function renderMapEditor(){
   const b=mapBlock(MAPED.id), body=document.getElementById("mapBody");
-  const say=function(m){ return '<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">'+m+'</div></div>'; };
+  const say=function(m){ return '<div class="bubble">'+spWho("watering")+'<div class="txt">'+spTone(m)+'</div></div>'; };
   let h='<div class="pagehead" style="margin-top:-12px"><button class="back" onclick="closeMapEditor()">‹</button><span class="lede">心の地図 ／ '+b.k+'</span></div>';
   if(b.pattern){
     /* パターン：本人が書いた4ブロックの言葉を、本人がつなぐ。AIは矢印の枠を出すだけ */
@@ -2998,7 +3032,7 @@ const TERMS_URL="", PRIVACY_URL="";
 /* 問い合わせ先。決まるまで空（架空の連絡先は作らない） */
 const CONTACT_URL="";
 /* 通知（初期設定。通知の仕組みは未実装のため、表示だけで切り替えはできない） */
-const NOTIFY_DEFAULTS=[{id:"review",k:"ふりかえりが利用できるようになったとき",on:true},{id:"letter",k:"心理士から手紙が届いたとき",on:true},{id:"daily",k:"今日の状態を記録するリマインド",on:false},{id:"otayori",k:"kokoniからのおたより",on:false}];
+const NOTIFY_DEFAULTS=[{id:"review",k:"ふりかえりが利用できるようになったとき",on:true},{id:"letter",k:"大塚さんから手紙が届いたとき",on:true},{id:"daily",k:"今日の状態を記録するリマインド",on:false},{id:"otayori",k:"すぷらんからのおたより",on:false}];
 
 function myRow(ic,t,sub,fn,soon){
   return '<button class="myrow'+(soon?' soon':'')+'" '+(soon?'disabled aria-disabled="true"':'onclick="'+fn+'"')+'>'
@@ -3024,10 +3058,10 @@ function renderLog(){
     +'<button class="mypf" onclick="openProfile()"><span>プロフィールの確認・編集</span><span class="pcta"><small>入力状況 '+pct+'%</small> ›</span></button>'
     +mySec("利用設定",[
       myRow("🔔","通知の設定","ふりかえり・手紙・毎日の記録の通知","myGo('notify')"),
-      myRow("🧭","AIのパーソナライズ設定","AIが参考にしている情報を確認する","myGo('ai')")])
+      myRow("🧭","すぷらんが参考にしている情報","すぷらん（AI）が参考にしている情報を確認する","myGo('ai')")])
     +mySec("プライバシー・データ管理",[
       myRow("🗂","保存されている情報の確認","kokoniに残っている情報の一覧","myGo('data')"),
-      myRow("✉️","心理士への共有履歴・同意の確認","いつ、何を共有したか","myGo('share')"),
+      myRow("✉️","大塚さんへの共有履歴・同意の確認","いつ、何を共有したか","myGo('share')"),
       myRow("🛠","データ・アカウントの管理","データの削除・アカウントの削除","myGo('account')")])
     +mySec("ヘルプ・アプリについて",[
       myRow("📗","kokoniの使い方","5つの機能をかんたんに","myGo('guide')"),
@@ -3057,8 +3091,8 @@ function myAi(){
     {k:"やってみたことの記録", used:true, d:"今の一歩と、最近やってみた記録（5件まで）", fix:"S.kiroku_next='mood';go('map')", fixT:"きろくを見る"},
     {k:"過去のふりかえり", used:false, d:"いまは使っていません", fix:"", fixT:""}
   ];
-  return myBack()+'<div class="mysub"><h2>AIのパーソナライズ設定</h2>'
-    +'<p class="lede">はなす・心の地図でAIが参考にしている情報です。<br>AIは、これらだけであなたのことを決めつけません。</p>'
+  return myBack()+'<div class="mysub"><h2>すぷらんが参考にしている情報</h2>'
+    +'<p class="lede">はなす・心の地図で、すぷらん（AI）が参考にしている情報です。<br>すぷらんは、これらだけであなたのことを決めつけません。<br>大塚さんが毎日の会話を見ることはありません。</p>'
     +'<div class="mybox">'+rows.map(function(r){ return '<div class="myinfo"><div class="t"><b>'+r.k+'</b><span class="st'+(r.used?' on':'')+'">'+(r.used?'参考にしています':'まだ使っていません')+'</span></div>'
       +'<div class="d">'+esc(r.d)+'</div>'+(r.fix?'<button class="dslink" style="margin-top:4px" onclick="'+r.fix+'">'+r.fixT+' ›</button>':'')+'</div>'; }).join("")+'</div>'
     +'<div class="mybox" style="margin-top:10px">'+myRow("⚙️","参考にする情報を選ぶ","情報ごとにオン・オフする（準備中）","",true)+'</div></div>';
@@ -3071,7 +3105,7 @@ function myData(){
     ["最初に答えた3つの質問", S.current_status ? "回答あり" : "まだありません"],
     ["心の地図", "見えてきたこと "+mapCount()+" / "+MAP_N+"・あなたが確かめたこと "+I.confirmed.length+"件・確かめ中の見方 "+I.working.length+"件"],
     ["気持ちの記録", dsAll().length+"件（メモつき "+dsAll().filter(function(r){ return r.optional_note; }).length+"件）"],
-    ["AIとの会話（はなす）", S.mini_sessions.length+"回"],
+    ["すぷらんとの会話（はなす）", S.mini_sessions.length+"回"],
     ["やってみたことの記録", S.act_logs.length+"件"],
     ["ふりかえり", S.reviews.length+"回（共有 "+S.reviews.filter(function(r){ return r.shared; }).length+"回）"]
   ];
@@ -3080,12 +3114,12 @@ function myData(){
     +'<div class="mybox">'+rows.map(function(r){ return '<div class="myinfo"><div class="t"><b>'+r[0]+'</b></div><div class="d">'+esc(r[1])+'</div></div>'; }).join("")+'</div>'
     +'<p class="lede" style="margin-top:10px">※ このデモでは、情報はこの端末のブラウザの中に保存されます（ほかの端末やサーバーには送りません）。</p></div>';
 }
-/* 心理士への共有履歴・同意の確認（レター本文と手紙はふりかえりタブで見る） */
+/* 大塚さんへの共有履歴・同意の確認（レター本文と手紙はふりかえりタブで見る） */
 function myShare(){
   const L=S.reviews.slice().reverse();
   const items=function(sel){ const n={state:"今の状態・テーマ",action:"試してみたこと",reflection:"本人の振り返り",note:"気づいたこと"};
     return Object.keys(n).filter(function(k){ return sel&&sel[k]; }).map(function(k){ return n[k]; }).join("・"); };
-  return myBack()+'<div class="mysub"><h2>心理士への共有履歴・同意の確認</h2>'
+  return myBack()+'<div class="mysub"><h2>大塚さんへの共有履歴・同意の確認</h2>'
     +'<div class="mybox"><div class="myinfo"><div class="t"><b>共有のしくみ</b></div><div class="d">'
     +'最初の3日、そのあとは1週間ごとに、あなたが選んだ内容を200文字までのレターにまとめ、確認してから大塚さんに共有できます。<br>'
     +'送るのは、確認画面に表示した文だけです。共有しない回もえらべます。<br>'
@@ -3112,10 +3146,10 @@ function myConfirmReset(){
 }
 function myGuide(){
   const G=[["🌱","今週の小さな一歩","ホームに出ている、今週試してみることです。できる日だけで大丈夫です。合わなければ変えられます。"],
-    ["💬","はなす","AIと一緒に、最近のことを整理したり、今週の一歩を見直したり、気持ちを少し話したりできます。"],
+    ["💬","すぷらんとはなす","すぷらん（AI）と一緒に、最近のことを整理したり、今週の一歩を見直したり、気持ちを少し話したりできます。大塚さんには自動で届きません。"],
     ["🗺","心の地図","話したことや試したことから、あなたのパターンが少しずつ見えてくる地図です。完成するものではありません。"],
     ["🌤","気持ちの記録","1日1回を目安に、今の気分を10秒で残せます。きろくで、気持ちの変化を見返せます。"],
-    ["✉️","ふりかえりと心理士への共有","最初は3日後、そのあとは1週間ごとにふりかえります。内容を確認してから、大塚さんに共有できます（共有しなくてもかまいません）。"]];
+    ["✉️","ふりかえりと大塚さんへの共有","最初は3日後、そのあとは1週間ごとにふりかえります。内容を確認してから、大塚さんに共有できます（共有しなくてもかまいません）。"]];
   return myBack()+'<div class="mysub"><h2>kokoniの使い方</h2>'
     +'<div class="mybox">'+G.map(function(g){ return '<div class="myinfo"><div class="t"><b>'+g[0]+' '+g[1]+'</b></div><div class="d">'+g[2]+'</div></div>'; }).join("")+'</div></div>';
 }
@@ -3238,7 +3272,7 @@ function renderGate(){
   /* 前のサイクルで共有した分の手紙が未読なら、先に知らせる */
   const ul=unreadLetter(), banner = (ul && ul!==r)
     ? `<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span><div style="flex:1"><div class="k">大塚さんから</div>
-        <div class="v">心理士から手紙が届いています</div></div><span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>` : "";
+        <div class="v">大塚さんから手紙が届きました</div></div><span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>` : "";
   if(c.weekly_review_status==="locked") b.innerHTML=banner+gateLocked(c);
   else if(c.weekly_review_status==="available") b.innerHTML=banner+gateReviewFlow();
   else b.innerHTML=banner+gateCompleted(r);
@@ -3321,12 +3355,14 @@ function buildLetter(){
 }
 
 /* ── ふりかえりの画面（3ステップ） ── */
+function spMini(){ return '<img class="sp-xxs" src="assets/suplan/opt/base.png" alt="" width="22" height="22">'; }
 function gateReviewFlow(){
   const rv=rvInit(), first=isFirst();
   if(rv.step==="share") return gateShare();
   if(rv.step==="preview") return gatePreview();
   const d=cycleData(), ready=RV_Q.every(function(x){ return rv.ans[x.id]; });
-  return '<div class="card"><h3>'+(first?'最初の3日をふりかえってみましょう':'この1週間をふりかえってみましょう')+'</h3>'
+  return '<div class="spq"><img class="sp-m" src="assets/suplan/opt/base.png" alt="すぷらん" width="72" height="72"><div class="bub2">'+(first?'この3日間、どうだった？':'この1週間、どうだった？')+'</div></div>'
+    +'<div class="card"><h3>'+(first?'最初の3日をふりかえってみましょう':'この1週間をふりかえってみましょう')+'</h3>'
     +'<p class="lede" style="margin-bottom:14px">'+(first?'うまくできたかどうかではなく、<br>この方法が自分に合いそうだったかを<br>一緒に見てみます。':'うまくできたかどうかより、<br>この1週間のやり方が合っていたかを見てみます。')+'</p>'
     +RV_Q.map(function(x){ return '<div class="sum"><div class="v" style="font-weight:700;color:var(--ink);margin-bottom:8px">'+x.q+'</div>'
       +(x.id==="tried"?'<div class="hint" style="font-size:12px;color:var(--muted);margin-bottom:8px">記録では、'+(first?'この3日':'この1週間')+'で '+d.action.count+'回 やってみています。</div>':'')
@@ -3347,8 +3383,9 @@ function rvNext(step){
 }
 function gateShare(){
   const rv=rvInit(), hasNote=!!(rv.self||"").trim();
-  return '<div class="card"><h3>共有する内容を選ぶ</h3>'
-    +'<p class="lede" style="margin-bottom:12px">選んだ内容だけを使って、大塚さんへの短いレターをつくります。</p>'
+  return '<div class="roles"><span>'+spMini()+'すぷらんがまとめる</span><i>→</i><span>✍️ あなたが確認</span><i>→</i><span><span class="psyic sm">👤</span>大塚さん<small>共有するときだけ</small></span></div>'
+    +'<div class="card"><h3>共有する内容を選ぶ</h3>'
+    +'<p class="lede" style="margin-bottom:12px">選んだ内容だけを使って、すぷらんが<br>臨床心理士の大塚さんへの短いレターにまとめるよ。</p>'
     +LT_ITEMS.map(function(it){ const dis = it.id==="note" && !hasNote, on=rv.sel[it.id] && !dis;
       return '<div class="chk'+(on?' on':'')+(dis?' dis':'')+'" '+(dis?'':'onclick="rvSel(\''+it.id+'\')"')+'><span class="bx">'+(on?'✓':'')+'</span>'
         +'<span>'+(it.id==="note"?'その他、共有したい気づき'+(dis?'<span class="opt-l">気づいたことが未記入</span>':''):({state:"今の状態・テーマ",action:"試してみたこと",reflection:"本人の振り返り"}[it.id]))+'</span></div>'; }).join("")
@@ -3365,8 +3402,8 @@ function rvSel(id){ const rv=rvInit(), ak=document.getElementById("rvAsk"); if(a
 function gatePreview(){
   const rv=rvInit(), n=lcount(rv.letter), over=n>LETTER_LIMIT;
   return '<div class="card"><h3>大塚さんに共有する内容を確認しましょう</h3>'
-    +'<p class="lede" style="margin-bottom:12px">送る内容は、自由に直せます。<br>共有したくないことは外しても大丈夫です。</p>'
-    +'<div class="ltbox"><div class="lth">✉️ 大塚さんへの共有レター</div>'
+    +'<p class="lede" style="margin-bottom:12px">すぷらんがまとめた内容です。自由に直せます。<br>共有したくないことは外しても大丈夫です。</p>'
+    +'<div class="ltbox"><div class="lth"><span class="psyic sm">👤</span>臨床心理士 大塚さんへの共有レター</div>'
     +'<textarea id="ltText" rows="8" oninput="rvLetterInput(this)">'+esc(rv.letter)+'</textarea>'
     +'<div class="ltcnt'+(over?' over':'')+'" id="ltCnt">'+n+' / '+LETTER_LIMIT+'文字</div></div>'
     +'<p class="ltwarn" id="ltWarn"'+(over?'':' hidden')+'>200文字を超えています。「相談したいこと」や「気づいたこと」を少し短くしてください。</p>'
@@ -3444,7 +3481,7 @@ function letterHtml(r){
       +"できなかった日のことも書いてくださったのが、とても大事だと思いました。<br><br>"
       +"次の1週間も、無理のない形で一緒に見ていきましょう。";
   return `<div class="card warm">
-    <div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:10px">✉️ 大塚さんから</div>
+    <div class="psyh"><span class="psyic" aria-hidden="true">👤</span><span><b>臨床心理士 大塚さん</b>からの手紙</span></div>
     <p style="color:var(--ink);line-height:1.95;margin:0">${S.nickname||"ここに"}さん<br><br>${body}<br><br>大塚</p></div>`;
 }
 function openLetter(){
@@ -3554,7 +3591,7 @@ function msNew(from){
     hyp:null, mech:null, proposals:[], chosen:null, kept:null};
 }
 /* 入口はいくつあっても、同じエンジン。mode：explore（既定）／action_review／open_talk */
-const MS_TITLE={explore:"最近のことを整理する", action_review:"今週の一歩を見直す", open_talk:"今の気持ちを少し話す"};
+const MS_TITLE={explore:"すぷらんと整理する", action_review:"すぷらんと一歩を見直す", open_talk:"すぷらんに気持ちを話す"};
 function openMini(from,mode){
   mode=mode||"explore";
   if(mode==="explore" && !mapUnlocked()){   // 心の地図を深めるミニセッションは、最初のふりかえりまでロック
@@ -3577,10 +3614,10 @@ function openMini(from,mode){
   const full=mapCount()>=MAP_N, draft=S.mini_draft;
   /* はなすタブから「一緒に整理する」を選んだ人には、説明画面を重ねない（続きがあるときだけ選んでもらう） */
   if(from==="talk" && !draft){ document.getElementById("miniTitle").textContent=MS_TITLE.explore; return msBegin(false); }
-  document.getElementById("miniTitle").textContent = full ? "少し話して、心の地図を深める" : "少し話して、心の地図をひろげる";
+  document.getElementById("miniTitle").textContent = full ? "すぷらんと地図を深める" : "すぷらんと地図をひろげる";
   document.getElementById("miniFlow").innerHTML='<div class="card tint" style="margin-top:6px">'
     +'<div style="font-size:30px;line-height:1;margin-bottom:10px">🗺</div>'
-    +'<h2 style="font-size:19px;line-height:1.6;margin-bottom:10px">'+(full?'少し話して、心の地図を深める':'少し話して、心の地図をひろげる')+'</h2>'
+    +'<h2 style="font-size:19px;line-height:1.6;margin-bottom:10px">'+(full?'すぷらんと地図を深める':'すぷらんと地図をひろげる')+'</h2>'
     +'<p style="font-size:14px;line-height:1.9;margin:0">5分くらい、最近のことを一緒に整理してみましょう。<br><br>'
     +'質問に答えるだけではなく、最後に、</p>'
     +'<ul style="font-size:14px;line-height:1.9;margin:6px 0 10px;padding-left:20px"><li>今起きていそうなこと</li><li>新しく見えてきたこと</li><li>今週試してみるとよさそうなこと</li></ul>'
@@ -3614,7 +3651,8 @@ function msSay(m,then){
   const tray=document.getElementById("miniTray");
   tray.innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
   setTimeout(function(){
-    document.getElementById("miniFlow").insertAdjacentHTML("beforeend",'<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">'+m+'</div></div>');
+    if(!S.sp_intro_seen){ S.sp_intro_seen=true; m=SP_INTRO+"<br><br>"+m; }
+    document.getElementById("miniFlow").insertAdjacentHTML("beforeend",'<div class="bubble">'+spWho("thinking")+'<div class="txt">'+spTone(m)+'</div></div>');
     window.scrollTo(0,document.body.scrollHeight); if(then) then();
   },430);
 }
@@ -3991,7 +4029,7 @@ function msActions(){
     +'<div class="msarrow">↓</div>'
     +'<div class="mslab">今週変えてみたいこと</div><div class="msv">'+esc(MINI.policy)+'</div>'
     +'<div class="msarrow">↓</div>'
-    +'<div class="mslab">試してみるなら</div>'
+    +'<div class="mslab">すぷらんからの提案</div>'
     +MINI.proposals.map(function(id,i){ const a=act(id);
       return '<button class="opt" style="text-align:left;margin-top:8px" onclick="msChoose('+i+')">'
         +'<div style="font-size:11px;color:var(--teal-deep);font-weight:800">'+a.category_name+'</div>'
@@ -4074,8 +4112,9 @@ function msSave(status,keepDraft){
 function renderTalk(){
   const cur=curAct(), draft=S.mini_draft;
   document.getElementById("talkBody").innerHTML=
-    '<div class="talkhead"><h2>今日は、どんなことを<br>一緒に話しましょうか？</h2>'
-    +'<p>これまでの心の地図や記録も参考にしながら、<br>今のことを一緒に整理していきます。<br>まとまっていなくても大丈夫です。</p></div>'
+    '<div class="talkhead"><div class="spk"><img class="sp-m" src="assets/suplan/opt/base.png" alt="すぷらん" width="72" height="72">'
+    +'<div class="bub2">今日は、どんなことを<br>一緒に話そうか？</div></div>'
+    +'<p class="tnote">すぷらんはAIです。ここで話したことが、大塚さんに自動で届くことはありません。</p></div>'
     +talkCard("📗","最近のことを整理する","最近あったことや気持ちを振り返って、自分のパターンを少し見つけていきます。","5分くらい","一緒に整理する","explore",
       draft?"前回の続きから始められます":"")
     +talkCard("🌱","今週の一歩を見直す","今のやり方が自分に合っていそうか、続けやすい方法を一緒に考えます。","3〜5分くらい","一歩を見直す","action_review",
