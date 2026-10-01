@@ -93,6 +93,48 @@
       policy:policy, evidence:ev, confidence:c}};
   }
 
+  /* ── open_talk（今の気持ちを少し話す）用 ───────────────────
+     受け止めが中心。仮説・提案・質問攻めはしない。過去情報は past にあるものだけ、重なるときに一言 */
+  const TALK_SYSTEM = [
+    "あなたは、セルフケアアプリ kokoni の対話パートナーです。臨床心理士のように落ち着いた、穏やかな日本語で話します。",
+    "利用者が「今の気持ちを少し話したい」と来ています。まず受け止めることを大切にします。",
+    "",
+    "## 返答（reply）",
+    "- 2〜4文。本人の言葉を少し拾って受け止める。共感だけで終わらせず、話してくれた内容に具体的に触れる",
+    "- 質問は最大1つまで。質問しなくてもよい。分析・見立て・アドバイス・行動の提案はしない",
+    "- past に今回と重なる情報があれば、「前に〜と残してくれていましたね」と一言だけつないでよい。無ければつながない。past に無いことは作らない",
+    "- 断定しない。診断名・症状名・専門用語を使わない。「必要です」「すべき」「絶対」は使わない。過剰に励まさない。絵文字は使わない",
+    "- 言葉づかいは、やわらかい丁寧語（です・ます）まで。「いらっしゃる」「お察しいたします」「お辛い」などのかしこまった敬語は使わない。呼びかけ（〜さん）は毎回つけない",
+    "  例：「夜になると、仕事のことを考えてしまうんですね。」「話してくれてありがとうございます。」",
+    "- past.first_scene や past.recent_notes に、今回と同じ話題（例：夜・仕事・会議）があれば、「前にも〜と話してくれていましたね」と一言つなぐ",
+    "",
+    "## summary",
+    "今日話してくれた内容を、本人の言葉を中心に1〜2文（60字以内）。解釈や原因の推測を足さない。心の地図に残す候補として本人が確認する",
+    "",
+    "## 出力（JSONのみ）",
+    '{"reply":"","summary":""}'
+  ].join("\n");
+  /* かしこまりすぎた敬語を、kokoni のやわらかい丁寧語にそろえる（意味は変えない） */
+  function soften(t){
+    return t.replace(/ていらっしゃる/g,"ている").replace(/でいらっしゃる/g,"でいる").replace(/いらっしゃる/g,"いる")
+      .replace(/お話しくださり|お話しくださって|話してくださり|話してくださって/g,"話してくれて")
+      .replace(/お察しいたします/g,"").replace(/お辛い/g,"つらい").replace(/のですね/g,"んですね").replace(/\s{2,}/g," ").trim();
+  }
+  function buildTalkPrompt(ctx){ return { systemPrompt: TALK_SYSTEM, user: "入力:\n"+JSON.stringify(ctx, null, 1) }; }
+  function validateTalk(raw){
+    let o;
+    try { o = typeof raw==="string" ? JSON.parse(raw.replace(/^```json\s*|```\s*$/g,"")) : raw; }
+    catch(e){ return {ok:false, reason:"json_parse_error"}; }
+    const reply=str(o&&o.reply,220), summary=str(o&&o.summary,80);
+    if(!reply) return {ok:false, reason:"missing_or_too_long"};
+    const all=reply+"\n"+(summary||"");
+    for(const re of BANNED){ if(re.test(all)) return {ok:false, reason:"banned:"+re.source.slice(0,12)}; }
+    if(RISK.test(all)) return {ok:false, reason:"risk_word_in_output"};
+    if((reply.match(/？|\?/g)||[]).length>1) return {ok:false, reason:"too_many_questions"};
+    return {ok:true, out:{reply:soften(reply), summary:summary||""}};
+  }
+
   root.KokoniMiniAI = { MECH:MECH, SYSTEM:SYSTEM, buildPrompt:buildPrompt, validate:validate,
+    buildTalkPrompt:buildTalkPrompt, validateTalk:validateTalk,
     model:"gemini-2.5-flash", gen:{temperature:0.4, maxTokens:1200, thinkingBudget:0, responseMimeType:"application/json"} };
 })(typeof window!=="undefined" ? window : module.exports);

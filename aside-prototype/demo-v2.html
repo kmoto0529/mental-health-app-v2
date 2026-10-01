@@ -266,6 +266,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .stepcard .desc{font-size:13.5px;line-height:1.75;color:var(--ink2);margin-bottom:8px}
 .chips2{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
 .chips2 span{font-size:12px;font-weight:700;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:3px 10px}
+/* はなす */
+.talkhead{padding:6px 22px 4px}
+.talkhead h2{font-size:19px;line-height:1.6;margin:0 0 8px;color:var(--ink)}
+.talkhead p{font-size:13.5px;line-height:1.85;color:var(--ink2);margin:0}
+.tcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);margin:12px 18px;padding:16px;box-shadow:var(--shadow)}
+.tcard .top{display:flex;align-items:center;gap:12px}
+.tcard .ic{flex:0 0 44px;height:44px;border-radius:50%;background:var(--g-pale-2);border:1px solid var(--teal-line);display:flex;align-items:center;justify-content:center;font-size:21px}
+.tcard h3{margin:0;font-size:16px;color:var(--ink)}
+.tcard .time{font-size:11.5px;color:var(--muted);margin-top:2px}
+.tcard p{font-size:13.5px;line-height:1.8;color:var(--ink2);margin:10px 0 12px}
+.tcard .note{font-size:12px;color:var(--teal-deep);font-weight:700;margin:-4px 0 10px}
+.tcard .btn{margin:0}
+.opt .sub2{font-size:11.5px;color:var(--muted);font-weight:400;margin-top:2px}
 /* 初回：まず3日試す */
 .trycard{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r);padding:18px;margin:12px 0}
 .trycard h2{font-size:18.5px;line-height:1.55;margin:8px 0 8px}
@@ -516,7 +529,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 
   <section id="s-talk" class="screen">
     <div class="pagehead"><b style="font-size:16px">はなす</b><span></span></div>
-    <div id="talkFlow"></div><div class="tray" id="talkTray"></div></section>
+    <div id="talkBody"></div></section>
 
   <section id="s-map" class="screen">
     <div class="pagehead"><b style="font-size:16px">きろく</b><span></span></div>
@@ -618,7 +631,7 @@ function go(id){
   if(id==="map"){ MAPED=null; S.kiroku=S.kiroku_next||"map"; S.kiroku_next=null; renderMap(); }
   if(id==="gate") renderGate();
   if(id==="log") renderLog();
-  if(id==="talk") startTalk();
+  if(id==="talk") renderTalk();
   sync(); window.scrollTo(0,0);
 }
 function toggleSide(){
@@ -2026,7 +2039,7 @@ function stepCard(){
       ${p.pips?`<div class="pips">${p.pips.map(function(on){ return '<i class="'+(on?"on":"")+'"></i>'; }).join("")}</div>`:""}
       <div class="note" style="margin-top:${p.pips?8:0}px">${p.note}</div></div>`:""}
     <button class="btn" ${a?"":"disabled"} onclick="openAction()">やってみる</button>
-    <button class="linkbtn" onclick="openAlt()">ほかのやり方を考える</button>
+    <button class="linkbtn" onclick="openMini('home','action_review')">ほかのやり方を考える</button>
   </div>`;
 }
 /* 「ほかのやり方を考える」。候補は行動マスターから（同じ目的のより簡単な行動を先頭に）。変えるかは本人が決める */
@@ -2128,41 +2141,6 @@ function showLetter(){
   },80);
 }
 
-/* 以下は初回体験の対象外（参照用） */
-const TALK=[
- {t:"ai", m:"こんにちは。今日はどんな感じですか。"},
- {t:"c", o:["しんどい","あまりよくない","ふつう","すこし楽"]},
- {t:"ai", m:"「__HW__」は、どうでしたか。"},
- {t:"c", o:["できた","すこしできた","できなかった"]},
- {t:"ai", m:"そうだったんですね。<br><b>やろうとは思えましたか。</b>"},
- {t:"c", o:["思ったけど、動けなかった","思わなかった"]},
- {t:"ai", m:"思えただけでも十分だと思います。<br>何が難しかったか、一緒に見てみませんか。"},
- {t:"end"}
-];
-let ti=0;
-function startTalk(){ S.talk_logs.push({at:nowIso()}); ti=0;document.getElementById("talkFlow").innerHTML=""; document.getElementById("talkTray").innerHTML=""; stepTalk(); }
-function stepTalk(){
-  const flow=document.getElementById("talkFlow"), tray=document.getElementById("talkTray");
-  if(ti>=TALK.length) return;
-  const s=TALK[ti];
-  if(s.t==="ai"){
-    tray.innerHTML=`<div class="typing"><i></i><i></i><i></i></div>`;
-    setTimeout(()=>{
-      flow.insertAdjacentHTML("beforeend",`<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">${s.m.replace("__HW__",S.first_action||"小さな一歩")}</div></div>`);
-      ti++; stepTalk(); window.scrollTo(0,document.body.scrollHeight);
-    },430);
-  } else if(s.t==="c"){
-    tray.innerHTML=`<div class="opts">${s.o.map((o,i)=>`<button class="opt" onclick="tPick(${i})">${o}</button>`).join("")}</div>`;
-    window.scrollTo(0,document.body.scrollHeight);
-  } else { tray.innerHTML=`<button class="btn" onclick="go('map')">きろくを見る</button>`; }
-}
-function tPick(i){
-  const s=TALK[ti];
-  document.getElementById("talkFlow").insertAdjacentHTML("beforeend",`<div class="bubble me"><div class="txt">${s.o[i]}</div></div>`);
-  document.getElementById("talkTray").innerHTML="";
-  if(ti===3 && i<2) ti=7; else ti++;
-  stepTalk();
-}
 /* ══════════════════════════════════════════════════════════════
    心の地図 ──「少しずつ自分が見えてくる」場所
    - 7つの視点。完成はしない（7/7でも「ここから深めていきます」）
@@ -2240,6 +2218,7 @@ function mapFeed(n){
     const m=mapMaterials(b.id).filter(function(x){ return x.at; }).slice(-1)[0];
     if(m) rows.push({id:b.id,k:b.k,text:m.t,at:m.at,mine:false});
   });
+  insights().confirmed.filter(function(c){ return c.type==="talk"; }).forEach(function(c){ rows.push({id:null,k:"話して残したこと",text:c.text,at:c.at,mine:true}); });
   return rows.sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); }).slice(0,n||3);
 }
 function mapRecent(){ return mapFeed(2).filter(function(r){ return r.mine; }); }
@@ -2316,7 +2295,7 @@ function renderMap(){
 
     + '<div class="sech">最近見えてきたこと</div>'
     + (feed.length ? feed.map(function(f){
-        return '<div class="found tap" onclick="openMapEditor(\''+f.id+'\')"><div class="k">'+f.k+'<span>'+fmtMD(f.at)+'</span></div>'
+        return '<div class="found'+(f.id?' tap" onclick="openMapEditor(\''+f.id+'\')"':'"')+'><div class="k">'+f.k+'<span>'+fmtMD(f.at)+'</span></div>'
           +'<div class="v">'+(f.mine?esc(f.text):'「'+esc(f.text)+'」')+'</div>'
           +'<div class="s">'+(f.mine?'あなたの言葉':(f.id==="pattern"?'一緒に確かめた流れ':'話してくれたことから'))+'</div></div>'; }).join("")
       : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">少し話してみると、ここに見えてきたことが並びます。</div></div>')
@@ -2900,17 +2879,28 @@ function insights(){ S.insights=S.insights||{confirmed:[],working:[]}; return S.
 
 function msNew(from){
   return {id:"MS-"+String(S.mini_sessions.filter(function(m){ return m.status!=="partial"; }).length+1).padStart(3,"0")+"-"+Date.now().toString(36),
-    from:from, stage:"scene", started_at:nowIso(), before:mapCount(), extra_q:0,
+    from:from, mode:"explore", stage:"scene", started_at:nowIso(), before:mapCount(), extra_q:0,
     d:{situation:"", thought:[], emotion:[], body:[], behavior:[], coping:[], effect:"", other:{}},
     hyp:null, mech:null, proposals:[], chosen:null, kept:null};
 }
-function openMini(from){
+/* 入口はいくつあっても、同じエンジン。mode：explore（既定）／action_review／open_talk */
+const MS_TITLE={explore:"最近のことを整理する", action_review:"今週の一歩を見直す", open_talk:"今の気持ちを少し話す"};
+function openMini(from,mode){
+  mode=mode||"explore";
   closeWhy();
   document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
   document.getElementById("s-mini").classList.add("active"); S.screen="mini";
   document.getElementById("miniFlow").innerHTML=""; document.getElementById("miniTray").innerHTML="";
-  MINI={from:from, stage:"start"}; msSteps(); sync(); window.scrollTo(0,0);
+  MINI={from:from, mode:mode, stage:"start"}; msSteps(); sync(); window.scrollTo(0,0);
+  if(mode!=="explore"){
+    S.talk_logs.push({at:nowIso(), mode:mode});
+    MINI=msNew(from); MINI.mode=mode; MINI.stage=mode; msSteps();
+    document.getElementById("miniTitle").textContent=MS_TITLE[mode];
+    return mode==="action_review" ? arStart() : otStart();
+  }
   const full=mapCount()>=MAP_N, draft=S.mini_draft;
+  /* はなすタブから「一緒に整理する」を選んだ人には、説明画面を重ねない（続きがあるときだけ選んでもらう） */
+  if(from==="talk" && !draft){ document.getElementById("miniTitle").textContent=MS_TITLE.explore; return msBegin(false); }
   document.getElementById("miniTitle").textContent = full ? "少し話して、心の地図を深める" : "少し話して、心の地図をひろげる";
   document.getElementById("miniFlow").innerHTML='<div class="card tint" style="margin-top:6px">'
     +'<div style="font-size:30px;line-height:1;margin-bottom:10px">🗺</div>'
@@ -2935,13 +2925,13 @@ function msBegin(resume){
     msSay("前回の続きからはじめますね。<br>"+(MINI.d.situation?"「"+esc(MINI.d.situation)+"」のことを話していました。":""),msRun);
     return;
   }
-  S.mini_draft=null; MINI=msNew(from); msRun();
+  S.mini_draft=null; MINI=msNew(from); S.talk_logs.push({at:nowIso(), mode:"explore"}); msRun();
 }
 function msStepNo(){ return {scene:1,feel:2,confirm:2,revise:2,cope:3,edu:3,act:4,compare:4,done:4}[MINI&&MINI.stage]||0; }
 function msSteps(){
   const el=document.getElementById("miniSteps"); if(!el) return;
-  const n=msStepNo();
-  const f=document.getElementById("miniFoot"); if(f) f.hidden = !n || (MINI&&MINI.stage==="done");
+  const ex=!MINI || !MINI.mode || MINI.mode==="explore", n=ex?msStepNo():0;
+  const f=document.getElementById("miniFoot"); if(f) f.hidden = !MINI || MINI.stage==="start" || MINI.stage==="done" || (ex && !n);
   el.innerHTML = n ? MS_STEPS.map(function(t,i){ return '<div class="'+(i+1===n?'on':(i+1<n?'done':''))+'"><i></i>'+t+'</div>'; }).join("") : "";
 }
 function msSay(m,then){
@@ -2958,7 +2948,11 @@ function msMe(t){
 }
 /* 自由入力はすべてここを通す。危機対応の条件に触れたら、セッションを止めて安全対応を優先する */
 function msRisk(t){
-  if(t && RISK_RE.test(t)){ msSave("partial"); S.mini_draft=MINI; MINI=null; openSafety("free_text","unspecified"); return true; }
+  if(t && RISK_RE.test(t)){
+    if(MINI.mode==="open_talk") otSave("partial");
+    else if(!MINI.mode || MINI.mode==="explore"){ msSave("partial"); S.mini_draft=MINI; }
+    MINI=null; openSafety("free_text","unspecified"); return true;
+  }
   return false;
 }
 function msTray(h){ document.getElementById("miniTray").innerHTML=h; window.scrollTo(0,document.body.scrollHeight); }
@@ -2970,13 +2964,17 @@ function msRun(){
   if(st==="scene"){
     /* ① 場面。初回 Q2 と、すでに聞いている場面を使う（ゼロから聞き直さない） */
     const tp=msTopic();
-    const opts=(MS_SCENES[tp]||MS_SCENES._).slice();
-    if(S.iv_scene) opts.unshift(S.iv_scene.length>24 ? S.iv_scene.slice(0,24)+"…" : S.iv_scene);
-    MINI.sceneOpts=opts;
-    msSay((tp ? "前に、"+IV_TOPIC_P[tp]+"が気になっていると話してくれました。<br>" : "")
+    const opts=(MS_SCENES[tp]||MS_SCENES._).slice(), vals=opts.slice(), sub={};
+    const cut=function(x){ return x.length>24 ? x.slice(0,24)+"…" : x; };
+    if(S.iv_scene){ opts.unshift(cut(S.iv_scene)); vals.unshift(S.iv_scene); sub[0]="前に話してくれた場面"; }
+    if(MINI.carry){ opts.unshift(cut(MINI.carry)); vals.unshift(MINI.carry.length>40?MINI.carry.slice(0,40)+"…":MINI.carry);
+      Object.keys(sub).forEach(function(k){ sub[+k+1]=sub[k]; delete sub[k]; }); sub[0]="今話してくれたこと"; }
+    MINI.sceneOpts=opts; MINI.sceneVals=vals; MINI.sceneSub=sub;
+    msSay((MINI.carry ? "今話してくれたことも、場面のひとつとして選べます。<br>" : "")
+      +(tp ? "前に、"+IV_TOPIC_P[tp]+"が気になっていると話してくれました。<br>" : "")
       +(S.iv_scene ? "最初に「"+esc(S.iv_scene)+"」という場面のことも教えてくれましたね。<br><br>" : "<br>")
       +"最近だと、どんな時に<br>特に気持ちが動きましたか？",function(){
-      msTray('<div class="opts">'+opts.map(function(o,i){ return '<button class="opt" onclick="msScene('+i+')">'+esc(o)+(S.iv_scene&&i===0?'<div style="font-size:11px;color:var(--muted);font-weight:400">前に話してくれた場面</div>':'')+'</button>'; }).join("")
+      msTray('<div class="opts">'+opts.map(function(o,i){ return '<button class="opt" onclick="msScene('+i+')">'+esc(o)+(sub[i]?'<div style="font-size:11px;color:var(--muted);font-weight:400">'+sub[i]+'</div>':'')+'</button>'; }).join("")
         +'<button class="opt" onclick="msScene(-1)">どれとも少し違う</button></div>');
     });
     return;
@@ -3007,7 +3005,7 @@ function msScene(i){
     });
     return;
   }
-  const v = (S.iv_scene && i===0) ? S.iv_scene : MINI.sceneOpts[i];
+  const v = (MINI.sceneVals||MINI.sceneOpts)[i];
   msMe(MINI.sceneOpts[i]); MINI.d.situation=v; MINI.stage="feel"; msRun();
 }
 function msSceneOther(skip){
@@ -3384,9 +3382,254 @@ function msSave(status,keepDraft){
   if(status==="partial" && keepDraft) S.mini_draft=MINI;
   if(status==="completed") S.mini_draft=null;
 }
+/* ══════════════════════════════════════════════════════════════
+   はなす ── AIと一緒に、自分への理解を深める場所（自由チャットではない）
+   入口は3つ。中身は共通のミニセッションエンジン（openMini）で、mode だけを切り替える
+     explore       最近のことを整理する（場面→そのときのこと→仮説→確認→心の地図→一歩）
+     action_review 今週の一歩を見直す（今のActionの記録から。変更は本人が選んだときだけ）
+     open_talk     今の気持ちを少し話す（仮説や提案まで進めなくてよい。話すだけで終われる）
+   どの入口でも：安全対応は共通（msRisk）／記録は S.mini_sessions に mode つきで残る／途中でやめられる
+   ══════════════════════════════════════════════════════════════ */
+function renderTalk(){
+  const cur=curAct(), draft=S.mini_draft;
+  document.getElementById("talkBody").innerHTML=
+    '<div class="talkhead"><h2>今日は、どんなことを<br>一緒に話しましょうか？</h2>'
+    +'<p>これまでの心の地図や記録も参考にしながら、<br>今のことを一緒に整理していきます。<br>まとまっていなくても大丈夫です。</p></div>'
+    +talkCard("📗","最近のことを整理する","最近あったことや気持ちを振り返って、自分のパターンを少し見つけていきます。","5分くらい","一緒に整理する","explore",
+      draft?"前回の続きから始められます":"")
+    +talkCard("🌱","今週の一歩を見直す","今のやり方が自分に合っていそうか、続けやすい方法を一緒に考えます。","3〜5分くらい","一歩を見直す","action_review",
+      cur?"いまの一歩：「"+esc(cur.title)+"」":"")
+    +talkCard("💬","今の気持ちを少し話す","何から話したらいいかわからなくても大丈夫。今の気持ちから、ゆっくり始めましょう。","決めなくてOK","少し話してみる","open_talk","");
+}
+function talkCard(ic,t,d,time,cta,mode,note){
+  return '<div class="tcard"><div class="top"><span class="ic">'+ic+'</span><div style="min-width:0"><h3>'+t+'</h3>'
+    +'<div class="time">⏱ '+time+'</div></div></div><p>'+d+'</p>'
+    +(note?'<div class="note">'+note+'</div>':'')
+    +'<button class="btn'+(mode==="open_talk"?' ghost':'')+'" onclick="openMini(\'talk\',\''+mode+'\')">'+cta+'</button></div>';
+}
+
+/* ── action_review：今週の一歩を見直す ───────────────────────────
+   AIに渡すもの＝今のAction・頻度/時間・実施回数・実施後の記録・今日の状態・心の地図（MINI.ar に保持）
+   出口＝続ける／頻度を減らす／1回の時間を短くする／別のActionを試す（Action Master から）。本人の同意なく上書きしない */
+const AR_Q=["自分に合っていそう","少し負担が大きい","別の方法がよさそう","まだよくわからない"];
+const AR_BURDEN=["回数が多い","1回の時間が長い","やり方が難しい","気持ちの余裕がない"];
+function arContext(){
+  const a=curAct(), from=S.cycle?Date.parse(S.cycle.cycle_started_at):0;
+  const logs=S.act_logs.filter(function(l){ return l.action_id===S.act_id && Date.parse(l.at)>=from; });
+  return {action_id:S.act_id, title:a?a.title:"", plan:a?planLabel():"", count:logs.length,
+    feelings:logs.map(function(l){ return l.feeling; }), today:todayMood(), map_seen:mapCount(), period: isFirst()?"この3日":"今週"};
+}
+function arStart(){
+  const a=curAct();
+  if(!a){ msSay("今週の一歩は、まだ決まっていないようです。",function(){ msTray(arBackBtns()); }); return; }
+  const c=MINI.ar=arContext();
+  let m="今週は「"+esc(c.title)+"」を試していますね。<br><span style=\"font-size:12.5px;color:var(--muted)\">目安："+esc(c.plan)+"</span><br><br>";
+  m += c.count ? "記録では、"+c.period+"で"+c.count+"回やってみています。"+(c.feelings.length?"<br>やってみたあとの記録：「"+esc(countText(c.feelings))+"」":"")
+               : "記録では、まだやってみた回はないようです。<br>それでも大丈夫です。";
+  if(c.today) m+="<br>今日は「"+esc(c.today)+"」と記録しています。";
+  msSay(m,function(){ msSay("実際にやってみて、どんな感じですか？",function(){
+    msTray('<div class="opts">'+AR_Q.map(function(o,i){ return '<button class="opt" onclick="arAns('+i+')">'+o+'</button>'; }).join("")+'</div>'); }); });
+}
+function arAns(i){
+  MINI.ar.answer=AR_Q[i]; msMe(AR_Q[i]);
+  if(i===0) return msSay("続けやすそうなんですね。"+(MINI.ar.count?"<br>記録を見ても、試してこられています。":"")+"<br>このまま続けてみましょうか。",function(){ arExit("keep"); });
+  if(i===1) return msSay("どのあたりが負担になっていそうですか？",function(){
+    msTray('<div class="opts">'+AR_BURDEN.map(function(o,j){ return '<button class="opt" onclick="arBurden('+j+')">'+o+'</button>'; }).join("")+'</div>'); });
+  if(i===2) return msSay("別のやり方も見てみましょう。<br>今の心の地図から、試しやすそうなものを選びます。",function(){ arExit("change"); });
+  msSay("まだ判断しなくて大丈夫です。<br>数回やってみてから、ふりかえりで一緒に見てみましょう。",function(){ arExit("keep"); });
+}
+function arBurden(j){
+  MINI.ar.burden=AR_BURDEN[j]; msMe(AR_BURDEN[j]);
+  const o=adjustOptions();
+  const rec = j===0 ? (o.freq?"freq":"change") : j===1 ? (o.dur?"dur":"change") : j===2 ? "change" : (o.freq?"freq":(o.dur?"dur":"change"));
+  const m = j===3 ? "気持ちの余裕がない時は、小さくしても、休んでも大丈夫です。"
+          : "「"+AR_BURDEN[j]+"」と感じているんですね。";
+  msSay(m+"<br>どうするか、選んでみてください。",function(){ arExit(rec); });
+}
+/* 出口：4つの選び方。おすすめは目印だけ（決めるのは本人） */
+function arExit(rec){
+  const o=adjustOptions(), a=curAct(), tag=function(k){ return rec===k?' <span class="tag">今の話に近いもの</span>':''; };
+  MINI.ar.rec=rec;
+  let h='<div class="opts">'
+    +'<button class="opt" style="text-align:left" onclick="arApply(\'keep\')">今の一歩を続ける'+tag("keep")+'</button>';
+  if(o.freq) h+='<button class="opt" style="text-align:left" onclick="arApply(\'freq\')">頻度を減らす<div class="sub2">'+esc(planText(S.act_frequency,S.act_duration,a))+' → '+esc(planText(o.freq.f,o.freq.d,a))+'</div>'+tag("freq")+'</button>';
+  if(o.dur)  h+='<button class="opt" style="text-align:left" onclick="arApply(\'dur\')">1回の時間を短くする<div class="sub2">1回'+S.act_duration+'分 → '+o.dur.d+'分</div>'+tag("dur")+'</button>';
+  h+='<button class="opt" style="text-align:left" onclick="arApply(\'change\')">別の一歩を試す'+tag("change")+'</button></div>';
+  msTray(h);
+}
+function arApply(k){
+  const o=adjustOptions(), before={action_id:S.act_id, title:(curAct()||{}).title, frequency:S.act_frequency, duration:S.act_duration};
+  if(k==="keep"){ msMe("今の一歩を続ける"); return arDone("keep",before); }
+  if(k==="freq" && o.freq){ msMe("頻度を減らす"); S.act_frequency=o.freq.f; adjDone("frequency"); return arDone("freq",before); }
+  if(k==="dur" && o.dur){ msMe("1回の時間を短くする"); S.act_duration=o.dur.d; adjDone("duration"); return arDone("dur",before); }
+  msMe("別の一歩を試す");
+  const cur=act(S.act_id), ids=[];
+  if(cur && cur.easier_action_id && act(cur.easier_action_id)) ids.push(cur.easier_action_id);
+  scoreActions().forEach(function(r){ if(ids.length<3 && r.id!==S.act_id && ids.indexOf(r.id)<0) ids.push(r.id); });
+  MINI.ar.alts=ids;
+  msSay("試してみるなら、こんな方法があります。<br>今の一歩の記録は、変えてもそのまま残ります。",function(){
+    msTray('<div class="opts">'+ids.map(function(id,i){ const x=act(id);
+      return '<button class="opt" style="text-align:left" onclick="arPick('+i+')"><div style="font-size:11px;color:var(--teal-deep);font-weight:800">'+x.category_name+'</div>'
+        +'<div style="font-size:15px;font-weight:800;line-height:1.6">'+x.title+'</div>'
+        +'<div style="font-size:12px;color:var(--ink2);font-weight:400">'+x.short_description+'</div>'
+        +'<div style="font-size:11.5px;color:var(--muted);font-weight:400;margin-top:4px">'+defaultPlanLabel(x)+'</div></button>'; }).join("")
+      +'<button class="opt" onclick="arApply(\'keep\')">やっぱり今の一歩を続ける</button></div>');
+  });
+}
+function arPick(i){
+  const id=MINI.ar.alts[i], x=act(id), cur=curAct(); msMe(x.title);
+  msSay("「"+esc(cur.title)+"」から、「"+esc(x.title)+"」に変えますか？",function(){
+    msTray('<div class="opts"><button class="opt" onclick="arSwitch(\''+id+'\')">変える</button><button class="opt" onclick="arApply(\'keep\')">変えずに続ける</button></div>');
+  });
+}
+function arSwitch(id){
+  const before={action_id:S.act_id, title:(curAct()||{}).title, frequency:S.act_frequency, duration:S.act_duration};
+  msMe("変える");
+  S.action_changes=(S.action_changes||[]).concat([{at:nowIso(), from:S.act_id, to:id, via:"talk_action_review"}]);   // 変更前の実績（act_logs）はそのまま
+  changeActionSilently(id); arDone("change",before);
+}
+function arDone(k,before){
+  const a=curAct();
+  S.mini_sessions.push({id:MINI.id, session_id:MINI.id, mode:"action_review", at:MINI.started_at, source:MINI.from, status:"completed",
+    context:MINI.ar, answer:MINI.ar.answer||"", burden:MINI.ar.burden||"", recommended:MINI.ar.rec||"", decision:k,
+    action_before:before, action_after:{action_id:S.act_id, title:a?a.title:"", frequency:S.act_frequency, duration:S.act_duration},
+    summary:"今週の一歩の見直し："+esc(MINI.ar.answer||"")+"／"+({keep:"続ける",freq:"頻度を減らした",dur:"時間を短くした",change:"別の一歩に変えた"}[k])});
+  const m = k==="keep" ? "では、今の一歩をそのまま続けましょう。<br>できる日だけで大丈夫です。"
+    : "今週の一歩を<br><b>「"+esc(a.title)+"」</b>（"+esc(planLabel())+"）<br>にしました。<br>できる日だけで大丈夫です。";
+  MINI.stage="done";
+  msSay(m,function(){ msTray(arBackBtns()); });
+}
+function arBackBtns(){
+  return '<button class="btn" onclick="go(\'home\')">ホームに戻る</button>'
+    +'<button class="btn ghost" style="margin-top:9px" onclick="go(\'talk\')">はなすに戻る</button>';
+}
+
+/* ── open_talk：今の気持ちを少し話す ───────────────────────────
+   最初からCBTの質問を続けない。受け止めて、過去情報と重なれば少しだけつなぐ。仮説や提案まで進めなくてよい */
+const OT_Q=["少し聞いてほしいことがある","なんとなくモヤモヤしている","今日あったことを話したい","うまく言葉にならない"];
+const OT_ASK=["聞かせてください。<br>話せるところからで大丈夫です。","モヤモヤしているんですね。<br>いま、どんなことが頭に浮かんでいますか？",
+  "今日は、どんなことがありましたか？","大丈夫です。言葉にならないままでも、ここにいて大丈夫です。<br>よかったら、浮かんだ言葉をひとつだけでも。"];
+const OT_MAX_TURNS=3;
+function otStart(){
+  MINI.ot={topic:"", turns:[]};
+  msSay("今日は、どんなことを話したい気分ですか？<br><span style=\"font-size:12.5px;color:var(--muted)\">選んでも、そのまま書いても大丈夫です。</span>",function(){
+    msTray('<div class="opts">'+OT_Q.map(function(o,i){ return '<button class="opt" onclick="otPick('+i+')">'+o+'</button>'; }).join("")+'</div>'
+      +otInput("そのまま書いてもOK"));
+  });
+}
+function otInput(ph){
+  return '<div class="card" style="margin:10px 0 0"><textarea id="otIn" rows="3" maxlength="400" placeholder="'+ph+'"></textarea>'
+    +'<button class="btn" style="margin-top:10px" onclick="otSend()">送る</button></div>';
+}
+function otPick(i){
+  MINI.ot.topic=OT_Q[i]; msMe(OT_Q[i]);
+  msSay(OT_ASK[i],function(){ msTray(otInput("うまく書けなくて大丈夫です。")+'<button class="linkbtn" onclick="otSkip()">書かずに進む</button>'); });
+}
+function otSkip(){
+  msMe("書かずに進む");
+  msSay("書かなくても大丈夫です。<br>今日はここに来てくれただけで、十分です。",otEndAsk);
+}
+function otSend(){
+  const el=document.getElementById("otIn"), v=el?el.value.trim():"";
+  if(!v) return;
+  msMe(v);
+  if(msRisk(v)) return;          // 安全対応を優先（どのモードでも）
+  MINI.ot.turns.push({role:"user", text:v, at:nowIso()});
+  otReply(v);
+}
+/* 返答：まず受け止める。過去の情報（実在するもの）と言葉が重なれば、無理のない範囲で一言つなぐ */
+const OT_WORDS=["仕事","会議","上司","同僚","職場","夜","眠","朝","家族","友達","人","疲れ","不安","焦","落ち込","体","休み","お金","将来"];
+function otPastLink(v){
+  const past=[].concat(insights().confirmed.filter(function(c){ return c.type==="pattern"; }).map(function(c){ return c.text; }),
+    S.iv_scene?[S.iv_scene]:[], dsAll().filter(function(r){ return r.optional_note; }).slice(-5).map(function(r){ return r.optional_note; }));
+  for(const w of OT_WORDS){ if(v.indexOf(w)>=0){ const hit=past.filter(function(p){ return p.indexOf(w)>=0; })[0]; if(hit) return hit; } }
+  return "";
+}
+function otRuleReply(v){
+  const q=v.length>40?v.slice(0,40)+"…":v, link=otPastLink(v);
+  return "話してくれてありがとうございます。<br>「"+esc(q)+"」<br>そう感じていたんですね。"
+    +(link?"<br><br>前に残してくれた「"+esc(link.length>30?link.slice(0,30)+"…":link)+"」とも、少しつながっているのかもしれません。":"");
+}
+function otReply(v){
+  const done=function(html,src){
+    MINI.ot.turns.push({role:"kokoni", text:html, at:nowIso(), source:src});
+    msSay(html,function(){
+      const more = MINI.ot.turns.filter(function(t){ return t.role==="user"; }).length < OT_MAX_TURNS;
+      msTray((more?otInput("続けて話してもOK"):'')+'<button class="'+(more?'linkbtn':'btn')+'" onclick="otEndAsk()">今日はここまでにする／整理する</button>');
+    });
+  };
+  if(!aiOn() || !window.KokoniMiniAI || !KokoniMiniAI.buildTalkPrompt) return done(otRuleReply(v),"rule");
+  document.getElementById("miniTray").innerHTML='<div class="typing"><i></i><i></i><i></i></div>';
+  const sid=MINI.id;
+  aiTalk(v).then(function(r){ if(!MINI || MINI.id!==sid) return; done(r?esc(r.reply).replace(/\n/g,"<br>"):otRuleReply(v), r?"gemini":"rule"); });
+}
+function aiTalk(v){
+  const A=window.KokoniMiniAI, ctx={nickname:S.nickname||"", topic:MINI.ot.topic,
+    turns:MINI.ot.turns.map(function(t){ return {role:t.role, text:t.role==="user"?t.text:t.text.replace(/<[^>]+>/g," ")}; }),
+    past:{confirmed_patterns:insights().confirmed.filter(function(c){ return c.type==="pattern"; }).slice(-3).map(function(c){ return c.text; }),
+      first_scene:S.iv_scene||"", recent_notes:dsAll().filter(function(r){ return r.optional_note; }).slice(-3).map(function(r){ return r.optional_note; })}};
+  const pr=A.buildTalkPrompt(ctx), ctl=window.AbortController?new AbortController():null, timer=setTimeout(function(){ if(ctl) ctl.abort(); },15000);
+  return fetch("/api/gemini-proxy",{method:"POST",signal:ctl?ctl.signal:undefined,headers:{"Content-Type":"application/json","X-Invite-Code":AI_CFG.code},
+      body:JSON.stringify({model:A.model, systemPrompt:pr.systemPrompt, messages:[{role:"user",content:pr.user}], temperature:0.5, maxTokens:600, thinkingBudget:0, responseMimeType:"application/json"})})
+    .then(function(res){ if(!res.ok) throw new Error("http_"+res.status); return res.json(); })
+    .then(function(j){ clearTimeout(timer); const v2=A.validateTalk(j.text||"",ctx); if(!v2.ok){ if(DEBUG) console.warn("[talk-ai]",v2.reason); return null; }
+      MINI.ot.ai_summary=v2.out.summary; return v2.out; })
+    .catch(function(){ clearTimeout(timer); return null; });
+}
+/* 一区切り：今日はここまで／今の話を少し整理する（→ explore）／心の地図に残す（本人が確認してから） */
+function otEndAsk(){
+  const said=MINI.ot.turns.some(function(t){ return t.role==="user"; });
+  msSay("今日はここまでにしますか？",function(){
+    msTray('<div class="opts"><button class="opt" onclick="otFinish()">今日はここまで</button>'
+      +(said?'<button class="opt" onclick="otToExplore()">今の話を少し整理する</button><button class="opt" onclick="otToMap()">心の地図に残す</button>':'')+'</div>');
+  });
+}
+function otSave(status){
+  if(!MINI || !MINI.ot) return;
+  const rec={id:MINI.id, session_id:MINI.id, mode:"open_talk", at:MINI.started_at, source:MINI.from, status:status,
+    topic:MINI.ot.topic, turns:MINI.ot.turns, saved_note:MINI.ot.saved||"",
+    summary:"今の気持ちを少し話す："+esc(MINI.ot.topic||"")};
+  S.mini_sessions=S.mini_sessions.filter(function(m){ return m.id!==MINI.id; }).concat([rec]);
+}
+function otFinish(){
+  msMe("今日はここまで"); otSave("completed"); MINI.stage="done";
+  msSay("話してくれてありがとうございました。<br>また話したくなったら、いつでもどうぞ。",function(){ msTray(arBackBtns()); });
+}
+function otUserText(){ return MINI.ot.turns.filter(function(t){ return t.role==="user"; }).map(function(t){ return t.text; }).join(" "); }
+function otToExplore(){
+  msMe("今の話を少し整理する"); otSave("completed");
+  const carry=otUserText(), from=MINI.from;
+  MINI=msNew(from); MINI.mode="explore"; MINI.carry=carry;
+  document.getElementById("miniTitle").textContent="最近のことを整理する";
+  msSay("では、今の話を少し整理してみましょう。",msRun);
+}
+function otToMap(){
+  msMe("心の地図に残す");
+  const t=otUserText(), sum=MINI.ot.ai_summary || (t.length>60?t.slice(0,60)+"…":t);
+  msSay("こんなふうに残しますか？<br>直してから残すこともできます。",function(){
+    msTray('<div class="card" style="margin:0"><textarea id="otSum" rows="3" maxlength="120">'+esc(sum)+'</textarea>'
+      +'<button class="btn" style="margin-top:10px" onclick="otSaveMap()">この内容で残す</button>'
+      +'<button class="linkbtn" onclick="otFinish()">残さずに終わる</button></div>');
+  });
+}
+function otSaveMap(){
+  const el=document.getElementById("otSum"), v=el?el.value.trim():""; if(!v) return;
+  if(msRisk(v)) return;
+  msMe(v);
+  insights().confirmed.push({session_id:MINI.id, type:"talk", text:v, at:nowIso(), own:true});   // 本人が確認した内容だけ
+  MINI.ot.saved=v; otSave("completed"); MINI.stage="done";
+  msSay("心の地図に残しました。<br>「最近見えてきたこと」から見返せます。",function(){
+    msTray('<button class="btn" onclick="go(\'map\')">心の地図を見る</button><button class="btn ghost" style="margin-top:9px" onclick="go(\'home\')">ホームに戻る</button>');
+  });
+}
+
 /* 今日はここまで：聞いた分は保存し、次回は続きから。確かめていない見方は confirmed にしない */
 function msStop(){
-  if(MINI && MINI.d && MINI.stage!=="done"){ msSave("partial"); S.mini_draft=MINI; }
+  if(MINI && MINI.stage!=="done"){
+    if(MINI.mode==="open_talk") otSave("partial");                         // 話した分は残す
+    else if(MINI.mode==="action_review"){}                                  // 選ぶまで何も変えない
+    else if(MINI.d){ msSave("partial"); S.mini_draft=MINI; }
+  }
   miniBack();
 }
 
@@ -3416,7 +3659,7 @@ function msDone(){
       +'<button class="btn ghost" style="margin-top:9px" onclick="miniBack()">'+(MINI.from==="gate"?"次の一歩を決めに戻る":"ホームに戻る")+'</button>');
   });
 }
-function miniBack(){ const f=MINI&&MINI.from; MINI=null; go(f==="gate"||f==="map" ? f : "home"); }
+function miniBack(){ const f=MINI&&MINI.from; MINI=null; go(f==="gate"||f==="map"||f==="talk" ? f : "home"); }
 
 function pastReviews(){
   const cur=S.cycle?S.cycle.weekly_cycle_id:"";
