@@ -266,6 +266,54 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .stepcard .desc{font-size:13.5px;line-height:1.75;color:var(--ink2);margin-bottom:8px}
 .chips2{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
 .chips2 span{font-size:12px;font-weight:700;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:3px 10px}
+/* きろく：プロフィール・心の地図・気持ちの記録 */
+.pfcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);margin:12px 18px;padding:14px 16px}
+.pfcard .top{display:flex;gap:12px;align-items:flex-start}
+.pfcard h3{margin:0 0 4px;font-size:14px;color:var(--ink)}
+.pfcard p{margin:0;font-size:12px;line-height:1.7;color:var(--ink2)}
+.pfcard .pct{flex:0 0 auto;font-size:12px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.pfcard .pct b{font-size:20px;color:var(--teal-deep)}
+.pfbar{height:5px;border-radius:99px;background:var(--teal-line);margin:10px 0 8px;overflow:hidden}
+.pfbar i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.pfchips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.pfchips span{font-size:10.5px;border:1px dashed var(--line-input);color:var(--muted);border-radius:99px;padding:2px 8px}
+.pfchips span.on{border-style:solid;border-color:var(--teal-line);color:var(--teal-deep);background:var(--teal-soft)}
+.btn.sm2{padding:9px;font-size:13.5px;margin:0}
+.pfmodal{max-height:86vh;overflow:auto}
+.pfmulti{font-size:10.5px;color:var(--muted);font-weight:700;margin-left:6px}
+.pfwhy{font-size:11.5px;line-height:1.75;color:var(--muted);background:var(--paper2);border-radius:10px;padding:8px 10px;margin-top:8px}
+.mcount{font-size:13px;color:var(--ink2);font-weight:700}
+.mcount b{font-size:18px;color:var(--teal-deep)}
+.mfold{margin:4px 22px 10px;font-size:12.5px;color:var(--ink2)}
+.mfold summary{cursor:pointer;color:var(--teal-deep);font-weight:700}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 18px 10px}
+.vcard{background:var(--paper2);border:1px dashed var(--line-input);border-radius:14px;padding:11px 12px;min-width:0}
+.vcard.on{background:var(--paper);border:1px solid var(--teal-line)}
+.vcard.tap{cursor:pointer}
+.vcard .vk{font-size:12.5px;font-weight:800;color:var(--ink)}
+.vcard .vs{font-size:10.5px;font-weight:700;color:var(--muted);margin-top:3px}
+.vcard.on .vs{color:var(--teal-deep)}
+.vcard .vt{font-size:12px;line-height:1.6;color:var(--ink2);margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mapcta2{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r-m);margin:14px 18px 6px;padding:16px}
+.mapcta2 h3{margin:0 0 4px;font-size:15px;color:var(--ink)}
+.mapcta2 p{margin:0 0 12px;font-size:12.5px;line-height:1.75;color:var(--ink2)}
+.mapcta2 .btn{margin:0}
+.dlist2{margin:0;padding-left:20px;font-size:13px;line-height:1.9;color:var(--ink2)}
+.tlf{display:inline-flex;gap:3px;background:var(--paper2);border:1px solid var(--line);border-radius:99px;padding:2px}
+.tlf button{border:none;background:none;border-radius:99px;padding:3px 9px;font-size:10.5px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;letter-spacing:0}
+.tlf button.on{background:var(--paper);color:var(--teal-deep);box-shadow:var(--shadow)}
+.tlday{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);margin:0 18px 9px;padding:12px 14px}
+.tlday .dh{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:6px}
+.tl{display:flex;gap:8px;align-items:flex-start}
+.tl .t{flex:0 0 40px;font-size:12px;font-weight:700;color:var(--teal-deep);font-variant-numeric:tabular-nums;padding-top:3px}
+.tl .ic{flex:0 0 24px;display:flex;justify-content:center}
+.tl .ic.sprout{font-size:17px;line-height:22px;background:var(--teal-soft);border-radius:50%;height:24px;width:24px}
+.tl .b{flex:1;min-width:0}
+.tl .kind{font-size:10.5px;font-weight:700;color:var(--muted)}
+.tl.act .kind{color:var(--teal-deep)}
+.tl .l{font-size:13.5px;font-weight:700;color:var(--ink)}
+.tl .n{font-size:12.5px;line-height:1.7;color:var(--ink2);margin-top:1px}
+.tlsep{color:var(--teal-line);font-size:10px;margin:2px 0 2px 52px}
 /* はなす */
 .talkhead{padding:6px 22px 4px}
 .talkhead h2{font-size:19px;line-height:1.6;margin:0 0 8px;color:var(--ink)}
@@ -592,7 +640,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 
 <script>
 const S = {
-  nickname:"", age_range:"", gender:"", agree_terms:false, agree_privacy:false,
+  nickname:"", age_range:"", gender:"", life_status:"", support_use:[], agree_terms:false, agree_privacy:false,
   current_status:"", current_concerns:[], safety_answer:"", ai_conversation_summary:"", ai_confirm:"",
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
   setup_status:"not_started", setup_completed_at:null, entered:false,
@@ -1848,25 +1896,10 @@ function dayChangeText(recs){
   if(la===lz) return pa+"も"+pz+"も、「"+la+"」と記録しています。";
   return (pa===pz?hm(a.recorded_at):pa)+"は「"+la+"」、"+(pa===pz?hm(z.recorded_at):pz)+"には「"+lz+"」と記録しています。";
 }
-/* 選んだ日の記録（時刻順・1件ずつ編集できる） */
-function dayPanel(date){
-  const recs=dsDay(date), u=S.ds_ui;
-  let h='<div class="daypanel"><div class="dph"><b>'+mdW(dateMs(date))+'</b><span>'+(recs.length?recs.length+'件の記録':'記録はありません')+'</span></div>';
-  if(!recs.length) return h+'<div class="lede" style="margin:4px 0 0">この日は記録がありません。</div></div>';
-  const ct=dayChangeText(recs); if(ct) h+='<div class="dpchange">'+esc(ct)+'</div>';
-  recs.forEach(function(r){
-    if(u && u.mode==="edit" && u.id===r.record_id && u.where==="log"){ h+=dsEditForm(r,"log"); return; }
-    h+='<div class="dprow"><span class="t">'+hm(r.recorded_at)+'</span>'+face(dsLevel(r.daily_state),20)
-      +'<div class="b"><div class="l">'+dsLabel(r.daily_state)+(r.edited_at?'<span class="ed">編集済み</span>':'')+'</div>'
-      +(r.optional_note?'<div class="n">'+esc(r.optional_note)+'</div>':'')+'</div>'
-      +'<button class="dslink" style="margin:0" onclick="dsStartEdit(\''+r.record_id+'\',\'log\')">編集</button></div>';
-  });
-  return h+'</div>';
-}
 /* 今週のふりかえり：事実ベースの短い要約。1日の最後の記録や単純平均で「その日の気分」を決めない */
 function weekSummary(days,off){
   const rd=days.filter(function(d){ return d.recs.length; }), n=rd.length;
-  if(n<3) return '<div class="dsai muted">あと'+(3-n)+'日分たまると、'+(off?'この週':'今週')+'のふりかえりが表示されます。</div>';
+  if(n<3) return '<div class="dsai muted">これから記録が増えると、少しずつ気持ちの変化を見返せるようになります。</div>';
   const low=function(d){ return d.recs.some(function(r){ return dsLevel(r.daily_state)<=1; }); };
   const easy=function(d){ return d.recs.some(function(r){ return dsLevel(r.daily_state)>=2; }); };
   const half=Math.floor(n/2), A=rd.slice(0,half), B=rd.slice(n-half);
@@ -1881,7 +1914,7 @@ function weekSummary(days,off){
   else if(!rd.some(easy)) t+="しんどさを感じる記録が続いた週だったようです。<br>無理のないペースで大丈夫です。";
   else t+="日によって、気分に波があったようです。";
   if(rose) t+="<br>1日の中で、あとから少し楽になったと記録した日が"+rose+"日ありました。";
-  return '<div class="dsai"><div class="lab">🌱 kokoniからの気づき</div><div class="v">'+t+'</div>'
+  return '<div class="dsai"><div class="lab">🌱 '+(off?'この週':'今週')+'見えてきたこと</div><div class="v">'+t+'</div>'
     +'<div class="s">記録した内容から、事実をまとめています。</div></div>';
 }
 function avg(a){ return a.length ? a.reduce(function(x,y){ return x+y; },0)/a.length : 0; }
@@ -1918,43 +1951,6 @@ function dsInsights(){
       d:DOW[worst]+"曜日の記録は、ほかの日より「しんどい」寄りのことが多いようです。", ev:[DOW[worst]+"曜日の記録："+by[worst].length+"回"]});
   }
   return {n:nDays, items:out};
-}
-let DS_INS=[];
-function renderMoodLog(){
-  const off=S.mood_week||0, days=weekDays(off), body=document.getElementById("mapBody");
-  if(!S.mood_day || !days.some(function(d){ return d.date===S.mood_day; })){
-    const withRec=days.filter(function(d){ return d.recs.length; });
-    S.mood_day = days.some(function(d){ return d.date===isoDate(nowMs()); }) ? isoDate(nowMs()) : (withRec.length ? withRec[withRec.length-1].date : days[0].date);
-  }
-  const ins=dsInsights(); DS_INS=ins.items;
-  const notes=dsAll().filter(function(r){ return r.optional_note; }).sort(function(a,b){ return Date.parse(b.recorded_at)-Date.parse(a.recorded_at); });
-  const shown=S.memo_all?notes:notes.slice(0,3);
-  const range=mdW(days[0].ms)+" 〜 "+mdW(days[6].ms);
-  body.innerHTML=
-    '<div class="mapsum"><h3>気持ちの記録</h3><div class="lede" style="margin:4px 0 0;line-height:1.85">毎日の気分を少しずつ残すと、<br>自分の波や傾向が見えてきます。</div></div>'
-    +'<div class="sech" style="justify-content:space-between">'+(off===0?'今週の気持ちの変化':'気持ちの変化')
-      +'<span class="wknav"><button onclick="S.mood_week=(S.mood_week||0)-1;S.mood_day=null;renderMap()" aria-label="前の週">‹</button>'+range
-      +'<button onclick="S.mood_week=Math.min(0,(S.mood_week||0)+1);S.mood_day=null;renderMap()" '+(off===0?'disabled':'')+' aria-label="次の週">›</button></span></div>'
-    +'<div class="card" style="margin-top:0;padding:12px 10px 8px">'+moodChart(days)
-    +'<div class="chartnote"><span>日付を押すと、その日の記録が見られます</span><i></i>メモあり</div>'
-    +dayPanel(S.mood_day)+'</div>'
-    +weekSummary(days,off)
-    +(!dsAll().length ? '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">まだ記録はありません。<br>ホームの「今日の状態」から、10秒で残せます。</div></div>' : '')
-    +'<div class="sech">残したメモ</div>'
-    +(notes.length ? shown.map(function(r){ const lv=dsLevel(r.daily_state);
-        return '<div class="memo"><div class="top">'+face(lv,20)+'<b>'+mdW(dateMs(r.date))+' '+hm(r.recorded_at)+'</b><span>'+dsLabel(r.daily_state)+'</span></div>'
-          +'<div class="v">「'+esc(r.optional_note)+'」</div></div>'; }).join("")
-        +(notes.length>3?'<button class="dslink" style="margin:0 18px 6px" onclick="S.memo_all=!S.memo_all;renderMap()">'+(S.memo_all?'閉じる':'すべて見る（'+notes.length+'件）')+'</button>':'')
-      : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">「今日の状態」を残すときに、一言メモも残せます。</div></div>')
-    +'<div class="sech">最近見えてきたこと</div>'
-    +(ins.items.length ? '<div class="lede" style="margin:-2px 22px 8px">これまでの記録から、こんな傾向が見えてきました。</div>'
-        +ins.items.map(function(x,i){ return '<div class="found"><div class="v" style="font-weight:700">'+esc(x.t)+'</div>'
-          +'<div class="s" style="font-size:12.5px;line-height:1.7;color:var(--ink2)">'+esc(x.d)+'</div>'
-          +'<button class="whybtn" style="margin-top:6px" onclick="msWhy({evidence:DS_INS['+i+'].ev})">どうしてそう思ったの？</button></div>'; }).join("")
-      : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">'
-        +(ins.n<5 ? '記録が5日分ほどたまると、ここに傾向が見えてきます。（いま'+ins.n+'日分）' : 'まだはっきりした傾向は見えていません。<br>もう少し記録がたまると、見えてくるかもしれません。')+'</div></div>')
-    +'<div class="mapcta"><button class="btn ghost" onclick="S.kiroku=\'map\';renderMap();window.scrollTo(0,0)">心の地図でくわしく見る</button>'
-    +'<div class="lede" style="margin-top:8px;text-align:center">ここで見えてきたことは、まだ仮の見方です。<br>心の地図には、あなたが確かめてから加えていきます。</div></div>';
 }
 
 /* デモ用：過去9日分の記録サンプル（メモつき・1日に複数回の日もある）。今日の分は入れない */
@@ -2219,6 +2215,7 @@ function mapFeed(n){
     if(m) rows.push({id:b.id,k:b.k,text:m.t,at:m.at,mine:false});
   });
   insights().confirmed.filter(function(c){ return c.type==="talk"; }).forEach(function(c){ rows.push({id:null,k:"話して残したこと",text:c.text,at:c.at,mine:true}); });
+  insights().confirmed.filter(function(c){ return c.type==="daily"; }).forEach(function(c){ rows.push({id:null,k:"記録から確かめたこと",text:c.text,at:c.at,mine:true}); });
   return rows.sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); }).slice(0,n||3);
 }
 function mapRecent(){ return mapFeed(2).filter(function(r){ return r.mine; }); }
@@ -2283,45 +2280,216 @@ function renderMap(){
     return;
   }
   if(MAPED) return renderMapEditor();
-  const n=mapCount(), st=mapStatusText(n), feed=mapFeed(3), full=n>=MAP_N;
-  body.innerHTML =
-    '<div class="mapsum"><div class="mhero">'+mapArt(92)+'<div style="min-width:0">'
-    + '<div class="lede" style="margin:0 0 4px">心の地図を、一緒に少しずつひろげていきましょう</div>'
-    + '<h3 id="mapHead">'+st.h+'</h3>'+mapPips()+'</div></div>'
-    + '<div class="lede" style="line-height:1.85;margin:10px 0 0">'+st.s+'</div></div>'
-
-    + '<div class="sech">はじめに話してくれたこと<span>最初の下書き</span></div>'
-    + '<div class="card draft" style="margin-top:0">'+draftHtml(false)+'</div>'
-
-    + '<div class="sech">最近見えてきたこと</div>'
-    + (feed.length ? feed.map(function(f){
-        return '<div class="found'+(f.id?' tap" onclick="openMapEditor(\''+f.id+'\')"':'"')+'><div class="k">'+f.k+'<span>'+fmtMD(f.at)+'</span></div>'
-          +'<div class="v">'+(f.mine?esc(f.text):'「'+esc(f.text)+'」')+'</div>'
-          +'<div class="s">'+(f.mine?'あなたの言葉':(f.id==="pattern"?'一緒に確かめた流れ':'話してくれたことから'))+'</div></div>'; }).join("")
-      : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">少し話してみると、ここに見えてきたことが並びます。</div></div>')
-
-    + (insights().working.length ? '<div class="sech">まだ確かめ中の見方<span>kokoniの仮の見方</span></div>'
-        + insights().working.slice(-2).reverse().map(function(w){ const i=insights().working.indexOf(w);
-          return '<div class="found working"><div class="k">繰り返しやすい流れ？<span>'+fmtMD(w.at)+'</span></div>'
-            +'<div class="v">'+esc(w.hyp||w.text)+'</div>'
-            +'<button class="whybtn" onclick="msWhy(insights().working['+i+'])">どうしてそう考えたの？</button></div>'; }).join("") : '')
-    + '<div class="sech">7つの視点</div>'
-    + '<div class="mgrid">'+MAP_BLOCKS.map(mapBlockHtml).join("")+'</div>'
-
-    + '<div class="mapcta"><button class="btn" onclick="openMini(\'map\')">'+(full?'少し話して、地図を深める':'少し話して、地図をひろげる')+'</button>'
-    + '<div class="lede" style="margin-top:8px;text-align:center">話したことから、見えてくることが増えていきます。<br>カードを押すと、自分の言葉で書き足せます。</div></div>'
-    + '<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。</div>';
+  renderMapMain(body);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   プロフィール（心の地図の補助情報）
+   - マイページと同じデータ（S.nickname / age_range / gender / life_status / support_use）を参照する。二重管理しない
+   - 入力率は心の地図の進捗とは別。「回答しない」も回答済みとして数える。100%でなくても全機能が使える
+   - 通院・カウンセリングの状況は、提案の内容やペースを考えるためだけに使う。心理士への共有は本人が選んだときだけ
+   ══════════════════════════════════════════════════════════════ */
+const PF_FIELDS=[
+  {id:"nickname",   k:"ニックネーム"},
+  {id:"age_range",  k:"年代",   o:["10代","20代","30代","40代","50代","60代以上","回答しない"]},
+  {id:"gender",     k:"性別",   o:["女性","男性","その他","回答しない"]},
+  {id:"life_status",k:"現在の状況", o:["就業中","休職中","離職中","学生","その他","回答しない"]},
+  {id:"support_use",k:"サポートの利用状況", multi:true,
+   o:["現在、医療機関に通院している","現在、カウンセリングを利用している","過去に利用したことがある","現在は利用していない","回答しない"]}
+];
+function pfVal(id){ const v=S[id]; return Array.isArray(v) ? v : (v||""); }
+function pfDone(id){ const v=pfVal(id); return Array.isArray(v) ? v.length>0 : !!v; }
+function pfPct(){ return Math.round(PF_FIELDS.filter(function(f){ return pfDone(f.id); }).length/PF_FIELDS.length*100); }
+function pfText(id){ const v=pfVal(id); return Array.isArray(v) ? v.join("・") : v; }
+function profileMini(){
+  const pct=pfPct(), done=PF_FIELDS.filter(function(f){ return pfDone(f.id); }), todo=PF_FIELDS.filter(function(f){ return !pfDone(f.id); });
+  return '<div class="pfcard"><div class="top"><div style="min-width:0"><h3>あなたのことをもう少し教える</h3>'
+    +'<p>今の生活や状況を少し教えてもらうと、kokoniもあなたに合った提案を考えやすくなります。</p></div>'
+    +'<div class="pct"><b>'+pct+'</b>%</div></div>'
+    +'<div class="pfbar"><i style="width:'+pct+'%"></i></div>'
+    +'<div class="pfchips">'+done.map(function(f){ return '<span class="on">✓ '+f.k+'</span>'; }).join("")
+      +todo.map(function(f){ return '<span>'+f.k+'</span>'; }).join("")+'</div>'
+    +'<button class="btn ghost sm2" onclick="openProfile()">'+(done.length>1?'プロフィールを確認・編集する':'プロフィールを追加する')+'</button></div>';
+}
+/* 編集はマイページ・心の地図の共通モーダル。保存するまでは下書き（S.pf） */
+function openProfile(){
+  S.pf={}; PF_FIELDS.forEach(function(f){ const v=pfVal(f.id); S.pf[f.id]=Array.isArray(v)?v.slice():v; });
+  renderProfile();
+}
+function renderProfile(){
+  const P=S.pf;
+  const chip=function(f,o){ const on = f.multi ? P[f.id].indexOf(o)>=0 : P[f.id]===o;
+    return '<button class="chip'+(on?' on':'')+'" onclick="pfPick(\''+f.id+'\',\''+o+'\')">'+o+'</button>'; };
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal pfmodal" onclick="event.stopPropagation()">'
+    +'<h3>あなたのことをもう少し教える</h3><p style="font-size:12.5px">どれも任意です。答えたくないものは「回答しない」を選べます。</p>'
+    +'<div class="msgrp"><h4>ニックネーム</h4><input type="text" id="pfNick" maxlength="12" value="'+esc(P.nickname)+'"></div>'
+    +PF_FIELDS.slice(1).map(function(f){ return '<div class="msgrp"><h4>'+f.k+(f.multi?'<span class="pfmulti">いくつでも</span>':'')+'</h4><div class="chips">'+f.o.map(function(o){ return chip(f,o); }).join("")+'</div>'
+      +(f.id==="support_use"?'<div class="pfwhy">通院やカウンセリングの状況は、提案の内容やペースを考えるためだけに使います。診断や判断には使いません。心理士に共有されるのは、あなたが共有を選んだときだけです。</div>':'')+'</div>'; }).join("")
+    +'<button class="btn" onclick="pfSave()">保存する</button><button class="linkbtn" onclick="closeWhy()">やめる</button></div></div>';
+}
+function pfPick(id,o){
+  const f=PF_FIELDS.filter(function(x){ return x.id===id; })[0], P=S.pf;
+  const nick=document.getElementById("pfNick"); if(nick) P.nickname=nick.value;
+  if(f.multi){
+    const a=P[id], k=a.indexOf(o);
+    if(k>=0) a.splice(k,1);
+    else if(o==="回答しない") a.length=0, a.push(o);
+    else { const n=a.indexOf("回答しない"); if(n>=0) a.splice(n,1);
+      if(o==="現在は利用していない"){ ["現在、医療機関に通院している","現在、カウンセリングを利用している"].forEach(function(x){ const j=a.indexOf(x); if(j>=0) a.splice(j,1); }); }
+      if(o.indexOf("現在、")===0){ const j=a.indexOf("現在は利用していない"); if(j>=0) a.splice(j,1); }
+      a.push(o); }
+  } else P[id] = P[id]===o ? "" : o;
+  const box=document.querySelector(".pfmodal"), y=box?box.scrollTop:0; renderProfile(); const b2=document.querySelector(".pfmodal"); if(b2) b2.scrollTop=y;
+}
+function pfSave(){
+  const nick=document.getElementById("pfNick"); if(nick) S.pf.nickname=nick.value.trim();
+  PF_FIELDS.forEach(function(f){ if(f.id==="nickname" && !S.pf.nickname) return; S[f.id]=S.pf[f.id]; });   // ニックネームは空にしない
+  S.pf=null; closeWhy();
+  if(S.screen==="log") renderLog(); else if(S.screen==="map") renderMap();
+}
+
+/* ── 心の地図タブ（プロフィール → 心の地図 → 最近見えてきたこと → 7つの視点 → AIミニセッション） ── */
+function renderMapMain(body){
+  const n=mapCount(), full=n>=MAP_N, started=mapStarted();
+  const feed=mapFeed(1)[0], work=insights().working.slice(-1)[0];
+  let h=profileMini()
+    +'<div class="mapsum"><div class="mhero">'+mapArt(84)+'<div style="min-width:0">'
+    +'<h3 style="margin-bottom:2px">心の地図</h3>'
+    +'<div class="lede" style="margin:0 0 6px;line-height:1.7">話したことや試したことから、<br>自分のパターンを少しずつ見つけていきます。</div>'
+    +'<div class="mcount" id="mapHead">'+(full?'7つの視点が見えてきました':'見えてきたこと <b>'+n+'</b> / '+MAP_N)+'</div>'+mapPips()+'</div></div>'
+    +(full?'<div class="lede" style="margin:10px 0 0">ここからは、少しずつ理解を深めていきましょう。</div>':'')+'</div>';
+  if(!started){
+    /* 初期：3問から見えた最初の地図だけ。空欄のカードを並べない */
+    h+='<div class="sech">最初の心の地図<span>3つの答えから</span></div>'
+      +'<div class="card draft" style="margin-top:0">'+draftHtml(false)+'</div>'
+      +'<details class="mfold"><summary>7つの視点について</summary><div class="lede" style="margin:6px 0 0;line-height:1.8">'
+      +MAP_BLOCKS.map(function(b){ return b.k; }).join("・")+'<br>話したり試したりするうちに、ひとつずつ見えてきます。</div></details>';
+  } else {
+    h+='<div class="sech">最近見えてきたこと</div>'
+      +(feed ? '<div class="found'+(feed.id?' tap" onclick="openMapEditor(\''+feed.id+'\')"':'"')+'><div class="k">'+feed.k+'<span>'+fmtMD(feed.at)+'</span></div>'
+          +'<div class="v">'+(feed.mine?esc(feed.text):'「'+esc(feed.text)+'」')+'</div>'
+          +'<div class="s">'+(feed.mine?'あなたが確かめたこと':(feed.id==="pattern"?'一緒に確かめた流れ':'話してくれたことから'))+'</div></div>'
+        : '<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">少し話してみると、ここに見えてきたことが出てきます。</div></div>')
+      +(work ? '<details class="mfold"><summary>まだ確かめ中の見方が'+insights().working.length+'つあります</summary>'
+          +'<div class="found working" style="margin:8px 0 0"><div class="k">kokoniの仮の見方<span>'+fmtMD(work.at)+'</span></div>'
+          +'<div class="v">'+esc(work.hyp||work.text)+'</div>'
+          +'<button class="whybtn" onclick="msWhy(insights().working['+insights().working.indexOf(work)+'])">どうしてそう考えたの？</button></div></details>' : '')
+      +'<div class="sech">7つの視点</div>'
+      +'<div class="vgrid">'+MAP_BLOCKS.map(mapBlockHtml).join("")+'</div>'
+      +'<details class="mfold"><summary>最初の心の地図（3つの答え）</summary><div class="card draft" style="margin:8px 0 0">'+draftHtml(false)+'</div></details>';
+  }
+  h+='<div class="mapcta2"><h3>'+(full?'心の地図を深める':'心の地図をもう少しひろげる')+'</h3>'
+    +'<p>少し話すと、あなたの考え方や行動のパターンが、<br>もう少し見えてくるかもしれません。</p>'
+    +'<button class="btn" onclick="openMini(\'map\')">'+(full?'少し話して、地図を深める':'少し話してみる')+'</button></div>'
+    +'<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。</div>';
+  body.innerHTML=h;
+}
+/* 7つの視点：2列のコンパクトなカード。状態は「見えてきました」／「まだ少し霧がかかっています」。押すと詳しく */
 function mapBlockHtml(b){
-  const e=mapEntry(b.id), mats=mapMaterials(b.id);
-  let inner;
-  if(e) inner='<div class="mine">'+esc(e.text)+'</div><div class="sub" style="margin:6px 0 0">あなたの言葉（'+fmtMD(e.at)+'）</div>';
-  else if(mats.length) inner='<ul>'+mats.slice(-2).map(function(m){ return '<li>'+esc(m.t)+'</li>'; }).join("")+'</ul>'
-    +(b.pattern?'<div class="sub" style="margin:6px 0 0">一緒に確かめた流れ</div>':'');
-  else inner='<div class="sub" style="margin:0">まだこれから</div>';
-  const can = !!e || mats.length>0 || (b.pattern && ["scene","thought","feeling","behavior"].filter(mapSeen).length>=2);
-  return '<div class="layer '+b.cls+(can?' tap':'')+(mapSeen(b.id)?'':' dim')+'"'+(can?' onclick="openMapEditor(\''+b.id+'\')"':'')+'><h4>'+b.k+'</h4>'+inner
-    +(can?'<div class="mgo">'+(e?'書き直す':'自分の言葉にしてみる')+' ›</div>':'')+'</div>';
+  const e=mapEntry(b.id), mats=mapMaterials(b.id), seen=mapSeen(b.id);
+  const snip = e ? e.text : (mats.length ? mats[mats.length-1].t : "");
+  const can = seen || (b.pattern && ["scene","thought","feeling","behavior"].filter(mapSeen).length>=2);
+  return '<div class="vcard'+(seen?' on':'')+(can?' tap':'')+'"'+(can?' onclick="openMapEditor(\''+b.id+'\')"':'')+'>'
+    +'<div class="vk">'+b.k+'</div>'
+    +'<div class="vs">'+(seen ? (b.pattern&&!e?'一緒に確かめた流れ':'見えてきました') : 'まだ少し霧がかかっています')+'</div>'
+    +(snip?'<div class="vt">'+esc(snip)+'</div>':'')+'</div>';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   気持ちの記録タブ（今週の気持ちの変化 → 今週見えてきたこと → 最近のきろく）
+   - 「最近のきろく」は気分（daily_states）と、やってみたこと（act_logs）を表示のときだけ時系列で並べる。データは別のまま
+   - 記録が少ないときは、空欄を並べず説明と導線だけ
+   ══════════════════════════════════════════════════════════════ */
+function tlItems(filter){
+  const a=[];
+  if(filter!=="act") dsAll().forEach(function(r){ a.push({kind:"mood", at:r.recorded_at, date:r.date, r:r}); });
+  if(filter!=="mood") S.act_logs.forEach(function(l){ a.push({kind:"act", at:l.at, date:isoDate(Date.parse(l.at)), l:l}); });
+  return a.sort(function(x,y){ return Date.parse(y.at)-Date.parse(x.at); });
+}
+function tlRow(it){
+  if(it.kind==="mood"){ const r=it.r;
+    return '<div class="tl mood"><span class="t">'+hm(r.recorded_at)+'</span><span class="ic">'+face(dsLevel(r.daily_state),22)+'</span>'
+      +'<div class="b"><div class="kind">今日の状態</div><div class="l">「'+dsLabel(r.daily_state)+'」</div>'
+      +(r.optional_note?'<div class="n">メモ：'+esc(r.optional_note)+'</div>':'')+'</div></div>'; }
+  const l=it.l;
+  return '<div class="tl act"><span class="t">'+hm(l.at)+'</span><span class="ic sprout">🌱</span>'
+    +'<div class="b"><div class="kind">やってみたこと</div><div class="l">「'+esc(l.title)+'」</div>'
+    +'<div class="n">'+(l.duration_minutes?'目安'+l.duration_minutes+'分':'')+(l.feeling?(l.duration_minutes?'／':'')+'やってみたあと：'+esc(l.feeling):'')+'</div></div></div>';
+}
+function timelineHtml(){
+  const f=S.tl_filter||"all", items=tlItems(f), full=!!S.tl_all;
+  const days=[]; items.forEach(function(it){ const g=days[days.length-1]; if(g && g.date===it.date) g.items.push(it); else days.push({date:it.date, items:[it]}); });
+  const shown = full ? days : days.slice(0,2);
+  let h='<div class="sech" style="justify-content:space-between">最近のきろく<span class="tlf">'
+    +[["all","すべて"],["mood","気持ち"],["act","やってみたこと"]].map(function(x){ return '<button class="'+(f===x[0]?'on':'')+'" onclick="S.tl_filter=\''+x[0]+'\';renderMap()">'+x[1]+'</button>'; }).join("")+'</span></div>';
+  if(!items.length) return h+'<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">'+(f==="act"?'まだ、やってみた記録はありません。':'まだ記録はありません。')+'</div></div>';
+  h+=shown.map(function(d){ return '<div class="tlday"><div class="dh">'+mdW(dateMs(d.date))+'</div>'
+    +d.items.slice().reverse().map(tlRow).join('<div class="tlsep">↓</div>')+'</div>'; }).join("");
+  if(days.length>2) h+='<button class="dslink" style="margin:0 18px 6px" onclick="S.tl_all=!S.tl_all;renderMap()">'+(full?'閉じる':'くわしく見る（'+days.length+'日分）')+'</button>';
+  return h;
+}
+/* その日の記録（グラフで日付を押したとき）：気分と、やってみたことを時刻順に */
+function dayPanel(date){
+  const recs=dsDay(date), acts=S.act_logs.filter(function(l){ return isoDate(Date.parse(l.at))===date; }), u=S.ds_ui;
+  let h='<div class="daypanel"><div class="dph"><b>'+mdW(dateMs(date))+'</b><span>'+(recs.length?'気分 '+recs.length+'件':'気分の記録なし')+(acts.length?'・やってみたこと '+acts.length+'件':'')+'</span></div>';
+  if(!recs.length && !acts.length) return h+'<div class="lede" style="margin:4px 0 0">この日は記録がありません。</div></div>';
+  const ct=dayChangeText(recs); if(ct) h+='<div class="dpchange">'+esc(ct)+'</div>';
+  const items=recs.map(function(r){ return {at:r.recorded_at, r:r}; }).concat(acts.map(function(l){ return {at:l.at, l:l}; }))
+    .sort(function(a,b){ return Date.parse(a.at)-Date.parse(b.at); });
+  items.forEach(function(it){
+    if(it.l){ h+='<div class="dprow"><span class="t">'+hm(it.at)+'</span><span style="font-size:17px;line-height:1">🌱</span><div class="b"><div class="l">'+esc(it.l.title)+'</div>'
+      +(it.l.feeling?'<div class="n">やってみたあと：'+esc(it.l.feeling)+'</div>':'')+'</div></div>'; return; }
+    const r=it.r;
+    if(u && u.mode==="edit" && u.id===r.record_id && u.where==="log"){ h+=dsEditForm(r,"log"); return; }
+    h+='<div class="dprow"><span class="t">'+hm(r.recorded_at)+'</span>'+face(dsLevel(r.daily_state),20)
+      +'<div class="b"><div class="l">'+dsLabel(r.daily_state)+(r.edited_at?'<span class="ed">編集済み</span>':'')+'</div>'
+      +(r.optional_note?'<div class="n">'+esc(r.optional_note)+'</div>':'')+'</div>'
+      +'<button class="dslink" style="margin:0" onclick="dsStartEdit(\''+r.record_id+'\',\'log\')">編集</button></div>';
+  });
+  return h+'</div>';
+}
+/* 記録から見えてきた見方を、本人が確かめてから心の地図へ（自動では入れない） */
+function dsAddToMap(i){
+  const x=DS_INS[i]; if(!x) return;
+  insights().confirmed.push({type:"daily", text:x.t, evidence:x.ev, at:nowIso(), own:true});
+  S.ds_decided=(S.ds_decided||[]).concat([x.t]); renderMap();
+}
+function dsDismiss(i){ const x=DS_INS[i]; if(!x) return; S.ds_decided=(S.ds_decided||[]).concat([x.t]); renderMap(); }
+let DS_INS=[];
+function renderMoodLog(){
+  const body=document.getElementById("mapBody"), hasAny=dsAll().length>0 || S.act_logs.length>0;
+  if(!hasAny){
+    body.innerHTML='<div class="mapsum"><h3>気持ちの記録</h3><div class="lede" style="margin:4px 0 0;line-height:1.85">毎日の気分を少しずつ残すと、<br>自分の波や傾向が見えてきます。</div></div>'
+      +'<div class="card"><p style="font-size:13.5px;line-height:1.85;margin:0 0 10px">記録が増えると、ここで見られるようになります。</p>'
+      +'<ul class="dlist2"><li>1週間の気持ちの変化</li><li>1日の中での気持ちの動きと、やってみたこと</li><li>記録から見えてくる、あなたの傾向</li></ul>'
+      +'<button class="btn" style="margin-top:12px" onclick="go(\'home\')">今日の気持ちを記録する</button>'
+      +'<div class="lede" style="margin-top:8px;text-align:center">ホームの「今日の状態」から、10秒で残せます。</div></div>';
+    return;
+  }
+  const off=S.mood_week||0, days=weekDays(off);
+  if(!S.mood_day || !days.some(function(d){ return d.date===S.mood_day; })){
+    const withRec=days.filter(function(d){ return d.recs.length; });
+    S.mood_day = days.some(function(d){ return d.date===isoDate(nowMs()); }) ? isoDate(nowMs()) : (withRec.length ? withRec[withRec.length-1].date : days[0].date);
+  }
+  const ins=dsInsights(); DS_INS=ins.items;
+  const open=ins.items.map(function(x,i){ return {x:x,i:i}; }).filter(function(o){ return (S.ds_decided||[]).indexOf(o.x.t)<0; });
+  const range=mdW(days[0].ms)+" 〜 "+mdW(days[6].ms);
+  body.innerHTML=
+    '<div class="sech" style="justify-content:space-between;margin-top:6px">'+(off===0?'今週の気持ちの変化':'気持ちの変化')
+      +'<span class="wknav"><button onclick="S.mood_week=(S.mood_week||0)-1;S.mood_day=null;renderMap()" aria-label="前の週">‹</button>'+range
+      +'<button onclick="S.mood_week=Math.min(0,(S.mood_week||0)+1);S.mood_day=null;renderMap()" '+(off===0?'disabled':'')+' aria-label="次の週">›</button></span></div>'
+    +'<div class="card" style="margin-top:0;padding:12px 10px 8px">'+moodChart(days)
+    +'<div class="chartnote"><span>日付を押すと、その日の記録が見られます</span><i></i>メモあり</div>'
+    +dayPanel(S.mood_day)+'</div>'
+    +weekSummary(days,off)
+    +timelineHtml()
+    +(open.length ? '<div class="sech">記録から見えてきた見方<span>まだ仮の見方です</span></div>'
+        +open.slice(0,2).map(function(o){ return '<div class="found"><div class="v" style="font-weight:700">'+esc(o.x.t)+'</div>'
+          +'<div class="s" style="font-size:12.5px;line-height:1.7;color:var(--ink2)">'+esc(o.x.d)+'</div>'
+          +'<div class="dsrow" style="flex-wrap:wrap"><button class="btn sm" onclick="dsAddToMap('+o.i+')">近いので心の地図に加える</button>'
+          +'<button class="dslink" onclick="dsDismiss('+o.i+')">ちがう気がする</button>'
+          +'<button class="whybtn" onclick="msWhy({evidence:DS_INS['+o.i+'].ev})">どうしてそう思ったの？</button></div></div>'; }).join("") : '')
+    +'<div class="mapcta"><button class="btn ghost" onclick="S.kiroku=\'map\';renderMap();window.scrollTo(0,0)">心の地図でくわしく見る</button></div>';
 }
 
 /* ホームの心の地図カード。状態で3段階に変わる
@@ -2424,41 +2592,15 @@ function renderLog(){
   document.getElementById("logBody").innerHTML=
     profileCard()+`
     <div class="card"><h3>基本情報</h3><p style="margin:0;font-size:13.5px">
-      ニックネーム：${S.nickname||"—"}／年代：${S.age_range||"—"}／性別：${S.gender||"—"}</p></div>
+      ニックネーム：${S.nickname||"—"}／年代：${S.age_range||"—"}／性別：${S.gender||"—"}<br>現在の状況：${S.life_status||"—"}<br>サポートの利用状況：${(S.support_use||[]).join("・")||"—"}</p></div>
     <div class="card"><h3>いまの状況</h3><p style="margin:0;font-size:13.5px">${S.current_status||"—"}<br>
       <span style="color:var(--muted)">${S.current_concerns.join("・")||"—"}</span></p></div>
     <div class="card"><h3>少し先に目指すこと</h3><p style="margin:0">${S.direction_goal||"—"}</p></div>
     <div class="card"><h3>今週やってみること</h3><p style="margin:0">${S.first_action||"—"}
       ${S.action_adjusted_flag?'<span class="tag">やりやすく調整済み</span>':""}</p></div>`;
 }
-/* マイページのプロフィール。任意入力で、未入力でも全機能が使える。
-   属性は補助情報であり、行動提案は Q1/Q2/Q3/場面 を優先する（属性で決めつけない） */
-function profileCard(){
-  const filled = S.age_range && S.gender;
-  if(!S.profileOpen){
-    return `<div class="card">
-      <h3>AIにあなたのことをもう少し教える</h3>
-      <p class="lede" style="margin:8px 0 12px">${filled
-        ? "年代：" + S.age_range + "／性別：" + S.gender
-        : "プロフィールを少し追加すると、AIがあなたに合った提案をより考えやすくなります。"}</p>
-      <button class="btn ghost" onclick="S.profileOpen=true;renderLog()">${filled?"プロフィールを変更する":"プロフィールを追加する"}</button>
-    </div>`;
-  }
-  return `<div class="card">
-    <h3>AIにあなたのことをもう少し教える</h3>
-    <p class="lede" style="margin:8px 0 16px">少しだけプロフィールを教えてもらうと、あなたに合った提案やサポートをより考えやすくなります。</p>
-    <div class="fld"><label>年代（任意）</label><div class="opts">${
-      ["10代","20代","30代","40代","50代","60代以上"].map(a=>
-        `<button class="opt ${S.age_range===a?"sel":""}" onclick="S.age_range=(S.age_range==='${a}'?'':'${a}');renderLog()">${a}</button>`).join("")
-    }</div></div>
-    <div class="fld"><label>性別（任意）</label><div class="radios">${
-      ["女性","男性","その他","回答しない"].map(g=>
-        `<button class="${S.gender===g?"sel":""}" onclick="S.gender=(S.gender==='${g}'?'':'${g}');renderLog()">${g}</button>`).join("")
-    }</div></div>
-    <button class="btn" onclick="S.profileOpen=false;renderLog()">保存する</button>
-    <div class="foot" style="margin:10px 0 0">どちらも任意です。未入力のままでも、すべての機能をお使いいただけます。</div>
-  </div>`;
-}
+/* マイページのプロフィール：心の地図と同じデータ・同じ編集画面（二重管理しない） */
+function profileCard(){ return profileMini(); }
 /* ══════════════════════════════════════════════════════════════
    週次サイクル・週次ふりかえり・ふりかえりタブ
    - 初回の行動確定で first サイクル（3日）を開始。初回ふりかえり後、次の一歩を決めたら regular（7日）へ
@@ -3089,6 +3231,7 @@ function msCtx(){
     nickname:S.nickname||"",
     intake:{state:S.current_status||"", topic:(S.current_concerns||[])[0]||"", want:S.direction_goal||""},
     today_mood:todayMood()||"",
+    profile:{life_status:S.life_status||"", support_use:S.support_use||[]},   // 提案の内容やペースを考える補助。診断・判断には使わない
     current_action: cur ? {title:cur.title, plan:planLabel()} : null,
     past:{
       first_scene:S.iv_scene||"",
