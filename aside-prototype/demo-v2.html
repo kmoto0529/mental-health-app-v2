@@ -226,6 +226,16 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .layer.res{background:#FFFDF6;border-color:var(--accent-line)}
 .layer.res h4{color:var(--accent)}
 .layer ul li{margin-bottom:2px}
+.layer.tap{cursor:pointer}
+.layer .mine{font-size:14px;line-height:1.75;color:var(--ink);font-weight:700}
+.layer .mgo{font-size:12px;font-weight:800;color:var(--teal-deep);margin-top:8px}
+.layer.loop .mgo{color:var(--accent)}
+.mat{border-top:1px solid var(--line);padding:9px 0}
+.mat:first-of-type{border-top:none;padding-top:0}
+.mat .t{font-size:14px;line-height:1.7;color:var(--ink)}
+.mat .s{font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.chip{background:var(--paper);border:1px solid var(--line-input);border-radius:99px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--ink)}
 .mapnote{font-size:11.5px;color:var(--muted);margin:2px 18px 14px;line-height:1.75}
 .lstate{display:flex;gap:6px;margin:0 18px 10px}
 .lstate span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:6px 2px;border-bottom:2px solid var(--line)}
@@ -429,6 +439,7 @@ const S = {
   /* 週次サイクル。Home の「週1回のふり返り」と「節目」は、どちらもこの S.cycle だけを見る */
   cycle:null, cycles:[], reviews:[], rv:null, mood_logs:[], talk_logs:[],
   mini_sessions:[],   // AIミニセッション（任意）の構造化された要約。ふり返りから参照する
+  map:{}, map_log:[],   // 心の地図。本人が書いた言葉だけ（block_id → {text, at, history}）
   clock_offset:0   // デモ用の時計送り（ms）。日付計算はすべて nowMs() 経由
 };
 const STATUS_OPTS=["仕事は続けているけど少ししんどい","休んだ方がいいのか迷っている","いま休職している",
@@ -448,7 +459,7 @@ function go(id){
   const nav=document.getElementById("nav");
   S.entered=true; nav.hidden=false; nav.classList.remove("locked");
   if(id==="home") renderHome();
-  if(id==="map") renderMap();
+  if(id==="map"){ MAPED=null; renderMap(); }
   if(id==="gate") renderGate();
   if(id==="log") renderLog();
   if(id==="talk") startTalk();
@@ -1393,7 +1404,9 @@ function renderHome(){
       <div class="mood">${MOODS.map(t=>`<button class="${mood===t?"sel":""}" onclick="setMood('${t}')">${t}</button>`).join("")}</div></div>
     <div class="subgrid">
       <div class="hcard tap" onclick="go('talk')"><div class="k">💬</div><div class="v">今日は話すだけにする</div><div class="s">今の気持ちを言葉にしてみましょう</div></div>
-      <div class="hcard tap" onclick="go('map')"><div class="k">📗</div><div class="v">最近わかったこと</div><div class="s">これから一緒に見つけていきます</div></div>
+      <div class="hcard tap" onclick="go('map')"><div class="k">📗</div><div class="v">最近わかったこと</div><div class="s">${(function(){
+        const r=mapRecent()[0]; if(r) return esc(r.text);
+        return mapNextBlock() ? "話してくれた言葉がたまっています" : "これから一緒に見つけていきます"; })()}</div></div>
     </div>`;
   if(letterArrived()) h+=`<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span>
     <div style="flex:1"><div class="k">大塚さんから</div><div class="v">心理士から手紙が届いています</div></div>
@@ -1609,32 +1622,170 @@ function renderMap(){
       + '<div style="margin:14px 18px"><button class="btn" onclick="resumeSetup()">一緒に決める</button></div>';
     return;
   }
-  const c =S.current_concerns.length ? S.current_concerns : ["—"];
-  const pat = S.ai_conversation_summary || "これから一緒に見つけていきます";
-  const li = a => a.map(x=>"<li>"+x+"</li>").join("");
+  if(MAPED) return renderMapEditor();
+  const next=mapNextBlock(), recent=mapRecent();
   document.getElementById("mapBody").innerHTML =
-    '<div class="mapsum"><h3>少しずつ、道が見えてきました</h3>'
-    + '<div class="lede">これまでの記録と対話から、すぷらんが整理しました。</div>'
-    + '<div class="row"><div class="k">今、特に<br>向き合っていること</div><div class="v">'+c[0]+'</div></div>'
-    + '<div class="row"><div class="k">よくある<br>パターン</div><div class="v">考える → 避ける → さらに不安</div></div>'
-    + '<div class="row"><div class="k">試してみて<br>よかったこと</div><div class="v">散歩すると気分が上がる</div></div>'
-    + '<div class="row"><div class="k">これから<br>試したいこと</div><div class="v">人に気持ちを話してみる</div></div>'
+    '<div class="mapsum"><h3>あなたの言葉で、少しずつ</h3>'
+    + '<div class="lede" style="line-height:1.85">すぷらんは、あなたが話してくれた言葉を集めておきます。<br>'
+    +   'まとめて言葉にするのは、あなたです。</div>'
+    + (recent.length ? recent.map(function(e){ return '<div class="row"><div class="k">'+e.k+'</div><div class="v">'+esc(e.text)+'</div></div>'; }).join("")
+        : '<div class="row"><div class="k">書いたこと</div><div class="v" style="color:var(--muted)">まだありません</div></div>')
+    + (next ? '<button class="btn" style="margin-top:12px" onclick="openMapEditor(\''+next.id+'\')">「'+next.k+'」を一緒に探す</button>'
+            + '<div class="lede" style="margin:8px 0 0;text-align:center">1回に1つずつで十分です</div>' : '')
     + '</div>'
-    + '<div class="mgrid">'
-    +   '<div class="layer"><h4>心が動きやすい場面</h4><ul>'+li(["仕事の連絡を見るとき","日曜の夜","人と比較したとき"])+'</ul></div>'
-    +   '<div class="layer"><h4>浮かびやすい考え</h4><ul>'+li(["また失敗するかもしれない","自分はまだまだだ","迷惑をかけてしまう"])+'</ul></div>'
-    +   '<div class="layer"><h4>感情・身体の反応</h4><ul>'+li(["不安・焦り・落ち込み","胸が苦しくなる","体が重くなる・眠れない"])+'</ul></div>'
-    +   '<div class="layer"><h4>取りやすい行動</h4><ul>'+li(["考えるのを避ける","SNSを見て紛らわす","やるべきことを後回しにする"])+'</ul></div>'
-    +   '<div class="layer loop wide"><h4>繰り返しやすいパターン</h4>'
-    +     '<div class="sub">すぷらんが仮に言葉にして、あなたが確かめたもの</div>'
-    +     '<div class="flow">考える → 不安になる → 避ける → さらに不安</div></div>'
-    +   '<div class="layer good wide"><h4>試して分かったこと</h4><ul>'+li(["考えを書き出せると少し楽になる","散歩すると気分が上がる","人に相談すると整理される","夜のスマホは気分が下がりやすい"])+'</ul></div>'
-    +   '<div class="layer res wide"><h4>自分を支えてくれるもの</h4><ul>'+li(["家族・パートナー","散歩・運動","好きな音楽・旅行","すぷらんとの対話"])+'</ul></div>'
-    +   '<div class="layer locked wide"><h4>背景にあるもの</h4>'
-    +     '<div style="font-size:13px">ここは、もう少し一緒に見えてきてから、お伝えします。</div></div>'
-    + '</div>'
+    + '<div class="mgrid">'+MAP_BLOCKS.map(mapBlockHtml).join("")+'</div>'
     + '<div class="mapnote">※ これは診断ではありません。あなたが自分を理解するためのものです。<br>'
-    +   '<span class="tag">8ブロックは「すぷらん 心の地図」1枚図 準拠／中身はデモ用の例</span></div>';
+    +   '<span class="tag">AIは本人の言葉を集めて問いかけるだけ。地図の文は本人が書く（9/22「生みの苦しみ」への対応）</span></div>';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   心の地図 ──「途中まで一緒に言葉を探し、本人が仕上げる」
+   - AIは完成した見立てを出さない。出すのは ①本人が話した言葉（材料） ②問い ③書き出しの文 だけ
+   - 書くのは本人。書かなくてもよい（「いまは書かない」）
+   - 材料は 初回の対話・AIミニセッション・行動の記録・今日の状態 から集める（AIが作った文は混ぜない）
+   - 「背景にあるもの」（縦断的な層）は PoC では扱わない
+   ══════════════════════════════════════════════════════════════ */
+let MAPED=null;   // 編集中のブロック {id, draft, slots}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+const MAP_BLOCKS=[
+  {id:"scene",    k:"心が動きやすい場面", cls:"",
+   q:"話してくれた場面を並べてみました。<br>共通していそうなことはありますか？", stem:"＿＿＿。そういう場面で、心が動きやすいのかもしれない。",
+   words:["夜","ひとりのとき","連絡を見たとき","休みの前の日","人と比べたとき","予定がないとき"]},
+  {id:"thought",  k:"浮かびやすい考え", cls:"",
+   q:"そのとき、頭の中ではどんな言葉が流れていそうですか？<br>自分の口ぐせのように書いてみてください。", stem:"そういうとき、「＿＿＿」と考えやすい。",
+   words:["また失敗する","迷惑をかけている","ちゃんとしなきゃ","どうせ無理","自分だけが遅れている"]},
+  {id:"feeling",  k:"感情・身体の反応", cls:"",
+   q:"気持ちや体には、どんなことが起きていますか？<br>ぴったりの言葉がなければ、近いもので大丈夫です。", stem:"そのとき、気持ちは＿＿＿、体は＿＿＿。",
+   words:["不安","焦り","落ち込み","イライラ","むなしさ","胸が苦しい","体が重い","眠れない","肩がこわばる"]},
+  {id:"behavior", k:"取りやすい行動", cls:"",
+   q:"そのあと、どうすることが多いですか？<br>良い・悪いは考えなくて大丈夫です。", stem:"そういうとき、わたしは＿＿＿ことが多い。",
+   words:["スマホを見る","布団から出られない","後回しにする","人を避ける","がんばりすぎる"]},
+  {id:"pattern",  k:"繰り返しやすいパターン", cls:"loop wide", pattern:true,
+   q:"これまで書いた言葉をつなげると、どう流れていそうですか？<br>つながらなければ、つなげなくて大丈夫です。"},
+  {id:"tried",    k:"試して分かったこと", cls:"good wide",
+   q:"やってみた記録を並べてみました。<br>やってみて、自分について分かったことはありますか？", stem:"＿＿＿をすると、わたしは＿＿＿。",
+   words:["少し楽になる","変わらない日もある","朝のほうがやりやすい","短いほうが続く"]},
+  {id:"support",  k:"自分を支えてくれるもの", cls:"res wide",
+   q:"しんどいとき、少しでも支えになっているものはありますか？<br>人・場所・時間・もの、なんでも大丈夫です。", stem:"わたしを支えてくれているのは、＿＿＿。",
+   words:["家族","友人","散歩","音楽","眠ること","ペット"]},
+  {id:"background", k:"背景にあるもの", cls:"locked wide", locked:true}
+];
+function mapBlock(id){ return MAP_BLOCKS.filter(function(b){ return b.id===id; })[0]; }
+function fmtMD(iso){ const d=new Date(Date.parse(iso)); return (d.getMonth()+1)+"/"+d.getDate(); }
+/* 本人が話した・記録した言葉だけを集める（AIが作った文は入れない） */
+function mapMaterials(id){
+  const out=[], add=function(t,src){ t=(t||"").trim(); if(t && !out.some(function(o){ return o.t===t; })) out.push({t:t,src:src}); };
+  const miniKey={scene:"scene",thought:"thought",feeling:"feeling",behavior:"behavior",support:"coping"}[id];
+  if(id==="scene") add(S.iv_scene,"最初に話した場面");
+  S.mini_sessions.forEach(function(m){ if(miniKey) add(m[miniKey],"AIと整理（"+fmtMD(m.at)+"）"); });
+  if(id==="thought") S.act_logs.forEach(function(l){ if(l.input && UI_FAMILY[l.app_type]==="write") add(l.input,"「"+l.title+"」で書いたこと（"+fmtMD(l.at)+"）"); });
+  if(id==="feeling"){
+    const n=S.mood_logs.filter(function(m){ return m.v==="しんどい"; }).length;
+    if(n) add("「しんどい」と記録した日："+n+"日","今日の状態");
+  }
+  if(id==="tried"){
+    const by={};
+    S.act_logs.forEach(function(l){ (by[l.title]=by[l.title]||[]).push(l.feeling); });
+    Object.keys(by).forEach(function(t){ add("「"+t+"」のあと："+countText(by[t]),"やってみた記録"); });
+  }
+  return out;
+}
+function mapEntry(id){ return (S.map||{})[id]; }
+function mapRecent(){
+  return Object.keys(S.map||{}).map(function(id){ return Object.assign({id:id,k:mapBlock(id).k},S.map[id]); })
+    .sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); }).slice(0,2);
+}
+/* 次に一緒に探すブロック：材料があって、まだ本人が書いていないもの（パターンは2つ以上書いてから） */
+function mapNextBlock(){
+  const written=Object.keys(S.map||{}).length;
+  return MAP_BLOCKS.filter(function(b){
+    if(b.locked || mapEntry(b.id)) return false;
+    if(b.pattern) return written>=2;
+    return mapMaterials(b.id).length>0;
+  })[0]||null;
+}
+function mapBlockHtml(b){
+  if(b.locked) return '<div class="layer locked wide"><h4>'+b.k+'</h4>'
+    +'<div style="font-size:13px">ここは、いまは扱いません。<br>もっと深く見ていくときは、担当の心理士と一緒に。</div></div>';
+  const e=mapEntry(b.id), mats=b.pattern?[]:mapMaterials(b.id);
+  let body;
+  if(e) body='<div class="mine">'+esc(e.text)+'</div><div class="sub" style="margin:6px 0 0">あなたの言葉（'+fmtMD(e.at)+'）</div>';
+  else if(b.pattern) body='<div class="sub" style="margin:0">ほかの場所に2つ以上書いたら、つなげてみられます。</div>';
+  else if(mats.length) body='<div class="sub" style="margin:0">話してくれた言葉が '+mats.length+' つあります</div>';
+  else body='<div class="sub" style="margin:0">まだ空白です</div>';
+  const can = e || (b.pattern ? Object.keys(S.map||{}).length>=2 : mats.length>0);
+  return '<div class="layer '+b.cls+(can?' tap':'')+'"'+(can?' onclick="openMapEditor(\''+b.id+'\')"':'')+'><h4>'+b.k+'</h4>'+body
+    +(can?'<div class="mgo">'+(e?'書き直す':'一緒に探す')+' ›</div>':'')+'</div>';
+}
+
+function openMapEditor(id){
+  const e=mapEntry(id);
+  MAPED={id:id, draft:e?e.text:"", slots:e&&e.slots?e.slots.slice():["","","",""]};
+  renderMap(); window.scrollTo(0,0);
+}
+function closeMapEditor(){ MAPED=null; renderMap(); window.scrollTo(0,0); }
+function mapIns(i){
+  const ta=document.getElementById("mapIn"), w=window.__MAPW[i]; if(!ta||!w) return;
+  const s=ta.selectionStart==null?ta.value.length:ta.selectionStart, en=ta.selectionEnd==null?s:ta.selectionEnd;
+  /* 書き出しの「＿＿＿」が残っていれば、そこを先に埋める */
+  const u=ta.value.indexOf("＿＿＿");
+  ta.value = u>=0 ? ta.value.slice(0,u)+w+ta.value.slice(u+3) : ta.value.slice(0,s)+w+ta.value.slice(en);
+  MAPED.draft=ta.value; ta.focus();
+}
+function mapUseStem(){ const b=mapBlock(MAPED.id); MAPED.draft=b.stem; renderMap(); }
+function renderMapEditor(){
+  const b=mapBlock(MAPED.id), body=document.getElementById("mapBody");
+  const say=function(m){ return '<div class="bubble"><div class="who"><i></i>kokoni</div><div class="txt">'+m+'</div></div>'; };
+  let h='<div class="pagehead" style="margin-top:-12px"><button class="back" onclick="closeMapEditor()">‹</button><span class="lede">心の地図 ／ '+b.k+'</span></div>';
+  if(b.pattern){
+    /* パターン：本人が書いた4ブロックの言葉を、本人がつなぐ。AIは矢印の枠を出すだけ */
+    const src=[["scene","場面"],["thought","考え"],["feeling","気持ち・体"],["behavior","行動"]];
+    h+=say(b.q)
+      +'<div class="card">'+src.map(function(p,i){
+          const e=mapEntry(p[0]);
+          return '<div class="fld" style="margin-bottom:6px"><label>'+p[1]+'</label>'
+            +(e?'<div class="lede" style="margin:-2px 0 6px">あなたの言葉：'+esc(e.text)+'</div>':'')
+            +'<input type="text" class="patIn" value="'+esc(MAPED.slots[i])+'" placeholder="'+(e?'短く言いかえる':'わからなければ空けておく')+'" oninput="MAPED.slots['+i+']=this.value"></div>'
+            +(i<3?'<div style="text-align:center;color:var(--accent);font-weight:800">↓</div>':'');
+        }).join("")
+      +'<button class="btn" style="margin-top:12px" onclick="saveMapPattern()">地図に書く</button>'
+      +'<button class="btn ghost" style="margin-top:9px" onclick="closeMapEditor()">いまは書かない</button></div>';
+  } else {
+    const mats=mapMaterials(b.id), words=mats.map(function(m){ return m.t; }).concat(b.words||[]);
+    window.__MAPW=words;
+    h+=say(b.q)
+      +(mats.length?'<div class="card"><h3 style="font-size:13px;margin-bottom:8px">あなたが話してくれた言葉</h3>'
+        +mats.map(function(m,i){ return '<div class="mat"><div class="t">「'+esc(m.t)+'」</div><div class="s">'+esc(m.src)+'</div>'
+          +'<button class="linkbtn" style="margin:2px 0 0;padding:0;text-align:left;font-size:12.5px" onclick="mapIns('+i+')">この言葉を使う</button></div>'; }).join("")+'</div>':'')
+      +'<div class="card"><h3 style="font-size:13px;margin-bottom:8px">あなたの言葉で書いてみる</h3>'
+      +'<textarea id="mapIn" rows="3" maxlength="120" oninput="MAPED.draft=this.value" placeholder="うまく書けなくて大丈夫です。">'+esc(MAPED.draft)+'</textarea>'
+      +(MAPED.draft?'':'<button class="linkbtn" style="margin:8px 0 0;padding:0;text-align:left;font-size:12.5px;line-height:1.6" onclick="mapUseStem()">書き出しを借りる：'+esc(b.stem)+'</button>')
+      +'<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;color:var(--muted)">言葉が見つからないとき</summary>'
+      +'<div class="chips">'+(b.words||[]).map(function(w,j){ return '<button class="chip" onclick="mapIns('+(mats.length+j)+')">'+w+'</button>'; }).join("")+'</div>'
+      +'<div class="lede" style="margin-top:6px">ことばの例です。あなたに当てはまるとは限りません。</div></details>'
+      +'<button class="btn" style="margin-top:14px" onclick="saveMapEntry()">地図に書く</button>'
+      +'<button class="btn ghost" style="margin-top:9px" onclick="closeMapEditor()">いまは書かない</button></div>';
+  }
+  body.innerHTML=h;
+}
+function saveMapEntry(){
+  const ta=document.getElementById("mapIn"), v=(ta?ta.value:MAPED.draft).trim();
+  if(!v || v.indexOf("＿＿＿")>=0){ alert(v?"「＿＿＿」のところを、あなたの言葉で埋めてみてください。":"ひとことでも大丈夫です。"); return; }
+  if(RISK_RE.test(v)){ MAPED=null; openSafety("free_text","unspecified"); return; }
+  mapPut(MAPED.id,{text:v});
+}
+function saveMapPattern(){
+  const sl=MAPED.slots.map(function(s){ return (s||"").trim(); }), filled=sl.filter(Boolean);
+  if(filled.length<2){ alert("2つ以上埋めると、流れとして残せます。"); return; }
+  if(RISK_RE.test(filled.join(" "))){ MAPED=null; openSafety("free_text","unspecified"); return; }
+  mapPut("pattern",{text:filled.join(" → "), slots:sl});
+}
+function mapPut(id,v){
+  S.map=S.map||{};
+  const prev=S.map[id];
+  S.map[id]=Object.assign({at:nowIso(), history:prev?(prev.history||[]).concat([{text:prev.text,at:prev.at}]):[]},v);
+  S.map_log.push({block:id, at:S.map[id].at});
+  MAPED=null; renderMap(); window.scrollTo(0,0);
 }
 function renderLog(){
   document.getElementById("logBody").innerHTML=
@@ -1756,7 +1907,15 @@ function reviewRows(){
     {id:"talk", k:"すぷらんと話したこと", v: d.talk_count ? "今週は"+d.talk_count+"回話しました。"+(S.ai_conversation_summary?"<br>"+S.ai_conversation_summary:"") : "今週は、はなすは使いませんでした。"},
     {id:"action", k:"試したこと", v: "「"+d.action.title+"」（目安："+d.action.plan+"）<br>やってみた回数："+d.action.count+"回"},
     {id:"reaction", k:"やってみたあとの反応", v: d.action.feelings.length ? countText(d.action.feelings) : "まだ記録はありません。"}
-  ];
+  ].concat(mapRow());
+}
+/* このサイクル中に本人が心の地図に書いたこと。本人の言葉そのまま（AIの言い換えはしない） */
+function mapRow(){
+  if(!S.cycle) return [];
+  const from=Date.parse(S.cycle.cycle_started_at);
+  const ids=Object.keys(S.map||{}).filter(function(id){ return Date.parse(S.map[id].at)>=from; });
+  if(!ids.length) return [];
+  return [{id:"map", k:"心の地図に書いたこと", v: ids.map(function(id){ return mapBlock(id).k+"："+esc(S.map[id].text); }).join("<br>")}];
 }
 
 function renderGate(){
@@ -1849,7 +2008,7 @@ function firstRows(){
     {id:"reaction", k:"やってみたあとの反応", v: d.action.feelings.length ? countText(d.action.feelings) : "まだ記録はありません。"}
   ];
   if(m) rows.push({id:"mini", k:"AIと整理したこと", v: m.summary});
-  return rows;
+  return rows.concat(mapRow());
 }
 function fq(id,i){ S.rv.fq[id]=i; renderGate(); }
 function gateFirstForm(){
