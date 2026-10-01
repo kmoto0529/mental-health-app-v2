@@ -2888,7 +2888,7 @@ function msFeelDone(){
 
 /* ── Gemini 連携（デモ） ─────────────────────────────────
    /api/gemini-proxy（招待コード必須・キーはサーバー側）。js/kokoni-mini-ai.js のプロンプトと検証を使う */
-const AI_KEY="kokoni_demo_ai";
+const AI_KEY="kokoni_demo_ai", DEMO_URL="https://mental-health-app-v2-51bc.vercel.app/demo-v2.html";
 let AI_CFG=(function(){ try{ return JSON.parse(localStorage.getItem(AI_KEY)||"{}"); }catch(_){ return {}; } })();
 if(new URLSearchParams(location.search).get("ai")==="1") AI_CFG.on=true;
 function aiOn(){ return !!(AI_CFG.on && AI_CFG.code && window.KokoniMiniAI); }
@@ -2897,7 +2897,12 @@ function aiBtnSync(){ const b=document.getElementById("aiBtn"); if(!b) return;
   b.textContent = aiOn() ? "AI: ON" : "AI: OFF"; b.classList.toggle("on", aiOn()); }
 function toggleAi(){
   if(!aiOn()){
-    if(location.protocol==="file:"){ alert("AIは公開URL（Vercel）でのみ動きます。ファイルを直接開いた場合はルールで動きます。"); return; }
+    /* ファイルを直接開いているとAPI（/api/gemini-proxy）に届かない。公開URLへ案内する */
+    if(location.protocol==="file:"){
+      if(confirm("AIは公開URLで開いたときだけ動きます。\n（いまはファイルを直接開いているため、ルールで動いています）\n\n公開URLで開きますか？"))
+        location.href=DEMO_URL+"?ai=1";
+      return;
+    }
     if(!AI_CFG.code){ const c=prompt("AIを使うには、β版の招待コードを入力してください。"); if(!c) return; AI_CFG.code=c.trim(); }
     AI_CFG.on=true;
   } else AI_CFG.on=false;
