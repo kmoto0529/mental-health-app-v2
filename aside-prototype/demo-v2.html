@@ -406,6 +406,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .roles>span small{font-size:10px;color:var(--muted);font-weight:700;margin-left:3px}
 .roles i{font-style:normal;color:var(--teal-line)}
 .roles .sp-xxs{width:20px;height:20px;flex:0 0 20px}
+.startcard.v2{background:linear-gradient(180deg,#FBFBF4,#F4F7EC);padding:18px 20px 22px;text-align:center}
+.startcard.v2 .qbtn{width:34px;height:34px;font-size:16px;font-weight:800;border:1.5px solid var(--teal);color:var(--teal-deep);background:var(--paper)}
+.st-art{position:relative;width:100%;max-width:320px;height:170px;margin:4px auto 6px}
+.st-bg{position:absolute;inset:0;width:100%;height:100%}
+.st-sp{position:absolute;left:50%;bottom:4px;width:150px;height:150px;object-fit:contain;transform:translateX(-50%)}
+.startcard.v2 .ttl{font-size:22px;font-weight:800;color:var(--ink);margin:4px 0 8px;letter-spacing:.02em}
+.st-sub{font-size:13px;line-height:1.7;color:var(--ink2);margin:0 0 16px}
+.st-cta{display:flex;align-items:center;justify-content:center;gap:14px;font-size:16px}
+.st-cta span{font-size:20px;line-height:1}
 /* Home（シンプル版） */
 .hhead2{padding:16px 20px 4px}
 .hhead2 .nm{display:block;font-size:24px;color:var(--ink);font-weight:800;letter-spacing:.02em}
@@ -2382,16 +2391,25 @@ function firstNextCard(r){ return nextCard(r); }
 function firstNext(k){ nextStep(k); }
 
 /* 初回ホームの「まずはここから」── 登録の催促ではなく、これからを一緒に決める入口 */
+/* 初回ホームの「まずは、一緒に決めよう」カード。考えているすぷらん＋やわらかい背景（茂み・地面・芽）は SVG で描く */
 function startHereCard(){
-  return `<div class="startcard">
-    <button class="qbtn" onclick="openWhy()">？</button>
-    <div class="leaf">🌱</div>
-    <div class="ttl">まずは、これからのことを<br>一緒に決めましょう</div>
-    <p style="font-size:13.5px;line-height:1.85;color:var(--ink2);margin:10px 0 0">kokoni では、決まったやり方を一方的に進めるのではなく、今のあなたに合った進み方を一緒に考えていきます。</p>
-    <p style="font-size:12.5px;line-height:1.8;color:var(--muted);margin:10px 0 0">${S.setup_status==="in_progress"
-      ? "途中まで答えてくれた内容から、続けられます。"
-      : "3つほど質問しながら、今の状態と、これからやっていくことを整理します。"}</p>
-    <button class="btn" style="margin-top:16px" onclick="resumeSetup()">${S.setup_status==="in_progress"?"続きから一緒に決める":"一緒に決める"}</button>
+  const cont=S.setup_status==="in_progress";
+  return `<div class="startcard v2">
+    <button class="qbtn" onclick="openWhy()" aria-label="なぜ最初にこれをするの？">?</button>
+    <div class="st-art" aria-hidden="true">
+      <svg class="st-bg" viewBox="0 0 320 170" preserveAspectRatio="xMidYMax meet">
+        <ellipse cx="160" cy="152" rx="130" ry="18" style="fill:#E6EFD6"></ellipse>
+        <path d="M30 152 C 18 120, 52 96, 80 108 C 86 82, 122 74, 142 92 L 142 152 Z" style="fill:#EEF4E2"></path>
+        <path d="M290 152 C 302 120, 268 94, 242 106 C 236 82, 200 76, 182 94 L 182 152 Z" style="fill:#EEF4E2"></path>
+        <g style="fill:#A7C47F"><path d="M70 150 q-2 -16 -12 -22 q12 2 14 16 z"></path><path d="M72 150 q4 -14 14 -18 q-6 10 -10 20 z"></path>
+        <path d="M248 150 q-2 -16 -12 -22 q12 2 14 16 z"></path><path d="M250 150 q4 -14 14 -18 q-6 10 -10 20 z"></path></g>
+        <g style="stroke:#BBD48F;stroke-width:3;stroke-linecap:round;fill:none"><path d="M226 42 l8 -10"></path><path d="M236 54 l12 -4"></path></g>
+      </svg>
+      <img class="st-sp" src="assets/suplan/opt/thinking.png" alt="" width="150" height="150">
+    </div>
+    <div class="ttl">${cont?"続きから、一緒に決めよう":"まずは、一緒に決めよう"}</div>
+    <p class="st-sub">${cont?"途中まで答えてくれた内容から続けられます。":"3つの質問で、今のあなたに合う一歩を見つけます。"}</p>
+    <button class="btn st-cta" onclick="resumeSetup()">${cont?"続きから一緒に決める":"一緒に決める"}<span aria-hidden="true">›</span></button>
   </div>`;
 }
 /* 週1回のふりかえり。日付・残り日数・状態はすべて S.cycle から出す（ふりかえりタブと同じ値） */
