@@ -472,6 +472,21 @@ body:has(#s-flow.active .obw.night){background:#17221F}
 .ob-dcard ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.75;color:var(--ink2)}
 .ob-dcard.safe .ob-ic{background:#F8E6E3;color:#B5655A}
 .ob-dcard a{color:var(--teal-deep)}
+.ob-h1.g5{font-size:24px}.ob-h1.g5 b{color:#5F8A4E;font-size:34px;line-height:1}
+.g5-hero{position:relative;height:150px;margin:0 auto 6px;max-width:340px;background:radial-gradient(ellipse 70% 22% at 50% 92%,#E4EED4 0,#E4EED4 60%,transparent 62%)}
+.g5-hero img{display:block;margin:0 auto;width:140px;height:140px;object-fit:contain}
+.g5-bub{position:absolute;right:0;top:14px;background:#fff;border-radius:18px;padding:8px 12px;font-size:12px;line-height:1.6;color:var(--ink);text-align:left;box-shadow:0 2px 8px rgba(80,90,60,.1)}
+.g5-cards{display:flex;flex-direction:column;gap:10px;margin:4px 0 16px;text-align:left}
+.g5-card{display:flex;gap:10px;align-items:flex-start;border-radius:18px;padding:14px 10px 14px 14px;box-shadow:0 2px 12px rgba(80,90,60,.07);background:#fff}
+.g5-card.n2{background:#FDF6F3}.g5-card.n3{background:#F6F9F6}
+.g5-no{flex-shrink:0;width:30px;height:30px;border-radius:50%;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px;background:#A9BE84}
+.n2 .g5-no{background:#E39C98}.n3 .g5-no{background:#8EA9B5}
+.g5-tx{flex:1;min-width:0}
+.g5-art{position:relative;flex-shrink:0;width:72px;align-self:center}
+.g5-art img{display:block;width:72px;height:72px;object-fit:contain}
+.g5-letter{position:absolute;left:-6px;top:-8px;font-size:20px;color:#C9A36A;background:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.g5-cta{display:flex;align-items:center;justify-content:center;gap:14px;background:#4A6B44}
+.g5-cta span{font-size:18px}
 /* Home（シンプル版） */
 .hhead2{padding:16px 20px 4px}
 .hhead2 .nm{display:block;font-size:24px;color:var(--ink);font-weight:800;letter-spacing:.02em}
@@ -989,17 +1004,19 @@ function renderFlow(){
     break; }
 
   /* 5/5 使い方ガイド（内容は検討中。仮の3枚） */
+  /* 5/5 kokoniでできる3つのこと（2026-10-02 社長版テキスト。絵は仮。大塚さんは人物の絵にしない） */
   case "a5":
     h=`<div class="obs">${obHead(5,"a4")}
-      <h1 class="ob-h1">kokoniの使い方</h1>
-      <p class="ob-sub">3つのことを、すぷらんと一緒にやっていくよ</p>
-      <div class="ob-cards">
-        ${obCard("leaf","今日の一歩を決めて、試す","まずは3日間、無理のない一歩をひとつ試してみよう。")}
-        ${obCard("chat","すぷらんとはなす","気持ちがもやもやしたら、いつでも話しかけてね。")}
-        ${obCard("heart","ふりかえって、次を決める","どうだったかを一緒にふりかえって、次の一歩を決めよう。")}
+      <h1 class="ob-h1 g5">kokoni でできる <b>3</b>つのこと</h1>
+      <p class="ob-sub">すぷらんと心理士が、あなたの一歩に伴走します。</p>
+      <div class="g5-hero"><img src="assets/suplan/opt/heart.png" alt="" width="150" height="150"><div class="g5-bub">一緒に<br>はじめてみよう！</div></div>
+      <div class="g5-cards">
+        ${g5Card(1,"今のあなたに合う<br>小さな一歩を決める","すぷらんと話しながら、今のあなたに合う取り組みを一緒に決めます。","thinking.png")}
+        ${g5Card(2,"気持ちの変化から<br>自分のことを知っていく","日々の気持ちや行動を記録しながら、少しずつ自分のパターンや変化が見えてきます。","bulb.png")}
+        ${g5Card(3,"心理士の大塚さんから<br>定期的にフィードバック","3日ごと（その後は週1回）のふりかえりを共有すると、臨床心理士の大塚さんからあなたに合わせたアドバイスが届きます。","thanks.png",true)}
       </div>
-      <button class="btn ob-cta" onclick="startApp()">はじめる</button>
-      ${DEBUG?'<div class="foot">DEBUG：5枚目（使い方ガイド）は内容検討中の仮置き</div>':""}
+      <button class="btn ob-cta g5-cta" onclick="startApp()">すぷらんとはじめる<span aria-hidden="true">→</span></button>
+      <button class="ob-skip" onclick="startApp()">スキップ</button>
     </div>`;
     break;
   }
@@ -1025,6 +1042,10 @@ const OB_ICON={
 };
 function obHead(n,back){ return '<div class="ob-top"><button class="back" onclick="step(\''+back+'\')" aria-label="戻る">‹</button><span class="ob-step">'+n+' / 5</span><span></span></div>'; }
 function obCard(ic,t,d){ return '<div class="ob-card"><span class="ob-ic">'+OB_ICON[ic]+'</span><div><div class="ob-ct">'+t+'</div><div class="ob-cd">'+d+'</div></div></div>'; }
+function g5Card(n,t,d,img,letter){
+  return '<div class="g5-card n'+n+'"><span class="g5-no">'+n+'</span><div class="g5-tx"><div class="ob-ct">'+t+'</div><div class="ob-cd">'+d+'</div></div>'
+    +'<div class="g5-art" aria-hidden="true">'+(letter?'<span class="g5-letter">✉</span>':'')+'<img src="assets/suplan/opt/'+img+'" alt=""></div></div>';
+}
 function obAgree(){ S.agree_terms=true; S.agree_privacy=true; S.agreed_at=new Date().toISOString(); closeWhy(); step("a3"); }
 function obDetails(){
   const link=function(u,t){ return u ? '<a href="'+u+'" target="_blank" rel="noopener">'+t+'</a>' : t+'（準備中）'; };
