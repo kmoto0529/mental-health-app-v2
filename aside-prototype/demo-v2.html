@@ -806,6 +806,15 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 .prow .nm{font-weight:800;font-size:15px}
 .prow .mt{font-size:12px;color:#6b7a85;margin-top:2px}
 .prow .go{font-size:12px;color:var(--pro);font-weight:700;white-space:nowrap}
+.psum{font-size:13px;color:#4a5a66;margin:0 0 10px}.psum b{color:var(--warn)}
+.ptag{font-size:10.5px;font-weight:700;color:#4a6a80;background:#e6eef4;border-radius:6px;padding:1px 6px;margin-left:4px}
+.pst{font-size:11px;font-weight:700;margin-left:4px;color:#6b7a85}.pst.unread,.pst.late{color:var(--warn)}.pst.replied{color:#4f7a52}
+.pfoot{font-size:11.5px;color:#8a97a0;margin:12px 2px 0}
+.pname{font-size:18px;font-weight:800;color:var(--pro);margin:0 0 12px}.pname small{font-size:12px;color:#6b7a85;font-weight:600;margin-left:6px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:13.5px;line-height:1.6}
+.pgrid .k{display:block;font-size:11px;color:#8a97a0}.na{color:#b7c0c6}
+.pmoods{display:flex;gap:4px;margin:2px 0 4px}
+.pcols>div>.pcard+.pcard{margin-top:12px}
 .pcols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .pcard{background:#fff;border:1px solid #d9e0e5;border-radius:12px;padding:15px}
 .pcard h3{margin:0 0 4px;font-size:12px;letter-spacing:.06em;color:#6b7a85;font-weight:800;text-transform:uppercase}
@@ -910,7 +919,6 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <div class="pwrap">
     <div class="phead"><h1>kokoni ／ 心理士用</h1><p>大塚 紀廣 さん（臨床心理士/公認心理師）</p></div>
     <div id="proBody"></div>
-    <div class="foot">※ 今回の初回体験の対象外ですが、参照用に残しています。</div>
   </div>
 </div>
 
@@ -1048,7 +1056,7 @@ function renderFlow(){
       <img class="ob-decor sm" src="assets/suplan/scenes/kokoni-decor.jpg" alt="" aria-hidden="true">
       ${OB_PROFILE.map(obSection).join("")}
       <button class="btn ob-cta" id="obProfBtn" ${ok?"":"disabled"} onclick="step('a5')">これで進む</button>
-      <p class="ob-hint">${ok?"あとでプロフィールから変更できます":"現在の状況・年代・性別を選ぶと進めます"}</p>
+      <p class="ob-hint">${ok?"あとでプロフィールから変更できます。提案に役立てるため、大塚さんにも共有されます":"現在の状況・年代・性別を選ぶと進めます"}</p>
     </div>`;
     break; }
 
@@ -1102,7 +1110,7 @@ function obDetails(){
   document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal obdmodal" onclick="event.stopPropagation()">'
     +'<div class="ob-deye">安心して使うために</div><h3>くわしく知る</h3><p style="font-size:12.5px">不安なときに、いつでも内容を確認できます。</p>'
     +sec("heart","kokoniについて",["kokoniは、気持ちや行動を整理し、小さな一歩を支えるセルフケアアプリです。","医療行為や診断を行うサービスではありません。"])
-    +sec("leaf","すぷらん（AI）について",["すぷらんはAIです。あなたの気持ちや行動の整理を手伝います。","提案や気づきはAIによるもので、正確さや効果を保証するものではありません。","すぷらんとの毎日の会話が、そのまま大塚さんに届くことはありません。","ふりかえりのたびに、あなたが確認した内容を臨床心理士/公認心理師の大塚さんに共有します。"])
+    +sec("leaf","すぷらん（AI）について",["すぷらんはAIです。あなたの気持ちや行動の整理を手伝います。","提案や気づきはAIによるもので、正確さや効果を保証するものではありません。","すぷらんとの毎日の会話が、そのまま大塚さんに届くことはありません。","ふりかえりのたびに、あなたが確認した内容を臨床心理士/公認心理師の大塚さんに共有します。","プロフィール（今の状況・サポートの利用状況など）も、提案に役立てるため大塚さんに共有します。"])
     +sec("data","データの取り扱いについて",["ニックネームで利用できます。実名は不要です。","入力した内容や利用状況は、サービスの改善や分析のために利用します。","個人が特定される情報を第三者に提供することはありません。","くわしくは"+link(PRIVACY_URL,"プライバシーポリシー")+"・"+link(TERMS_URL,"利用規約")+"をご確認ください。"])
     +sec("shield","安全について",["強い不安やつらさがあるときは、医療機関や相談窓口をご利用ください。ひとりで抱えこまず、専門の支援を受けることも大切です。"]," safe")
     +'<button class="btn" onclick="obAgree()">同意して進む</button><button class="linkbtn" onclick="closeWhy()">とじる</button></div></div>';
@@ -3015,7 +3023,7 @@ function renderMap(){
    プロフィール（心の地図の補助情報）
    - マイページと同じデータ（S.nickname / age_range / gender / life_status / support_use）を参照する。二重管理しない
    - 入力率は心の地図の進捗とは別。「回答しない」も回答済みとして数える。100%でなくても全機能が使える
-   - 通院・カウンセリングの状況は、提案の内容やペースを考えるためだけに使う。プロフィールは心理士に共有しない
+   - 通院・カウンセリングの状況は、提案の内容やペースを考えるためだけに使う。プロフィールは提案の参考として心理士にも共有する（2026-10-02 社長決定）
    ══════════════════════════════════════════════════════════════ */
 /* 基本8項目（入力状況の分母。2026-10-02 「気になること」を追加）。g＝表示グループ。ex＝ほかと同時に選べない選択肢
    サポート利用状況は「今」（support_use）と「過去の利用歴」（support_past）を別フィールドで持つ */
@@ -3079,7 +3087,7 @@ function renderProfile(){
     if(f.id==="support_use"){
       const past=P.support_past, noAns=P.support_use.indexOf("回答しない")>=0;
       h+='<div class="chips" style="margin-top:6px"><button class="chip'+(past?' on':'')+(noAns?' off':'')+'" aria-pressed="'+!!past+'" '+(noAns?'disabled':'onclick="pfPast()"')+'>過去に利用したことがある</button></div>'
-        +'<div class="pfwhy">通院やカウンセリングの状況は、提案の内容やペースを考えるためだけに使います。診断や判断には使いません。大塚さんには自動で共有されません。</div>';
+        +'<div class="pfwhy">通院やカウンセリングの状況は、提案の内容やペースを考えるためだけに使います。診断や判断には使いません。今後の提案に役立てるため、大塚さんにも共有されます。</div>';
     }
     if(f.id==="confidant") h+='<div class="pfwhy">一歩を考えるときに、まわりのサポートの様子を参考にします。</div>';
     if(f.id==="time_slots") h+='<div class="pfwhy">一歩に取り組むタイミングを考える参考にします。</div>';
@@ -3442,7 +3450,7 @@ function myShare(){
     +'<div class="mybox"><div class="myinfo"><div class="t"><b>共有のしくみ</b></div><div class="d">'
     +'最初の3日、そのあとは1週間ごとに、あなたが選んだ内容を200文字までのレターにまとめ、確認してから大塚さんに共有できます。<br>'
     +'送るのは、確認画面に表示した文だけです。ふりかえりのたびに共有します。<br>'
-    +'プロフィール・会話の全文・毎日のメモは、自動では共有されません。<br>'
+    +'プロフィールは、提案に役立てるため大塚さんにも共有されます。会話の全文・毎日のメモは共有されません。<br>'
     +'レターは緊急の相談窓口ではありません。</div></div></div>'
     +'<div class="myh" style="margin:16px 4px 6px">これまでの共有</div>'
     +(L.length ? '<div class="mybox">'+L.map(function(r){ const d=new Date(Date.parse(r.completed_at));
@@ -3621,7 +3629,7 @@ function miniInCycle(){
    ② 共有する内容を選ぶ（3項目は選択済み）＋「大塚さんに聞いてみたいこと」（80字まで）
    ③ レター全文をプレビュー・編集（見出し込み200字まで）→ 共有する（共有は必須。「共有しない」は出さない）
    - レターは回答と実施記録だけから組み立てる（架空の内容を足さない）。本人が書いた相談は意味を変えず・切らない
-   - 自動で共有しないもの：AIとの会話全文・毎日のメモ全文・プロフィール・心の地図の詳細・未確認の仮説
+   - 共有するもの：レター＋プロフィール（2026-10-02〜）／共有しないもの：AIとの会話全文・毎日のメモ全文・心の地図の詳細・未確認の仮説
    - 送るのはプレビューに表示した文だけ。1サイクル1回まで
    ══════════════════════════════════════════════════════════════ */
 const LETTER_LIMIT=200, ASK_LIMIT=80;   // 運用検証用の上限（定数）
@@ -3729,7 +3737,7 @@ function gatePreview(){
     +(rv.letter_meta && rv.letter_meta.ask_generated?'<p class="lede" style="font-size:12px;margin:8px 0 0">※「相談したいこと」は、次にどうしたいかの答えから入れています。違えば直してください。</p>':'')
     +'<button class="btn" id="ltSendBtn" style="margin-top:14px" '+(over||!n?'disabled':'')+' onclick="completeReview(true)">この内容を大塚さんに共有する</button>'
     +'<button class="linkbtn" onclick="rvNext(\'share\')">‹ 共有する内容を選びなおす</button></div>'
-    +'<div class="foot">送るのは、この画面に表示している文だけです。<br>会話の全文・毎日のメモ・プロフィールは送りません。<br>'
+    +'<div class="foot">送るのは、この画面に表示している文だけです。<br>会話の全文・毎日のメモは送りません。プロフィールは大塚さんにも共有されます。<br>'
     +'<b>このレターは、緊急の相談窓口ではありません。</b><br>今すぐつらいときは、<a style="color:var(--teal-deep);cursor:pointer" onclick="openSupportList(\'gate\')">相談できる窓口</a>を見てください。</div>';
 }
 function rvLetterInput(el){
@@ -4741,34 +4749,127 @@ function pastReviews(){
   }).join("")+'</div>';
 }
 
-let proView="list";
+/* ══════════════════════════════════════════════════════════════
+   心理士側（大塚さん）
+   - 一覧：利用者ごとの状態（未読レター／返信待ち／返信済み／ふりかえり前）
+   - 詳細：プロフィール（2026-10-02〜共有）／本人が相談したいこと／引き継ぎレター／この期間の記録の要約／お返事
+   - サンプル5名は 10/2 レビュー用の架空データ。デモ中の本人（S）は実データで表示
+   ══════════════════════════════════════════════════════════════ */
+const PRO_SAMPLES=[
+  {id:"c1", nickname:"みなと", week:"2週目", cycle:"7日", status:"unread", sent:"火曜 21:40", due_days:1,
+   pf:{age_range:"30代", gender:"男性", life_status:"社会人", interests:["仕事・学業","将来"], support_use:["現在は利用していない"], support_past:false, confidant:"いるけれど、少し話しにくい", time_slots:["夜"]},
+   action:{title:"出来事・考え・気持ちを分けてみる", plan:"気持ちが大きく動いた時に・1回7分", times:3, days:2, len:7},
+   moods:[1,1,2,1,0,1,2],
+   letter:{ask:"上司との面談の前になると眠れなくなります。休むことも考えたほうがいいのか、相談したいです。",
+     state:"仕事のことが気になっていて、「少ししんどい」の記録が多い。", action:"「出来事・考え・気持ちを分けてみる」。実施記録3回。", reflection:"何回かやってみた。少し負担があった。少し調整したい。", note:"書き出すと、面談そのものより「評価が下がる」と考えている時間が長いと気づいた。"}},
+  {id:"c2", nickname:"はる", week:"1週目（最初の3日）", cycle:"3日", status:"unread", sent:"今日 8:15", due_days:2,
+   pf:{age_range:"20代", gender:"女性", life_status:"社会人", interests:["人間関係","健康"], support_use:["現在、医療機関に通院している"], support_past:false, confidant:"いる", time_slots:["朝"]},
+   action:{title:"3分間の呼吸", plan:"毎日・1回3分", times:2, days:2, len:3},
+   moods:[0,1,1],
+   letter:{ask:"朝、職場に向かう電車で動悸がします。呼吸以外にできることはありますか。",
+     state:"人との関わりが気になっていて、「少ししんどい」の記録が多い。", action:"「3分間の呼吸」。実施記録2回。", reflection:"1回やってみた。やりやすかった。このまま続けたい。", note:""}},
+  {id:"c3", nickname:"そら", week:"3週目", cycle:"7日", status:"replied", sent:"先週火曜", due_days:-5,
+   pf:{age_range:"40代", gender:"女性", life_status:"休職中", leave_duration:"1〜3か月未満", interests:["仕事・学業","将来","お金"], support_use:["現在、カウンセリングを利用している"], support_past:true, confidant:"いる", time_slots:["夕方"]},
+   action:{title:"5分だけ散歩する", plan:"週3回・1回5分", times:3, days:3, len:7},
+   moods:[2,2,1,2,3,2,2],
+   letter:{ask:"復職の時期を考えると焦ってしまいます。焦りとの付き合い方を知りたいです。",
+     state:"仕事のことが気になっていて、「ふつう」の記録が多い。", action:"「5分だけ散歩する」。実施記録3回。", reflection:"思ったよりできた。やりやすかった。このまま続けたい。", note:"散歩のあとは、夕方の落ち込みが少し軽い。"},
+   reply:"散歩を3回続けられたこと、夕方の落ち込みとの関係に自分で気づけたことは大きな一歩です。焦りは「早く戻らなければ」という考えから強まりやすいので、来週は焦りが出た場面を一つだけメモしてみましょう。"},
+  {id:"c4", nickname:"ゆう", week:"1週目（最初の3日）", cycle:"3日", status:"before", sent:"", due_days:null,
+   pf:{age_range:"20代", gender:"回答しない", life_status:"学生", interests:["将来","人間関係"], support_use:["回答しない"], support_past:false, confidant:"いない", time_slots:["夜"]},
+   action:{title:"今の考えを書き出してみる", plan:"考えが止まらなくなった時に・1回5分", times:1, days:1, len:3, day:"2/3日目"},
+   moods:[1,0], letter:null},
+  {id:"c5", nickname:"あお", week:"2週目", cycle:"7日", status:"late", sent:"先週金曜", due_days:-2,
+   pf:{age_range:"50代", gender:"男性", life_status:"社会人", interests:["健康","仕事・学業"], support_use:["現在は利用していない"], support_past:true, confidant:"よくわからない", time_slots:["日によって違う"]},
+   action:{title:"困っていることを1文にしてみる", plan:"今週1回・1回7分", times:1, days:1, len:7},
+   moods:[1,1,1,2,1],
+   letter:{ask:"",
+     state:"生活や体調が気になっていて、「少ししんどい」の記録が多い。", action:"「困っていることを1文にしてみる」。実施記録1回。", reflection:"1回やってみた。まだよくわからない。まだよくわからない。", note:""}}
+];
+const PRO_ST={unread:["● 未読のレター","alert"], late:["● 返信目安を過ぎています","alert"], replied:["返信済み",""], before:["ふりかえり前",""], waiting:["返信待ち",""]};
+let proView="list", proClient=null;
+/* デモ中の本人を、サンプルと同じ形にそろえる */
+function liveClient(){
+  pfMigrate();
+  const rv=S.reviews.filter(function(r){ return r.shared && r.letter; }).slice(-1)[0], P=rv&&rv.letter.parsed||{};
+  const c=S.cycle, logs=c?cycleActLogs(c):[], days={}; logs.forEach(function(l){ days[isoDate(Date.parse(l.at))]=1; });
+  const from=c?Date.parse(c.cycle_started_at):0, mo=dsAll().filter(function(r){ return Date.parse(r.recorded_at)>=from; }).map(function(r){ return dsLevel(r.daily_state); });
+  const a=curAct();
+  let st="before"; if(rv) st = rv.letter_status==="arrived" ? "replied" : (nowMs()>=Date.parse(rv.letter_due_at)+DAY ? "late" : "unread");
+  return {id:"live", live:true, nickname:S.nickname||"ここに", week:(c?(c.cycle_type==="first"?"1週目（最初の3日）":(S.cycles.length+1)+"週目"):"セットアップ前"), status:st,
+    pf:{age_range:S.age_range, gender:S.gender, life_status:S.life_status, leave_duration:S.leave_duration, interests:S.interests, support_use:S.support_use, support_past:S.support_past, confidant:S.confidant, time_slots:S.time_slots},
+    action:{title:a?a.title:(S.first_action||"—"), plan:a?planLabel():"", times:logs.length, days:Object.keys(days).length, len:c?c.cycle_length_days:0, day:c?cycleDayLabel():""},
+    moods:mo, letter: rv ? {ask:P.ask, state:P.state, action:P.action, reflection:P.reflection, note:P.note, other:P.other, text:rv.letter.text, chars:rv.letter.chars, first:rv.cycle_type==="first"} : null};
+}
+function proClients(){ return [liveClient()].concat(PRO_SAMPLES.map(function(c){ const r=(S.pro_replies||{})[c.id]; return r ? Object.assign({},c,{status:"replied", reply:r.text}) : c; })); }
+function proSub(c){
+  if(c.status==="before") return c.week+" ／ "+(c.action.day||"")+" ／ ふりかえり前";
+  if(c.status==="replied") return c.week+" ／ 手紙を送りました";
+  return c.week+" ／ 引き継ぎレターが届いています"+(c.sent?"（"+c.sent+"）":"");
+}
 function renderPro(){
   const b=document.getElementById("proBody");
   if(proView==="list"){
-    b.innerHTML=`<div class="prow alert" onclick="openSession()"><div><div class="nm">みなと さん <span style="font-size:11px;color:var(--warn);font-weight:700">● 未読</span></div>
-      <div class="mt">2週目 ／ ふりかえりのまとめが届いています</div></div><div class="go">開く →</div></div>
-      <div class="prow" onclick="openSession()"><div><div class="nm">${S.nickname||"ここに"} さん</div>
-      <div class="mt">1週目 ／ 初期セットアップ ${S.setup_status==="completed"?"完了":"未完了"}</div></div><div class="go">開く →</div></div>`;
-  } else {
-    b.innerHTML=`<button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="proView='list';stopTimer();renderPro()">← 一覧へ</button>
-    <div class="pcols"><div>
-      ${(function(){
-        /* 本人がプレビューで確認・編集して「共有する」を選んだレターだけ。会話全文・毎日のメモ・プロフィール・心の地図の詳細は出さない */
-        const rv=S.reviews.filter(function(r){ return r.shared && r.letter; }).slice(-1)[0];
-        if(!rv) return '<div class="pcard"><h3>届いたレター</h3><p class="note">まだ届いたレターはありません。本人がふりかえりを終えると届きます。</p></div>';
-        const P=rv.letter.parsed||{}, row=function(k,v){ return v?'<div class="pitem"><span class="k">'+k+'</span>'+esc(v)+'</div>':''; };
-        return '<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7"><h3 style="color:#8a6a2a">本人が相談したいこと</h3>'
-          +(P.ask?'<div class="pitem" style="white-space:pre-wrap">'+esc(P.ask)+'</div>':'<p class="note">相談の記入はありません。</p>')+'</div>'
-          +'<div class="pcard"><h3>引き継ぎレター（'+rv.letter.chars+'文字）</h3>'
-          +'<p class="note">'+(rv.cycle_type==="first"?"最初の3日":"この1週間")+'のふりかえり。本人が確認・編集して送った内容だけです。</p>'
-          +row("今の状態・テーマ",P.state)+row("試したこと",P.action)+row("本人の振り返り",P.reflection)+row("気づいたこと",P.note)+row("本人の追記",P.other)
-          +'<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:#6b7a85">送られた全文</summary><div class="pitem" style="white-space:pre-wrap">'+esc(rv.letter.text)+'</div></details></div>';
-      })()}
-      </div>
-    <div>${proLetterCard()}</div></div>
-    <div class="timer"><span>このふりかえりにかかっている時間 <small>（自動計測）</small></span><b id="tm">0:00</b></div>`;
-    startTimer();
+    const cs=proClients(), n=cs.filter(function(c){ return c.status==="unread"||c.status==="late"; }).length;
+    b.innerHTML='<div class="psum">担当 '+cs.length+'名 ／ お返事が必要 <b>'+n+'名</b></div>'
+      +cs.map(function(c){ const st=PRO_ST[c.status]||["",""];
+        return '<div class="prow '+st[1]+'" onclick="'+(c.live?'openSession()':'openClient(\''+c.id+'\')')+'"><div><div class="nm">'+esc(c.nickname)+' さん'
+          +(c.live?' <span class="ptag">デモ中の本人</span>':'')+(st[0]?' <span class="pst '+c.status+'">'+st[0]+'</span>':'')+'</div>'
+          +'<div class="mt">'+proSub(c)+'</div><div class="mt">一歩：'+esc(c.action.title)+'</div></div><div class="go">開く ›</div></div>'; }).join("")
+      +'<p class="pfoot">※ 「デモ中の本人」以外の5名は、レビュー用の架空の利用者です。</p>';
+    return;
   }
+  const c = proView==="session" ? liveClient() : proClients().filter(function(x){ return x.id===proClient; })[0];
+  if(!c){ proView="list"; return renderPro(); }
+  b.innerHTML='<button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="proView=\'list\';stopTimer();renderPro()">← 一覧へ</button>'
+    +'<div class="pname">'+esc(c.nickname)+' さん <small>'+esc(c.week)+'</small></div>'
+    +'<div class="pcols"><div>'+proLetterBlocks(c)+proRecord(c)+'</div><div>'+proProfile(c)+(c.live?proLetterCard():proReplyCard(c))+'</div></div>'
+    +'<div class="timer"><span>このふりかえりにかかっている時間 <small>（自動計測）</small></span><b id="tm">0:00</b></div>';
+  startTimer();
+}
+function openClient(id){ proClient=id; proView="client"; renderPro(); window.scrollTo(0,0); }
+/* プロフィール（本人が答えた項目。「回答しない」はそのまま見せ、未回答は「—」） */
+function proProfile(c){
+  const P=c.pf||{}, v=function(x){ return Array.isArray(x) ? (x.length?x.join("・"):"") : (x||""); };
+  const sup=v(P.support_use)+((P.support_past && (P.support_use||[]).indexOf("回答しない")<0)?(v(P.support_use)?" ／ ":"")+"過去に利用したことがある":"");
+  const rows=[["現在の状況", v(P.life_status)+(P.life_status==="休職中"&&P.leave_duration?"（"+P.leave_duration+"）":"")],["年代",v(P.age_range)],["性別",v(P.gender)],
+    ["気になること",v(P.interests)],["サポートの利用状況",sup],["相談できる人",v(P.confidant)],["取り組みやすい時間帯",v(P.time_slots)]];
+  return '<div class="pcard"><h3>プロフィール</h3><p class="note">本人が答えた内容です（提案の参考として共有）。</p>'
+    +'<div class="pgrid">'+rows.map(function(r){ return '<div><span class="k">'+r[0]+'</span>'+(r[1]?esc(r[1]):'<span class="na">—</span>')+'</div>'; }).join("")+'</div></div>';
+}
+function proLetterBlocks(c){
+  const L=c.letter, row=function(k,v){ return v?'<div class="pitem"><span class="k">'+k+'</span>'+esc(v)+'</div>':''; };
+  if(!L) return '<div class="pcard"><h3>届いたレター</h3><p class="note">まだ届いたレターはありません。本人がふりかえりを終えると届きます。</p></div>';
+  const text=L.text||["今の状態："+L.state,"試したこと："+L.action,"振り返り："+L.reflection].concat(L.note?["気づいたこと："+L.note]:[]).concat(L.ask?["相談したいこと："+L.ask]:[]).join("\n");
+  return '<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7"><h3 style="color:#8a6a2a">本人が相談したいこと</h3>'
+    +(L.ask?'<div class="pitem" style="white-space:pre-wrap">'+esc(L.ask)+'</div>':'<p class="note">相談の記入はありません。</p>')+'</div>'
+    +'<div class="pcard"><h3>引き継ぎレター（'+(L.chars||lcount(text))+'文字）</h3>'
+    +'<p class="note">'+((L.first!=null?L.first:c.cycle==="3日")?"最初の3日":"この1週間")+'のふりかえり。本人が確認・編集して送った内容だけです。</p>'
+    +row("今の状態・テーマ",L.state)+row("試したこと",L.action)+row("本人の振り返り",L.reflection)+row("気づいたこと",L.note)+row("本人の追記",L.other)
+    +'<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:#6b7a85">送られた全文</summary><div class="pitem" style="white-space:pre-wrap">'+esc(text)+'</div></details></div>';
+}
+/* この期間の記録（回数と日数・気持ちの記録の並び）。会話の全文・メモは出さない */
+function proRecord(c){
+  const A=c.action||{}, lv=["しんどい","少ししんどい","ふつう","少し楽"];
+  return '<div class="pcard"><h3>この期間の記録</h3>'
+    +'<div class="pitem"><span class="k">今の一歩</span>'+esc(A.title||"—")+(A.plan?'<div style="font-size:12px;color:#6b7a85">'+esc(A.plan)+'</div>':'')+'</div>'
+    +'<div class="pitem"><span class="k">実施</span>'+(A.times||0)+'回（'+(A.days||0)+'日）'+(A.len?' ／ '+A.len+'日間のうち':'')+'</div>'
+    +'<div class="pitem"><span class="k">気持ちの記録（古い順）</span>'
+      +((c.moods||[]).length ? '<div class="pmoods">'+c.moods.map(function(m){ return m>=0?face(m,22):''; }).join("")+'</div><div style="font-size:11.5px;color:#8a97a0">'+c.moods.filter(function(m){ return m>=0; }).map(function(m){ return lv[m]; }).join(" → ")+'</div>' : '<span class="na">まだ記録はありません</span>')+'</div>'
+    +'<p class="note" style="margin:8px 0 0">すぷらんとの会話の全文・毎日のメモは共有されません。</p></div>';
+}
+/* サンプル利用者へのお返事（デモ用。この端末に保存） */
+function proReplyCard(c){
+  if(c.status==="before") return '<div class="pcard"><h3>お返事を書く</h3><p class="note">本人のふりかえりが終わると、レターが届いて書けるようになります。</p></div>';
+  if(c.reply) return '<div class="pcard"><h3>送った手紙</h3><div class="pitem" style="white-space:pre-wrap">'+esc(c.reply)+'</div></div>';
+  return '<div class="pcard"><h3>お返事を書く</h3><p class="note">手紙として本人に届きます。'+(c.status==="late"?'<b style="color:var(--warn)">返信の目安を過ぎています。</b>':'')+'</p>'
+    +'<textarea id="pxIn" maxlength="'+LETTER_MAX+'" style="min-height:180px" placeholder="今週、読んで思ったこと" oninput="document.getElementById(\'pxCnt\').textContent=this.value.length+\' / '+LETTER_MAX+'\';document.getElementById(\'pxSend\').disabled=!this.value.trim()"></textarea>'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7a85;margin-top:4px"><span>目安 '+LETTER_GUIDE+'字／上限 '+LETTER_MAX+'字（仮）</span><span id="pxCnt">0 / '+LETTER_MAX+'</span></div>'
+    +'<button class="pbtn" id="pxSend" disabled onclick="proSendSample(\''+c.id+'\')">手紙を送る</button></div>';
+}
+function proSendSample(id){
+  const t=(document.getElementById("pxIn")||{}).value||""; if(!t.trim()) return;
+  S.pro_replies=S.pro_replies||{}; S.pro_replies[id]={text:t.trim().slice(0,LETTER_MAX), at:nowIso()}; saveState(); renderPro();
 }
 function openSession(){ proView="session"; renderPro(); window.scrollTo(0,0); }
 
