@@ -887,7 +887,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 
 <div id="proapp" hidden>
   <div class="pwrap">
-    <div class="phead"><h1>kokoni ／ 心理士用</h1><p>大塚 紀廣 さん（公認心理師・臨床心理士）</p></div>
+    <div class="phead"><h1>kokoni ／ 心理士用</h1><p>大塚 紀廣 さん（臨床心理士/公認心理師）</p></div>
     <div id="proBody"></div>
     <div class="foot">※ 今回の初回体験の対象外ですが、参照用に残しています。</div>
   </div>
@@ -1041,7 +1041,7 @@ function renderFlow(){
       <div class="g5-cards">
         ${g5Card(1,"今のあなたに合う<br>小さな一歩を決める","すぷらんと話しながら、今のあなたに合う取り組みを一緒に決めます。","thinking.png")}
         ${g5Card(2,"気持ちの変化から<br>自分のことを知っていく","日々の気持ちや行動を記録しながら、少しずつ自分のパターンや変化が見えてきます。","bulb.png")}
-        ${g5Card(3,"心理士の大塚さんから<br>定期的にフィードバック","3日ごと（その後は週1回）のふりかえりを共有すると、臨床心理士の大塚さんからあなたに合わせたアドバイスが届きます。","thanks.png",true)}
+        ${g5Card(3,"臨床心理士/公認心理師の<br>大塚さんから定期的にフィードバック","3日ごと（その後は週1回）のふりかえりを共有すると、臨床心理士/公認心理師の大塚さんからあなたに合わせたアドバイスが届きます。","thanks.png",true)}
       </div>
       <button class="btn ob-cta g5-cta" onclick="startApp()">すぷらんとはじめる</button>
       <button class="ob-skip" onclick="startApp()">スキップ</button>
@@ -1081,7 +1081,7 @@ function obDetails(){
   document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal obdmodal" onclick="event.stopPropagation()">'
     +'<div class="ob-deye">安心して使うために</div><h3>くわしく知る</h3><p style="font-size:12.5px">不安なときに、いつでも内容を確認できます。</p>'
     +sec("heart","kokoniについて",["kokoniは、気持ちや行動を整理し、小さな一歩を支えるセルフケアアプリです。","医療行為や診断を行うサービスではありません。"])
-    +sec("leaf","すぷらん（AI）について",["すぷらんはAIです。あなたの気持ちや行動の整理を手伝います。","提案や気づきはAIによるもので、正確さや効果を保証するものではありません。","すぷらんとの会話が、臨床心理士に自動で届くことはありません。共有は、あなたが選んだときだけです。"])
+    +sec("leaf","すぷらん（AI）について",["すぷらんはAIです。あなたの気持ちや行動の整理を手伝います。","提案や気づきはAIによるもので、正確さや効果を保証するものではありません。","すぷらんとの毎日の会話が、そのまま大塚さんに届くことはありません。","ふりかえりのたびに、あなたが確認した内容を臨床心理士/公認心理師の大塚さんに共有します。"])
     +sec("data","データの取り扱いについて",["ニックネームで利用できます。実名は不要です。","入力した内容や利用状況は、サービスの改善や分析のために利用します。","個人が特定される情報を第三者に提供することはありません。","くわしくは"+link(PRIVACY_URL,"プライバシーポリシー")+"・"+link(TERMS_URL,"利用規約")+"をご確認ください。"])
     +sec("shield","安全について",["強い不安やつらさがあるときは、医療機関や相談窓口をご利用ください。ひとりで抱えこまず、専門の支援を受けることも大切です。"]," safe")
     +'<button class="btn" onclick="obAgree()">同意して進む</button><button class="linkbtn" onclick="closeWhy()">とじる</button></div></div>';
@@ -1714,7 +1714,7 @@ function ivRender(){
 
   /* ⑦ 今週の一歩を提案。候補は必ず行動マスターの中から選ぶ（新規生成はしない）
        「他も見てみる」は置き換えではなく追加。前の候補も選べるまま残す */
-  /* ⑦ 「おすすめ」ではなく「まず3日だけ試す方法を選ぶ」。3日後に見直せること・共有は任意であることを先に見せる */
+  /* ⑦ 「おすすめ」ではなく「まず3日だけ試す方法を選ぶ」。3日後に見直せること・ふりかえりを大塚さんに共有することを先に見せる */
   case 8: {
     if(!S.iv_offered.length) addOffers();
     const flow=document.getElementById("ivFlow");
@@ -1729,7 +1729,7 @@ function ivRender(){
         +'<li><b>今日</b><span>やってみることを決める</span></li>'
         +'<li><b>3日間</b><span>無理のない範囲で試してみる</span></li>'
         +'<li><b>3日後</b><span>自分に合っていそうか、一緒にふりかえる</span></li>'
-        +'<li class="tf-opt"><b>必要なら</b><span>臨床心理士の大塚さんにも共有できる</span></li>'
+        +'<li><b>共有</b><span>臨床心理士/公認心理師の大塚さんに共有して、手紙をもらう</span></li>'
         +'</ol></div>');
     }
     ivSay("無理なくできそうなものを<br>1つ選んでみませんか？<br><span style=\"font-size:12.5px;color:var(--muted)\">合わなければ、3日後に変えることができます。</span>",
@@ -1755,7 +1755,7 @@ function ivRender(){
         +'<div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;margin-bottom:10px">まず3日、試してみること</div>'
         +'<h2 style="font-size:19px;line-height:1.75;margin-bottom:10px">'+a.title+'</h2>'
         +'<p class="lede" style="margin-bottom:14px">目安：'+planLabel()+'</p>'
-        +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">できない日があっても大丈夫です。<br>3日後に、自分に合っていそうかを一緒にふりかえります。<br>必要なら、その内容を心理士にも共有できます。</p>'
+        +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">できない日があっても大丈夫です。<br>3日後に、自分に合っていそうかを一緒にふりかえります。<br>その内容を大塚さんに共有して、手紙が届きます。</p>'
         +'<button class="btn" onclick="completeSetup()">まず3日、試してみる</button></div>'
         +debugPanel();
       window.scrollTo(0,document.body.scrollHeight);
@@ -2602,7 +2602,7 @@ function skipToRegular(){
   if(!S.initial_plan_completed) skipSetup();
   if(S.cycle && S.cycle.cycle_type==="first"){
     advanceToReview(); rvInit(); S.rv.ans={tried:"何回かやってみた", feel:"やりやすかった", next:"このまま続けたい"};
-    completeReview(false); nextStep("keep");
+    completeReview(true); nextStep("keep");
   }
   go("home");
 }
@@ -2787,7 +2787,7 @@ function openOtayori(id){
   document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="otClose()"><div class="modal" style="padding:10px" onclick="event.stopPropagation()">'
     +'<div class="card warm" style="margin:0"><img class="sp-ot" src="assets/suplan/opt/happy.png" alt="" width="56" height="56"><div class="otlab">💌 すぷらんからのおたより<span>'+(d.getMonth()+1)+'/'+d.getDate()+'</span></div>'
     +'<p style="color:var(--ink);line-height:1.95;margin:0">'+esc(S.nickname||"ここに")+'さんへ<br><br>'+esc(o.content)+'<br><br>すぷらんより</p>'
-    +'<div class="otnote">このおたよりは、あなたの記録をもとにすぷらん（AI）が書いたものです。臨床心理士の大塚さんからの手紙ではありません。</div></div>'
+    +'<div class="otnote">このおたよりは、あなたの記録をもとにすぷらん（AI）が書いたものです。臨床心理士/公認心理師の大塚さんからの手紙ではありません。</div></div>'
     +'<button class="btn" style="margin:10px 0 6px" onclick="otCta(\''+o.letter_id+'\')">'+otCtaLabel(o)+'</button>'
     +'<button class="linkbtn" onclick="otClose()">閉じる</button></div></div>';
 }
@@ -2978,7 +2978,7 @@ function renderMap(){
    プロフィール（心の地図の補助情報）
    - マイページと同じデータ（S.nickname / age_range / gender / life_status / support_use）を参照する。二重管理しない
    - 入力率は心の地図の進捗とは別。「回答しない」も回答済みとして数える。100%でなくても全機能が使える
-   - 通院・カウンセリングの状況は、提案の内容やペースを考えるためだけに使う。心理士への共有は本人が選んだときだけ
+   - 通院・カウンセリングの状況は、提案の内容やペースを考えるためだけに使う。プロフィールは心理士に共有しない
    ══════════════════════════════════════════════════════════════ */
 /* 基本8項目（入力状況の分母。2026-10-02 「気になること」を追加）。g＝表示グループ。ex＝ほかと同時に選べない選択肢
    サポート利用状況は「今」（support_use）と「過去の利用歴」（support_past）を別フィールドで持つ */
@@ -3404,7 +3404,7 @@ function myShare(){
   return myBack()+'<div class="mysub"><h2>大塚さんへの共有履歴・同意の確認</h2>'
     +'<div class="mybox"><div class="myinfo"><div class="t"><b>共有のしくみ</b></div><div class="d">'
     +'最初の3日、そのあとは1週間ごとに、あなたが選んだ内容を200文字までのレターにまとめ、確認してから大塚さんに共有できます。<br>'
-    +'送るのは、確認画面に表示した文だけです。共有しない回もえらべます。<br>'
+    +'送るのは、確認画面に表示した文だけです。ふりかえりのたびに共有します。<br>'
     +'プロフィール・会話の全文・毎日のメモは、自動では共有されません。<br>'
     +'レターは緊急の相談窓口ではありません。</div></div></div>'
     +'<div class="myh" style="margin:16px 4px 6px">これまでの共有</div>'
@@ -3431,7 +3431,7 @@ function myGuide(){
     ["💬","すぷらんとはなす","すぷらん（AI）と一緒に、最近のことを整理したり、今週の一歩を見直したり、気持ちを少し話したりできます。大塚さんには自動で届きません。"],
     ["🗺","心の地図","話したことや試したことから、あなたのパターンが少しずつ見えてくる地図です。完成するものではありません。"],
     ["🌤","気持ちの記録","1日1回を目安に、今の気分を10秒で残せます。きろくで、気持ちの変化を見返せます。"],
-    ["✉️","ふりかえりと大塚さんへの共有","最初は3日後、そのあとは1週間ごとにふりかえります。内容を確認してから、大塚さんに共有できます（共有しなくてもかまいません）。"]];
+    ["✉️","ふりかえりと大塚さんへの共有","最初は3日後、そのあとは1週間ごとにふりかえります。内容を確認してから、毎回大塚さんに共有します。"]];
   return myBack()+'<div class="mysub"><h2>kokoniの使い方</h2>'
     +'<div class="mybox">'+G.map(function(g){ return '<div class="myinfo"><div class="t"><b>'+g[0]+' '+g[1]+'</b></div><div class="d">'+g[2]+'</div></div>'; }).join("")+'</div></div>';
 }
@@ -3443,7 +3443,7 @@ function myGuide(){
    - review_available_at＝開始＋cycle_length_days
    - weekly_review_status：locked → available（期間経過）→ completed（ふりかえり完了）
    - Home の「週1回のふりかえり」カードと「ふりかえり」タブは同じ S.cycle・同じふりかえりデータを使う
-   - 週次ふりかえり（自分のため・必ずできる）と、大塚さんへの共有（本人が選ぶ）は別物
+   - 大塚さんへの共有は必須（2026-10-02 社長決定）。ふりかえりの完了＝レターの共有。AIとの対話のみ版は将来別途設計
    - 共有できるのは 1 weekly_cycle につき 1 回まで
    ══════════════════════════════════════════════════════════════ */
 const DAY=86400000;
@@ -3582,7 +3582,7 @@ function miniInCycle(){
    ふりかえり → 引き継ぎレター（初回3日・通常7日で共通）
    ① 選択式3問＋任意の気づき（実施ログは自動で表示。本人の申告とは別に保持）
    ② 共有する内容を選ぶ（3項目は選択済み）＋「大塚さんに聞いてみたいこと」（80字まで）
-   ③ レター全文をプレビュー・編集（見出し込み200字まで）→ 共有する／今回は共有しない
+   ③ レター全文をプレビュー・編集（見出し込み200字まで）→ 共有する（共有は必須。「共有しない」は出さない）
    - レターは回答と実施記録だけから組み立てる（架空の内容を足さない）。本人が書いた相談は意味を変えず・切らない
    - 自動で共有しないもの：AIとの会話全文・毎日のメモ全文・プロフィール・心の地図の詳細・未確認の仮説
    - 送るのはプレビューに表示した文だけ。1サイクル1回まで
@@ -3665,9 +3665,9 @@ function rvNext(step){
 }
 function gateShare(){
   const rv=rvInit(), hasNote=!!(rv.self||"").trim();
-  return '<div class="roles"><span>'+spMini()+'すぷらんがまとめる</span><i>→</i><span>✍️ あなたが確認</span><i>→</i><span><span class="psyic sm">👤</span>大塚さん<small>共有するときだけ</small></span></div>'
+  return '<div class="roles"><span>'+spMini()+'すぷらんがまとめる</span><i>→</i><span>✍️ あなたが確認</span><i>→</i><span><span class="psyic sm">👤</span>大塚さん<small>ふりかえりごと</small></span></div>'
     +'<div class="card"><h3>共有する内容を選ぶ</h3>'
-    +'<p class="lede" style="margin-bottom:12px">選んだ内容だけを使って、すぷらんが<br>臨床心理士の大塚さんへの短いレターにまとめるよ。</p>'
+    +'<p class="lede" style="margin-bottom:12px">選んだ内容だけを使って、すぷらんが<br>臨床心理士/公認心理師の大塚さんへの短いレターにまとめるよ。</p>'
     +LT_ITEMS.map(function(it){ const dis = it.id==="note" && !hasNote, on=rv.sel[it.id] && !dis;
       return '<div class="chk'+(on?' on':'')+(dis?' dis':'')+'" '+(dis?'':'onclick="rvSel(\''+it.id+'\')"')+'><span class="bx">'+(on?'✓':'')+'</span>'
         +'<span>'+(it.id==="note"?'その他、共有したい気づき'+(dis?'<span class="opt-l">気づいたことが未記入</span>':''):({state:"今の状態・テーマ",action:"試してみたこと",reflection:"本人の振り返り"}[it.id]))+'</span></div>'; }).join("")
@@ -3684,16 +3684,15 @@ function rvSel(id){ const rv=rvInit(), ak=document.getElementById("rvAsk"); if(a
 function gatePreview(){
   const rv=rvInit(), n=lcount(rv.letter), over=n>LETTER_LIMIT;
   return '<div class="card"><h3>大塚さんに共有する内容を確認しましょう</h3>'
-    +'<p class="lede" style="margin-bottom:12px">すぷらんがまとめた内容です。自由に直せます。<br>共有したくないことは外しても大丈夫です。</p>'
-    +'<div class="ltbox"><div class="lth"><span class="psyic sm">👤</span>臨床心理士 大塚さんへの共有レター</div>'
+    +'<p class="lede" style="margin-bottom:12px">すぷらんがまとめた内容です。自由に直せます。<br>入れたくないことは外しても大丈夫です。</p>'
+    +'<div class="ltbox"><div class="lth"><span class="psyic sm">👤</span>臨床心理士/公認心理師 大塚さんへの共有レター</div>'
     +'<textarea id="ltText" rows="8" oninput="rvLetterInput(this)">'+esc(rv.letter)+'</textarea>'
     +'<div class="ltcnt'+(over?' over':'')+'" id="ltCnt">'+n+' / '+LETTER_LIMIT+'文字</div></div>'
     +'<p class="ltwarn" id="ltWarn"'+(over?'':' hidden')+'>200文字を超えています。「相談したいこと」や「気づいたこと」を少し短くしてください。</p>'
     +(rv.letter_meta && rv.letter_meta.ask_generated?'<p class="lede" style="font-size:12px;margin:8px 0 0">※「相談したいこと」は、次にどうしたいかの答えから入れています。違えば直してください。</p>':'')
     +'<button class="btn" id="ltSendBtn" style="margin-top:14px" '+(over||!n?'disabled':'')+' onclick="completeReview(true)">この内容を大塚さんに共有する</button>'
-    +'<button class="btn ghost" style="margin-top:9px" onclick="completeReview(false)">今回は共有しない</button>'
     +'<button class="linkbtn" onclick="rvNext(\'share\')">‹ 共有する内容を選びなおす</button></div>'
-    +'<div class="foot">送るのは、この画面に表示している文だけです。<br>会話の全文・毎日のメモ・プロフィールは送りません。<br>共有しなくても、ふりかえりは kokoni の中に残ります。<br>'
+    +'<div class="foot">送るのは、この画面に表示している文だけです。<br>会話の全文・毎日のメモ・プロフィールは送りません。<br>'
     +'<b>このレターは、緊急の相談窓口ではありません。</b><br>今すぐつらいときは、<a style="color:var(--teal-deep);cursor:pointer" onclick="openSupportList(\'gate\')">相談できる窓口</a>を見てください。</div>';
 }
 function rvLetterInput(el){
@@ -3703,10 +3702,11 @@ function rvLetterInput(el){
   document.getElementById("ltWarn").hidden=!over; document.getElementById("ltSendBtn").disabled=over||!n;
 }
 
-/* ふりかえりの完了。共有するかどうかに関係なく保存し、このサイクルは completed にする（1サイクル1回まで） */
+/* ふりかえりの完了。レターを共有して保存し（共有は必須）、このサイクルは completed にする（1サイクル1回まで） */
 function completeReview(share){
   const c=refreshCycle();
   if(!c || c.weekly_review_status!=="available" || curReview()) return;
+  if(!share) return;   // 共有は必須（共有しないで終える経路はない）
   const rv=rvInit(), d=cycleData();
   if(!rv.letter){ const L=buildLetter(); rv.letter=L.text; rv.letter_meta=L; }   // 互換：直接呼ばれたとき
   const text=(rv.letter||"").trim();
@@ -3763,7 +3763,7 @@ function letterHtml(r){
       +"できなかった日のことも書いてくださったのが、とても大事だと思いました。<br><br>"
       +"次の1週間も、無理のない形で一緒に見ていきましょう。";
   return `<div class="card warm">
-    <div class="psyh"><span class="psyic" aria-hidden="true">👤</span><span><b>臨床心理士 大塚さん</b>からの手紙</span></div>
+    <div class="psyh"><span class="psyic" aria-hidden="true">👤</span><span><b>臨床心理士/公認心理師 大塚さん</b>からの手紙</span></div>
     <p style="color:var(--ink);line-height:1.95;margin:0">${S.nickname||"ここに"}さん<br><br>${body}<br><br>大塚</p></div>`;
 }
 function openLetter(){
@@ -4718,7 +4718,7 @@ function renderPro(){
       ${(function(){
         /* 本人がプレビューで確認・編集して「共有する」を選んだレターだけ。会話全文・毎日のメモ・プロフィール・心の地図の詳細は出さない */
         const rv=S.reviews.filter(function(r){ return r.shared && r.letter; }).slice(-1)[0];
-        if(!rv) return '<div class="pcard"><h3>届いたレター</h3><p class="note">まだ届いたレターはありません。本人が共有を選んだときだけ届きます。</p></div>';
+        if(!rv) return '<div class="pcard"><h3>届いたレター</h3><p class="note">まだ届いたレターはありません。本人がふりかえりを終えると届きます。</p></div>';
         const P=rv.letter.parsed||{}, row=function(k,v){ return v?'<div class="pitem"><span class="k">'+k+'</span>'+esc(v)+'</div>':''; };
         return '<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7"><h3 style="color:#8a6a2a">本人が相談したいこと</h3>'
           +(P.ask?'<div class="pitem" style="white-space:pre-wrap">'+esc(P.ask)+'</div>':'<p class="note">相談の記入はありません。</p>')+'</div>'
