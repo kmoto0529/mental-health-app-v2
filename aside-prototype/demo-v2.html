@@ -584,6 +584,27 @@ body:has(#s-flow.active .obw.night){background:#17221F}
 .tcard .btn{margin:0}
 .opt .sub2{font-size:11.5px;color:var(--muted);font-weight:400;margin-top:2px}
 /* 初回：まず3日試す */
+.trycard.v2{text-align:center;padding:16px 14px}
+.tc-step{font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em}
+.trycard.v2 h2{font-size:19px;margin:6px 0 12px}
+.tc-flow{display:flex;align-items:center;justify-content:center;gap:6px}
+.tc-flow span{flex:1;max-width:96px;background:var(--paper);border:1px solid var(--teal-line);border-radius:12px;padding:6px 4px;font-size:12px;color:var(--ink2);line-height:1.4}
+.tc-flow span b{display:block;font-size:13px;color:var(--teal-deep)}
+.tc-flow i{font-style:normal;color:var(--muted);font-size:14px}
+.ofh{font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;margin:4px 0 6px}
+.ofh.sub{color:var(--muted);margin-top:14px}
+.ofc{position:relative;display:block;width:100%;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:14px 14px 12px;cursor:pointer;font-family:inherit;color:var(--ink);margin-bottom:8px}
+.ofc.main{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border-color:var(--teal-line)}
+.ofc.on{border:2px solid #6E8A4E;box-shadow:0 0 0 3px rgba(110,138,78,.12)}
+.ofc-ck{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:#6E8A4E;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.ofc-cat{font-size:11.5px;font-weight:800;color:var(--teal-deep);margin-bottom:2px}
+.ofc-t{font-size:16px;font-weight:800;line-height:1.5;padding-right:26px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ofc-chips{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}
+.ofc-chips span{font-size:11.5px;font-weight:700;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:2px 9px}
+.ofc-d{font-size:12.5px;line-height:1.7;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ofc-tag{display:inline-block;margin-top:7px;font-size:11.5px;color:var(--ink2);background:#F3EEDF;border-radius:8px;padding:2px 8px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ofmore{display:block;width:100%;background:none;border:1.5px dashed var(--teal-line);border-radius:14px;padding:10px;font-size:13px;font-weight:700;color:var(--teal-deep);cursor:pointer;font-family:inherit;margin:2px 0 4px}
+.ofcta{margin-top:12px;background:#5F7F5C}
 .trycard{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r);padding:18px;margin:12px 0}
 .trycard h2{font-size:18.5px;line-height:1.55;margin:8px 0 8px}
 .trycard p{font-size:13.5px;line-height:1.85;color:var(--ink2);margin:0 0 8px}
@@ -1446,7 +1467,7 @@ function renderAction(phase){
       +'<p class="lede" style="margin:8px 0 14px">'+a.short_description+'</p>'
       +'<div class="opts row" style="margin-bottom:14px">'
       +'<span class="opt" style="pointer-events:none">目安 '+S.act_duration+'分</span>'
-      +'<span class="opt" style="pointer-events:none">'+"★".repeat(a.difficulty)+'</span></div>'
+      +'<span class="opt" style="pointer-events:none">'+diffLabel(a.difficulty)+'</span></div>'
       +'<p style="font-size:14px;line-height:1.9">'+a.instruction+'</p>'
       +'<button class="btn" style="margin-top:16px" onclick="renderAction(\''+fam+'\')">'+a.cta_label+'</button>'
       +'</div><div class="foot"><span class="tag">注意事項｜マスター登録値</span><br>'
@@ -1612,7 +1633,7 @@ const IV_WANT_P={"気持ちを少し軽くしたい":"気持ちの重さを少�
 function nick(){ return S.nickname || "あなた"; }
 
 function beginSetup(){
-  S.setup_status="in_progress"; S.iv=0; S.iv_offered=[]; S.iv_exclude=[]; S.step="iv";
+  S.setup_status="in_progress"; S.iv=0; S.iv_offered=[]; S.iv_sel=null; S.iv_more=false; S.iv_more_scrolled=false; S.iv_exclude=[]; S.step="iv";
   document.querySelectorAll("#userapp .screen").forEach(x=>x.classList.remove("active"));
   document.getElementById("s-flow").classList.add("active");
   document.getElementById("nav").hidden=false;
@@ -1720,19 +1741,13 @@ function ivRender(){
     const flow=document.getElementById("ivFlow");
     if(!S.iv_try_intro){
       S.iv_try_intro=true;
-      flow.insertAdjacentHTML("beforeend",'<div class="trycard">'
-        +'<div style="font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em">STEP 2 ／ 一歩をえらぶ</div>'
-        +'<h2>最初の3日で、<br>ひとつ試してみましょう</h2>'
-        +'<p><b>すぷらんからの提案</b>：今のお話をもとに、<br>まず試しやすそうな方法を考えたよ。</p>'
-        +'<p>どれが一番合うかを、今ここで決めなくても大丈夫です。<br>まずは3日だけ、「これならできそう」と思うものを試してみましょう。</p>'
-        +'<ol class="tryflow">'
-        +'<li><b>今日</b><span>やってみることを決める</span></li>'
-        +'<li><b>3日間</b><span>無理のない範囲で試してみる</span></li>'
-        +'<li><b>3日後</b><span>自分に合っていそうか、一緒にふりかえる</span></li>'
-        +'<li><b>共有</b><span>臨床心理士/公認心理師の大塚さんに共有して、手紙をもらう</span></li>'
-        +'</ol></div>');
+      /* 2026-10-02 シンプル版：長い説明と4行の表は出さない。3日＝毎日やるという意味ではない（頻度は行動マスターに従う） */
+      flow.insertAdjacentHTML("beforeend",'<div class="trycard v2">'
+        +'<div class="tc-step">STEP 2 ／ 一歩をえらぶ</div>'
+        +'<h2>最初の3日、これを試してみよう</h2>'
+        +'<div class="tc-flow"><span><b>今日</b>決める</span><i aria-hidden="true">›</i><span><b>3日</b>試す</span><i aria-hidden="true">›</i><span><b>あとで</b>見直す</span></div></div>');
     }
-    ivSay("無理なくできそうなものを<br>1つ選んでみませんか？<br><span style=\"font-size:12.5px;color:var(--muted)\">合わなければ、3日後に変えることができます。</span>",
+    ivSay("できそうなものを、<br>1つ選んでみよう",
       function(){ renderOffers(tray); });
     break; }
 
@@ -1742,7 +1757,10 @@ function ivRender(){
     document.getElementById("ivFlow").insertAdjacentHTML("beforeend",
       '<div class="card warm" style="margin:12px 0"><div style="font-size:11.5px;font-weight:800;color:var(--accent);margin-bottom:6px">まず3日、試してみること</div>'
       +'<h2 style="font-size:18px;line-height:1.7;margin:0">'+curAct().title+'</h2>'
-      +'<p class="lede" style="margin:8px 0 0">目安：'+planLabel()+'</p></div>');
+      +'<p class="lede" style="margin:8px 0 0">目安：'+planLabel()+'</p>'
+      +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin:8px 0 0">'+esc(curAct().instruction||curAct().short_description||"")+'</p>'
+      +(function(){ const r=S.iv_offered.filter(function(x){ return x.id===S.act_id; })[0]; return r?'<p style="font-size:12px;line-height:1.75;color:var(--muted);margin:8px 0 0">'+actReason(r)+'</p>':''; })()
+      +'</div>');
     ivSay("これなら、<br>3日間の中で、どのくらいできそうですか？",function(){ ivOpts(["難しそう","たぶんできそう","できそう"],"ivFeas"); });
     break;
 
@@ -1793,15 +1811,32 @@ function addOffers(){
   window.__IVP=S.iv_offered;
   return add.length;
 }
-function offerCard(r){
-  const a=r.a, i=S.iv_offered.indexOf(r);
-  return '<button class="opt" style="text-align:left" onclick="ivPick('+i+')">'
-    +'<div style="font-size:11px;color:var(--teal-deep);font-weight:800;margin-bottom:4px">'+a.category_name+'</div>'
-    +'<div style="font-size:15px;font-weight:800;line-height:1.6">'+a.title+'</div>'
-    +'<div style="font-size:11.5px;color:var(--muted);margin:6px 0;font-weight:400">'
-      +defaultPlanLabel(a)+' ・ 難易度 '+"★".repeat(a.difficulty)+'</div>'
-    +'<div style="font-size:12.5px;color:var(--ink2);font-weight:400;line-height:1.75">'+a.short_description+'</div>'
-    +'<div style="font-size:12px;color:var(--muted);font-weight:400;line-height:1.75;margin-top:6px">'+actReason(r)+'</div>'
+/* 難易度は表示ラベルだけ変える（データは行動マスターの difficulty のまま） */
+function diffLabel(d){ return d<=1 ? "やさしめ" : (d===2 ? "ふつう" : "しっかり"); }
+/* おすすめ理由の短いタグ。初回3問・場面で実際に答えたことからだけ作る（推測しない・断定しない） */
+const TAG_TOPIC={"仕事・学校":"仕事のことが気になっている","人間関係":"人との関わりが気になっている","将来・お金":"これからのことが気になっている",
+  "自分自身のこと":"自分のことを知りたい","生活・体調":"生活や体調が気になっている"};
+const TAG_STATE={"かなりしんどい":"まずは休息から","少ししんどい":"負担の少ないものから","波がある":"気持ちが大きく動いたときに"};
+function reasonTags(r){
+  const m=r.a.match||{}, t=[], tp=(S.current_concerns||[])[0];
+  if((m.want||[]).indexOf(S.direction_goal)>=0) t.push(S.direction_goal);
+  if((m.topic||[]).indexOf(tp)>=0 && TAG_TOPIC[tp]) t.push(TAG_TOPIC[tp]);
+  if((r.why||[]).some(function(w){ return w.indexOf("場面の言葉")===0; })) t.push("話してくれた場面に近い");
+  if((m.state||[]).indexOf(S.current_status)>=0 && TAG_STATE[S.current_status]) t.push(TAG_STATE[S.current_status]);
+  return t;
+}
+/* 表示順に、前のカードと同じ理由は出さない */
+function offerTag(r,used){ const t=reasonTags(r).filter(function(x){ return used.indexOf(x)<0; })[0]; if(t) used.push(t); return t||""; }
+function offerCard(r,tag,main){
+  const a=r.a, i=S.iv_offered.indexOf(r), on=S.iv_sel===i;
+  const freq = isTrigger(a) ? "必要なときに" : a.default_frequency;
+  return '<button class="ofc'+(main?' main':'')+(on?' on':'')+'" aria-pressed="'+on+'" onclick="ivSel('+i+')">'
+    +(on?'<span class="ofc-ck" aria-hidden="true">✓</span>':'')
+    +'<div class="ofc-cat">'+esc(a.category_name)+'</div>'
+    +'<div class="ofc-t">'+esc(a.title)+'</div>'
+    +'<div class="ofc-chips"><span>'+a.default_duration+'分</span><span>'+esc(freq)+'</span><span>'+diffLabel(a.difficulty)+'</span></div>'
+    +'<div class="ofc-d">'+esc(a.short_description)+'</div>'
+    +(tag?'<div class="ofc-tag">'+esc(tag)+'</div>':'')
     +'</button>';
 }
 function renderOffers(tray){
@@ -1813,25 +1848,27 @@ function renderOffers(tray){
     window.scrollTo(0,document.body.scrollHeight);
     return;
   }
-  const first=S.iv_offered.filter(function(r){ return r.batch!=="other"; });
-  const other=S.iv_offered.filter(function(r){ return r.batch==="other"; });
-  const head=function(t){ return '<div style="font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin:14px 0 6px">'+t+'</div>'; };
-  let h='<div class="opts">'+first.map(offerCard).join("")+'</div>';
-  if(other.length) h+=head("ほかの候補")+'<div class="opts">'+other.map(offerCard).join("")+'</div>';
-  h += (S.iv_offered.length<OFFER_MAX)
-    ? '<div class="opts" style="margin-top:12px"><button class="opt" onclick="ivAlt()">他も見てみる</button></div>'
-    : '<div class="foot">これで全部です。この中から1つ選んでみてください。</div>';
+  /* おすすめ（いちばん点の高い候補）は最初から選択状態。ほかを選べる自由は残す */
+  if(S.iv_sel==null || !S.iv_offered[S.iv_sel]) S.iv_sel=0;
+  const used=[], rest=S.iv_offered.slice(1);
+  let h='<div class="ofh">すぷらんのおすすめ</div>'+offerCard(S.iv_offered[0],offerTag(S.iv_offered[0],used),true);
+  if(!S.iv_more) h+='<button class="ofmore" onclick="S.iv_more=true;renderOffers(document.getElementById(\'ivTray\'))">ほかの候補を見る ＋</button>';
+  else {
+    h+='<div class="ofh sub">ほかの候補</div><div class="ofrest">'+rest.map(function(r){ return offerCard(r,offerTag(r,used),false); }).join("")+'</div>';
+    if(S.iv_offered.length<OFFER_MAX) h+='<button class="ofmore" onclick="ivAlt()">さらにほかも見る ＋</button>';
+  }
+  h+='<button class="btn ofcta" onclick="ivPick(S.iv_sel)">この一歩を選ぶ</button>';
   tray.innerHTML = h + debugPanel();
-  window.scrollTo(0,document.body.scrollHeight);
+  if(!S.iv_more_scrolled){ S.iv_more_scrolled=true; const f=document.getElementById("ivFlow"), c=f&&f.querySelector(".trycard.v2"); if(c) c.scrollIntoView({block:"start"}); }
 }
 /* 「他も見てみる」＝前の候補を残したまま、マスターから追加で提示する */
 function ivAlt(){
   const n=addOffers();
   const tray=document.getElementById("ivTray");
   if(!n){ renderOffers(tray); return; }
-  ivMe("他も見てみる");
-  ivSay("では、ほかの候補も出しますね。<br>さきほどの3つも、そのまま選べます。",function(){ renderOffers(tray); });
+  renderOffers(tray);
 }
+function ivSel(i){ if(!S.iv_offered[i]) return; S.iv_sel=i; const y=window.scrollY; renderOffers(document.getElementById("ivTray")); window.scrollTo(0,y); }
 function ivPick(i){
   const r=S.iv_offered[i]; if(!r) return;
   setPlan(r.id);
