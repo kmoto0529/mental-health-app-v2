@@ -415,6 +415,63 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);bo
 .st-sub{font-size:13px;line-height:1.7;color:var(--ink2);margin:0 0 16px}
 .st-cta{display:flex;align-items:center;justify-content:center;gap:14px;font-size:16px}
 .st-cta span{font-size:20px;line-height:1}
+/* はじめての5ステップ */
+.obw{position:relative;height:calc(100svh - 40px);min-height:560px;overflow:hidden;margin-bottom:-92px;background:#DDE8C6}
+.obw.night{background:#17221F}
+.obw-img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.obw .obw-cta{position:absolute;left:0;right:0;bottom:calc(30px + env(safe-area-inset-bottom,0px));margin:0 auto;width:calc(100% - 48px);max-width:330px;border-radius:999px;background:#5F7F5C;box-shadow:0 6px 18px rgba(40,60,40,.25)}
+.obw.night .obw-cta{background:#6F8F6A}
+.obs{background:#FDFAF3;min-height:calc(100svh - 40px);margin-bottom:-92px;padding:12px 20px 30px;box-sizing:border-box;text-align:center}
+.ob-top{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;margin-bottom:4px}
+.ob-top .back{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:0;font-family:inherit;text-align:left}
+.ob-step{font-size:13px;color:var(--muted);letter-spacing:.12em;font-variant-numeric:tabular-nums}
+.ob-decor{display:block;width:100%;max-width:360px;margin:0 auto 6px;aspect-ratio:1200/375;object-fit:cover}
+.ob-decor.sm{max-width:300px;margin:6px auto 4px}
+.ob-h1{font-size:23px;line-height:1.5;color:var(--ink);margin:6px 0 8px;font-weight:800;text-wrap:balance}
+.ob-h2{font-size:17px;color:var(--ink);margin:8px 0 2px}
+.ob-sub{font-size:13.5px;color:var(--ink2);line-height:1.8;margin:0 0 16px}
+.ob-cards{display:flex;flex-direction:column;gap:12px;margin:4px 0 14px;text-align:left}
+.ob-card{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:16px 16px;box-shadow:0 2px 12px rgba(80,90,60,.07)}
+.ob-ic{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:#EAF1E3;display:flex;align-items:center;justify-content:center;color:#55784F}
+.ob-ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ob-ct{font-size:14.5px;font-weight:800;color:var(--ink);line-height:1.55;margin-bottom:4px}
+.ob-cd{font-size:12.5px;color:var(--ink2);line-height:1.7}
+.ob-more{background:none;border:none;color:var(--teal-deep);font-size:13.5px;font-weight:700;cursor:pointer;padding:6px 10px;margin:0 auto 12px;display:block;font-family:inherit;letter-spacing:.04em}
+.ob-cta{border-radius:999px;background:#5F7F5C;margin-top:6px}
+.ob-cta:disabled{opacity:.45}
+.ob-hint{font-size:12px;color:var(--muted);margin:10px 0 0}
+.ob-skip{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:12px;margin-top:4px;font-family:inherit}
+.ob-nick{position:relative;margin:4px auto 6px;width:200px}
+.ob-nick img{display:block;margin:28px auto 0;width:140px;height:140px;object-fit:contain}
+.ob-bub{position:absolute;top:0;right:-6px;background:#fff;border-radius:14px;padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--teal-deep);box-shadow:0 2px 8px rgba(80,90,60,.1)}
+.ob-input{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:14px;padding:14px;font-size:16px;font-family:inherit;text-align:center;background:#fff;color:var(--ink);margin-bottom:8px}
+.ob-input:focus{outline:none;border-color:var(--teal)}
+.ob-sec{text-align:left;margin:0 0 14px}
+.ob-sec h3{font-size:14.5px;font-weight:800;color:var(--ink);margin:0 0 8px}
+.ob-sec h3 span{font-size:12px;font-weight:500;color:var(--muted);margin-left:2px}
+.ob-chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.ob-chips.clife_status{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ob-chips.cgender{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ob-chips.csupport_use{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ob-chip{display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1.5px solid #ECE8DC;border-radius:12px;padding:10px 6px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;font-family:inherit;line-height:1.4;min-width:0;text-align:left}
+.ob-chip .e{font-size:16px;line-height:1;flex-shrink:0}
+.clife_status .ob-chip{flex-direction:column;gap:4px;padding:10px 2px;text-align:center}
+.clife_status .ob-chip .e{font-size:20px}
+.cgender .ob-chip{padding:10px 2px;gap:3px;font-size:11.5px;white-space:nowrap}
+.cgender .ob-chip .e{font-size:14px}
+body:has(#s-flow.active .obs){background:#FDFAF3}
+body:has(#s-flow.active .obw){background:#DDE8C6}
+body:has(#s-flow.active .obw.night){background:#17221F}
+.csupport_use .ob-chip{justify-content:flex-start;padding:10px 10px;font-size:12px}
+.ob-chip.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep)}
+.ob-chip:disabled{opacity:.4;cursor:default}
+.obdmodal .ob-deye{font-size:11.5px;font-weight:800;color:var(--teal-deep);letter-spacing:.06em}
+.ob-dcard{display:flex;gap:12px;align-items:flex-start;background:var(--paper2);border-radius:14px;padding:12px;margin:10px 0;text-align:left}
+.ob-dcard .ob-ic{width:38px;height:38px}.ob-dcard .ob-ic svg{width:20px;height:20px}
+.ob-dcard h4{font-size:13.5px;margin:2px 0 4px;color:var(--ink)}
+.ob-dcard ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.75;color:var(--ink2)}
+.ob-dcard.safe .ob-ic{background:#F8E6E3;color:#B5655A}
+.ob-dcard a{color:var(--teal-deep)}
 /* Home（シンプル版） */
 .hhead2{padding:16px 20px 4px}
 .hhead2 .nm{display:block;font-size:24px;color:var(--ink);font-weight:800;letter-spacing:.02em}
@@ -720,6 +777,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <button class="hideable" onclick="openSafety('demo','some')">リスク検知</button>
   <button class="hideable" onclick="skipToRegular()">2周目へ</button>
   <button class="hideable" onclick="resetDemo()">最初から</button>
+  <button class="hideable" id="themeBtn" onclick="toggleObTheme()">昼夜: 自動</button>
   <span class="sp"></span>
   <span id="statusLab" style="opacity:.7"></span>
   <button class="tog" onclick="document.getElementById('demobar').classList.toggle('min')">▾</button>
@@ -797,7 +855,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 
 <script>
 const S = {
-  nickname:"", age_range:"", gender:"", life_status:"", leave_duration:"", support_use:[], support_past:false, confidant:"", time_slots:[], agree_terms:false, agree_privacy:false,
+  nickname:"", age_range:"", gender:"", life_status:"", leave_duration:"", support_use:[], support_past:false, interests:[], agreed_at:null, confidant:"", time_slots:[], agree_terms:false, agree_privacy:false,
   current_status:"", current_concerns:[], safety_answer:"", ai_conversation_summary:"", ai_confirm:"",
   direction_goal:"", first_action:"", action_difficulty:"", action_adjusted_flag:false, plan_b_text:"",
   setup_status:"not_started", setup_completed_at:null, entered:false,
@@ -876,31 +934,72 @@ function renderFlow(){
   let h="";
   switch(S.step){
 
-  case "a1":
-    h=`<div style="height:8px"></div>
-    <div class="card tint" style="text-align:center;padding:34px 24px 26px">
-      <div style="font-size:42px;line-height:1;margin-bottom:14px">🌿</div>
-      <div style="font-size:15px;font-weight:800;letter-spacing:.06em;color:var(--teal-deep);margin-bottom:18px">kokoni</div>
-      <h2 style="font-size:22px;margin-bottom:12px;line-height:1.6">こころを整理し、<br>自分のことを少しずつ<br>知っていく場所。</h2>
-      <p style="font-size:14px;margin-bottom:22px">kokoni は、気持ちや考えを整理しながら、<br>自分に合った進み方を<br>見つけていくための場所です。</p>
-      <button class="btn" onclick="step('a3')">次へ</button>
-    </div>
-    <div class="foot">※ ここでは「CBT」「治療」「16回」などの言葉を出しません。</div>`;
+  /* 1/5 Welcome：昼と夜で画像を切り替える（18:00〜5:00 は夜）。画像に「kokoni」と文言が入っている */
+  case "a1": {
+    const night=obNight();
+    h=`<div class="obw${night?" night":""}">
+      <img class="obw-img" src="assets/suplan/scenes/kokoni-welcome-${night?"night":"day"}.jpg" alt="kokoni。ここは、あなたの気持ちをそっと整理できる場所。ひとりで抱えこまなくていいよ。すぷらんが、そばにいるよ。">
+      <button class="btn obw-cta" onclick="step('a2')">はじめます</button>
+    </div>`;
+    break; }
+
+  /* 2/5 安心してご利用いただくために（同意） */
+  case "a2":
+    h=`<div class="obs">${obHead(2,"a1")}
+      <img class="ob-decor" src="assets/suplan/scenes/kokoni-decor.jpg" alt="" aria-hidden="true">
+      <h1 class="ob-h1">安心してご利用いただくために</h1>
+      <p class="ob-sub">kokoniは、セルフケアを<br>やさしく支えるアプリです。</p>
+      <div class="ob-cards">
+        ${obCard("heart","医療行為や診断を行う<br>サービスではありません","このアプリは、医療行為や診断を行うサービスではありません。")}
+        ${obCard("leaf","すぷらん（AI）が<br>気持ちや行動の整理を支えます","すぷらんが、気持ちの整理や小さな一歩を考えるお手伝いをします。")}
+        ${obCard("shield","つらさが強いときは、<br>医療機関や相談窓口もご利用ください","ひとりで抱えこまず、必要なときは専門の支援も受けることが大切です。")}
+      </div>
+      <button class="ob-more" onclick="obDetails()">くわしく見る ›</button>
+      <button class="btn ob-cta" onclick="obAgree()">同意して進む</button>
+      <p class="ob-hint">同意しないと利用できません</p>
+    </div>`;
     break;
 
+  /* 3/5 ニックネーム（マイページのニックネームと同じ S.nickname） */
   case "a3":
-    h=`<div class="pagehead"><button class="back" onclick="step('a1')">‹</button><span></span></div>
-    <div class="brandrow"><span class="mark"></span><b>kokoni</b></div>
-    <div class="card">
-      <h2>安心してご利用いただくために</h2>
-      <p>kokoni は、あなたのペースで<br>こころのセルフケアをサポートします。</p>
-      <div class="checks">
-        <div class="chk ${S.agree_terms?"on":""}" onclick="S.agree_terms=!S.agree_terms;renderFlow()">
-          <span class="bx">${S.agree_terms?"✓":""}</span><span>${TERMS_URL?`<a href="${TERMS_URL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">利用規約</a>`:"<a>利用規約</a>"}に同意する</span></div>
-        <div class="chk ${S.agree_privacy?"on":""}" onclick="S.agree_privacy=!S.agree_privacy;renderFlow()">
-          <span class="bx">${S.agree_privacy?"✓":""}</span><span>${PRIVACY_URL?`<a href="${PRIVACY_URL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">プライバシーポリシー</a>`:"<a>プライバシーポリシー</a>"}に同意する</span></div>
+    h=`<div class="obs">${obHead(3,"a2")}
+      <h1 class="ob-h1">ニックネームを教えてね</h1>
+      <p class="ob-sub">あなたを呼ぶ名前になるよ</p>
+      <div class="ob-nick"><div class="ob-bub">よろしくね！</div><img src="assets/suplan/opt/happy.png" alt="" width="140" height="140"></div>
+      <h2 class="ob-h2">なんて呼べばいい？</h2>
+      <p class="ob-sub" style="margin-bottom:12px">あとから変更できるよ</p>
+      <input type="text" id="obNick" class="ob-input" maxlength="12" placeholder="ニックネームを入力（例：すぷらん）" value="${esc(S.nickname)}"
+        oninput="document.getElementById('obNickBtn').disabled=!this.value.trim()">
+      <button class="btn ob-cta" id="obNickBtn" ${S.nickname?"":"disabled"} onclick="obNickSave()">これで進む</button>
+      <button class="ob-skip" onclick="S.nickname=S.nickname||'';step('a4')">スキップ</button>
+    </div>`;
+    break;
+
+  /* 4/5 あなたについて教えてね（マイページのプロフィールと同じ項目・同じデータ） */
+  case "a4": {
+    const ok=obProfileOk();
+    h=`<div class="obs">${obHead(4,"a3")}
+      <h1 class="ob-h1">あなたについて教えてね</h1>
+      <p class="ob-sub">よりよいサポートのために（あとで変更OK）</p>
+      <img class="ob-decor sm" src="assets/suplan/scenes/kokoni-decor.jpg" alt="" aria-hidden="true">
+      ${OB_PROFILE.map(obSection).join("")}
+      <button class="btn ob-cta" id="obProfBtn" ${ok?"":"disabled"} onclick="step('a5')">これで進む</button>
+      <p class="ob-hint">${ok?"あとでプロフィールから変更できます":"現在の状況・年代・性別を選ぶと進めます"}</p>
+    </div>`;
+    break; }
+
+  /* 5/5 使い方ガイド（内容は検討中。仮の3枚） */
+  case "a5":
+    h=`<div class="obs">${obHead(5,"a4")}
+      <h1 class="ob-h1">kokoniの使い方</h1>
+      <p class="ob-sub">3つのことを、すぷらんと一緒にやっていくよ</p>
+      <div class="ob-cards">
+        ${obCard("leaf","今日の一歩を決めて、試す","まずは3日間、無理のない一歩をひとつ試してみよう。")}
+        ${obCard("chat","すぷらんとはなす","気持ちがもやもやしたら、いつでも話しかけてね。")}
+        ${obCard("heart","ふりかえって、次を決める","どうだったかを一緒にふりかえって、次の一歩を決めよう。")}
       </div>
-      <button class="btn" ${S.agree_terms&&S.agree_privacy?"":"disabled"} onclick="startApp()">kokoni をはじめる</button>
+      <button class="btn ob-cta" onclick="startApp()">はじめる</button>
+      ${DEBUG?'<div class="foot">DEBUG：5枚目（使い方ガイド）は内容検討中の仮置き</div>':""}
     </div>`;
     break;
   }
@@ -908,7 +1007,73 @@ function renderFlow(){
   sync();
 }
 
-/* 同意 →（プロフィール入力を挟まず）そのままホームへ。この時点で下部タブを全活性化する */
+/* ── はじめての5ステップ（Welcome → 同意 → ニックネーム → プロフィール → 使い方）── */
+/* 昼夜：18:00〜5:00 は夜の画像。デモバーで手動切り替えもできる（OB_THEME） */
+let OB_THEME="auto";
+function obNight(){ if(OB_THEME!=="auto") return OB_THEME==="night"; const h=new Date().getHours(); return h>=18 || h<5; }
+function toggleObTheme(){
+  OB_THEME = OB_THEME==="auto" ? "day" : (OB_THEME==="day" ? "night" : "auto");
+  document.getElementById("themeBtn").textContent="昼夜: "+({auto:"自動",day:"昼",night:"夜"})[OB_THEME];
+  if(!S.entered && S.step==="a1") renderFlow();
+}
+const OB_ICON={
+  heart:'<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  leaf:'<svg viewBox="0 0 24 24"><path d="M12 21V11"/><path d="M12 13C12 8 8.5 6 4 6c0 5 3 7.5 8 7z"/><path d="M12 11c0-4.5 3-7 8-7 0 5-3 7.5-8 7z"/></svg>',
+  shield:'<svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.6-8 10-4.6-1.4-8-5.5-8-10V6l8-3z"/><path d="M12 9v6"/><path d="M9 12h6"/></svg>',
+  chat:'<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>',
+  data:'<svg viewBox="0 0 24 24"><path d="M6 20v-8"/><path d="M12 20V6"/><path d="M18 20v-6"/></svg>'
+};
+function obHead(n,back){ return '<div class="ob-top"><button class="back" onclick="step(\''+back+'\')" aria-label="戻る">‹</button><span class="ob-step">'+n+' / 5</span><span></span></div>'; }
+function obCard(ic,t,d){ return '<div class="ob-card"><span class="ob-ic">'+OB_ICON[ic]+'</span><div><div class="ob-ct">'+t+'</div><div class="ob-cd">'+d+'</div></div></div>'; }
+function obAgree(){ S.agree_terms=true; S.agree_privacy=true; S.agreed_at=new Date().toISOString(); closeWhy(); step("a3"); }
+function obDetails(){
+  const link=function(u,t){ return u ? '<a href="'+u+'" target="_blank" rel="noopener">'+t+'</a>' : t+'（準備中）'; };
+  const sec=function(ic,t,items,cls){ return '<div class="ob-dcard'+(cls||"")+'"><span class="ob-ic">'+OB_ICON[ic]+'</span><div><h4>'+t+'</h4><ul>'+items.map(function(x){ return '<li>'+x+'</li>'; }).join("")+'</ul></div></div>'; };
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal obdmodal" onclick="event.stopPropagation()">'
+    +'<div class="ob-deye">安心して使うために</div><h3>くわしく知る</h3><p style="font-size:12.5px">不安なときに、いつでも内容を確認できます。</p>'
+    +sec("heart","kokoniについて",["kokoniは、気持ちや行動を整理し、小さな一歩を支えるセルフケアアプリです。","医療行為や診断を行うサービスではありません。"])
+    +sec("leaf","すぷらん（AI）について",["すぷらんはAIです。あなたの気持ちや行動の整理を手伝います。","提案や気づきはAIによるもので、正確さや効果を保証するものではありません。","すぷらんとの会話が、臨床心理士に自動で届くことはありません。共有は、あなたが選んだときだけです。"])
+    +sec("data","データの取り扱いについて",["ニックネームで利用できます。実名は不要です。","入力した内容や利用状況は、サービスの改善や分析のために利用します。","個人が特定される情報を第三者に提供することはありません。","くわしくは"+link(PRIVACY_URL,"プライバシーポリシー")+"・"+link(TERMS_URL,"利用規約")+"をご確認ください。"])
+    +sec("shield","安全について",["強い不安やつらさがあるときは、医療機関や相談窓口をご利用ください。ひとりで抱えこまず、専門の支援を受けることも大切です。"]," safe")
+    +'<button class="btn" onclick="obAgree()">同意して進む</button><button class="linkbtn" onclick="closeWhy()">とじる</button></div></div>';
+}
+function obNickSave(){ const v=document.getElementById("obNick").value.trim(); if(!v) return; S.nickname=v; step("a4"); }
+/* 4/5 の項目。値はマイページのプロフィール（PF_FIELDS）と同じ S の項目に直接入る */
+const OB_PROFILE=[
+  {id:"life_status", k:"現在の状況", o:[["学生","🎓"],["社会人","💼"],["休職中","🏠"],["離職中","🌱"],["その他","💭"]]},
+  {id:"age_range",   k:"年代", o:[["10代","🌱"],["20代","🌱"],["30代","🌱"],["40代","🌳"],["50代","🌳"],["60代以上","🌳"]]},
+  {id:"gender",      k:"性別", o:[["女性","🌸"],["男性","🍃"],["その他","🌈"],["回答しない","🌙"]]},
+  {id:"interests",   k:"気になること", note:"（複数選択OK）", o:[["仕事・学業","💼"],["人間関係","💬"],["恋愛","💗"],["将来","🌱"],["お金","💰"],["健康","🌿"],["その他","✨"]]},
+  {id:"support_use", k:"サポートの利用状況", note:"（任意）", o:[["現在、医療機関に通院している","🏥"],["現在、カウンセリングを利用している","💬"],["過去に利用したことがある","📋"],["現在は利用していない","🌱"],["回答しない","🌙"]]}
+];
+function obProfileOk(){ return !!(S.life_status && S.age_range && S.gender); }
+function obOn(id,o){
+  if(id==="support_use" && o==="過去に利用したことがある") return !!S.support_past;
+  const v=pfVal(id); return Array.isArray(v) ? v.indexOf(o)>=0 : v===o;
+}
+function obSection(f,fi){
+  const noAns = f.id==="support_use" && S.support_use.indexOf("回答しない")>=0;
+  return '<section class="ob-sec"><h3>'+f.k+(f.note?'<span>'+f.note+'</span>':'')+'</h3><div class="ob-chips c'+f.id+'">'
+    +f.o.map(function(x,oi){ const on=obOn(f.id,x[0]), dis = noAns && x[0]==="過去に利用したことがある";
+      return '<button class="ob-chip'+(on?' on':'')+'" aria-pressed="'+on+'" '+(dis?'disabled':'')+' onclick="obPick('+fi+','+oi+')"><span class="e" aria-hidden="true">'+x[1]+'</span><span>'+x[0]+'</span></button>'; }).join("")
+    +'</div></section>';
+}
+/* 選び方のルールはプロフィール編集（pfPick）と同じ：複数選択・排他の選択肢・「回答しない」と過去の利用歴の排他 */
+function obPick(fi,oi){
+  const f=OB_PROFILE[fi], o=f.o[oi][0], pf=PF_FIELDS.filter(function(x){ return x.id===f.id; })[0];
+  pfMigrate();
+  if(f.id==="support_use" && o==="過去に利用したことがある"){ if(S.support_use.indexOf("回答しない")<0) S.support_past=!S.support_past; }
+  else if(pf.multi){
+    const a=S[f.id], k=a.indexOf(o), ex=pf.ex||[];
+    if(k>=0) a.splice(k,1);
+    else if(ex.indexOf(o)>=0){ a.length=0; a.push(o); }
+    else { for(let i=a.length-1;i>=0;i--) if(ex.indexOf(a[i])>=0) a.splice(i,1); a.push(o); }
+    if(f.id==="support_use" && a.indexOf("回答しない")>=0) S.support_past=false;
+  } else S[f.id] = S[f.id]===o ? "" : o;
+  if(f.id==="life_status" && S.life_status!=="休職中") S.leave_duration="";
+  const y=window.scrollY; renderFlow(); window.scrollTo(0,y);
+}
+/* 5/5 のあと → ホーム。この時点で下部タブを全活性化する */
 function startApp(){ S.entered=true; go("home"); }
 function openWhy(){
   document.getElementById("modalRoot").innerHTML=`<div class="modalbg" onclick="closeWhy()">
@@ -1440,22 +1605,15 @@ function ivRender(){
   renderIvSteps();
   switch(S.iv){
 
-  /* ① 呼び方 */
+  /* ① すぷらんの自己紹介（呼び方は聞かない） */
   case 0:
     S.sp_intro_seen=true;
-    ivSay(SP_INTRO+"<br><br>はじめに、なんて呼んだらいい？",function(){
-      tray.innerHTML='<div class="card" style="margin:0">'
-        +'<div class="fld" style="margin-bottom:8px"><input type="text" id="ivNick" placeholder="例）もと" maxlength="12" value="'+S.nickname+'"'
-        +' oninput="document.getElementById(\'ivNickBtn\').disabled=!this.value.trim()"></div>'
-        +'<p class="lede" style="margin-bottom:12px">あとからマイページで変更できます。</p>'
-        +'<button class="btn" id="ivNickBtn" '+(S.nickname?"":"disabled")+' onclick="ivSetNick()">これで進む</button></div>';
-      window.scrollTo(0,document.body.scrollHeight);
-    });
+    ivSay(SP_INTRO,ivNext);   // ニックネームは「はじめての5ステップ」で取得済み。ここでは聞かない
     break;
 
   /* ② Q1 いまのこころの状態 */
   case 1:
-    ivSay(nick()+"さん、今のこころの状態に近いものを教えてください。",function(){ ivOpts(IV_STATE,"ivQ1"); });
+    ivSay((S.nickname?S.nickname+"さん、":"")+"今のこころの状態に近いものを教えてください。",function(){ ivOpts(IV_STATE,"ivQ1"); });
     break;
   case 2:
     ivSay(IV_STATE_P[S.current_status]+"んですね。<br>教えてくれてありがとう。",ivNext);
@@ -1555,10 +1713,6 @@ function ivRender(){
   }
 }
 
-function ivSetNick(){
-  const v=document.getElementById("ivNick").value.trim(); if(!v) return;
-  S.nickname=v; ivMe(v); ivNext();
-}
 function ivQ1(i){ S.current_status=IV_STATE[i]; ivMe(IV_STATE[i]); ivNext(); }
 function ivQ2(i){ S.current_concerns=[IV_TOPIC[i]]; ivMe(IV_TOPIC[i]); ivNext(); }
 function ivQ3(i){ S.direction_goal=IV_WANT[i]; ivMe(IV_WANT[i]); ivNext(); }
@@ -2718,13 +2872,14 @@ function renderMap(){
    - 入力率は心の地図の進捗とは別。「回答しない」も回答済みとして数える。100%でなくても全機能が使える
    - 通院・カウンセリングの状況は、提案の内容やペースを考えるためだけに使う。心理士への共有は本人が選んだときだけ
    ══════════════════════════════════════════════════════════════ */
-/* 基本7項目（入力状況の分母）。g＝表示グループ。ex＝ほかと同時に選べない選択肢
+/* 基本8項目（入力状況の分母。2026-10-02 「気になること」を追加）。g＝表示グループ。ex＝ほかと同時に選べない選択肢
    サポート利用状況は「今」（support_use）と「過去の利用歴」（support_past）を別フィールドで持つ */
 const PF_FIELDS=[
   {id:"nickname",   g:"basic", k:"ニックネーム"},
   {id:"age_range",  g:"basic", k:"年代",   o:["10代","20代","30代","40代","50代","60代以上","回答しない"]},
   {id:"gender",     g:"basic", k:"性別",   o:["女性","男性","その他","回答しない"]},
-  {id:"life_status",g:"life",  k:"現在の状況", o:["就業中","休職中","離職中","学生","その他","回答しない"]},
+  {id:"life_status",g:"life",  k:"現在の状況", o:["学生","社会人","休職中","離職中","その他","回答しない"]},
+  {id:"interests",  g:"life",  k:"気になること", multi:true, o:["仕事・学業","人間関係","恋愛","将来","お金","健康","その他"]},
   {id:"support_use",g:"life",  k:"サポートの利用状況", multi:true, ex:["現在は利用していない","回答しない"],
    o:["現在、医療機関に通院している","現在、カウンセリングを利用している","現在は利用していない","回答しない"]},
   {id:"confidant",  g:"life",  k:"相談できる人", q:"困ったときに、相談できる人はいますか？",
@@ -2741,6 +2896,8 @@ function pfMigrate(){
     S.support_use=S.support_use.filter(function(x){ return x!=="過去に利用したことがある"; }); S.support_past=true; }
   if(!Array.isArray(S.support_use)) S.support_use=[];
   if(!Array.isArray(S.time_slots)) S.time_slots=[];
+  if(!Array.isArray(S.interests)) S.interests=[];
+  if(S.life_status==="就業中") S.life_status="社会人";   // 以前の選択肢名
 }
 function pfVal(id){ pfMigrate(); const v=S[id]; return Array.isArray(v) ? v : (v||""); }
 function pfDone(id){ const v=pfVal(id); if(id==="support_use") return v.length>0 || !!S.support_past; return Array.isArray(v) ? v.length>0 : !!v; }
@@ -2818,7 +2975,7 @@ function pfForAI(){
   const arr=function(a){ a=(a||[]).filter(function(x){ return x!=="回答しない"; }); return a.length?a:undefined; };
   const o={life_status:keep(S.life_status), leave_duration: S.life_status==="休職中" ? keep(S.leave_duration) : undefined,
     support_now:arr(S.support_use), support_past: S.support_use.indexOf("回答しない")<0 && S.support_past ? true : undefined,
-    confidant:keep(S.confidant), time_slots:arr(S.time_slots)};
+    confidant:keep(S.confidant), time_slots:arr(S.time_slots), interests:arr(S.interests)};
   Object.keys(o).forEach(function(k){ if(o[k]===undefined) delete o[k]; });
   return o;
 }
