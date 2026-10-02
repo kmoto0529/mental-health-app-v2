@@ -501,6 +501,34 @@ body:has(#s-flow.active .obw.night){background:#17221F}
 .stepcard.v2 .sc-art{display:block;width:120px;height:120px;object-fit:contain;margin:6px auto 0}
 .stepcard.v2 h2{font-size:21px;line-height:1.5;margin:4px 0 8px;text-wrap:balance}
 .stepcard.v2 .chips2{justify-content:center;margin-bottom:12px}
+.sc-done{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:800;color:var(--teal-deep);margin:2px 0 12px}
+.sc-done .ck{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.stepcard.v2.did .sc-art{opacity:.95}
+.sc-end{font-size:14.5px;font-weight:800;color:var(--ink);margin:2px 0 10px}
+.linkbtn.again{display:block;margin:8px auto 0;font-size:12.5px}
+.cprog{margin:14px 0 0;text-align:left}
+.cp-h{font-size:12px;font-weight:800;color:var(--ink2);margin-bottom:6px}
+.cp-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.cp-t{border-radius:10px;padding:6px 4px;text-align:center;background:var(--paper2);border:1.5px solid transparent}
+.cp-t b{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.cp-t span{font-size:12px;font-weight:800;color:var(--muted)}
+.cp-t.done{background:var(--teal-soft)}.cp-t.done.today{border-color:var(--teal)}.cp-d.done.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--teal)}.cp-t.done span{color:var(--teal-deep)}.cp-t.done b{color:var(--teal-deep)}
+.cp-t.today{border-color:var(--teal);background:var(--paper)}.cp-t.today span{color:var(--teal-deep)}
+.cp-t.future{opacity:.55}
+.cp-dots{display:flex;justify-content:space-between;gap:4px}
+.cp-d{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.cp-d i{width:22px;height:22px;border-radius:50%;background:var(--paper2);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:800;color:#fff;box-sizing:border-box}
+.cp-d span{font-size:10.5px;color:var(--muted)}
+.cp-d.done i{background:var(--teal);border-color:var(--teal)}
+.cp-d.today i{border:2px solid var(--teal);background:var(--paper)}
+.cp-d.future i{opacity:.5}
+.cp-sum{font-size:12px;color:var(--ink2);margin-top:7px}.cp-sum b{color:var(--teal-deep)}
+.dsnote.c1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px 10px;font-size:12.5px;margin-top:6px}
+.dslist{margin-top:8px;padding-top:6px;border-top:1px dashed var(--teal-line);display:flex;flex-direction:column;gap:4px}
+.dsrowc.sub .now{font-size:13px;font-weight:700}
+.actrec{background:var(--paper2);border-radius:12px;padding:10px 12px;margin:8px 0;text-align:left}
+.ar-t{font-weight:800;color:var(--teal-deep);font-size:13.5px}.ar-f{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.ar-i{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6;white-space:pre-wrap}
 .stepcard.v2 .sc-sep{border-top:1px solid var(--teal-line);margin:18px -4px 14px}
 .dsv2{text-align:left}
 .dsv2 .dq{font-size:13.5px;font-weight:800;color:var(--ink2);margin-bottom:8px}
@@ -1015,7 +1043,7 @@ function renderFlow(){
         ${g5Card(2,"気持ちの変化から<br>自分のことを知っていく","日々の気持ちや行動を記録しながら、少しずつ自分のパターンや変化が見えてきます。","bulb.png")}
         ${g5Card(3,"心理士の大塚さんから<br>定期的にフィードバック","3日ごと（その後は週1回）のふりかえりを共有すると、臨床心理士の大塚さんからあなたに合わせたアドバイスが届きます。","thanks.png",true)}
       </div>
-      <button class="btn ob-cta g5-cta" onclick="startApp()">すぷらんとはじめる<span aria-hidden="true">→</span></button>
+      <button class="btn ob-cta g5-cta" onclick="startApp()">すぷらんとはじめる</button>
       <button class="ob-skip" onclick="startApp()">スキップ</button>
     </div>`;
     break;
@@ -1524,10 +1552,12 @@ function saveActPlan(){
 /* 実施結果を保持する（将来：心の地図・週次のふりかえり・心理士への共有に使う） */
 function finishAction(feeling){
   const a=curAct();
+  /* 「やってみる」を押しただけでは作らない。最後の「今どんな感じ？」を選んで保存したときに1件作る（気持ちの記録は作らない） */
   S.act_logs.push({
-    action_id:S.act_id, app_type:a.app_type, title:a.title,
+    log_id:"ACTLOG_"+Date.now().toString(36), action_id:S.act_id, cycle_id:S.cycle?S.cycle.weekly_cycle_id:"",
+    app_type:a.app_type, title:a.title,
     duration_minutes:S.act_duration, frequency:S.act_frequency,
-    input:S.act_input||"", feeling:feeling, at:nowIso()
+    input:S.act_input||"", feeling:feeling, at:nowIso(), status:"saved"
   });
   S.act_feeling=feeling;
   const body=document.getElementById("actBody");
@@ -2034,15 +2064,68 @@ function planChips(a){
   return '<div class="chips2"><span>⏱ '+S.act_duration+'分</span><span>🗓 '+esc(f)+'</span></div>';
 }
 function firstDayTag(){ return ""; }   // 日数は右上のバッジに集約
+/* このサイクルの実施記録（cycle_id で結びつける。以前の記録は期間で判定） */
+function cycleActLogs(c){
+  c=c||S.cycle; if(!c) return [];
+  const from=dayStart(Date.parse(c.cycle_started_at)), to=from+c.cycle_length_days*DAY;
+  return S.act_logs.filter(function(l){ if(l.status && l.status!=="saved") return false;
+    if(l.cycle_id) return l.cycle_id===c.weekly_cycle_id;
+    const t=Date.parse(l.at); return t>=from && t<to; });
+}
+function todayActLogs(){ const d=isoDate(nowMs()); return cycleActLogs().filter(function(l){ return l.action_id===S.act_id && isoDate(Date.parse(l.at))===d; }); }
+/* サイクルの各日：done（実施記録あり）／today／past（記録なし。失敗扱いしない）／future */
+function cycleDays(){
+  const c=S.cycle; if(!c) return [];
+  const start=dayStart(Date.parse(c.cycle_started_at)), today=isoDate(nowMs()), logs=cycleActLogs(c);
+  const out=[];
+  for(let i=0;i<c.cycle_length_days;i++){
+    const ms=start+i*DAY+12*3600000, date=isoDate(ms), n=logs.filter(function(l){ return isoDate(Date.parse(l.at))===date; }).length;
+    out.push({i:i, ms:ms, date:date, n:n, today:date===today, future:dayStart(ms)>dayStart(nowMs())});
+  }
+  return out;
+}
+/* 「いつ試したか」が分かる記録表示（全部埋めることを目標にしない） */
+function cycleProgress(){
+  const c=S.cycle; if(!c) return "";
+  const first=c.cycle_type==="first", days=cycleDays(), logs=cycleActLogs(c), dd=days.filter(function(d){ return d.n>0; }).length;
+  const st=function(d){ return d.n>0?"done":(d.today?"today":(d.future?"future":"past")); };
+  const cls=function(d){ return st(d)+(d.today&&d.n>0?' today':''); };
+  let h='<div class="cprog'+(first?' cp-first':' cp-week')+'"><div class="cp-h">'+(first?'最初の3日間':'今週の記録')+'</div>';
+  if(first) h+='<div class="cp-tiles">'+days.map(function(d){ const k=st(d);
+      return '<div class="cp-t '+cls(d)+'"><b>'+(d.i+1)+'日目</b><span>'+(k==="done"?'✓ 記録あり':(k==="today"?'今日':(k==="future"?'これから':'—')))+'</span></div>'; }).join("")+'</div>';
+  else h+='<div class="cp-dots">'+days.map(function(d){ const k=st(d), w=DOW[new Date(d.ms).getDay()];
+      return '<div class="cp-d '+cls(d)+'" title="'+mdW(d.ms)+'"><i>'+(k==="done"?'✓':'')+'</i><span>'+w+'</span></div>'; }).join("")+'</div>';
+  h+='<div class="cp-sum">'+(first?'この3日間で':'今週は')+' <b>'+logs.length+'回</b> 試しました'+(!first && logs.length?'（'+dd+'日）':'')+'</div>';
+  return h+'</div>';
+}
+/* 今日の実施記録を見る */
+function openActRecord(){
+  const logs=todayActLogs();
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>今日の記録</h3>'
+    +(logs.map(function(l){ return '<div class="actrec"><div class="ar-t">✓ '+hm(l.at)+'　'+esc(l.title)+'</div>'
+      +'<div class="ar-f">やってみて：'+esc(l.feeling)+'</div>'+(l.input?'<div class="ar-i">'+esc(l.input)+'</div>':'')+'</div>'; }).join("")||'<p>まだ記録はありません。</p>')
+    +'<button class="btn" onclick="closeWhy()">とじる</button></div></div>';
+}
 function stepCard(){
-  const a=curAct(), paused=S.action_status==="paused";
-  return '<div class="stepcard v2">'
+  const a=curAct(), paused=S.action_status==="paused", c=S.cycle;
+  const reviewDay = c && c.weekly_review_status==="available";
+  const doneToday = todayActLogs().length>0;
+  let act;
+  if(paused) act='<div class="pausebox">いまはお休み中です</div><button class="btn" onclick="resumeAction()">また試してみる</button>';
+  else if(reviewDay) act='<div class="sc-end">'+(c.cycle_type==="first"?'最初の3日間が終わりました':'今週の取り組みが終わりました')+'</div>'
+    +'<button class="btn" onclick="go(\'gate\')">ふりかえりをはじめる</button>';
+  else if(doneToday) act='<div class="sc-done"><span class="ck">✓</span>今日は試してみました</div>'
+    +'<button class="btn ghost" onclick="openActRecord()">実施した記録を見る</button>'
+    +'<button class="linkbtn again" onclick="openAction()">もう一度やってみる</button>';
+  else act='<button class="btn" '+(a?'':'disabled')+' onclick="openAction()">やってみる</button>';
+  return '<div class="stepcard v2'+(doneToday&&!reviewDay?' did':'')+'">'
     +'<div class="sc-top"><span class="lab">🌱 今日の一歩</span><span class="daypill">'+cycleDayLabel()+'</span></div>'
     +'<img class="sc-art" src="'+spSrc(actArt(a))+'" alt="" width="120" height="120">'
     +'<h2>'+(a?esc(a.title):esc(S.first_action||"—"))+'</h2>'
-    +planChips(a)
-    +(paused ? '<div class="pausebox">いまはお休み中です</div><button class="btn" onclick="resumeAction()">また試してみる</button>'
-             : '<button class="btn" '+(a?'':'disabled')+' onclick="openAction()">やってみる →</button>')
+    +(doneToday||reviewDay ? '' : planChips(a))
+    +act
+    +cycleProgress()
     +'<div class="sc-sep"></div>'
     +dailyCard()
     +(paused?'':'<button class="linkbtn pauselink" onclick="openPause()">つらいときは、お休みもできます</button>')
@@ -2058,22 +2141,25 @@ function dailyCard(){
     return '<div class="dsv2"><div class="dq">今日の気持ちは？</div>'+faces("setDaily")
       +(pre ? '<textarea id="dsNote" rows="2" maxlength="200" placeholder="会議のあと少し疲れた。でも帰り道で少し落ち着いた。">'+esc(u.note||"")+'</textarea>'
               +'<div class="dshint" style="text-align:left">気持ちを選ぶと、メモと一緒に残ります</div>'
-            : '<button class="dslink memo" onclick="S.ds_ui={mode:\'pre_note\'};renderHome()">✏️ メモを書く（任意）</button>')
+            : '<button class="dslink memo" onclick="S.ds_ui={mode:\'pre_note\'};renderHome()">✏️ メモを残す（任意）</button>')
       +'</div>';
   }
   if(u && u.mode==="add") return '<div class="dsv2"><div class="dq">今はどんな感じ？</div>'+faces("setDaily")
     +'<button class="dslink" onclick="dsCancel()">やめる</button></div>';
   if(u && u.mode==="edit" && (u.where||"home")==="home"){ const er=dsById(u.id); if(er) return '<div class="dsv2">'+dsEditForm(er,"home")+'</div>'; }
-  let h='<div class="dsv2 done"><div class="dsrowc">'+face(dsLevel(r.daily_state),24)
-    +'<span class="now">'+(n>1?'今は':'今日は')+'「'+dsLabel(r.daily_state)+'」</span>'
-    +'<span class="at">✓ '+hm(r.recorded_at)+'</span>'
-    +'<button class="dslink" onclick="dsStartEdit(\''+r.record_id+'\')">編集</button></div>';
+  /* 最新の1件だけを大きく。ほかは「今日の記録 n件を見る」で開く。編集＝その記録を更新／＋＝新しい記録 */
+  const row=function(x,main){ return '<div class="dsrowc'+(main?'':' sub')+'">'+face(dsLevel(x.daily_state),main?24:20)
+    +'<span class="now">'+dsLabel(x.daily_state)+'</span><span class="at">✓ '+hm(x.recorded_at)+'</span>'
+    +'<button class="dslink" onclick="dsStartEdit(\''+x.record_id+'\')">編集</button></div>'
+    +(x.optional_note && !(u && u.mode==="note" && u.id===x.record_id) ? '<div class="dsnote c1">'+esc(x.optional_note)+'</div>' : ''); };
+  let h='<div class="dsv2 done"><div class="dq">今日の気持ち</div>'+row(r,true);
   if(u && u.mode==="note" && u.id===r.record_id)
     h+=dsNoteBox(r.optional_note,"")+'<div class="dsrow"><button class="btn sm" onclick="dsSave()">メモを残す</button><button class="dslink" onclick="dsCancel()">やめる</button></div>';
-  else if(r.optional_note) h+='<div class="dsnote">'+esc(r.optional_note)+'</div>';
+  if(n>1 && u && u.mode==="list") h+='<div class="dslist">'+recs.slice(0,-1).reverse().map(function(x){ return row(x,false); }).join("")+'</div>';
   h+='<div class="dsacts">'
-    +(!r.optional_note && !(u && u.mode==="note") ? '<button class="dslink" onclick="S.ds_ui={mode:\'note\',id:\''+r.record_id+'\'};renderHome()">✏️ メモを書く</button>' : '')
-    +(n<DS_MAX_PER_DAY ? '<button class="dslink" onclick="dsStartAdd()">＋ 今の気持ちも残す</button>' : '<span class="dsfull2">今日は3つ残しました</span>')
+    +(!r.optional_note && !(u && u.mode==="note") ? '<button class="dslink" onclick="S.ds_ui={mode:\'note\',id:\''+r.record_id+'\'};renderHome()">✏️ メモを残す</button>' : '')
+    +(n>1 ? '<button class="dslink" onclick="S.ds_ui=(S.ds_ui&&S.ds_ui.mode===\'list\')?null:{mode:\'list\'};renderHome()">'+((u&&u.mode==="list")?'とじる':'今日の記録 '+n+'件を見る')+'</button>' : '')
+    +(n<DS_MAX_PER_DAY ? '<button class="dslink" onclick="dsStartAdd()">＋ 今の気持ちも残す</button>' : '')
     +'</div>';
   return h+'</div>';
 }
@@ -2106,10 +2192,10 @@ function mapLockInfo(){
 function recallCard(){
   const c=refreshCycle(); if(!c) return "";
   const first=c.cycle_type==="first", st=c.weekly_review_status;
-  if(st==="available") return '<div class="hcard2 col today"><span class="ic2">📅</span><span class="tx"><b>今日がふりかえりの日</b></span>'
-    +'<button class="btn" onclick="go(\'gate\')">ふりかえりをはじめる →</button></div>';
+  if(st==="available") return S.action_status==="paused" ? '<div class="hcard2 col today"><span class="ic2">📅</span><span class="tx"><b>今日がふりかえりの日</b></span>'
+    +'<button class="btn" onclick="go(\'gate\')">ふりかえりをはじめる</button></div>' : "";   // 通常は今日の一歩カードに表示
   if(st==="completed") return '<div class="hcard2 col today"><span class="ic2">📅</span><span class="tx"><b>次の一歩を決めましょう</b></span>'
-    +'<button class="btn" onclick="go(\'gate\')">次の一歩を決める →</button></div>';
+    +'<button class="btn" onclick="go(\'gate\')">次の一歩を決める</button></div>';
   return '<div class="hcard2 cd" onclick="go(\'gate\')"><span class="ic2">📅</span><span class="tx"><small>'+(first?'最初のふりかえりまで':'次のふりかえりまで')+'</small>'
     +'<b class="big">あと'+daysLeft()+'日</b></span></div>';
 }
@@ -2200,7 +2286,8 @@ function dsButtons(selCode,fn){
 function dsCreate(code){
   const date=isoDate(nowMs());
   if(dsCount(date)>=DS_MAX_PER_DAY) return null;
-  const r={record_id:dsNewId(), user_id:DS_USER, date:date, daily_state:code, optional_note:"", recorded_at:nowIso(), edited_at:null};
+  const id=dsNewId();
+  const r={record_id:id, mood_id:id, user_id:DS_USER, date:date, daily_state:code, optional_note:"", recorded_at:nowIso(), edited_at:null, updated_at:null};
   dsAll().push(r); return r;
 }
 /* 未回答時の4択／「＋ 今の気持ちも残す」の4択。押した時点で記録完了 → 任意のメモ欄 */
@@ -2217,7 +2304,7 @@ function dsSave(){
   const changed = (u.mode==="edit" && u.code && u.code!==r.daily_state) || t!==r.optional_note;
   if(u.mode==="edit" && u.code) r.daily_state=u.code;
   if(t!==r.optional_note) r.optional_note=t;
-  if(changed && u.mode==="edit") r.edited_at=nowIso();   // 記録直後のメモ追加は「編集」に数えない
+  if(changed && u.mode==="edit"){ r.edited_at=nowIso(); r.updated_at=r.edited_at; }   // 記録直後のメモ追加は「編集」に数えない
   const where=u.where; S.ds_ui=null;
   if(t && RISK_RE.test(t)){ openSafety("free_text","unspecified"); return; }   // メモでも安全対応を優先
   dsRerender(where);
