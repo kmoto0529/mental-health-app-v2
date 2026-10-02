@@ -2927,7 +2927,7 @@ function pfText(id){ const v=pfVal(id); return Array.isArray(v) ? v.join("・") 
 function profileMini(){
   const pct=pfPct(), done=PF_FIELDS.filter(function(f){ return pfDone(f.id); }), todo=PF_FIELDS.filter(function(f){ return !pfDone(f.id); });
   return '<div class="pfcard"><div class="top"><div style="min-width:0"><h3>あなたのことをもう少し教える</h3>'
-    +'<p>今の生活や状況を少し教えてもらうと、kokoniもあなたに合った提案を考えやすくなります。</p></div>'
+    +'<p>今の生活や状況を少し教えてもらうと、すぷらんもあなたに合った提案を考えやすくなります。</p></div>'
     +'<div class="pct"><span class="pl">プロフィール入力状況</span><b>'+pct+'</b>%</div></div>'
     +'<div class="pfbar"><i style="width:'+pct+'%"></i></div>'
     +'<div class="pfchips">'+done.map(function(f){ return '<span class="on">✓ '+f.k+'</span>'; }).join("")
@@ -3001,12 +3001,11 @@ function pfForAI(){
   return o;
 }
 
-/* ── 心の地図タブ（プロフィール → 心の地図 → 最近見えてきたこと → 7つの視点 → AIミニセッション） ── */
+/* ── 心の地図タブ（心の地図 → 最近見えてきたこと → 7つの視点 → AIミニセッション） ── */
 function renderMapMain(body){
   const n=mapCount(), full=n>=MAP_N, started=mapStarted();
   const feed=mapFeed(1)[0], work=insights().working.slice(-1)[0];
-  let h=profileMini()
-    +'<div class="mapsum"><div class="mhero">'+mapArt(84)+'<div style="min-width:0">'
+  let h='<div class="mapsum"><div class="mhero">'+mapArt(84)+'<div style="min-width:0">'
     +'<h3 style="margin-bottom:2px">心の地図</h3>'
     +'<div class="lede" style="margin:0 0 6px;line-height:1.7">話したことや試したことから、<br>自分のパターンを少しずつ見つけていきます。</div>'
     +'<div class="mcount" id="mapHead">'+(full?'7つの視点が見えてきました':'見えてきたこと <b>'+n+'</b> / '+MAP_N)+'</div>'+mapPips()+'</div></div>'
@@ -3251,7 +3250,7 @@ function renderLog(){
   el.innerHTML=
     '<div class="myhead"><div class="av" aria-hidden="true">🌱</div><div style="min-width:0">'
     +'<b>'+esc(S.nickname||"ゲスト")+'さん</b><p>kokoniをご利用いただきありがとうございます。</p></div></div>'
-    +'<button class="mypf" onclick="openProfile()"><span>プロフィールの確認・編集</span><span class="pcta"><small>入力状況 '+pct+'%</small> ›</span></button>'
+    +profileMini()   // プロフィールの入力をうながすカード（2026-10-02 きろくタブから移動）
     +mySec("利用設定",[
       myRow("🔔","通知の設定","ふりかえり・手紙・毎日の記録の通知","myGo('notify')"),
       myRow("🧭","すぷらんが参考にしている情報","すぷらん（AI）が参考にしている情報を確認する","myGo('ai')")])
