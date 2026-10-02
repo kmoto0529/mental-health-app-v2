@@ -724,6 +724,39 @@ body:has(#s-flow.active .obw.night){background:#17221F}
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
 .chip{background:var(--paper);border:1px solid var(--line-input);border-radius:99px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--ink)}
 .mapnote{font-size:11.5px;color:var(--muted);margin:2px 18px 14px;line-height:1.75}
+.rvwrap{margin:0 18px}
+.rvhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 4px}
+.rvhead h2{font-size:19px;margin:0;color:var(--ink)}
+.rvmin{flex-shrink:0;font-size:11.5px;font-weight:800;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:3px 10px}
+.spq.rv{margin:6px 0 10px;display:flex;align-items:center;gap:8px}.spq.rv .sp-m{width:56px;height:56px}
+.rvmine{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px}
+.rvact{background:var(--paper2);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.rvact .k{font-size:11.5px;color:var(--muted);font-weight:700}.rvact b{font-size:15px;color:var(--ink)}
+.rvact .cnt{font-size:12.5px;color:var(--ink2);margin-top:2px}.rvact .cnt b{font-size:12.5px;color:var(--teal-deep)}
+.rvact input{margin-top:8px;font-size:14px}
+.rvq{margin-top:12px}.rvq .qh{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:800;color:var(--ink);margin-bottom:7px}
+.rvq .qs{font-size:12px;color:var(--muted);margin:-3px 0 7px}
+.rvchips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.rvchip{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:10px 6px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit}
+.rvchip.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep)}
+.rvex{background:none;border:1px solid var(--teal-line);border-radius:99px;padding:2px 9px;font-size:11.5px;font-weight:700;color:var(--teal-deep);cursor:pointer;font-family:inherit}
+.rvpop{background:#fff;border:1px solid var(--teal-line);border-radius:12px;padding:10px;margin-bottom:8px;box-shadow:0 4px 14px rgba(80,90,60,.1)}
+.rvpop .ph{font-size:12px;font-weight:800;color:var(--teal-deep);margin-bottom:6px}
+.rvpop button{display:block;width:100%;text-align:left;background:var(--paper2);border:none;border-radius:9px;padding:8px 10px;margin:5px 0;font-size:12.5px;line-height:1.6;color:var(--ink);cursor:pointer;font-family:inherit}
+.rvpop .pm{font-size:11.5px;color:var(--accent);margin-top:4px}
+.rvq textarea{width:100%;box-sizing:border-box;font-size:14px}
+.rvcnt{font-size:11px;color:var(--muted);text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}.rvcnt.over{color:var(--warn)}
+.rvq .chk{margin-bottom:6px}
+.rvshare{margin-top:14px;background:#EEF4E2;border:2px solid #B9CC98;border-radius:16px;padding:14px}
+.rsh b{display:block;font-size:15px;color:var(--teal-deep)}.rsh small{font-size:11.5px;color:var(--ink2)}
+.rsb{background:#fff;border-radius:12px;padding:10px 12px;margin-top:9px}
+.rsk{font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:3px}
+.rsv{font-size:13.5px;line-height:1.7;color:var(--ink)}.rsv.na{color:var(--muted)}
+.rsinc{display:block;font-size:12.5px;color:var(--ink2);margin:3px 0}
+.rsb textarea{width:100%;box-sizing:border-box;margin-top:6px;font-size:13.5px}
+.rsedit{display:block;margin:10px auto 10px}
+.rvneed{font-size:12px;color:var(--accent);text-align:center;margin:0 0 6px}
+.hcard2 .nt{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
 .lstate{display:flex;gap:6px;margin:0 18px 10px}
 .lstate span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:6px 2px;border-bottom:2px solid var(--line)}
 .lstate span.on{color:var(--teal-deep);font-weight:800;border-color:var(--teal)}
@@ -876,7 +909,7 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
   <section id="s-gate" class="screen">
     <div class="pagehead"><b style="font-size:16px" id="gateTitle">ふりかえり ── 週に1回</b><span></span></div>
     <div class="lstate" id="lstate" style="margin-top:10px">
-      <span data-s="before">レターを送る</span><span data-s="waiting">読んでもらう</span><span data-s="arrived">手紙が届く</span>
+      <span data-s="before">ふりかえる</span><span data-s="waiting">大塚さんに共有（任意）</span><span data-s="arrived">お返事を読む</span>
     </div><div id="gateBody"></div></section>
 
   <section id="s-log" class="screen">
@@ -1110,7 +1143,7 @@ function obDetails(){
   document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal obdmodal" onclick="event.stopPropagation()">'
     +'<div class="ob-deye">安心して使うために</div><h3>くわしく知る</h3><p style="font-size:12.5px">不安なときに、いつでも内容を確認できます。</p>'
     +sec("heart","kokoniについて",["kokoniは、気持ちや行動を整理し、小さな一歩を支えるセルフケアアプリです。","医療行為や診断を行うサービスではありません。"])
-    +sec("leaf","すぷらん（AI）について",["すぷらんはAIです。あなたの気持ちや行動の整理を手伝います。","提案や気づきはAIによるもので、正確さや効果を保証するものではありません。","すぷらんとの毎日の会話が、そのまま大塚さんに届くことはありません。","ふりかえりのたびに、あなたが確認した内容を臨床心理士/公認心理師の大塚さんに共有します。","プロフィール（今の状況・サポートの利用状況など）も、提案に役立てるため大塚さんに共有します。"])
+    +sec("leaf","すぷらん（AI）について",["すぷらんはAIです。あなたの気持ちや行動の整理を手伝います。","提案や気づきはAIによるもので、正確さや効果を保証するものではありません。","すぷらんとの毎日の会話が、そのまま大塚さんに届くことはありません。","ふりかえりの内容は、希望したときだけ、あなたが確認したうえで臨床心理士/公認心理師の大塚さんに共有します。","プロフィール（今の状況・サポートの利用状況など）も、提案に役立てるため大塚さんに共有します。"])
     +sec("data","データの取り扱いについて",["ニックネームで利用できます。実名は不要です。","入力した内容や利用状況は、サービスの改善や分析のために利用します。","個人が特定される情報を第三者に提供することはありません。","くわしくは"+link(PRIVACY_URL,"プライバシーポリシー")+"・"+link(TERMS_URL,"利用規約")+"をご確認ください。"])
     +sec("shield","安全について",["強い不安やつらさがあるときは、医療機関や相談窓口をご利用ください。ひとりで抱えこまず、専門の支援を受けることも大切です。"]," safe")
     +'<button class="btn" onclick="obAgree()">同意して進む</button><button class="linkbtn" onclick="closeWhy()">とじる</button></div></div>';
@@ -1781,7 +1814,7 @@ function ivRender(){
         +'<div style="font-size:12px;font-weight:800;color:var(--teal-deep);letter-spacing:.04em;margin-bottom:10px">まず3日、試してみること</div>'
         +'<h2 style="font-size:19px;line-height:1.75;margin-bottom:10px">'+a.title+'</h2>'
         +'<p class="lede" style="margin-bottom:14px">目安：'+planLabel()+'</p>'
-        +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">できない日があっても大丈夫です。<br>3日後に、自分に合っていそうかを一緒にふりかえります。<br>その内容を大塚さんに共有して、手紙が届きます。</p>'
+        +'<p style="font-size:13px;line-height:1.85;color:var(--ink2);margin-bottom:16px">できない日があっても大丈夫です。<br>3日後に、自分に合っていそうかを一緒にふりかえります。<br>希望すれば、その内容を大塚さんに共有してお返事をもらえます。</p>'
         +'<button class="btn" onclick="completeSetup()">まず3日、試してみる</button></div>'
         +debugPanel();
       window.scrollTo(0,document.body.scrollHeight);
@@ -2158,8 +2191,7 @@ function stepCard(){
   const doneToday = todayActLogs().length>0;
   let act;
   if(paused) act='<div class="pausebox">いまはお休み中です</div><button class="btn" onclick="resumeAction()">また試してみる</button>';
-  else if(reviewDay) act='<div class="sc-end">'+(c.cycle_type==="first"?'最初の3日間が終わりました':'今週の取り組みが終わりました')+'</div>'
-    +'<button class="btn" onclick="go(\'gate\')">ふりかえりをはじめる</button>';
+  else if(reviewDay) act='<div class="sc-end">'+(c.cycle_type==="first"?'最初の3日間が終わりました':'今週の取り組みが終わりました')+'</div>';
   else if(doneToday) act='<div class="sc-done"><span class="ck">✓</span>今日は試してみました</div>'
     +'<button class="btn ghost" onclick="openActRecord()">実施した記録を見る</button>'
     +'<button class="linkbtn again" onclick="openAction()">もう一度やってみる</button>';
@@ -2237,12 +2269,13 @@ function mapLockInfo(){
 function recallCard(){
   const c=refreshCycle(); if(!c) return "";
   const first=c.cycle_type==="first", st=c.weekly_review_status;
-  if(st==="available") return S.action_status==="paused" ? '<div class="hcard2 col today"><span class="ic2">📅</span><span class="tx"><b>今日がふりかえりの日</b></span>'
-    +'<button class="btn" onclick="go(\'gate\')">ふりかえりをはじめる</button></div>' : "";   // 通常は今日の一歩カードに表示
+  const note = SHARE_REQUIRED ? '大塚さんに共有して、お返事が届きます' : '希望すれば、大塚さんに共有できます';
+  if(st==="available") return '<div class="hcard2 col today rvhome"><span class="ic2">📅</span><span class="tx"><small>心理士とのふりかえり</small><b class="big">今日からできます</b><small class="nt">'+note+'</small></span>'
+    +'<button class="btn" onclick="go(\'gate\')">'+(first?'3日間をふりかえる':'今週をふりかえる')+'</button></div>';
   if(st==="completed") return '<div class="hcard2 col today"><span class="ic2">📅</span><span class="tx"><b>次の一歩を決めましょう</b></span>'
     +'<button class="btn" onclick="go(\'gate\')">次の一歩を決める</button></div>';
-  return '<div class="hcard2 cd" onclick="go(\'gate\')"><span class="ic2">📅</span><span class="tx"><small>'+(first?'最初のふりかえりまで':'次のふりかえりまで')+'</small>'
-    +'<b class="big">あと'+daysLeft()+'日</b></span></div>';
+  return '<div class="hcard2 cd" onclick="go(\'gate\')"><span class="ic2">📅</span><span class="tx"><small>心理士とのふりかえり</small>'
+    +'<b class="big">あと'+daysLeft()+'日</b><small class="nt">'+note+'</small></span></div>';
 }
 
 function renderHome(){
@@ -2666,7 +2699,7 @@ function mapLockedHtml(){
 
 /* ── ふりかえりのあと：次の1週間の一歩を決める（初回・通常で共通） ── */
 function nextCard(r){
-  const ans=(r.answers||{}), near={"このまま続けたい":"keep","少し調整したい":"adjust","別のやり方を見てみたい":"change"}[ans.next]
+  const ans=(r.answers||{}), near={"このまま続けたい":"keep","少し調整したい":"adjust","別のやり方を見てみたい":"change","別の一歩を試したい":"change"}[ans.next]
     || {"このまま続けてみたい":"keep","少し調整したい":"adjust","別のやり方も見てみたい":"change"}[(r.first_answers||{}).fit];
   const tag=function(k){ return near===k?' <span class="tag">ふりかえりの答えに近いもの</span>':''; };
   const cand=(S.next_candidates||[]).filter(function(c){ return r.weekly_cycle_id ? c.cycle_id===r.weekly_cycle_id : true; });
@@ -3448,15 +3481,15 @@ function myShare(){
     return Object.keys(n).filter(function(k){ return sel&&sel[k]; }).map(function(k){ return n[k]; }).join("・"); };
   return myBack()+'<div class="mysub"><h2>大塚さんへの共有履歴・同意の確認</h2>'
     +'<div class="mybox"><div class="myinfo"><div class="t"><b>共有のしくみ</b></div><div class="d">'
-    +'最初の3日、そのあとは1週間ごとに、あなたが選んだ内容を200文字までのレターにまとめ、確認してから大塚さんに共有できます。<br>'
-    +'送るのは、確認画面に表示した文だけです。ふりかえりのたびに共有します。<br>'
+    +'最初の3日、そのあとは1週間ごとにふりかえります。'+(SHARE_REQUIRED?'内容は確認してから大塚さんに共有します。':'希望すれば、確認した内容を大塚さんに共有できます。')+'<br>'
+    +'送るのは、「大塚さんに見てもらう内容」の枠に表示したものだけです。<br>'
     +'プロフィールは、提案に役立てるため大塚さんにも共有されます。会話の全文・毎日のメモは共有されません。<br>'
     +'レターは緊急の相談窓口ではありません。</div></div></div>'
     +'<div class="myh" style="margin:16px 4px 6px">これまでの共有</div>'
     +(L.length ? '<div class="mybox">'+L.map(function(r){ const d=new Date(Date.parse(r.completed_at));
         return '<div class="myinfo"><div class="t"><b>'+(d.getMonth()+1)+'/'+d.getDate()+' '+(r.cycle_type==="first"?"最初の3日":"1週間")+'のふりかえり</b>'
           +'<span class="st'+(r.shared?' on':'')+'">'+(r.shared?'共有した':'共有していない')+'</span></div>'
-          +'<div class="d">'+(r.shared ? '共有した内容：'+(items(r.share_select)||'—')+(r.ask?'・相談したいこと':'')+(r.letter?'（'+r.letter.chars+'文字）':'') : 'kokoniの中だけに保存しています')+'</div></div>'; }).join("")+'</div>'
+          +'<div class="d">'+(r.shared ? '共有した内容：'+(r.share_items ? r.share_items.join('・') : ((items(r.share_select)||'—')+(r.ask?'・相談したいこと':''))) : 'kokoniの中だけに保存しています')+'</div></div>'; }).join("")+'</div>'
       : '<div class="mybox"><div class="myinfo"><div class="d">まだふりかえりはありません。</div></div></div>')
     +'<button class="btn ghost" style="margin-top:12px" onclick="go(\'gate\')">レターと手紙は「ふりかえり」で見る</button></div>';
 }
@@ -3476,7 +3509,7 @@ function myGuide(){
     ["💬","すぷらんとはなす","すぷらん（AI）と一緒に、最近のことを整理したり、今週の一歩を見直したり、気持ちを少し話したりできます。大塚さんには自動で届きません。"],
     ["🗺","心の地図","話したことや試したことから、あなたのパターンが少しずつ見えてくる地図です。完成するものではありません。"],
     ["🌤","気持ちの記録","1日1回を目安に、今の気分を10秒で残せます。きろくで、気持ちの変化を見返せます。"],
-    ["✉️","ふりかえりと大塚さんへの共有","最初は3日後、そのあとは1週間ごとにふりかえります。内容を確認してから、毎回大塚さんに共有します。"]];
+    ["✉️","ふりかえりと大塚さんへの共有","最初は3日後、そのあとは1週間ごとにふりかえります。希望すれば、内容を確認してから大塚さんに共有できます。"]];
   return myBack()+'<div class="mysub"><h2>kokoniの使い方</h2>'
     +'<div class="mybox">'+G.map(function(g){ return '<div class="myinfo"><div class="t"><b>'+g[0]+' '+g[1]+'</b></div><div class="d">'+g[2]+'</div></div>'; }).join("")+'</div></div>';
 }
@@ -3488,7 +3521,7 @@ function myGuide(){
    - review_available_at＝開始＋cycle_length_days
    - weekly_review_status：locked → available（期間経過）→ completed（ふりかえり完了）
    - Home の「週1回のふりかえり」カードと「ふりかえり」タブは同じ S.cycle・同じふりかえりデータを使う
-   - 大塚さんへの共有は必須（2026-10-02 社長決定）。ふりかえりの完了＝レターの共有。AIとの対話のみ版は将来別途設計
+   - 大塚さんへの共有：2026-10-02 午前に必須→同日午後の仕様書で任意に（SHARE_REQUIRED で切り替え）。送らず保存でもふりかえりは完了
    - 共有できるのは 1 weekly_cycle につき 1 回まで
    ══════════════════════════════════════════════════════════════ */
 const DAY=86400000;
@@ -3594,7 +3627,7 @@ function renderGate(){
   document.getElementById("gateTitle").textContent = isFirst() ? "ふりかえり ── 最初の3日" : "ふりかえり ── 週に1回";
   const ls=document.getElementById("lstate");
   ls.style.display = (c.weekly_review_status==="available" || (r && r.shared)) ? "" : "none";
-  const stage = !r ? "before" : (r.letter_status==="arrived" ? "arrived" : "waiting");
+  const stage = !r ? "before" : (!r.shared ? "before" : (r.letter_status==="arrived" ? "arrived" : "waiting"));   // 送らなかったときはお返事待ちにしない
   document.querySelectorAll("#lstate span").forEach(s=>s.classList.toggle("on", s.dataset.s===stage));
   /* 前のサイクルで共有した分の手紙が未読なら、先に知らせる */
   const ul=unreadLetter(), banner = (ul && ul!==r)
@@ -3610,13 +3643,13 @@ function renderGate(){
 function gateLocked(c){
   const left=daysLeft(), first=isFirst();
   return `<div class="card" style="text-align:center">
-    <div class="lede">${first?"最初のふりかえりまで":"次のふりかえりまで"}</div>
+    <div class="lede">心理士とのふりかえりまで</div>
     <div style="font-size:40px;font-weight:800;color:var(--teal-deep);line-height:1.2;margin:4px 0"><span id="gateLeft">あと${left}日</span></div>
     <p style="font-size:13.5px;line-height:1.9;color:var(--ink2);margin:10px 0 16px">${first
       ? "最初の3日を過ごしたら、<br>今のやり方が自分に合っていそうか、<br>一緒に見なおしてみましょう。"
       : "次のふりかえりは <b>"+mdw(Date.parse(c.review_available_at))+"</b> です。<br>この1週間の様子をためて、<br>一緒にふりかえります。<br><span style=\"font-size:12.5px;color:var(--muted)\">"+DOW[REVIEW_DOW]+"曜日に送ると、大塚さんのお返事は"+LETTER_DAYS+"日ほどで届きます。</span>"}</p>
     <button class="btn" disabled>ふりかえりをする</button>
-    <p class="lede" style="margin-top:8px">その日になると、ふりかえりと送信ができるようになります。</p></div>`;
+    <p class="lede" style="margin-top:8px">その日になると、ふりかえりができます。${SHARE_REQUIRED?"内容は大塚さんに共有されます。":"希望すれば、大塚さんに共有できます。"}</p></div>`;
 }
 function miniInCycle(){
   if(!S.cycle) return null;
@@ -3624,15 +3657,24 @@ function miniInCycle(){
   return S.mini_sessions.filter(function(m){ return Date.parse(m.at)>=from; }).slice(-1)[0]||null;
 }
 /* ══════════════════════════════════════════════════════════════
-   ふりかえり → 引き継ぎレター（初回3日・通常7日で共通）
-   ① 選択式3問＋任意の気づき（実施ログは自動で表示。本人の申告とは別に保持）
-   ② 共有する内容を選ぶ（3項目は選択済み）＋「大塚さんに聞いてみたいこと」（80字まで）
-   ③ レター全文をプレビュー・編集（見出し込み200字まで）→ 共有する（共有は必須。「共有しない」は出さない）
+   ふりかえり（2026-10-02 再設計：1画面で完結）
+   上：自分のふりかえり（今回の一歩と実施記録＋任意の補足／① やってみてどうだった？／② 次はどうしたい？／③ 大塚さんに聞きたいこと 150字）
+       初回だけ「最初に話してくれたこと」（初回3問の答え。初期は全部未選択。安全確認の答えは出さない）
+   下：大塚さんに見てもらう内容（淡いグリーンの枠。この枠の中だけを送る。回答に合わせて自動で更新・編集と除外ができる）
+   - 3つの情報は別々に持つ：今回のふりかえり（200字）／相談（150字・本人の文のまま）／最初の3問（初回・選んだものだけ）
+   - 送信は1回。「この内容を大塚さんに送る」を押したときだけ共有。「今回は送らず、ふりかえりを保存」でも完了（SHARE_REQUIRED=false のとき）
    - レターは回答と実施記録だけから組み立てる（架空の内容を足さない）。本人が書いた相談は意味を変えず・切らない
    - 共有するもの：レター＋プロフィール（2026-10-02〜）／共有しないもの：AIとの会話全文・毎日のメモ全文・心の地図の詳細・未確認の仮説
    - 送るのはプレビューに表示した文だけ。1サイクル1回まで
    ══════════════════════════════════════════════════════════════ */
-const LETTER_LIMIT=200, ASK_LIMIT=80;   // 運用検証用の上限（定数）
+const LETTER_LIMIT=200, ASK_LIMIT=150;   // 今回のふりかえり200字／相談150字（別々に数える）
+/* 大塚さんへの共有を必須にするか。2026-10-02 午後の仕様書で「任意」に戻ったため false。true にすると「送らず保存」を出さない */
+const SHARE_REQUIRED=false;
+const RV_FEEL=["やりやすかった","少し難しかった","難しかった","まだ分からない"];
+const RV_NEXT=["このまま続けたい","少し調整したい","別の一歩を試したい","相談して決めたい"];
+const ASK_EX=["今の取り組みが自分に合っているか、どう判断すればいいですか？",
+  "やろうと思っても行動できない日があります。どうしたら無理なく取り組めますか？",
+  "気持ちが落ち込む理由がよく分かりません。何から整理していけばいいですか？"];
 const RV_Q=[
   {id:"tried", k:"どのくらい試せたか", q:"どのくらい試せましたか？", o:["まだできていない","1回やってみた","何回かやってみた","思ったよりできた"]},
   {id:"feel",  k:"やってみてどうだったか", q:"やってみてどうでしたか？", o:["やりやすかった","少し負担があった","かなり負担があった","まだよくわからない"]},
@@ -3644,6 +3686,9 @@ function rvInit(){
   const rv=S.rv=S.rv||{};
   rv.step=rv.step||"form"; rv.ans=rv.ans||{}; rv.self=rv.self||""; rv.ask=rv.ask||"";
   rv.sel=rv.sel||{state:true, action:true, reflection:true, note:false};
+  rv.inc=rv.inc||{action:true, outside:true, feel:true, next:true};   // 今回のふりかえりのうち、送る行
+  rv.first_sel=rv.first_sel||{state:false, topic:false, want:false}; // 初回3問：初期は全部未選択
+  rv.outside=rv.outside||"";
   return rv;
 }
 /* ── レターの各項目（実在データからだけ作る） ── */
@@ -3681,97 +3726,141 @@ function buildLetter(){
   return {text:t, ask_generated: !(rv.ask||"").trim() && !!ask, sections:{state:S1.full, action:A1.full, reflection:R1.full, note:note, ask:ask}};
 }
 
-/* ── ふりかえりの画面（3ステップ） ── */
+/* ── ふりかえりの画面（1画面） ── */
 function spMini(){ return '<img class="sp-xxs" src="assets/suplan/opt/base.png" alt="" width="22" height="22">'; }
+/* 初回3問の実際の答え（安全確認の答えは含めない。答えていない項目は出さない） */
+function firstAnswerItems(){
+  const it=[];
+  if(S.current_status) it.push({id:"state", k:"今の状態", v:S.current_status});
+  const tp=(S.current_concerns||[]).filter(function(x){ return x && x!=="まだわからない"; });
+  if(tp.length) it.push({id:"topic", k:"今、気になっていること", v:tp.join("・")+(S.iv_scene?"（本人の言葉：「"+S.iv_scene+"」）":"")});
+  if(S.direction_goal) it.push({id:"want", k:"少し先に目指したいこと", v:S.direction_goal});
+  return it;
+}
+function rvLines(){
+  const rv=rvInit(), d=cycleData(), a=rv.ans, L=[];
+  L.push({id:"action", t:"一歩："+(d.action.title||"—")+"（記録"+d.action.count+"回）"});
+  if((rv.outside||"").trim()) L.push({id:"outside", t:"アプリの外で："+rv.outside.trim()});
+  if(a.feel) L.push({id:"feel", t:"感想："+a.feel});
+  if(a.next) L.push({id:"next", t:"次は："+a.next});
+  return L;
+}
+/* 今回のふりかえり（送る文）。本人が直した文があればそれを正とする */
+function rvReflectText(){
+  const rv=rvInit();
+  if(rv.reflect_custom!=null) return rv.reflect_custom;
+  return rvLines().filter(function(l){ return rv.inc[l.id]!==false; }).map(function(l){ return l.t; }).join("\n");
+}
+function rvFirstShared(){
+  const rv=rvInit(); if(!isFirst()) return [];
+  return firstAnswerItems().filter(function(x){ return rv.first_sel[x.id]; });
+}
+function rvChips(id,list){
+  const rv=rvInit();
+  return '<div class="rvchips">'+list.map(function(o){ const on=rv.ans[id]===o;
+    return '<button class="rvchip'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="rvPick(\''+id+'\',\''+o+'\')">'+o+'</button>'; }).join("")+'</div>';
+}
 function gateReviewFlow(){
-  const rv=rvInit(), first=isFirst();
-  if(rv.step==="share") return gateShare();
-  if(rv.step==="preview") return gatePreview();
-  const d=cycleData(), ready=RV_Q.every(function(x){ return rv.ans[x.id]; });
-  return '<div class="spq"><img class="sp-m" src="assets/suplan/opt/base.png" alt="すぷらん" width="72" height="72"><div class="bub2">'+(first?'この3日間、どうだった？':'この1週間、どうだった？')+'</div></div>'
-    +'<div class="card"><h3>'+(first?'最初の3日をふりかえってみましょう':'この1週間をふりかえってみましょう')+'</h3>'
-    +'<p class="lede" style="margin-bottom:14px">'+(first?'うまくできたかどうかではなく、<br>この方法が自分に合いそうだったかを<br>一緒に見てみます。':'うまくできたかどうかより、<br>この1週間のやり方が合っていたかを見てみます。')+'</p>'
-    +RV_Q.map(function(x){ return '<div class="sum"><div class="v" style="font-weight:700;color:var(--ink);margin-bottom:8px">'+x.q+'</div>'
-      +(x.id==="tried"?'<div class="hint" style="font-size:12px;color:var(--muted);margin-bottom:8px">記録では、'+(first?'この3日':'この1週間')+'で '+d.action.count+'回 やってみています。</div>':'')
-      +'<div class="opts">'+x.o.map(function(o){ return '<button class="opt'+(rv.ans[x.id]===o?' sel':'')+'" onclick="rvPick(\''+x.id+'\',\''+o+'\')">'+o+'</button>'; }).join("")+'</div></div>'; }).join("")
-    +'<div class="askbox"><h4>やってみて気づいたこと<span class="opt-l">任意</span></h4>'
-    +'<div class="hint">小さなことで大丈夫です。書かなくても大丈夫です。</div>'
-    +'<textarea id="rvSelf" maxlength="200" oninput="S.rv.self=this.value" placeholder="（例）夜より朝の方がやりやすかった">'+esc(rv.self)+'</textarea></div>'
-    +(ready?'':'<p class="lede" style="color:var(--accent);margin:10px 0 0">3つの質問を選んでから進んでください。</p>')
-    +'<button class="btn" style="margin-top:12px" '+(ready?'':'disabled')+' onclick="rvNext(\'share\')">次へ</button></div>';
+  const rv=rvInit(), first=isFirst(), d=cycleData(), fa=first?firstAnswerItems():[];
+  let h='<div class="rvwrap">'
+    +'<div class="rvhead"><h2>'+(first?'最初の3日をふりかえろう':'今週をふりかえろう')+'</h2><span class="rvmin">約1分</span></div>'
+    +'<div class="spq rv"><img class="sp-m" src="assets/suplan/opt/base.png" alt="すぷらん" width="56" height="56"><div class="bub2">'+(first?'この3日間、どうだった？':'この1週間、どうだった？')+'</div></div>'
+    /* 自分のふりかえり（kokoniに保存） */
+    +'<div class="rvmine">'
+    +'<div class="rvact"><div class="k">今回の一歩</div><b>'+esc(d.action.title||"—")+'</b>'
+    +'<div class="cnt">アプリに残した実施記録：<b>'+d.action.count+'回</b></div>'
+    +(rv.out_open||rv.outside ? '<input type="text" id="rvOut" maxlength="100" placeholder="アプリの外でやったことがあれば（任意）" value="'+esc(rv.outside)+'" oninput="S.rv.outside=this.value;rvRefresh()">'
+      : '<button class="dslink" onclick="S.rv.out_open=true;rvRe()">＋ アプリの外でやったことを書く（任意）</button>')+'</div>'
+    +'<div class="rvq"><div class="qh">① やってみてどうだった？</div>'+rvChips("feel",RV_FEEL)+'</div>'
+    +'<div class="rvq"><div class="qh">② 次はどうしたい？</div>'+rvChips("next",RV_NEXT)+'</div>'
+    +'<div class="rvq"><div class="qh">③ 大塚さんに聞きたいことは？<button class="rvex" onclick="S.rv.ex_open=!S.rv.ex_open;rvRe()" aria-expanded="'+!!rv.ex_open+'">？ 相談例</button></div>'
+    +(rv.ex_open ? '<div class="rvpop"><div class="ph">例えば、こんな相談でも大丈夫です</div>'+ASK_EX.map(function(x,i){ return '<button onclick="rvUseEx('+i+')">'+x+'</button>'; }).join("")
+      +(rv.ex_msg?'<div class="pm">'+rv.ex_msg+'</div>':'')+'</div>' : '')
+    +'<textarea id="rvAsk" maxlength="'+ASK_LIMIT+'" rows="3" placeholder="相談したいことがあれば、ここに書いてね" oninput="S.rv.ask=this.value;rvRefresh()">'+esc(rv.ask)+'</textarea>'
+    +'<div class="rvcnt" id="askCnt">'+lcount(rv.ask)+' / '+ASK_LIMIT+'文字</div></div>';
+  if(first && fa.length) h+='<div class="rvq"><div class="qh">最初に話してくれたこと</div><div class="qs">大塚さんに知っておいてほしいことがあれば、選んでね。</div>'
+    +fa.map(function(x){ const on=!!rv.first_sel[x.id];
+      return '<div class="chk'+(on?' on':'')+'" onclick="rvFirst(\''+x.id+'\')"><span class="bx">'+(on?'✓':'')+'</span><span><b style="font-size:12.5px;color:var(--muted);font-weight:700">'+x.k+'</b><br>'+esc(x.v)+'</span></div>'; }).join("")+'</div>';
+  h+='</div>';
+  /* 大塚さんに見てもらう内容（この枠の中だけを送る） */
+  h+='<div class="rvshare" id="rvShare">'+rvShareInner()+'</div>';
+  h+='</div>';
+  return h;
 }
-function rvPick(id,o){ rvInit().ans[id]=o; const y=window.scrollY; renderGate(); window.scrollTo(0,y); }
-function rvNext(step){
-  const rv=rvInit(), el=document.getElementById("rvSelf"); if(el) rv.self=el.value;
-  const ak=document.getElementById("rvAsk"); if(ak) rv.ask=ak.value;
-  if((rv.self && RISK_RE.test(rv.self)) || (rv.ask && RISK_RE.test(rv.ask))){ openSafety("free_text","unspecified"); return; }
-  if(step==="preview"){ const L=buildLetter(); rv.letter=L.text; rv.letter_meta=L; rv.letter_edited=false; }
-  rv.step=step; renderGate(); window.scrollTo(0,0);
+function rvShareInner(){
+  const rv=rvInit(), a=rv.ans, ready=!!(a.feel && a.next), ref=rvReflectText(), ask=(rv.ask||"").trim(), fs=rvFirstShared();
+  const over=lcount(ref)>LETTER_LIMIT, askOver=lcount(ask)>ASK_LIMIT;
+  let h='<div class="rsh"><b>大塚さんに見てもらう内容</b><small>この枠内の情報だけが送信されます</small></div>';
+  h+='<div class="rsb"><div class="rsk">今回のふりかえり</div>';
+  if(rv.editing){
+    h+=rvLines().map(function(l){ const on=rv.inc[l.id]!==false;
+      return '<label class="rsinc"><input type="checkbox" '+(on?'checked':'')+(rv.reflect_custom!=null?' disabled':'')+' onchange="rvInc(\''+l.id+'\',this.checked)"> '+esc(l.t)+'</label>'; }).join("")
+      +'<textarea id="rvRef" rows="4" maxlength="'+(LETTER_LIMIT+40)+'" oninput="rvRefEdit(this)">'+esc(ref)+'</textarea>'
+      +'<div class="rvcnt'+(over?' over':'')+'" id="refCnt">'+lcount(ref)+' / '+LETTER_LIMIT+'文字</div>'
+      +(rv.reflect_custom!=null?'<button class="dslink" onclick="S.rv.reflect_custom=null;rvRe()">自動のまとめに戻す</button>':'');
+  } else h+= ref ? '<div class="rsv">'+esc(ref).replace(/\n/g,"<br>")+'</div>' : '<div class="rsv na">—</div>';
+  h+='</div>';
+  if(ask) h+='<div class="rsb"><div class="rsk">聞きたいこと</div><div class="rsv">'+esc(ask).replace(/\n/g,"<br>")+'</div></div>';
+  if(fs.length) h+='<div class="rsb"><div class="rsk">最初に話したこと</div><div class="rsv">'+fs.map(function(x){ return esc(x.k)+"："+esc(x.v); }).join("<br>")+'</div></div>';
+  h+='<button class="dslink rsedit" onclick="S.rv.editing=!S.rv.editing;rvRe()">'+(rv.editing?'編集をおえる':'内容を確認・編集する ✎')+'</button>';
+  if(over) h+='<p class="ltwarn">今回のふりかえりが200文字を超えています。少し短くしてください。</p>';
+  if(!ready) h+='<p class="rvneed">①と②を選ぶと送れます</p>';
+  h+='<button class="btn" id="ltSendBtn" '+(ready&&!over&&!askOver&&ref.trim()?'':'disabled')+' onclick="completeReview(true)">この内容を大塚さんに送る</button>';
+  if(!SHARE_REQUIRED) h+='<button class="btn ghost" id="rvSaveBtn" style="margin-top:8px" '+(ready?'':'disabled')+' onclick="completeReview(false)">今回は送らず、ふりかえりを保存</button>';
+  h+='<div class="foot" style="margin:10px 0 0">会話の全文・毎日のメモは送りません。<br><b>このレターは、緊急の相談窓口ではありません。</b>今すぐつらいときは、<a style="color:var(--teal-deep);cursor:pointer" onclick="openSupportList(\'gate\')">相談できる窓口</a>を見てください。</div>';
+  return h;
 }
-function gateShare(){
-  const rv=rvInit(), hasNote=!!(rv.self||"").trim();
-  return '<div class="roles"><span>'+spMini()+'すぷらんがまとめる</span><i>→</i><span>✍️ あなたが確認</span><i>→</i><span><span class="psyic sm">👤</span>大塚さん<small>ふりかえりごと</small></span></div>'
-    +'<div class="card"><h3>共有する内容を選ぶ</h3>'
-    +'<p class="lede" style="margin-bottom:12px">選んだ内容だけを使って、すぷらんが<br>臨床心理士/公認心理師の大塚さんへの短いレターにまとめるよ。</p>'
-    +LT_ITEMS.map(function(it){ const dis = it.id==="note" && !hasNote, on=rv.sel[it.id] && !dis;
-      return '<div class="chk'+(on?' on':'')+(dis?' dis':'')+'" '+(dis?'':'onclick="rvSel(\''+it.id+'\')"')+'><span class="bx">'+(on?'✓':'')+'</span>'
-        +'<span>'+(it.id==="note"?'その他、共有したい気づき'+(dis?'<span class="opt-l">気づいたことが未記入</span>':''):({state:"今の状態・テーマ",action:"試してみたこと",reflection:"本人の振り返り"}[it.id]))+'</span></div>'; }).join("")
-    +'</div>'
-    +'<div class="askbox" style="margin:0 18px"><h4>大塚さんに聞いてみたいこと</h4>'
-    +'<div class="hint">一番相談したいことを、ひとつだけ残してみましょう。<br>書かなくても大丈夫です。</div>'
-    +'<textarea id="rvAsk" maxlength="'+ASK_LIMIT+'" oninput="S.rv.ask=this.value;document.getElementById(\'askCnt\').textContent=lcount(this.value)+\' / '+ASK_LIMIT+'文字\'"'
-    +' placeholder="例：まだ取り組めていないのですが、もう少し簡単な方法に変えてもよいでしょうか？">'+esc(rv.ask)+'</textarea>'
-    +'<div class="cnt" id="askCnt">'+lcount(rv.ask)+' / '+ASK_LIMIT+'文字</div></div>'
-    +'<div style="margin:14px 18px 0"><button class="btn" onclick="rvNext(\'preview\')">共有レターをつくる</button>'
-    +'<button class="linkbtn" onclick="rvNext(\'form\')">‹ 質問にもどる</button></div>';
+function rvRe(){ const y=window.scrollY; renderGate(); window.scrollTo(0,y); }
+/* 入力中はフォーカスを外さないよう、下の枠と文字数だけ更新する */
+function rvRefresh(){
+  const rv=rvInit(), c=document.getElementById("askCnt"); if(c) c.textContent=lcount(rv.ask)+" / "+ASK_LIMIT+"文字";
+  const box=document.getElementById("rvShare"); if(box && !rv.editing) box.innerHTML=rvShareInner();
 }
-function rvSel(id){ const rv=rvInit(), ak=document.getElementById("rvAsk"); if(ak) rv.ask=ak.value; rv.sel[id]=!rv.sel[id]; renderGate(); }
-function gatePreview(){
-  const rv=rvInit(), n=lcount(rv.letter), over=n>LETTER_LIMIT;
-  return '<div class="card"><h3>大塚さんに共有する内容を確認しましょう</h3>'
-    +'<p class="lede" style="margin-bottom:12px">すぷらんがまとめた内容です。自由に直せます。<br>入れたくないことは外しても大丈夫です。</p>'
-    +'<div class="ltbox"><div class="lth"><span class="psyic sm">👤</span>臨床心理士/公認心理師 大塚さんへの共有レター</div>'
-    +'<textarea id="ltText" rows="8" oninput="rvLetterInput(this)">'+esc(rv.letter)+'</textarea>'
-    +'<div class="ltcnt'+(over?' over':'')+'" id="ltCnt">'+n+' / '+LETTER_LIMIT+'文字</div></div>'
-    +'<p class="ltwarn" id="ltWarn"'+(over?'':' hidden')+'>200文字を超えています。「相談したいこと」や「気づいたこと」を少し短くしてください。</p>'
-    +(rv.letter_meta && rv.letter_meta.ask_generated?'<p class="lede" style="font-size:12px;margin:8px 0 0">※「相談したいこと」は、次にどうしたいかの答えから入れています。違えば直してください。</p>':'')
-    +'<button class="btn" id="ltSendBtn" style="margin-top:14px" '+(over||!n?'disabled':'')+' onclick="completeReview(true)">この内容を大塚さんに共有する</button>'
-    +'<button class="linkbtn" onclick="rvNext(\'share\')">‹ 共有する内容を選びなおす</button></div>'
-    +'<div class="foot">送るのは、この画面に表示している文だけです。<br>会話の全文・毎日のメモは送りません。プロフィールは大塚さんにも共有されます。<br>'
-    +'<b>このレターは、緊急の相談窓口ではありません。</b><br>今すぐつらいときは、<a style="color:var(--teal-deep);cursor:pointer" onclick="openSupportList(\'gate\')">相談できる窓口</a>を見てください。</div>';
+function rvPick(id,o){ rvInit().ans[id]=o; rvRe(); }
+function rvFirst(id){ const rv=rvInit(); rv.first_sel[id]=!rv.first_sel[id]; rvRe(); }
+function rvInc(id,on){ rvInit().inc[id]=on; rvRe(); }
+function rvRefEdit(el){
+  const rv=rvInit(); rv.reflect_custom=el.value; rv.letter_edited=true;
+  const n=lcount(el.value), c=document.getElementById("refCnt"); if(c){ c.textContent=n+" / "+LETTER_LIMIT+"文字"; c.classList.toggle("over",n>LETTER_LIMIT); }
+  const b=document.getElementById("ltSendBtn"); if(b) b.disabled = n>LETTER_LIMIT || !el.value.trim() || !(rv.ans.feel&&rv.ans.next);
 }
-function rvLetterInput(el){
-  const rv=rvInit(); rv.letter=el.value; rv.letter_edited=true;
-  const n=lcount(el.value), over=n>LETTER_LIMIT;
-  const c=document.getElementById("ltCnt"); c.textContent=n+" / "+LETTER_LIMIT+"文字"; c.classList.toggle("over",over);
-  document.getElementById("ltWarn").hidden=!over; document.getElementById("ltSendBtn").disabled=over||!n;
+/* 相談例：空なら入れる。書きかけがあるときは上書きせず、入るときだけ後ろに足す */
+function rvUseEx(i){
+  const rv=rvInit(), x=ASK_EX[i], cur=(rv.ask||"").trim();
+  if(!cur) rv.ask=x;
+  else if(cur.indexOf(x)>=0){ rv.ex_msg="もう入っています"; return rvRe(); }
+  else if(lcount(cur+"\n"+x)<=ASK_LIMIT) rv.ask=cur+"\n"+x;
+  else { rv.ex_msg="書きかけの文章があるため、入れられませんでした（150文字まで）"; return rvRe(); }
+  rv.ex_msg=""; rv.ex_open=false; rvRe();
 }
-
-/* ふりかえりの完了。レターを共有して保存し（共有は必須）、このサイクルは completed にする（1サイクル1回まで） */
+function rvNext(){ rvRe(); }   // 互換（以前の3ステップ）
+/* ふりかえりの完了。share=true のときだけ大塚さんに共有する。どちらでも completed（1サイクル1回まで） */
 function completeReview(share){
   const c=refreshCycle();
   if(!c || c.weekly_review_status!=="available" || curReview()) return;
-  if(!share) return;   // 共有は必須（共有しないで終える経路はない）
-  const rv=rvInit(), d=cycleData();
-  if(!rv.letter){ const L=buildLetter(); rv.letter=L.text; rv.letter_meta=L; }   // 互換：直接呼ばれたとき
-  const text=(rv.letter||"").trim();
-  if(share && (lcount(text)>LETTER_LIMIT || !text)) return;
-  if(share && RISK_RE.test(text)){ openSafety("free_text","unspecified"); return; }
-  const sec=(rv.letter_meta||{}).sections||{};
-  /* 心理士側の表示順：相談したいこと → 今の状態 → 試したこと → 振り返り（本人が編集した場合は全文を正とする） */
-  const letter = share ? {text:text, chars:lcount(text), edited:!!rv.letter_edited, parsed:parseLetter(text)} : null;
-  const ans=rv.ans||{};
-  const legacyFit={"このまま続けたい":"このまま続けてみたい","少し調整したい":"少し調整したい","別のやり方を見てみたい":"別のやり方も見てみたい","まだよくわからない":"まだよくわからない"}[ans.next];
+  if(!share && SHARE_REQUIRED) return;
+  const rv=rvInit(), d=cycleData(), ans=rv.ans||{};
+  if(!(ans.feel && ans.next)) return;
+  const ref=rvReflectText().trim(), ask=(rv.ask||"").trim(), fs=rvFirstShared();
+  if(share && (!ref || lcount(ref)>LETTER_LIMIT || lcount(ask)>ASK_LIMIT)) return;
+  if([ref,ask,rv.outside||""].some(function(t){ return t && RISK_RE.test(t); })){ openSafety("free_text","unspecified"); return; }
+  /* 送るのは枠の中に表示していたものだけ。心理士側は ①最初の3問 → ②今回のふりかえり → ③相談 の順に表示 */
+  const text=[fs.length?"【最初に話したこと】\n"+fs.map(function(x){ return x.k+"："+x.v; }).join("\n"):"",
+    "【今回のふりかえり】\n"+ref, ask?"【聞きたいこと】\n"+ask:""].filter(Boolean).join("\n\n");
+  const letter = share ? {text:text, chars:lcount(ref), ask_chars:lcount(ask), edited:rv.reflect_custom!=null,
+    blocks:{first:fs.map(function(x){ return [x.k,x.v]; }), reflection:ref, ask:ask},
+    parsed:{state:"", action:"", reflection:ref, note:"", ask:ask, other:""}} : null;
   S.reviews.push({
     review_id:"RV-"+c.weekly_cycle_id, weekly_cycle_id:c.weekly_cycle_id, cycle_type:c.cycle_type, completed_at:nowIso(),
-    shared:share, answers:{tried:ans.tried||"", feel:ans.feel||"", next:ans.next||""},
+    shared:share, answers:{feel:ans.feel, next:ans.next, outside:(rv.outside||"").trim()},
     action_log:{action_id:d.action.action_id, title:d.action.title, count:d.action.count},   // 実施ログ（本人の申告とは別）
-    self_reflection:rv.self||"", share_select:Object.assign({},rv.sel), ask:(rv.ask||"").trim(),
-    letter:letter, sections:sec,
-    first_answers: c.cycle_type==="first" ? {fit:legacyFit, tried:ans.tried, feel:ans.feel} : null,
+    self_reflection:(rv.outside||"").trim(), ask:ask,
+    share_items: share ? ["今回のふりかえり"].concat(ask?["聞きたいこと"]:[]).concat(fs.length?["最初に話したこと（"+fs.map(function(x){ return x.k; }).join("・")+"）"]:[]) : [],
+    letter:letter,
+    first_answers: c.cycle_type==="first" ? {feel:ans.feel, next:ans.next} : null,
     items:[], moods:d.moods, talk_count:d.talk_count, action:d.action,
     mini_session_id: c.cycle_type==="first" && miniInCycle() ? miniInCycle().session_id : null,
-    note: share ? (rv.ask||"").trim() : "",
+    note: share ? ask : "",
     letter_status: share ? "waiting" : null, letter_read:false,
     letter_due_at: share ? new Date(dayStart(nowMs())+LETTER_DAYS*DAY).toISOString() : null
   });
@@ -3788,8 +3877,8 @@ function parseLetter(t){
 function reviewView(r){
   const a=r.answers||{};
   let h='';
-  if(r.letter) h+='<div class="sum"><div class="k">大塚さんに送ったレター（'+r.letter.chars+'文字）</div><div class="v" style="white-space:pre-wrap">'+esc(r.letter.text)+'</div></div>';
-  if(a.tried||a.feel||a.next) h+='<div class="sum"><div class="k">ふりかえりの答え'+(r.shared?'':' <span class="tag">自分用</span>')+'</div><div class="v">'+[a.tried,a.feel,a.next].filter(Boolean).map(esc).join("／")+'</div></div>';
+  if(r.letter) h+='<div class="sum"><div class="k">大塚さんに送った内容</div><div class="v" style="white-space:pre-wrap">'+esc(r.letter.text)+'</div></div>';
+  else if(a.tried||a.feel||a.next) h+='<div class="sum"><div class="k">ふりかえりの答え'+(r.shared?'':' <span class="tag">自分用</span>')+'</div><div class="v">'+[a.tried,a.feel,a.next].filter(Boolean).map(esc).join("／")+'</div></div>';
   if(r.action_log) h+='<div class="sum"><div class="k">実施記録</div><div class="v">「'+esc(r.action_log.title||"")+'」'+r.action_log.count+'回</div></div>';
   if(r.self_reflection) h+='<div class="sum"><div class="k">気づいたこと</div><div class="v" style="white-space:pre-wrap">'+esc(r.self_reflection)+'</div></div>';
   /* 以前の形式のふりかえり */
@@ -4767,7 +4856,8 @@ const PRO_SAMPLES=[
    action:{title:"3分間の呼吸", plan:"毎日・1回3分", times:2, days:2, len:3},
    moods:[0,1,1],
    letter:{ask:"朝、職場に向かう電車で動悸がします。呼吸以外にできることはありますか。",
-     state:"人との関わりが気になっていて、「少ししんどい」の記録が多い。", action:"「3分間の呼吸」。実施記録2回。", reflection:"1回やってみた。やりやすかった。このまま続けたい。", note:""}},
+     state:"人との関わりが気になっていて、「少ししんどい」の記録が多い。", action:"「3分間の呼吸」。実施記録2回。", reflection:"1回やってみた。やりやすかった。このまま続けたい。", note:"",
+     first:[["今の状態","少ししんどい"],["今、気になっていること","人間関係"]]}},
   {id:"c3", nickname:"そら", week:"3週目", cycle:"7日", status:"replied", sent:"先週火曜", due_days:-5,
    pf:{age_range:"40代", gender:"女性", life_status:"休職中", leave_duration:"1〜3か月未満", interests:["仕事・学業","将来","お金"], support_use:["現在、カウンセリングを利用している"], support_past:true, confidant:"いる", time_slots:["夕方"]},
    action:{title:"5分だけ散歩する", plan:"週3回・1回5分", times:3, days:3, len:7},
@@ -4799,7 +4889,8 @@ function liveClient(){
   return {id:"live", live:true, nickname:S.nickname||"ここに", week:(c?(c.cycle_type==="first"?"1週目（最初の3日）":(S.cycles.length+1)+"週目"):"セットアップ前"), status:st,
     pf:{age_range:S.age_range, gender:S.gender, life_status:S.life_status, leave_duration:S.leave_duration, interests:S.interests, support_use:S.support_use, support_past:S.support_past, confidant:S.confidant, time_slots:S.time_slots},
     action:{title:a?a.title:(S.first_action||"—"), plan:a?planLabel():"", times:logs.length, days:Object.keys(days).length, len:c?c.cycle_length_days:0, day:c?cycleDayLabel():""},
-    moods:mo, letter: rv ? {ask:P.ask, state:P.state, action:P.action, reflection:P.reflection, note:P.note, other:P.other, text:rv.letter.text, chars:rv.letter.chars, first:rv.cycle_type==="first"} : null};
+    moods:mo, letter: rv ? (rv.letter.blocks ? {first:rv.letter.blocks.first, reflection:rv.letter.blocks.reflection, ask:rv.letter.blocks.ask, text:rv.letter.text, chars:rv.letter.chars, isFirst:rv.cycle_type==="first"}
+      : {ask:P.ask, state:P.state, action:P.action, reflection:P.reflection, note:P.note, other:P.other, text:rv.letter.text, chars:rv.letter.chars, isFirst:rv.cycle_type==="first"}) : null};
 }
 function proClients(){ return [liveClient()].concat(PRO_SAMPLES.map(function(c){ const r=(S.pro_replies||{})[c.id]; return r ? Object.assign({},c,{status:"replied", reply:r.text}) : c; })); }
 function proSub(c){
@@ -4823,7 +4914,7 @@ function renderPro(){
   if(!c){ proView="list"; return renderPro(); }
   b.innerHTML='<button class="pbtn ghost" style="width:auto;padding:8px 14px;margin:0 0 14px" onclick="proView=\'list\';stopTimer();renderPro()">← 一覧へ</button>'
     +'<div class="pname">'+esc(c.nickname)+' さん <small>'+esc(c.week)+'</small></div>'
-    +'<div class="pcols"><div>'+proLetterBlocks(c)+proRecord(c)+'</div><div>'+proProfile(c)+(c.live?proLetterCard():proReplyCard(c))+'</div></div>'
+    +'<div class="pcols"><div>'+proLetterBlocks(c)+proRecord(c)+proAskBlock(c)+'</div><div>'+proProfile(c)+(c.live?proLetterCard():proReplyCard(c))+'</div></div>'
     +'<div class="timer"><span>このふりかえりにかかっている時間 <small>（自動計測）</small></span><b id="tm">0:00</b></div>';
   startTimer();
 }
@@ -4838,15 +4929,24 @@ function proProfile(c){
     +'<div class="pgrid">'+rows.map(function(r){ return '<div><span class="k">'+r[0]+'</span>'+(r[1]?esc(r[1]):'<span class="na">—</span>')+'</div>'; }).join("")+'</div></div>';
 }
 function proLetterBlocks(c){
-  const L=c.letter, row=function(k,v){ return v?'<div class="pitem"><span class="k">'+k+'</span>'+esc(v)+'</div>':''; };
-  if(!L) return '<div class="pcard"><h3>届いたレター</h3><p class="note">まだ届いたレターはありません。本人がふりかえりを終えると届きます。</p></div>';
-  const text=L.text||["今の状態："+L.state,"試したこと："+L.action,"振り返り："+L.reflection].concat(L.note?["気づいたこと："+L.note]:[]).concat(L.ask?["相談したいこと："+L.ask]:[]).join("\n");
-  return '<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7"><h3 style="color:#8a6a2a">本人が相談したいこと</h3>'
-    +(L.ask?'<div class="pitem" style="white-space:pre-wrap">'+esc(L.ask)+'</div>':'<p class="note">相談の記入はありません。</p>')+'</div>'
-    +'<div class="pcard"><h3>引き継ぎレター（'+(L.chars||lcount(text))+'文字）</h3>'
-    +'<p class="note">'+((L.first!=null?L.first:c.cycle==="3日")?"最初の3日":"この1週間")+'のふりかえり。本人が確認・編集して送った内容だけです。</p>'
-    +row("今の状態・テーマ",L.state)+row("試したこと",L.action)+row("本人の振り返り",L.reflection)+row("気づいたこと",L.note)+row("本人の追記",L.other)
-    +'<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:#6b7a85">送られた全文</summary><div class="pitem" style="white-space:pre-wrap">'+esc(text)+'</div></details></div>';
+  const L=c.letter;
+  if(!L) return '<div class="pcard"><h3>届いたレター</h3><p class="note">まだ届いたレターはありません。本人がふりかえりを終えて、共有を選ぶと届きます。</p></div>';
+  /* 新形式（blocks）と以前の形式（見出しつき1本の文）の両方を同じ順で見せる */
+  const first=L.first||[], ref=L.reflection!=null && L.state==null ? L.reflection
+    : [L.action?"試したこと："+L.action:"", L.reflection?"振り返り："+L.reflection:"", L.note?"気づいたこと："+L.note:"", L.state?"今の状態："+L.state:""].filter(Boolean).join("\n");
+  const isF = L.isFirst!=null ? L.isFirst : c.cycle==="3日";
+  let h='';
+  if(first.length) h+='<div class="pcard"><h3>① 最初に話してくれたこと</h3><p class="note">初回の3つの質問の答えのうち、本人が選んだものだけです。</p>'
+    +first.map(function(x){ return '<div class="pitem"><span class="k">'+esc(x[0])+'</span>'+esc(x[1])+'</div>'; }).join("")+'</div>';
+  h+='<div class="pcard"><h3>'+(first.length?'② ':'')+'今回のふりかえり（'+lcount(ref)+'文字）</h3>'
+    +'<p class="note">'+(isF?"最初の3日":"この1週間")+'のふりかえり。本人が確認して送った内容だけです。</p>'
+    +'<div class="pitem" style="white-space:pre-wrap">'+esc(ref)+'</div></div>';
+  return h;
+}
+function proAskBlock(c){
+  const L=c.letter; if(!L) return '';
+  return '<div class="pcard" style="border-color:#e8d9bd;background:#fffdf7"><h3 style="color:#8a6a2a">'+((L.first||[]).length?'③ ':'')+'大塚さんに聞きたいこと</h3>'
+    +(L.ask?'<div class="pitem" style="white-space:pre-wrap">'+esc(L.ask)+'</div>':'<p class="note">相談の記入はありません。</p>')+'</div>';
 }
 /* この期間の記録（回数と日数・気持ちの記録の並び）。会話の全文・メモは出さない */
 function proRecord(c){
