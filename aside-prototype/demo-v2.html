@@ -882,7 +882,8 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 .pam .pc{font-size:11px;color:#4f7a52;font-weight:700}.pam-d{font-size:12.5px;line-height:1.7;color:#4a5a66;background:#f6f8f9;border-radius:8px;padding:8px;margin-top:6px}
 .pam .pbtn.sm{width:auto;padding:6px 12px}
 .pconf .pitem{text-align:left}
-.reccard{background:#EEF4E2;border:1.5px solid #B9CC98;border-radius:16px;padding:14px;margin-top:12px;text-align:left}
+.reccard{background:#EEF4E2;border:1.5px solid #B9CC98;border-radius:16px;padding:14px;margin:12px 18px 0;text-align:left}
+.modal .reccard{margin:12px 0 0}
 .rc-h{font-size:12.5px;font-weight:800;color:var(--teal-deep)}.rc-t{display:block;font-size:17px;margin:4px 0 2px;color:var(--ink)}
 .rc-m{font-size:12.5px;color:var(--teal-deep);font-weight:700}.rc-r{font-size:13px;line-height:1.75;color:var(--ink2);margin:8px 0}
 .rc-src{font-size:11.5px;color:var(--muted);margin:6px 0 10px}.rc-st{font-size:13px;font-weight:800;color:var(--teal-deep)}.rc-st.muted{color:var(--muted);font-weight:700}
@@ -3453,6 +3454,7 @@ function renderLog(){
   if(v==="share") return el.innerHTML=myShare();
   if(v==="account") return el.innerHTML=myAccount();
   if(v==="guide") return el.innerHTML=myGuide();
+  if(v==="otayori") return el.innerHTML=myBack()+'<div class="mysub"><h2>すぷらんからのおたより</h2>'+(otList()||'<p class="lede">まだおたよりはありません。</p>')+'</div>';   // 2026-10-03 ふりかえりタブから移動
   const pct=pfPct();
   el.innerHTML=
     '<div class="myhead"><div class="av" aria-hidden="true">🌱</div><div style="min-width:0">'
@@ -3460,6 +3462,7 @@ function renderLog(){
     +profileMini()   // プロフィールの入力をうながすカード（2026-10-02 きろくタブから移動）
     +mySec("利用設定",[
       myRow("🔔","通知の設定","ふりかえり・手紙・毎日の記録の通知","myGo('notify')"),
+      myRow("📮","すぷらんからのおたより","これまでに届いたおたよりを読む","myGo('otayori')"),
       myRow("🧭","すぷらんが参考にしている情報","すぷらん（AI）が参考にしている情報を確認する","myGo('ai')")])
     +mySec("プライバシー・データ管理",[
       myRow("🗂","保存されている情報の確認","kokoniに残っている情報の一覧","myGo('data')"),
@@ -3664,22 +3667,24 @@ function mapRow(){
 
 function renderGate(){
   const c=refreshCycle(), b=document.getElementById("gateBody"), r=curReview();
+  const prev = !r && c && c.weekly_review_status==="locked" ? (S.reviews.slice(-1)[0]||null) : null;   // 直前のふりかえり
   otCheck();
   if(!c) return showLock("gate");
   document.getElementById("gateTitle").textContent = isFirst() ? "ふりかえり ── 最初の3日" : "ふりかえり ── 週に1回";
   const ls=document.getElementById("lstate");
-  ls.style.display = (c.weekly_review_status==="available" || (r && r.shared)) ? "" : "none";
-  const stage = !r ? "before" : (!r.shared ? "before" : (r.letter_status==="arrived" ? "arrived" : "waiting"));   // 送らなかったときはお返事待ちにしない
+  const rr = r || prev;
+  ls.style.display = (c.weekly_review_status==="available" || (rr && rr.shared)) ? "" : "none";
+  const stage = c.weekly_review_status==="available" || !rr || !rr.shared ? "before" : (rr.letter_status==="arrived" ? "arrived" : "waiting");   // 送らなかったときはお返事待ちにしない
   document.querySelectorAll("#lstate span").forEach(s=>s.classList.toggle("on", s.dataset.s===stage));
   /* 前のサイクルで共有した分の手紙が未読なら、先に知らせる */
-  const ul=unreadLetter(), banner = (ul && ul!==r)
+  const ul=unreadLetter(), banner = (ul && ul!==r && ul!==prev)
     ? `<div class="hrow letter tap" onclick="openLetter()"><span class="ic">✉️</span><div style="flex:1"><div class="k">大塚さんから</div>
         <div class="v">大塚さんから手紙が届きました</div></div><span style="align-self:center;font-size:13px;font-weight:800;color:var(--accent)">手紙を読む ›</span></div>` : "";
-  if(c.weekly_review_status==="locked") b.innerHTML=banner+gateLocked(c);
+  if(c.weekly_review_status==="locked") b.innerHTML=banner+(prev?gateCompleted(prev):"")+gateLocked(c);
   else if(c.weekly_review_status==="available") b.innerHTML=banner+gateReviewFlow();
   else b.innerHTML=banner+gateCompleted(r);
-  b.innerHTML += pastReviews() + otList();
-  if(r && r.letter_status==="arrived") r.letter_read=true;   // ふりかえりで表示した＝読んだ
+  b.innerHTML += pastReviews();
+  if(rr && rr.letter_status==="arrived") rr.letter_read=true;   // ふりかえりで表示した＝読んだ
 }
 /* ふりかえり前：残り日数だけ見せ、作成・送信はできない */
 function gateLocked(c){
@@ -3811,6 +3816,8 @@ function gateReviewFlow(){
     +'<div class="rvmine">'
     +'<div class="rvact"><div class="k">今回の一歩</div><b>'+esc(d.action.title||"—")+'</b>'
     +'<div class="cnt">アプリに残した実施記録：<b>'+d.action.count+'回</b></div>'
+    +(function(){ const pr=(S.recommendations||[]).filter(function(x){ return x.user_id===DS_USER && x.status==="accepted"; }).slice(-1)[0], pa=pr&&act(pr.action_master_id);
+      return pa ? '<div class="cnt" style="color:var(--teal-deep)">ふりかえりのあとは、大塚さんから提案された「'+esc(pa.title)+'」で始まります。</div>' : ''; })()
     +(rv.out_open||rv.outside ? '<input type="text" id="rvOut" maxlength="100" placeholder="アプリの外でやったことがあれば（任意）" value="'+esc(rv.outside)+'" oninput="S.rv.outside=this.value;rvRefresh()">'
       : '<button class="dslink" onclick="S.rv.out_open=true;rvRe()">＋ アプリの外でやったことを書く（任意）</button>')+'</div>'
     +'<div class="rvq"><div class="qh">① やってみてどうだった？</div>'+rvChips("feel",RV_FEEL)+'</div>'
@@ -3907,7 +3914,30 @@ function completeReview(share){
     letter_due_at: share ? new Date(dayStart(nowMs())+LETTER_DAYS*DAY).toISOString() : null
   });
   c.weekly_review_status="completed";
+  autoNext();
   go("gate");
+}
+/* 2026-10-03 社長決定：一歩の変更は大塚さんの提案ベース。ふりかえりのあとに自分で選び直す画面（続ける／調整／別の一歩）は出さない
+   - ふりかえりが終わったら、同じ一歩で次の7日間を始める
+   - 本人が「次の一歩として選んでおく」にした大塚さんの提案があれば、その一歩で始める（本人が選んだときだけ） */
+function autoNext(){
+  const c=S.cycle; if(!c) return;
+  const pr=(S.recommendations||[]).filter(function(x){ return x.user_id===DS_USER && x.status==="accepted" && act(x.action_master_id); }).slice(-1)[0]||null;
+  if(pr){ const from=S.act_id; setPlan(pr.action_master_id); S.act_frequency=pr.recommended_frequency; S.act_duration=pr.recommended_duration;
+    S.first_action=act(pr.action_master_id).title; S.action_adjusted_flag=false;
+    S.action_changes=(S.action_changes||[]).concat([{at:nowIso(), from:from, to:pr.action_master_id, via:"psychologist_recommendation", recommendation_id:pr.recommendation_id}]); }
+  S.next_candidates=(S.next_candidates||[]).filter(function(x){ return x.cycle_id!==c.weekly_cycle_id; });
+  S.action_confirmed_at=nowIso();
+  startCycle("regular");
+  if(pr){ recSet(pr,"applied"); pr.applied_cycle_id=S.cycle.weekly_cycle_id; }
+  S.last_next={from_cycle:c.weekly_cycle_id, cycle_id:S.cycle.weekly_cycle_id, action_id:S.act_id, rec_id:pr?pr.recommendation_id:null};
+}
+/* ふりかえりのあと、次の7日間をどうしたかの一言 */
+function nextInfo(r){
+  const L=S.last_next; if(!L || L.from_cycle!==r.weekly_cycle_id) return "";
+  const a=act(L.action_id), t=a?a.title:(S.first_action||"");
+  return '<div class="card tint"><h3 style="margin-bottom:4px">次の7日間</h3><p class="lede" style="margin:0">'
+    +(L.rec_id ? '大塚さんから提案された「'+esc(t)+'」で始めました。' : '「'+esc(t)+'」を続けます。<br>大塚さんから別の一歩の提案が届いたら、そこから選べます。')+'</p></div>';
 }
 /* 送った本文を見出しで分ける（心理士側の並べ替え用）。見出しのない行は「その他」 */
 function parseLetter(t){
@@ -3956,7 +3986,8 @@ function recCard(r){
   const now=canChangeAction();
   let btn;
   if(x.status==="applied") btn='<div class="rc-st">✓ この一歩で進めています</div>';
-  else if(x.status==="accepted") btn=now ? '<button class="btn" onclick="recApply(\''+x.recommendation_id+'\')">この一歩で次の7日間を始める</button>' : '<div class="rc-st">✓ 次の一歩として選んであります。次のふりかえりのあとに始められます。</div>';
+  else if(x.status==="accepted") btn=now ? '<button class="btn" onclick="recApply(\''+x.recommendation_id+'\')">この一歩で次の7日間を始める</button>'
+    : '<div class="rc-st">✓ 次の一歩として選びました。次のふりかえりのあと、この一歩で始まります。</div><button class="linkbtn" onclick="recDecline(\''+x.recommendation_id+'\')">やっぱり今の一歩を続ける</button>';
   else if(x.status==="declined") btn='<div class="rc-st muted">今回は、今の一歩を続けています</div>';
   else btn=(now ? '<button class="btn" onclick="recApply(\''+x.recommendation_id+'\')">この一歩を選ぶ</button>'
                 : '<button class="btn" onclick="recKeep(\''+x.recommendation_id+'\')">次の一歩として選んでおく</button>')
@@ -4003,7 +4034,7 @@ function gateCompleted(r){
   const first=r.cycle_type==="first";
   let h = r.shared
     ? `<div class="card"><h3>${first?"この3日間のふりかえりを共有しました":"今週のふりかえりは送信済みです"}</h3>
-        <p class="lede">${first?"同じふりかえりをもう一度送ることはできません。":"同じ週にもう一度送ることはできません。次のふりかえりで、また送れます。"}</p></div>`
+        <p class="lede">${r.letter_status==="arrived"?"大塚さんからお返事が届きました。":"お返事が届いたら、ここでお知らせします。"}</p></div>`
     : `<div class="card"><h3>${first?"最初のふりかえりを保存しました":"今週のふりかえりを保存しました"}</h3>
         <p class="lede">大塚さんには${first?"共有して":"送って"}いません。ふりかえりは kokoni の中に残っています。</p></div>`;
   if(r.shared && r.letter_status!=="arrived"){
@@ -4011,8 +4042,8 @@ function gateCompleted(r){
       <p><b>大塚さんが読んでいます</b><br>お返事は${LETTER_DAYS}日ほどで届きます。<br><span style="font-size:12.5px;color:var(--muted)">${mdw(Date.parse(r.letter_due_at))}ごろ</span></p></div>`;
   }
   if(r.shared && r.letter_status==="arrived") h+=letterHtml(r);
+  h+=nextInfo(r);
   h+=`<div class="card"><h3>${r.shared?"送った内容":"ふりかえりの内容"}</h3>${reviewView(r)}</div>`;
-  h+= nextCard(r);
   return h;
 }
 /* 回数・時間の調整。行動マスターの範囲内（下限まで）だけ */
@@ -4918,7 +4949,7 @@ function miniBack(){ const f=MINI&&MINI.from; MINI=null; go(f==="gate"||f==="map
 
 function pastReviews(){
   const cur=S.cycle?S.cycle.weekly_cycle_id:"";
-  const past=S.reviews.filter(function(r){ return r.weekly_cycle_id!==cur; }).slice().reverse();
+  const last=S.reviews.slice(-1)[0], past=S.reviews.filter(function(r){ return r.weekly_cycle_id!==cur && r!==last; }).slice().reverse();
   if(!past.length) return "";
   return '<div class="card"><h3>これまでのふりかえり</h3>'+past.map(function(r){
     const d=new Date(Date.parse(r.completed_at));
