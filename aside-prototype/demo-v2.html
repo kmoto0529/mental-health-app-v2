@@ -605,6 +605,33 @@ body:has(#s-flow.active .obw.night){background:#17221F}
 .ofc-tag{display:inline-block;margin-top:7px;font-size:11.5px;color:var(--ink2);background:#F3EEDF;border-radius:8px;padding:2px 8px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ofmore{display:block;width:100%;background:none;border:1.5px dashed var(--teal-line);border-radius:14px;padding:10px;font-size:13px;font-weight:700;color:var(--teal-deep);cursor:pointer;font-family:inherit;margin:2px 0 4px}
 .ofcta{margin-top:12px;background:#5F7F5C}
+.ofc-d1{font-size:13px;line-height:1.7;color:var(--ink2);margin:4px 0 2px}
+.ofc-meta{display:flex;flex-direction:column;gap:3px;margin:8px 0 2px}
+.ofc-meta span{font-size:12.5px;color:var(--ink);line-height:1.6}.ofc-meta i{font-style:normal;display:inline-block;min-width:3.4em;margin-right:6px;font-size:11px;font-weight:800;color:var(--teal-deep);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:0 8px;text-align:center}
+.ofc-multi{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:700;color:#7A5B1E;background:#F6EBD3;border-radius:8px;padding:2px 8px}
+.ofc-why{font-size:12px;line-height:1.7;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--teal-line)}
+.ofc-more{display:inline-block;margin-top:8px;background:none;border:1.5px solid var(--teal-line);border-radius:99px;padding:4px 14px;font-size:12.5px;font-weight:700;color:var(--teal-deep);cursor:pointer;font-family:inherit}
+.wdsheet{position:fixed;inset:0;z-index:1000;background:var(--bg,#F7F4EC);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wdin{max-width:480px;margin:0 auto;padding:0 0 28px}
+.wdtop{padding:6px 20px 4px}.wdtop h2{font-size:20px;margin:2px 0 4px;line-height:1.5}
+.wdkind{font-size:11.5px;font-weight:800;color:var(--teal-deep)}
+.wdsec{margin:12px 16px 0;background:var(--paper);border-radius:16px;padding:14px 16px}
+.wdsec h4{margin:0 0 6px;font-size:14px;font-weight:800;color:var(--teal-deep)}
+.wdsec p{margin:0 0 6px;font-size:13.5px;line-height:1.85;color:var(--ink2)}.wdsec p:last-child{margin-bottom:0}
+.wdsec.demo{background:linear-gradient(160deg,#FBFBF4,#EEF4E2)}
+.wdphone{max-width:250px;margin:4px auto 2px;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:12px;box-shadow:0 4px 14px rgba(60,70,40,.08);text-align:left}
+.wdp-h{font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px}
+.wdp-in{font-size:12.5px;line-height:1.75;color:var(--ink);background:var(--paper);border-radius:10px;padding:8px 10px;min-height:64px}
+.wdp-cur{display:inline-block;width:1px;height:13px;background:var(--teal);vertical-align:middle;margin-left:1px}
+.wdp-btn{margin-top:8px;text-align:center;font-size:12px;font-weight:800;color:#fff;background:var(--teal);border-radius:99px;padding:5px}
+.wdphone.breath{text-align:center}.brmins.sm{margin:4px 0 6px;gap:4px}.brmins.sm .rvchip{width:auto;padding:2px 10px;font-size:11px}
+.brcirc.sm{width:92px;height:92px;font-size:12px;margin:4px auto}.brclock.sm{font-size:16px;margin:0}
+.wdlog{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:6px 12px}
+.wdl{display:grid;grid-template-columns:3em minmax(0,1fr) auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--teal-line);font-size:12.5px}
+.wdl b{color:var(--teal-deep)}.wdl em{font-style:normal;display:flex;align-items:center;gap:3px;font-size:11.5px;color:var(--ink2)}
+.wdl-note{font-size:11.5px;color:var(--muted);padding:6px 0 2px}
+.wdvid{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--teal-deep);font-weight:800}
+.wdcta{margin:16px 16px 0;display:flex;flex-direction:column;gap:8px}
 .trycard{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r);padding:18px;margin:12px 0}
 .trycard h2{font-size:18.5px;line-height:1.55;margin:8px 0 8px}
 .trycard p{font-size:13.5px;line-height:1.85;color:var(--ink2);margin:0 0 8px}
@@ -893,6 +920,35 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 .alh{font-size:13px;font-weight:800;color:var(--ink)}.alm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
 .alm .dsb{padding:4px 2px;font-size:10.5px}.alm .dsb.sel{border-color:var(--teal);background:var(--teal-soft)}
 .alx summary{cursor:pointer;font-size:12.5px;color:var(--teal-deep);font-weight:700;margin:8px 0}
+.al2 .al-h{font-size:18px;margin:0 0 8px}
+.al-msg{background:var(--teal-soft);color:var(--teal-deep);font-size:13px;font-weight:700;line-height:1.7;border-radius:12px;padding:9px 12px;margin:4px 0 10px}
+.al-stat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:6px 0 4px}
+.al-s{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--paper2);border:1.5px solid var(--line);border-radius:10px;padding:5px 2px;font-family:inherit;cursor:pointer;color:var(--muted)}
+.al-s b{font-size:12px;color:var(--ink)}.al-s span{font-size:10.5px;font-weight:700}
+.al-s.on{background:var(--teal-soft);border-color:var(--teal-line)}.al-s.on span{color:var(--teal-deep)}
+.al-s.cur{border-color:var(--teal)}
+.al-stat.sm{margin:8px 0 10px}.al-stat.sm .al-s{cursor:default;padding:4px 2px}
+.al-note{margin:4px 0 2px}
+.alrow.open{background:var(--paper2);border:1.5px solid var(--teal-line);border-radius:12px;padding:10px;margin:6px 0}
+.alrow.open .alh small{font-size:11px;color:var(--muted);font-weight:700}
+.alrow.done,.alrow.todo{flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.alrow.done .alh,.alrow.todo .alh{min-width:3em}
+.alrow.todo .dslink{margin-left:auto}
+.al-ck{display:inline-flex;width:16px;height:16px;border-radius:50%;background:var(--teal);color:#fff;font-size:10px;align-items:center;justify-content:center}
+.al-v{flex:1;min-width:0;font-size:13px;color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.al-v .wlm{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--ink2)}
+.al-cancel{display:block;margin:6px auto 0}
+.al-rf{text-align:center}.al-rf p{font-size:13px;line-height:1.8;color:var(--ink2);margin:0 0 10px}
+.al-rfh{font-size:12px;font-weight:800;color:var(--teal-deep);margin-bottom:4px}
+.al-days{text-align:center;margin:4px 0 8px}
+.al-remx{margin:0 16px 16px}.al-rem{background:var(--paper);border-radius:12px;padding:10px 12px}
+.al-remon{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink)}
+.al-remt{display:flex;gap:14px;margin-top:6px;font-size:12.5px;color:var(--ink2)}
+.al-tl{margin:6px 0 12px}
+.al-ht{font-size:15px;font-weight:800;color:var(--ink);line-height:1.7;margin:2px 0 6px}.al-ht small{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+.al-pill{display:inline-block;font-size:11px;font-weight:800;color:#7A5B1E;background:#F6EBD3;border-radius:99px;padding:1px 10px}
+.cp-t.rec{background:#F7F0DE}.cp-t.rec span{color:#7A5B1E}.cp-t.rec.today{border-color:var(--teal)}
+.cp-d.rec i{background:#EBDDB5;border-color:#DCC892}.cp-d.rec.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--teal)}
 .sc-next{font-size:12px;color:var(--teal-deep);background:var(--paper);border:1px dashed var(--teal-line);border-radius:10px;padding:6px 10px;margin:8px 0 0}
 .ofnote{font-size:12px;color:var(--muted);margin:-2px 0 8px}
 .rvfx summary{cursor:pointer;font-size:12.5px;color:var(--teal-deep);font-weight:700;margin:10px 0 6px}
@@ -1518,10 +1574,35 @@ const WORKS=[
    category_id:"CALM", category_name:"落ち着く", default_frequency:"毎日", default_duration:3, minimum_duration:1, cadence_type:"daily", difficulty:1,
    app_type:"breathing", cta:"呼吸法をはじめる", adjustable_fields:["duration"], status:"published", initial_work:true, cta_label:"呼吸法をはじめる", caution:"", reflection:""},
   {action_id:"WORK_ACTIVITY", work_type:"activity_log", title:"1日の行動と気持ちをふりかえる", short_description:"何をして、どんな気持ちだったかを残してみよう。",
-   instruction:"朝・昼・夕方・夜に、何をしていたか、そのときどんな気持ちだったかを残してみましょう。全部うめなくて大丈夫です。",
+   instruction:"朝・昼・夕方・夜を目安に、何をしていたか、そのときどんな気持ちだったかを少しずつ残してみましょう。全部うめなくて大丈夫です。夜に、その日の記録を少しふりかえります。",
    category_id:"ACT", category_name:"ふりかえる", default_frequency:"毎日", default_duration:5, minimum_duration:3, cadence_type:"daily", difficulty:1,
-   app_type:"activity_log_v2", cta:"今日の行動をふりかえる", adjustable_fields:["duration"], status:"published", initial_work:true, cta_label:"今日の行動をふりかえる", caution:"", reflection:""}
+   app_type:"activity_log_v2", cta:"今日の記録をはじめる", adjustable_fields:["duration"], status:"published", initial_work:true, cta_label:"今日の記録をはじめる", caution:"", reflection:""}
 ];
+/* ワークの詳しい説明（2026-10-03 初回ワーク提案UX改善）。画面は共通4要素：どんなこと／なぜ／どれくらい／ポイント＋実施イメージ
+   video は将来、大塚さんの解説動画（1〜2分）を足すための入れ物。{title, url, thumbnail, duration_sec, caption}
+   url が入っているときだけ画面に出す（未制作のプレースホルダーは出さない）。動画がなくても文章だけで分かるようにする */
+const WORK_DETAIL={
+  journaling:{name:"思ったことを書き出す", line:"頭に浮かんだことを、自由に書き出す", freq:"毎日", time:"3〜5分程度から",
+    what:["頭に浮かんだことを、自由に書き出すワークです。","文章にまとめたり、きれいに書いたりする必要はありません。","思いついたことを、そのまま言葉にしてみましょう。"],
+    why:["頭の中にある考えや気持ちを言葉にすることで、今の自分が何を感じ、何を気にしているのか、少し整理する手がかりになります。"],
+    how:["毎日・3〜5分程度から。"],
+    points:["「今日は疲れた」など、短い一言からでも大丈夫。","毎日を目安にしますが、書けない日があっても失敗ではありません。"],
+    demo:"journal", video:null},
+  breathing:{name:"呼吸を整える時間をつくる", line:"すぷらんのガイドに合わせて、呼吸に意識を向ける", freq:"毎日", time:"1〜3分",
+    what:["すぷらんのガイドに合わせて、短い時間、自然な呼吸に意識を向けてみるワークです。","1分・2分・3分から選べます。"],
+    why:["忙しかったり、考え事が続いたりする日常の中で、今の身体や呼吸に意識を向ける時間をつくります。"],
+    how:["毎日・1〜3分。"],
+    points:["無理に深く呼吸する必要はありません。","苦しくなったり、不快に感じたりした場合は、いつでも中断できます。"],
+    demo:"breath", video:null},
+  activity_log:{name:"1日の行動と気持ちをふりかえる", kind:"行動活性化の第一歩（活動モニタリング）", line:"何をしていたか、そのときの気持ちを、1日の中で少しずつ残す",
+    freq:"朝・昼・夕方・夜が目安", time:"1日の中で数回、少しずつ書き足す", multi:true,
+    what:["1日の要所要所で、「何をしていたか」「そのとき、どんな気持ちだったか」を少しずつ記録するワークです。","朝・昼・夕方・夜の4つの時間帯を目安にしています。"],
+    why:["自分がどんな行動をしたときに、どんな気持ちになりやすいのか。その関係を知るためのワークです。","記録を重ねることで、自分にとって少し心地よい時間や、気持ちに影響している生活のパターンを探していきます。"],
+    how:["朝・昼・夕方・夜の4つの時間帯を目安に、1日を通して少しずつ記録します。","夜に、その日の記録を少しふりかえります。"],
+    points:["1日4つの時間帯に分けて記録するのが目安ですが、毎回必ず入力する必要はありません。","思い出したタイミングで、あとからまとめて記録することもできます。","すべての時間帯を埋めなくても大丈夫です。"],
+    demo:"activity", video:null}
+};
+function workDetail(a){ return a && WORK_DETAIL[a.work_type] || null; }
 function injectWorks(){
   WORKS.forEach(function(w){ w.match=WORK_RULES[w.work_type]; if(!AM_BY_ID[w.action_id]){ AM.actions.push(w); AM_BY_ID[w.action_id]=w; } });
 }
@@ -1647,14 +1728,7 @@ function renderWork(type,opt){
       +'<button class="btn ghost" id="brEnd" style="margin-top:8px;display:none" onclick="brFinish(true)">ここでやめる</button>'
       +'<p class="wknote">呼吸を深くしたり、止めたりしなくて大丈夫。自然なペースでいいよ。</p></div>';
   } else if(type==="activity_log_v2"||type==="activity_log"){
-    const P=["朝","昼","夕方","夜"];
-    h+='<div class="card wk"><div class="spq rv"><img class="sp-m" src="assets/suplan/opt/watering.png" alt="" width="56" height="56"><div class="bub2">今日、何をして<br>どんな気持ちだった？</div></div>'
-      +'<p class="wknote" style="margin-top:0">全部うめなくて大丈夫。思い出せるところだけでOK。</p>'
-      +P.map(function(t,i){ return '<div class="alrow"><div class="alh">'+t+'</div><input type="text" class="alWhat" data-i="'+i+'" maxlength="60" placeholder="何をしていた？" oninput="alCheck()">'
-        +'<div class="alm" data-i="'+i+'">'+DAILY.map(function(d){ return '<button class="dsb" style="--c:'+d.c+'" data-code="'+d.code+'" onclick="alMood('+i+',\''+d.code+'\')">'+face(d.lv,20)+'<span>'+d.v+'</span></button>'; }).join("")+'</div></div>'; }).join("")
-      +'<details class="alx"><summary>＋ 時刻をくわしく残す（任意）</summary><div class="alrow"><input type="time" id="alTime"><input type="text" id="alXWhat" maxlength="60" placeholder="何をしていた？" oninput="alCheck()"></div></details>'
-      +'<button class="btn" id="alSave" disabled onclick="alSave()">保存する</button></div>';
-    window.__AL=P.map(function(){ return {what:"", mood:""}; });
+    openAL(opt); return;   // 1日の行動と気持ち：時間帯ごとに保存する画面（下の AL）
   }
   body.innerHTML=h; window.scrollTo(0,0);
 }
@@ -1701,26 +1775,239 @@ function brFinish(early){
   workLog({breath_seconds:done, breath_planned_minutes:BR.min, ended_early:!!early});
   workDone(early?"ここまで、おつかれさま":"呼吸に意識を向けられたね");
 }
-function alMood(i,code){ const L=window.__AL[i]; L.mood = L.mood===code ? "" : code;
-  document.querySelectorAll('.alm[data-i="'+i+'"] .dsb').forEach(function(b){ b.classList.toggle("sel", b.dataset.code===L.mood); }); alCheck(); }
-function alCheck(){
-  document.querySelectorAll(".alWhat").forEach(function(e){ window.__AL[+e.dataset.i].what=e.value; });
-  const x=(document.getElementById("alXWhat")||{}).value||"";
-  const ok=window.__AL.some(function(L){ return L.what.trim()||L.mood; }) || x.trim();
-  const b=document.getElementById("alSave"); if(b) b.disabled=!ok;
+/* ══════════════════════════════════════════════════════════════
+   1日の行動と気持ち（2026-10-03 活動記録UX改善）
+   - 朝・昼・夕方・夜は目安。時間帯ごとに保存する。1つ保存しても、1日のワークの完了にはしない
+   - 同じ日・同じ時間帯は1件。あとから編集できる（前の内容は edit_history に残す）。書きかけは下書きとして残す
+   - 1日のふりかえり（夜が目安・翌日以降も可）を保存したときだけ「ふりかえり済み」。実施記録（act_logs）はこのとき1件
+   - 1日の状態：not_started ／ recording ／ reflected ／ paused。現在時刻だけで「未達成」にはしない
+   - 今日の気持ち（daily_states）とは別データ。活動記録の気持ちを今日の気持ちへ登録しない（source / data_type で区別）
+   ══════════════════════════════════════════════════════════════ */
+const AL_P=["朝","昼","夕方","夜"], AL_LBL={"朝":"朝","昼":"お昼","夕方":"夕方","夜":"夜"};
+const AL_NEXT={"朝":"お昼","昼":"夕方","夕方":"夜","夜":""}, AL_SAY={"朝":"お昼や夕方も","昼":"夕方や夜も","夕方":"夜も","夜":""};
+let AL={date:"", open:null, mood:"", msg:"", view:"log", pick:null};
+function alHour(){ return new Date(nowMs()).getHours(); }
+function alToday(){ return isoDate(nowMs()); }
+function alRecs(date){ return (S.activity_logs||[]).filter(function(r){ return r.recorded_date===date && !r.deleted; }); }
+function alSlotRec(date,p){ return alRecs(date).filter(function(r){ return r.time_period===p; }).slice(-1)[0]||null; }
+function alDayInfo(date){ return (S.al_days||[]).filter(function(d){ return d.date===date; })[0]||null; }
+function alDayState(date){
+  date=date||alToday();
+  const info=alDayInfo(date);
+  if(info && info.status==="reflected") return "reflected";
+  if(S.action_status==="paused" && date===alToday()) return "paused";
+  return alRecs(date).length ? "recording" : "not_started";
 }
-/* 活動記録は今日の気持ち（daily_states）とは別データ。気持ちの記録は作らない */
-function alSave(){
-  alCheck(); const P=["朝","昼","夕方","夜"], d=isoDate(nowMs()), ids=[]; S.activity_logs=S.activity_logs||[];
-  window.__AL.forEach(function(L,i){ if(!L.what.trim() && !L.mood) return;
-    const r={activity_log_id:"AL-"+Date.now().toString(36)+"-"+i, user_id:DS_USER, recorded_date:d, time_period:P[i], activity_content:L.what.trim(), associated_mood:L.mood, created_at:nowIso(), cycle_id:S.cycle?S.cycle.weekly_cycle_id:""};
-    S.activity_logs.push(r); ids.push(r.activity_log_id); });
-  const xt=(document.getElementById("alTime")||{}).value||"", xw=((document.getElementById("alXWhat")||{}).value||"").trim();
-  if(xw){ const r={activity_log_id:"AL-"+Date.now().toString(36)+"-x", user_id:DS_USER, recorded_date:d, time_period:"時刻", time:xt, activity_content:xw, associated_mood:"", created_at:nowIso(), cycle_id:S.cycle?S.cycle.weekly_cycle_id:""}; S.activity_logs.push(r); ids.push(r.activity_log_id); }
-  if(!ids.length) return;
-  workLog({activity_log_ids:ids});
-  if(window.__AL.some(function(L){ return RISK_RE.test(L.what); }) || RISK_RE.test(xw)){ openSafety("free_text","unspecified"); return; }
-  workDone("今日の行動をふりかえったね");
+function alIsWork(){ return workType(S.act_id)==="activity_log"; }
+function alDayName(date){ if(date===alToday()) return "今日"; if(date===isoDate(nowMs()-DAY)) return "昨日"; const d=new Date(dateMs(date)); return (d.getMonth()+1)+"/"+d.getDate(); }
+/* その日を含むサイクル（今のサイクルの期間外なら、同じ日の記録が持つ cycle_id を使う） */
+function alCycleId(date){
+  const c=S.cycle;
+  if(c){ const from=dayStart(Date.parse(c.cycle_started_at)), m=dateMs(date); if(m>=from && m<from+c.cycle_length_days*DAY) return c.weekly_cycle_id; }
+  const r=alRecs(date).filter(function(x){ return x.cycle_id; })[0]; return r ? r.cycle_id : (c?c.weekly_cycle_id:"");
+}
+/* 今、記録しやすい時間帯（目安）。記録済みなら、まだの時間帯へ */
+function alSuggest(date){
+  const done=function(p){ return !!alSlotRec(date,p); };
+  if(date!==alToday()) return AL_P.filter(function(p){ return !done(p); })[0]||"夜";
+  const h=alHour(), cur= h<11?0:(h<15?1:(h<19?2:3));
+  for(let k=cur;k<4;k++) if(!done(AL_P[k])) return AL_P[k];
+  for(let k=cur-1;k>=0;k--) if(!done(AL_P[k])) return AL_P[k];
+  return AL_P[cur];
+}
+function alOrder(r){ if(r.time_period!=="時刻") return AL_P.indexOf(r.time_period)*100;
+  const t=(r.time||"12:00").split(":"), h=+t[0]; return (h<11?0:(h<15?1:(h<19?2:3)))*100+50+(+t[1]||0)/100; }
+/* サイクル内の集計（心理士画面・ふりかえりで使う。実施記録数と1日のふりかえり完了数を分ける） */
+function alStats(c){
+  c=c||S.cycle; if(!c) return {days:0, slots:0, reflected:0};
+  const from=dayStart(Date.parse(c.cycle_started_at)), to=from+c.cycle_length_days*DAY;
+  const inC=function(date){ const m=dateMs(date); return m>=from && m<to; };
+  const R=(S.activity_logs||[]).filter(function(r){ return !r.deleted && inC(r.recorded_date); });
+  return {days:new Set(R.map(function(r){ return r.recorded_date; })).size, slots:R.length,
+    reflected:(S.al_days||[]).filter(function(d){ return d.status==="reflected" && inC(d.date); }).length};
+}
+function alStatsText(s,sep){ return ["活動記録があった日："+s.days+"日","記録した時間帯："+s.slots+"件","1日のふりかえり完了："+s.reflected+"日"].join(sep||" ／ "); }
+
+/* ── 下書き（入力の途中で閉じても消えない）── */
+function alDraft(date,p){ return (S.al_draft||{})[date+"|"+p]; }
+function alDraftSet(){
+  if(!AL.open) return; const el=document.getElementById("alW");
+  S.al_draft=S.al_draft||{}; S.al_draft[AL.date+"|"+AL.open]={what:el?el.value:"", mood:AL.mood, at:nowIso()};
+  saveState(); alCheck();
+}
+function alCheck(){ const el=document.getElementById("alW"), b=document.getElementById("alSave"); if(b) b.disabled=!((el&&el.value.trim())||AL.mood); }
+function alMood(code){ AL.mood = AL.mood===code ? "" : code;
+  document.querySelectorAll('.alrow.open .dsb').forEach(function(b){ b.classList.toggle("sel", b.dataset.code===AL.mood); }); alDraftSet(); }
+
+/* ── 画面 ── */
+function openAL(opt){
+  opt=(opt && typeof opt==="object") ? opt : {};
+  AL={date:opt.date||alToday(), open:null, mood:"", msg:"", view:opt.view||"log", pick:null};
+  if(AL.view==="log"){ const s=alSuggest(AL.date); if(!alSlotRec(AL.date,s) && alDayState(AL.date)!=="reflected") alOpenSlot(s,true); }
+  renderAL(); window.scrollTo(0,0);
+}
+function alGo(view,date){ go("act"); openAL({view:view, date:date}); }
+function alOpenSlot(p,quiet){
+  AL.open=p; const r=alSlotRec(AL.date,p), d=alDraft(AL.date,p);
+  AL.mood = d ? d.mood : (r ? r.associated_mood : "");
+  if(!quiet){ AL.msg=""; renderAL(); const e=document.querySelector(".alrow.open"); if(e) e.scrollIntoView({block:"center"}); }
+}
+function alCloseSlot(){ AL.open=null; AL.mood=""; renderAL(); }
+function alRow(p){
+  const r=alSlotRec(AL.date,p), d=alDraft(AL.date,p);
+  if(AL.open===p){
+    const v = d ? d.what : (r ? r.activity_content : "");
+    return '<div class="alrow open" data-p="'+p+'"><div class="alh">'+p+(r?' <small>記録あり・編集中</small>':'')+'</div>'
+      +'<input type="text" id="alW" maxlength="60" placeholder="何をしていた？" value="'+esc(v)+'" oninput="alDraftSet()">'
+      +'<div class="alm">'+DAILY.map(function(x){ return '<button class="dsb'+(AL.mood===x.code?' sel':'')+'" style="--c:'+x.c+'" data-code="'+x.code+'" onclick="alMood(\''+x.code+'\')">'+face(x.lv,20)+'<span>'+x.v+'</span></button>'; }).join("")+'</div>'
+      +'<button class="btn" id="alSave" '+((v.trim()||AL.mood)?'':'disabled')+' onclick="alSaveSlot()">'+p+'の記録を'+(r?'直す':'残す')+'</button>'
+      +(r||alRecs(AL.date).length?'<button class="dslink al-cancel" onclick="alCloseSlot()">とじる</button>':'')
+      +'</div>';
+  }
+  if(r) return '<div class="alrow done" data-p="'+p+'"><div class="alh">'+p+' <span class="al-ck" aria-label="記録あり">✓</span></div>'
+    +'<div class="al-v">'+esc(r.activity_content||"（行動は書いていません）")+(r.associated_mood?'<span class="wlm">'+face(dsLevel(r.associated_mood),16)+dsLabel(r.associated_mood)+'</span>':'')+'</div>'
+    +'<button class="dslink" onclick="alOpenSlot(\''+p+'\')">編集</button></div>';
+  return '<div class="alrow todo" data-p="'+p+'"><div class="alh">'+p+'</div><button class="dslink" onclick="alOpenSlot(\''+p+'\')">'+(d&&(d.what||d.mood)?'書きかけの続きを書く':'＋ '+p+'の記録を残す')+'</button></div>';
+}
+function renderAL(){
+  if(AL.view==="reflect") return renderALReflect();
+  const a=curAct(), body=document.getElementById("actBody"), dn=alDayName(AL.date), st=alDayState(AL.date), recs=alRecs(AL.date), today=AL.date===alToday();
+  const ex=recs.filter(function(r){ return r.time_period==="時刻"; });
+  let h=workHead(a)+'<div class="card wk al2">'
+    +'<h2 class="al-h">'+dn+'の行動と気持ち</h2>'
+    +'<div class="spq rv"><img class="sp-m" src="assets/suplan/opt/watering.png" alt="" width="56" height="56"><div class="bub2">何をして、どんな気持ちだった？<br>思い出せるところだけで大丈夫だよ。</div></div>'
+    +(AL.msg?'<div class="al-msg" role="status">'+AL.msg+'</div>':'')
+    +'<div class="al-stat" aria-label="時間帯ごとの記録">'+AL_P.map(function(p){ const r=alSlotRec(AL.date,p);
+      return '<button class="al-s'+(r?' on':'')+(AL.open===p?' cur':'')+'" onclick="alOpenSlot(\''+p+'\')"><b>'+p+'</b><span>'+(r?'✓ 記録あり':'これから')+'</span></button>'; }).join("")+'</div>'
+    +'<p class="wknote al-note">時間帯は目安です。あとからまとめて書いても大丈夫。</p>'
+    +AL_P.map(alRow).join("")
+    +(ex.length?'<div class="alrow done">'+ex.map(function(r){ return '<div class="al-v"><b>'+esc(r.time||"時刻")+'</b> '+esc(r.activity_content)+'</div>'; }).join("")+'</div>':'')
+    +'<details class="alx"><summary>＋ 時刻をくわしく残す（任意）</summary><div class="alrow"><input type="time" id="alTime"><input type="text" id="alXWhat" maxlength="60" placeholder="何をしていた？">'
+    +'<button class="btn ghost sm" onclick="alSaveExtra()">この記録を残す</button></div></details>'
+    +'</div>';
+  if(recs.length){
+    const night = !today || alHour()>=19;
+    h+= st==="reflected"
+      ? '<div class="card al-rf done"><div class="sc-done"><span class="ck">✓</span>'+dn+'の記録をふりかえりました</div><p class="wknote" style="margin:0 0 6px;text-align:center">あとから書き足しても大丈夫です。</p><button class="btn ghost" onclick="AL.view=\'reflect\';renderAL()">ふりかえりを見直す</button></div>'
+      : '<div class="card al-rf"><div class="al-rfh">1日の終わりに</div><p>'+dn+'の行動と気持ちを、少しふりかえってみよう。全部うまっていなくても大丈夫。</p>'
+        +'<button class="btn'+(night?'':' ghost')+'" onclick="AL.view=\'reflect\';AL.pick=null;renderAL();window.scrollTo(0,0)">'+dn+'の記録をふりかえる</button></div>';
+  }
+  /* 前の日の記録も見る・書き足せる */
+  const y=isoDate(dateMs(AL.date)-DAY+12*3600000);
+  h+='<div class="al-days">'+(today
+      ? (alRecs(y).length?'<button class="dslink" onclick="openAL({date:\''+y+'\'})">昨日の記録を見る'+(alDayState(y)!=="reflected"?'・ふりかえる':'')+'</button>':'')
+      : '<button class="dslink" onclick="openAL({})">今日の記録にもどる</button>')+'</div>';
+  h+=alReminderUI();
+  body.innerHTML=h;
+}
+function alSaveSlot(){
+  const p=AL.open; if(!p) return; const el=document.getElementById("alW"), w=(el?el.value:"").trim();
+  if(!w && !AL.mood) return;
+  S.activity_logs=S.activity_logs||[];
+  let r=alSlotRec(AL.date,p); const edit=!!r;
+  if(r){ (r.edit_history=r.edit_history||[]).push({activity_content:r.activity_content, associated_mood:r.associated_mood, at:r.updated_at||r.created_at});
+    r.activity_content=w; r.associated_mood=AL.mood; r.updated_at=nowIso(); }
+  else { r={activity_log_id:"AL-"+Date.now().toString(36)+"-"+AL_P.indexOf(p), user_id:DS_USER, recorded_date:AL.date, time_period:p, activity_content:w, associated_mood:AL.mood,
+      created_at:nowIso(), updated_at:nowIso(), cycle_id:alCycleId(AL.date), source:"activity_log", data_type:"activity_slot"};
+    S.activity_logs.push(r); }
+  if(S.al_draft) delete S.al_draft[AL.date+"|"+p];
+  const info=alDayInfo(AL.date); if(info && info.status==="reflected") info.updated_after_reflect=nowIso();
+  AL.msg = edit ? AL_LBL[p]+"の記録を直したよ。"
+    : (p==="夜" ? "夜の記録を残せたね。よかったら、"+alDayName(AL.date)+"の記録を少しふりかえってみよう。"
+                : AL_LBL[p]+"の記録を残せたね。"+AL_SAY[p]+"、気づいたときに少しずつ残してみよう。");
+  AL.open=null; AL.mood="";
+  saveState();
+  if(RISK_RE.test(w)){ openSafety("free_text","unspecified"); return; }   // 書いた内容でも安全対応を優先（記録は残す）
+  renderAL(); window.scrollTo(0,0);
+}
+function alSaveExtra(){
+  const xt=(document.getElementById("alTime")||{}).value||"", xw=((document.getElementById("alXWhat")||{}).value||"").trim(); if(!xw) return;
+  S.activity_logs=S.activity_logs||[];
+  S.activity_logs.push({activity_log_id:"AL-"+Date.now().toString(36)+"-x", user_id:DS_USER, recorded_date:AL.date, time_period:"時刻", time:xt, activity_content:xw, associated_mood:"",
+    created_at:nowIso(), updated_at:nowIso(), cycle_id:alCycleId(AL.date), source:"activity_log", data_type:"activity_slot"});
+  AL.msg=(xt||"その時刻")+"の記録を残せたね。"; saveState();
+  if(RISK_RE.test(xw)){ openSafety("free_text","unspecified"); return; }
+  renderAL(); window.scrollTo(0,0);
+}
+
+/* ── 1日のふりかえり（本人が記録した内容だけを並べる。未入力の時間帯は作らない）── */
+function renderALReflect(){
+  const a=curAct(), body=document.getElementById("actBody"), dn=alDayName(AL.date), info=alDayInfo(AL.date);
+  const recs=alRecs(AL.date).slice().sort(function(x,y){ return alOrder(x)-alOrder(y); });
+  if(!recs.length){ AL.view="log"; return renderAL(); }
+  if(AL.pick==null) AL.pick = info ? (info.easiest||"") : "";
+  const acts=[]; recs.forEach(function(r){ const t=(r.activity_content||"").trim(); if(t && acts.indexOf(t)<0) acts.push(t); });
+  const opts=acts.concat(["よく分からない","特になかった"]); window.__ALO=opts;
+  body.innerHTML=workHead(a)+'<div class="card wk al2">'
+    +'<h2 class="al-h">'+dn+'の記録をふりかえる</h2>'
+    +'<div class="spq rv"><img class="sp-m" src="assets/suplan/opt/base.png" alt="" width="56" height="56"><div class="bub2">'+dn+'の行動と気持ちを、<br>一緒に見てみよう。</div></div>'
+    +'<div class="wdlog al-tl">'+recs.map(function(r){ return '<div class="wdl"><b>'+esc(r.time_period==="時刻"?(r.time||"時刻"):r.time_period)+'</b><span>'+esc(r.activity_content||"—")+'</span><em>'+(r.associated_mood?face(dsLevel(r.associated_mood),16)+dsLabel(r.associated_mood):'')+'</em></div>'; }).join("")+'</div>'
+    +'<div class="rvq"><div class="qh">'+(dn==="今日"?'今日':'この日')+'、少しでも気持ちが楽だったのはどんなとき？</div><p class="rvhint" style="margin-top:0">答えなくても大丈夫。</p>'
+    +'<div class="rvchips">'+opts.map(function(o,k){ const on=AL.pick===o; return '<button class="rvchip'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="alPick('+k+')">'+esc(o)+'</button>'; }).join("")+'</div></div>'
+    +'<button class="btn" onclick="alFinish()">'+dn+'の記録を終える</button>'
+    +'<button class="dslink" style="display:block;margin:10px auto 0" onclick="AL.view=\'log\';renderAL()">記録にもどる</button></div>';
+}
+function alPick(k){ const o=(window.__ALO||[])[k]; AL.pick = AL.pick===o ? "" : o; renderALReflect(); }
+function alFinish(){
+  const recs=alRecs(AL.date); if(!recs.length) return;
+  S.al_days=S.al_days||[];
+  let info=alDayInfo(AL.date); const first=!info || info.status!=="reflected";
+  if(!info){ info={al_day_id:"ALD-"+Date.now().toString(36), user_id:DS_USER, date:AL.date, created_at:nowIso()}; S.al_days.push(info); }
+  Object.assign(info,{status:"reflected", easiest:AL.pick||"", reflected_at:info.reflected_at||nowIso(), updated_at:nowIso(), slot_count:recs.length,
+    activity_log_ids:recs.map(function(r){ return r.activity_log_id; }), cycle_id:alCycleId(AL.date), source:"activity_log", data_type:"activity_day_reflection"});
+  /* 実施記録は「1日のふりかえり」1回につき1件（同じ日を見直しても増やさない） */
+  if(first) workLog({kind:"al_reflect", day:AL.date, cycle_id:info.cycle_id, activity_log_ids:info.activity_log_ids,
+    at: AL.date===alToday() ? nowIso() : new Date(dateMs(AL.date)+21*3600000).toISOString()});
+  saveState();
+  const dn=alDayName(AL.date), pk=AL.pick, isAct=pk && pk!=="よく分からない" && pk!=="特になかった";
+  document.getElementById("actBody").innerHTML='<div class="card tint" style="text-align:center;margin-top:24px">'
+    +'<img class="sp-m" src="assets/suplan/opt/happy.png" alt="" width="80" height="80" style="display:block;margin:0 auto 6px">'
+    +'<h2 style="font-size:18px;margin-bottom:8px">'+dn+'の記録をふりかえったね</h2>'
+    +'<p class="lede" style="margin-bottom:6px">'+(isAct ? '「'+esc(pk)+'」のときは、少し楽だったんだね。<br>こういう時間が、自分を知る手がかりになるかもしれないね。' : '残した記録は、自分を知る手がかりになるよ。')+'</p>'
+    +'<p class="wknote" style="margin-bottom:14px">記録は、あとから見直したり書き足したりできます。</p>'
+    +'<button class="btn" onclick="closeAction()">ホームへ</button></div>';
+  window.scrollTo(0,0);
+}
+
+/* ── お知らせ（オプトイン・1日2回まで）。実際の通知は未実装：将来の通知処理が alReminderDue() を見て出す ── */
+const AL_REM_TEXT={noon:"お昼になったね。ここまでの行動を、少し残してみる？", night:"今日もおつかれさま。思い出せるところだけ、振り返ってみよう。"};
+function alRem(){ S.al_reminder=S.al_reminder||{enabled:false, noon:"12:30", night:"21:00", updated_at:""}; return S.al_reminder; }
+function alReminderDue(kind){
+  const R=alRem(), d=alToday();
+  if(!R.enabled || !R[kind]) return false;
+  if(!alIsWork() || S.action_status==="paused") return false;                 // お休み中は止める
+  if(kind==="noon") return !alSlotRec(d,"昼");                                  // すでに残していれば出さない
+  if(kind==="night") return alDayState(d)!=="reflected";
+  return false;
+}
+function alReminderUI(){
+  const R=alRem();
+  return '<details class="alx al-remx"'+(R.enabled?' open':'')+'><summary>お知らせを受け取る（任意）</summary><div class="al-rem">'
+    +'<label class="al-remon"><input type="checkbox" id="alRemOn" '+(R.enabled?'checked':'')+' onchange="alRemSet()"> 1日2回まで、記録のお知らせを受け取る</label>'
+    +'<div class="al-remt"><label>昼 <input type="time" id="alRemNoon" value="'+esc(R.noon)+'" onchange="alRemSet()"></label><label>夜 <input type="time" id="alRemNight" value="'+esc(R.night)+'" onchange="alRemSet()"></label></div>'
+    +'<p class="wknote" style="margin:6px 0 0">お知らせを見逃しても、できなかったことにはなりません。お休み中や、すでに記録しているときは届きません。<br>※ このデモでは、実際の通知はまだ届きません。</p></div></details>';
+}
+function alRemSet(){
+  const R=alRem(), g=function(id){ return document.getElementById(id); };
+  R.enabled=!!(g("alRemOn")&&g("alRemOn").checked); if(g("alRemNoon")) R.noon=g("alRemNoon").value||R.noon; if(g("alRemNight")) R.night=g("alRemNight").value||R.night; R.updated_at=nowIso();
+  saveState();
+}
+
+/* ── Home「今日の一歩」（活動記録を選んでいるとき）── */
+function alHomeBlock(){
+  const d=alToday(), st=alDayState(d), recs=alRecs(d), slots=recs.filter(function(r){ return r.time_period!=="時刻"; });
+  const strip='<div class="al-stat sm" aria-label="今日の記録">'+AL_P.map(function(p){ const r=alSlotRec(d,p); return '<span class="al-s'+(r?' on':'')+'"><b>'+p+'</b><span>'+(r?'✓':'これから')+'</span></span>'; }).join("")+'</div>';
+  const y=isoDate(nowMs()-DAY), ylink = alRecs(y).length && alDayState(y)!=="reflected" ? '<button class="linkbtn again" onclick="alGo(\'reflect\',\''+y+'\')">昨日の記録をふりかえる</button>' : '';
+  if(st==="reflected") return '<div class="sc-done"><span class="ck">✓</span>今日の記録をふりかえりました</div>'+strip
+    +'<button class="btn ghost" onclick="alGo(\'log\')">今日の記録を見る</button>';
+  if(!recs.length) return '<p class="al-ht">今日の行動と気持ちを、少しずつ残そう。</p><button class="btn" onclick="alGo(\'log\')">今日の記録をはじめる</button>'+ylink;
+  const pill='<span class="al-pill">記録中</span>';
+  if(alHour()>=19) return pill+'<p class="al-ht">今日の行動と気持ちを、少しふりかえってみよう。</p>'+strip
+    +'<button class="btn" onclick="alGo(\'reflect\')">今日の記録をふりかえる</button><button class="linkbtn again" onclick="alGo(\'log\')">続きの記録を残す</button>'+ylink;
+  let t;
+  if(recs.length===1){ const p=recs[0].time_period; t = AL_LBL[p] ? AL_LBL[p]+"の記録を残せたね。"+(AL_NEXT[p]?AL_NEXT[p]+"はどうだった？":"") : "記録を残せたね。"; }
+  else { const nx=alSuggest(d); t="今日も少しずつ記録が増えてきたね。"+(!alSlotRec(d,nx)?'<small>'+AL_LBL[nx]+'のことも、気づいたときに残してみよう。</small>':''); }
+  return pill+'<p class="al-ht">'+t+'</p>'+strip+'<button class="btn" onclick="alGo(\'log\')">続きの記録を残す</button>'+ylink;
 }
 function renderAction(phase){
   const a=curAct(); const body=document.getElementById("actBody");
@@ -2016,7 +2303,7 @@ function ivRender(){
         +'<h2>最初の3日、これを試してみよう</h2>'
         +'<div class="tc-flow"><span><b>今日</b>決める</span><i aria-hidden="true">›</i><span><b>3日</b>試す</span><i aria-hidden="true">›</i><span><b>あとで</b>見直す</span></div></div>');
     }
-    ivSay("できそうなものを、<br>1つ選んでみよう",
+    ivSay("今のお話から、できそうなワークを考えたよ。<br>内容を見て、気になるものを1つ選んでね。",
       function(){ renderOffers(tray); });
     break; }
 
@@ -2103,7 +2390,19 @@ function reasonTags(r){
 /* 表示順に、前のカードと同じ理由は出さない */
 function offerTag(r,used){ const t=reasonTags(r).filter(function(x){ return used.indexOf(x)<0; })[0]; if(t) used.push(t); return t||""; }
 function offerCard(r,tag,main){
-  const a=r.a, i=S.iv_offered.indexOf(r), on=S.iv_sel===i;
+  const a=r.a, i=S.iv_offered.indexOf(r), on=S.iv_sel===i, D=workDetail(a);
+  if(D){
+    /* 初回の3つのワーク：名前／どんなことをするか1行／頻度／時間・取り組み方／理由（おすすめのみ）／詳しく見る */
+    return '<div class="ofc wd'+(main?' main':'')+(on?' on':'')+'" role="button" tabindex="0" aria-pressed="'+on+'" data-work="'+a.work_type+'" onclick="ivSel('+i+')">'
+      +(on?'<span class="ofc-ck" aria-hidden="true">✓</span>':'')
+      +'<div class="ofc-t">'+esc(D.name)+'</div>'
+      +'<div class="ofc-d1">'+esc(D.line)+'</div>'
+      +'<div class="ofc-meta"><span><i>頻度</i>'+esc(D.freq)+'</span><span><i>時間</i>'+esc(D.time)+'</span></div>'
+      +(D.multi?'<div class="ofc-multi">1日に数回、書き足すワークです</div>':'')
+      +(main && !S.iv_no_rank && workReason(r) ? '<div class="ofc-why">'+workReason(r)+'</div>' : '')
+      +'<button class="ofc-more" onclick="event.stopPropagation();openWorkDetail('+i+')">詳しく見る</button>'
+      +'</div>';
+  }
   const freq = isTrigger(a) ? "必要なときに" : a.default_frequency;
   return '<button class="ofc'+(main?' main':'')+(on?' on':'')+'" aria-pressed="'+on+'" onclick="ivSel('+i+')">'
     +(on?'<span class="ofc-ck" aria-hidden="true">✓</span>':'')
@@ -2126,9 +2425,9 @@ function renderOffers(tray){
   /* おすすめ（いちばん点の高い候補）は最初から選択状態。ほかを選べる自由は残す */
   if(S.iv_no_rank){
     const used0=[];
-    let h0='<div class="ofh">3つの中から、やってみたいものを選んでね</div><p class="ofnote">どれも1日数分からはじめられます。合わなくても、あとで大塚さんと相談できます。</p>'
+    let h0='<div class="ofh">3つの中から、やってみたいものを選んでね</div><p class="ofnote">「詳しく見る」で、内容と負担を確かめられます。合わなくても、あとで大塚さんと相談できます。</p>'
       +S.iv_offered.map(function(r){ return offerCard(r,"",false); }).join("")
-      +'<button class="btn ofcta" '+(S.iv_sel==null?'disabled':'')+' onclick="ivPick(S.iv_sel)">この一歩を選ぶ</button>';
+      +'<button class="btn ofcta" '+(S.iv_sel==null?'disabled':'')+' onclick="ivPick(S.iv_sel)">このワークを試してみる</button>';
     tray.innerHTML=h0+debugPanel();
     if(!S.iv_more_scrolled){ S.iv_more_scrolled=true; const f=document.getElementById("ivFlow"), c=f&&f.querySelector(".trycard.v2"); if(c) c.scrollIntoView({block:"start"}); }
     return;
@@ -2136,12 +2435,12 @@ function renderOffers(tray){
   if(S.iv_sel==null || !S.iv_offered[S.iv_sel]) S.iv_sel=0;
   const used=[], rest=S.iv_offered.slice(1);
   let h='<div class="ofh">すぷらんのおすすめ</div>'+offerCard(S.iv_offered[0],offerTag(S.iv_offered[0],used),true);
-  if(!S.iv_more) h+='<button class="ofmore" onclick="S.iv_more=true;renderOffers(document.getElementById(\'ivTray\'))">ほかの候補を見る ＋</button>';
+  if(!S.iv_more) h+='<button class="ofmore" onclick="S.iv_more=true;renderOffers(document.getElementById(\'ivTray\'))">'+(rest.length && rest.every(function(r){ return r.a && r.a.initial_work; }) ? 'ほかの'+rest.length+'つのワークを見る' : 'ほかの候補を見る ＋')+'</button>';
   else {
     h+='<div class="ofh sub">ほかの候補</div><div class="ofrest">'+rest.map(function(r){ return offerCard(r,offerTag(r,used),false); }).join("")+'</div>';
     if(S.iv_offered.length<OFFER_MAX && !S.iv_offered.every(function(r){ return r.a && r.a.initial_work; })) h+='<button class="ofmore" onclick="ivAlt()">さらにほかも見る ＋</button>';
   }
-  h+='<button class="btn ofcta" onclick="ivPick(S.iv_sel)">この一歩を選ぶ</button>';
+  h+='<button class="btn ofcta" onclick="ivPick(S.iv_sel)">'+(S.iv_offered[S.iv_sel]&&S.iv_offered[S.iv_sel].a.initial_work?'このワークを試してみる':'この一歩を選ぶ')+'</button>';
   tray.innerHTML = h + debugPanel();
   if(!S.iv_more_scrolled){ S.iv_more_scrolled=true; const f=document.getElementById("ivFlow"), c=f&&f.querySelector(".trycard.v2"); if(c) c.scrollIntoView({block:"start"}); }
 }
@@ -2153,6 +2452,53 @@ function ivAlt(){
   renderOffers(tray);
 }
 function ivSel(i){ if(!S.iv_offered[i]) return; S.iv_sel=i; const y=window.scrollY; renderOffers(document.getElementById("ivTray")); window.scrollTo(0,y); }
+/* ── ワークの詳しい説明（別画面）。開いただけでは決めない。「このワークを試してみる」で確認へ進む ── */
+/* おすすめの理由（1〜2行）。本人が答えたことだけを引く（推測しない・断定しない） */
+function workReason(r){
+  const m=r.a.match||{}, tp=(S.current_concerns||[])[0];
+  if((m.want||[]).indexOf(S.direction_goal)>=0) return "「"+esc(S.direction_goal)+"」と話してくれたから、ここから始めやすいと思ったよ。";
+  if((m.topic||[]).indexOf(tp)>=0) return "「"+esc(tp)+"」が気になっていると話してくれたから、ここから始めやすいと思ったよ。";
+  if((m.state||[]).indexOf(S.current_status)>=0) return "今は「"+esc(S.current_status)+"」と話してくれたから、負担の少ないものを選んだよ。";
+  return "";
+}
+function wdDemo(D){
+  if(D.demo==="journal") return '<div class="wdphone"><div class="wdp-h">思ったことを書き出す</div><div class="wdp-in">今日は仕事のことが少し気になった。明日の面談が不安なのかもしれない。<i class="wdp-cur"></i></div><div class="wdp-btn">保存する</div></div>';
+  if(D.demo==="breath") return '<div class="wdphone breath"><div class="wdp-h">呼吸を整える時間をつくる</div><div class="brmins sm"><span class="rvchip">1分</span><span class="rvchip">2分</span><span class="rvchip on">3分</span></div><div class="brcirc sm"><span>すって</span></div><div class="brclock sm">3:00</div></div>';
+  if(D.demo==="activity"){
+    const R=[["朝","散歩をした","somewhat_better"],["昼","仕事をした","somewhat_distressed"],["夕方","買い物に行った","somewhat_better"],["夜","テレビを見た","neutral"]];
+    return '<div class="wdlog">'+R.map(function(r){ return '<div class="wdl"><b>'+r[0]+'</b><span>'+r[1]+'</span><em>'+face(dsLevel(r[2]),16)+dsLabel(r[2])+'</em></div>'; }).join("")
+      +'<div class="wdl-note">夜に、この記録を見ながら少しふりかえります</div></div>';
+  }
+  return "";
+}
+function wdVideo(D){
+  const v=D.video; if(!v || !v.url) return "";   // 未制作のときは何も出さない
+  return '<div class="wdsec"><h4>'+esc(v.title||"大塚さんの解説")+'</h4><a class="wdvid" href="'+esc(v.url)+'" target="_blank" rel="noopener">'
+    +(v.thumbnail?'<img src="'+esc(v.thumbnail)+'" alt="">':'')+'<span>▶ '+(v.duration_sec?Math.round(v.duration_sec/60)+'分':'')+'</span></a>'
+    +(v.caption?'<p>'+esc(v.caption)+'</p>':'')+'</div>';
+}
+function openWorkDetail(i){
+  const r=S.iv_offered[i]; if(!r) return; const D=workDetail(r.a); if(!D) return;
+  S.wd_seen=S.wd_seen||[]; if(S.wd_seen.indexOf(r.a.work_type)<0) S.wd_seen.push(r.a.work_type);
+  const P=function(L){ return L.map(function(x){ return '<p>'+esc(x)+'</p>'; }).join(""); };
+  document.getElementById("modalRoot").innerHTML='<div class="wdsheet" role="dialog" aria-label="'+esc(D.name)+'"><div class="wdin">'
+    +'<div class="pagehead"><button class="back" onclick="closeWhy()">‹</button><span class="lede">ワークの説明</span></div>'
+    +'<div class="wdtop">'+(D.kind?'<div class="wdkind">'+esc(D.kind)+'</div>':'')+'<h2>'+esc(D.name)+'</h2>'
+    +'<div class="ofc-meta"><span><i>頻度</i>'+esc(D.freq)+'</span><span><i>時間</i>'+esc(D.time)+'</span></div>'
+    +(D.multi?'<div class="ofc-multi">1日に数回、書き足すタイプのワークです</div>':'')+'</div>'
+    +'<div class="wdsec"><h4>どんなことをするの？</h4>'+P(D.what)+'</div>'
+    +'<div class="wdsec demo"><h4>こんなイメージ</h4>'+wdDemo(D)+'</div>'
+    +'<div class="wdsec"><h4>なぜやるの？</h4>'+P(D.why)+'</div>'
+    +'<div class="wdsec"><h4>どれくらいやるの？</h4>'+P(D.how)+'</div>'
+    +'<div class="wdsec"><h4>取り組むときのポイント</h4>'+P(D.points)+'</div>'
+    +wdVideo(D)
+    +'<div class="wdcta"><button class="btn" onclick="wdTry('+i+')">このワークを試してみる</button>'
+    +'<button class="btn ghost" onclick="wdOthers()">ほかのワークも見る</button></div>'
+    +'</div></div>';
+  const sh=document.querySelector(".wdsheet"); if(sh) sh.scrollTop=0;
+}
+function wdTry(i){ closeWhy(); S.iv_sel=i; ivPick(i); }   // 次の画面で「どのくらいできそう？」を確かめてから確定
+function wdOthers(){ closeWhy(); S.iv_more=true; renderOffers(document.getElementById("ivTray")); const t=document.getElementById("ivTray"); if(t) t.scrollIntoView({block:"start"}); }
 function ivPick(i){
   const r=S.iv_offered[i]; if(!r) return;
   setPlan(r.id);
@@ -2398,11 +2744,13 @@ function todayActLogs(){ const d=isoDate(nowMs()); return cycleActLogs().filter(
 /* サイクルの各日：done（実施記録あり）／today／past（記録なし。失敗扱いしない）／future */
 function cycleDays(){
   const c=S.cycle; if(!c) return [];
-  const start=dayStart(Date.parse(c.cycle_started_at)), today=isoDate(nowMs()), logs=cycleActLogs(c);
+  const start=dayStart(Date.parse(c.cycle_started_at)), today=isoDate(nowMs()), logs=cycleActLogs(c), isAL=alIsWork();
   const out=[];
   for(let i=0;i<c.cycle_length_days;i++){
-    const ms=start+i*DAY+12*3600000, date=isoDate(ms), n=logs.filter(function(l){ return isoDate(Date.parse(l.at))===date; }).length;
-    out.push({i:i, ms:ms, date:date, n:n, today:date===today, future:dayStart(ms)>dayStart(nowMs())});
+    const ms=start+i*DAY+12*3600000, date=isoDate(ms);
+    /* 活動記録：1日のふりかえり済み＝done、時間帯の記録だけ＝rec（記録あり）。ほかのワーク：実施記録があれば done */
+    const n = isAL ? ((alDayInfo(date)||{}).status==="reflected"?1:0) : logs.filter(function(l){ return isoDate(Date.parse(l.at))===date; }).length;
+    out.push({i:i, ms:ms, date:date, n:n, al:isAL?alRecs(date).length:0, today:date===today, future:dayStart(ms)>dayStart(nowMs())});
   }
   return out;
 }
@@ -2410,14 +2758,16 @@ function cycleDays(){
 function cycleProgress(){
   const c=S.cycle; if(!c) return "";
   const first=c.cycle_type==="first", days=cycleDays(), logs=cycleActLogs(c), dd=days.filter(function(d){ return d.n>0; }).length;
-  const st=function(d){ return d.n>0?"done":(d.today?"today":(d.future?"future":"past")); };
-  const cls=function(d){ return st(d)+(d.today&&d.n>0?' today':''); };
+  const isAL=alIsWork(), stt=isAL?alStats(c):null;
+  const st=function(d){ return d.n>0?"done":(d.al>0?"rec":(d.today?"today":(d.future?"future":"past"))); };
+  const cls=function(d){ const k=st(d); return k+(d.today&&k!=="today"?' today':''); };
   let h='<div class="cprog'+(first?' cp-first':' cp-week')+'"><div class="cp-h">'+(first?'最初の3日間':'今週の記録')+'</div>';
   if(first) h+='<div class="cp-tiles">'+days.map(function(d){ const k=st(d);
-      return '<div class="cp-t '+cls(d)+'"><b>'+(d.i+1)+'日目</b><span>'+(k==="done"?'✓ 記録あり':(k==="today"?'今日':(k==="future"?'これから':'—')))+'</span></div>'; }).join("")+'</div>';
+      return '<div class="cp-t '+cls(d)+'"><b>'+(d.i+1)+'日目</b><span>'+(k==="rec"?'記録あり':k==="done"?(isAL?'✓ ふりかえり':'✓ 記録あり'):(k==="today"?'今日':(k==="future"?'これから':'—')))+'</span></div>'; }).join("")+'</div>';
   else h+='<div class="cp-dots">'+days.map(function(d){ const k=st(d), w=DOW[new Date(d.ms).getDay()];
       return '<div class="cp-d '+cls(d)+'" title="'+mdW(d.ms)+'"><i>'+(k==="done"?'✓':'')+'</i><span>'+w+'</span></div>'; }).join("")+'</div>';
-  h+='<div class="cp-sum">'+(first?'この3日間で':'今週は')+' <b>'+logs.length+'回</b> 試しました'+(!first && logs.length?'（'+dd+'日）':'')+'</div>';
+  if(isAL) h+='<div class="cp-sum">記録した日 <b>'+stt.days+'日</b>・時間帯 <b>'+stt.slots+'件</b>・ふりかえり <b>'+stt.reflected+'日</b></div>';
+  else h+='<div class="cp-sum">'+(first?'この3日間で':'今週は')+' <b>'+logs.length+'回</b> 試しました'+(!first && logs.length?'（'+dd+'日）':'')+'</div>';
   return h+'</div>';
 }
 /* 今日の実施記録を見る */
@@ -2432,10 +2782,12 @@ function openActRecord(){
 function stepCard(){
   const a=curAct(), paused=S.action_status==="paused", c=S.cycle;
   const reviewDay = c && c.weekly_review_status==="available";
-  const doneToday = todayActLogs().length>0;
+  const isAL = alIsWork();   // 1日の行動と気持ち：時間帯を1つ残しただけでは完了にしない
+  const doneToday = isAL ? alDayState()==="reflected" : todayActLogs().length>0;
   let act;
   if(paused) act='<div class="pausebox">いまはお休み中です</div><button class="btn" onclick="resumeAction()">また試してみる</button>';
   else if(reviewDay) act='<div class="sc-end">'+(c.cycle_type==="first"?'最初の3日間が終わりました':'今週の取り組みが終わりました')+'</div>';
+  else if(isAL) act=alHomeBlock();
   else if(doneToday) act='<div class="sc-done"><span class="ck">✓</span>今日は試してみました</div>'
     +'<button class="btn ghost" onclick="openActRecord()">実施した記録を見る</button>'
     +'<button class="linkbtn again" onclick="openAction()">もう一度やってみる</button>';
@@ -2445,7 +2797,7 @@ function stepCard(){
     +'<div class="sc-top"><span class="lab">🌱 今日の一歩</span><span class="daypill">'+cycleDayLabel()+'</span></div>'
     +'<img class="sc-art" src="'+spSrc(actArt(a))+'" alt="" width="120" height="120">'
     +'<h2>'+(a?esc(a.title):esc(S.first_action||"—"))+'</h2>'
-    +(doneToday||reviewDay ? '' : planChips(a))
+    +(doneToday||reviewDay||isAL ? '' : planChips(a))
     +act
     +cycleProgress()
     +'<div class="sc-sep"></div>'
@@ -3427,10 +3779,13 @@ function renderWorkLog(){
   const body=document.getElementById("mapBody"), items=[];
   (S.journals||[]).forEach(function(j){ items.push({at:j.created_at, k:"書き出し", h:'<details><summary>'+esc(j.content.split("\n")[0].slice(0,30))+(j.content.length>30?"…":"")+'</summary><div class="wlj">'+esc(j.content).replace(/\n/g,"<br>")+'</div></details>'}); });
   const al={}; (S.activity_logs||[]).forEach(function(r){ (al[r.recorded_date]=al[r.recorded_date]||[]).push(r); });
-  Object.keys(al).forEach(function(d){ const R=al[d]; items.push({at:R[R.length-1].created_at, k:"1日の行動と気持ち", h:R.map(function(r){ return '<div class="wla"><b>'+esc(r.time_period==="時刻"?(r.time||"時刻"):r.time_period)+'</b> '+esc(r.activity_content||"—")+(r.associated_mood?' <span class="wlm">'+face(dsLevel(r.associated_mood),16)+dsLabel(r.associated_mood)+'</span>':'')+'</div>'; }).join("")}); });
+  Object.keys(al).forEach(function(d){ const R=al[d].filter(function(r){ return !r.deleted; }).sort(function(x,y){ return alOrder(x)-alOrder(y); }); if(!R.length) return; const inf=alDayInfo(d);
+    const tail='<div class="wla wlrf">'+(inf&&inf.status==="reflected" ? '✓ 1日のふりかえり済み'+(inf.easiest?'（楽だったとき：'+esc(inf.easiest)+'）':'') : 'ふりかえりはまだ')+'</div>'
+      +'<button class="dslink" onclick="alGo(\'log\',\''+d+'\')">この日の記録をひらく</button>';
+    items.push({at:new Date(dateMs(d)+20*3600000).toISOString(), k:"1日の行動と気持ち", tail:tail, h:R.map(function(r){ return '<div class="wla"><b>'+esc(r.time_period==="時刻"?(r.time||"時刻"):r.time_period)+'</b> '+esc(r.activity_content||"—")+(r.associated_mood?' <span class="wlm">'+face(dsLevel(r.associated_mood),16)+dsLabel(r.associated_mood)+'</span>':'')+'</div>'; }).join("")}); });
   S.act_logs.filter(function(l){ return l.breath_seconds; }).forEach(function(l){ items.push({at:l.at, k:"呼吸", h:'<div class="wla">'+Math.floor(l.breath_seconds/60)+'分'+(l.breath_seconds%60?(l.breath_seconds%60)+'秒':'')+(l.ended_early?'（途中まで）':'')+'</div>'}); });
   items.sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); });
-  body.innerHTML = items.length ? items.map(function(x){ return '<div class="card wlc"><div class="wlh"><span>'+x.k+'</span><small>'+fmtMD(x.at)+' '+hm(x.at)+'</small></div>'+x.h+'</div>'; }).join("")
+  body.innerHTML = items.length ? items.map(function(x){ return '<div class="card wlc"><div class="wlh"><span>'+x.k+'</span><small>'+fmtMD(x.at)+(x.tail?'':' '+hm(x.at))+'</small></div>'+x.h+(x.tail||'')+'</div>'; }).join("")
     : '<div class="card"><p class="lede" style="margin:0">まだワークの記録はありません。ホームの「今日の一歩」から始められます。</p></div>';
 }
 /* ══════════════════════════════════════════════════════════════
@@ -4288,11 +4643,11 @@ function cycleData(){
     talk_count:S.talk_logs.filter(inC).length,
     action:{ action_id:S.act_id, title:a?a.title:S.first_action, plan:a?planLabel():"",
       count:acts.filter(function(l){ return l.action_id===S.act_id; }).length,
-      feelings:acts.map(function(l){ return l.feeling; }) }
+      feelings:acts.map(function(l){ return l.feeling; }).filter(Boolean) }
   };
 }
 function countText(list){
-  const m={}; list.forEach(function(v){ m[v]=(m[v]||0)+1; });
+  const m={}; list.filter(Boolean).forEach(function(v){ m[v]=(m[v]||0)+1; });
   return Object.keys(m).map(function(k){ return k+" "+m[k]+"回"; }).join("・");
 }
 function reviewRows(){
@@ -4443,7 +4798,7 @@ function cycleWorks(){
 }
 function rvLines(){
   const rv=rvInit(), a=rv.ans, L=[], W=cycleWorks();
-  L.push({id:"action", t:W.map(function(w){ return "一歩："+w.title+"（記録"+w.count+"回）"+(W.length>1?(w.current?"［途中から］":"［はじめ］"):""); }).join("\n")});
+  L.push({id:"action", t:W.map(function(w){ return "一歩："+w.title+(w.current && alIsWork() ? "（"+alStatsText(alStats(),"・")+"）" : "（記録"+w.count+"回）")+(W.length>1?(w.current?"［途中から］":"［はじめ］"):""); }).join("\n")});
   if((rv.outside||"").trim()) L.push({id:"outside", t:"アプリの外で："+rv.outside.trim()});
   if(a.feel) L.push({id:"feel", t:"感想："+a.feel});
   if(a.next) L.push({id:"next", t:"次は："+a.next});
@@ -4477,7 +4832,7 @@ function gateReviewFlow(){
     +'<div class="spq rv"><img class="sp-m" src="assets/suplan/opt/base.png" alt="すぷらん" width="56" height="56"><div class="bub2">'+(first?'この3日間、どうだった？':'この1週間、どうだった？')+'</div></div>'
     /* 自分のふりかえり（kokoniに保存） */
     +'<div class="rvmine">'
-    +'<div class="rvact"><div class="k">今回の一歩</div>'+cycleWorks().map(function(w){ return '<b>'+esc(w.title)+'</b><div class="cnt">アプリに残した実施記録：<b>'+w.count+'回</b></div>'; }).join("")
+    +'<div class="rvact"><div class="k">今回の一歩</div>'+cycleWorks().map(function(w){ return '<b>'+esc(w.title)+'</b>'+(w.current && alIsWork() ? '<div class="cnt">'+alStatsText(alStats(),'<br>')+'</div>' : '<div class="cnt">アプリに残した実施記録：<b>'+w.count+'回</b></div>'); }).join("")
     +(function(){ const pr=(S.recommendations||[]).filter(function(x){ return x.user_id===DS_USER && x.status==="accepted"; }).slice(-1)[0], pa=pr&&act(pr.action_master_id);
       return pa ? '<div class="cnt" style="color:var(--teal-deep)">ふりかえりのあとは、大塚さんから提案された「'+esc(pa.title)+'」で始まります。</div>' : ''; })()
     +(rv.out_open||rv.outside ? '<input type="text" id="rvOut" maxlength="100" placeholder="アプリの外でやったことがあれば（任意）" value="'+esc(rv.outside)+'" oninput="S.rv.outside=this.value;rvRefresh()">'
@@ -5382,7 +5737,7 @@ function arContext(){
   const a=curAct(), from=S.cycle?Date.parse(S.cycle.cycle_started_at):0;
   const logs=S.act_logs.filter(function(l){ return l.action_id===S.act_id && Date.parse(l.at)>=from; });
   return {action_id:S.act_id, title:a?a.title:"", plan:a?planLabel():"", count:logs.length, profile:pfForAI(),
-    feelings:logs.map(function(l){ return l.feeling; }), today:todayMood(), map_seen:mapCount(), period: isFirst()?"この3日":"今週"};
+    feelings:logs.map(function(l){ return l.feeling; }).filter(Boolean), today:todayMood(), map_seen:mapCount(), period: isFirst()?"この3日":"今週"};
 }
 function arStart(){
   const a=curAct();
@@ -5721,7 +6076,7 @@ function liveClient(){
     received_at: shared ? r.completed_at : null, before: !r, unshared: !!r && !r.shared,
     sent: shared && r.letter_status==="arrived" ? {text:r.letter_text||"", at:r.letter_sent_at} : null,
     pf:{age_range:S.age_range, gender:S.gender, life_status:S.life_status, leave_duration:S.leave_duration, interests:S.interests, support_use:S.support_use, support_past:S.support_past, confidant:S.confidant, time_slots:S.time_slots},
-    action:{id:S.act_id, title:a?a.title:(S.first_action||"—"), plan:a?planLabel():"", times:logs.length, days:Object.keys(days).length, len:c?c.cycle_length_days:0, day:c?cycleDayLabel():""},
+    action:{id:S.act_id, title:a?a.title:(S.first_action||"—"), plan:a?planLabel():"", times:logs.length, days:Object.keys(days).length, len:c?c.cycle_length_days:0, day:c?cycleDayLabel():"", al: c && alIsWork() ? alStats(c) : null},
     moods:mo, letter: B ? {first:B.first||[], reflection:B.reflection||"", ask:B.ask||"", state:B.state||"", factors:B.factors||[], journals:B.journals||[]} : null, letter_id: r ? r.review_id : "",
     pf_ok: cs.profile!==false, hist_ok: cs.history!==false,
     history: S.reviews.filter(function(x){ return x!==r && x.shared && x.letter; }).map(function(x){ const b=x.letter.blocks||{}; return {at:x.completed_at, ask:b.ask||x.ask||"", reflection:b.reflection||"", state:b.state||"", letter:x.letter_text||"", rec:(S.recommendations||[]).filter(function(q){ return q.letter_id===x.review_id; })[0]||null}; })};
@@ -5826,7 +6181,8 @@ function proRecord(c){
   const A=c.action||{}, lv=["しんどい","少ししんどい","ふつう","少し楽"];
   return '<div class="psub"><h4>この期間の記録</h4>'
     +'<div class="pitem"><span class="k">今の一歩</span>'+esc(A.title||"—")+(A.plan?'<div style="font-size:12px;color:#6b7a85">'+esc(A.plan)+'</div>':'')+'</div>'
-    +'<div class="pitem"><span class="k">実施</span>'+(A.times||0)+'回（'+(A.days||0)+'日）'+(A.len?' ／ '+A.len+'日間のうち':'')+'</div>'
+    +(A.al ? '<div class="pitem"><span class="k">実施</span>'+alStatsText(A.al)+(A.len?'（'+A.len+'日間のうち）':'')+'</div>'
+           : '<div class="pitem"><span class="k">実施</span>'+(A.times||0)+'回（'+(A.days||0)+'日）'+(A.len?' ／ '+A.len+'日間のうち':'')+'</div>')
     +'<div class="pitem"><span class="k">気持ちの記録（古い順）</span>'
       +((c.moods||[]).length ? '<div class="pmoods">'+c.moods.map(function(m){ return m>=0?face(m,22):''; }).join("")+'</div><div style="font-size:11.5px;color:#8a97a0">'+c.moods.filter(function(m){ return m>=0; }).map(function(m){ return lv[m]; }).join(" → ")+'</div>' : '<span class="na">まだ記録はありません</span>')+'</div>'
     +'<p class="note" style="margin:8px 0 0">すぷらんとの会話の全文・毎日のメモは共有されません。</p></div>';
