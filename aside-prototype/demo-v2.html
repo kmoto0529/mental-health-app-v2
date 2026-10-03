@@ -641,6 +641,21 @@ body:has(#s-flow.active .obw.night){background:#17221F}
 .m2phase span.past{color:var(--teal-deep)}.m2phase i{font-style:normal;color:var(--sub2)}
 .m2grow{margin:0 16px 10px;background:var(--teal-soft);color:var(--teal-deep);font-size:13px;font-weight:700;border-radius:12px;padding:8px 12px}
 .modal.mapopen{text-align:center}
+/* 気分 5段階（天気）。β版 index.html の .mood-grid を kokoni の配色で */
+.m5row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 2px}
+.m5b{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:68px;padding:10px 2px 8px;background:var(--paper2);border:2px solid var(--line);border-radius:14px;cursor:pointer;font-family:inherit;color:var(--ink2)}
+.m5b i{font-style:normal;font-size:28px;line-height:1}
+.m5b span{font-size:10.5px;font-weight:700;line-height:1.3;text-align:center}
+.m5b.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep)}
+.m5b.on span{font-weight:800}
+.m5row.sm .m5b{min-height:58px;padding:7px 1px 6px}.m5row.sm .m5b i{font-size:22px}.m5row.sm .m5b span{font-size:10px}
+.m5tag{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--ink2)}.m5tag i{font-style:normal;font-size:15px}
+.pm .bub2 b{font-size:15px}
+.pmq{margin:14px 0 0}.pmq .qh{font-size:13.5px;font-weight:800;color:var(--ink);margin-bottom:6px}.pmq .qh small{font-weight:600;color:var(--muted);margin-left:4px}
+.pm .btn{margin-top:16px}.pmskip{display:block;margin:10px auto 0}
+.wlmood{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:6px;font-size:12px;color:var(--ink2)}
+.wlmood .k{font-size:10.5px;font-weight:800;color:var(--teal-deep);background:var(--teal-soft);border-radius:6px;padding:0 6px}
+.wlmemo{font-size:12px;color:var(--ink2);margin-top:4px}
 .trycard{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r);padding:18px;margin:12px 0}
 .trycard h2{font-size:18.5px;line-height:1.55;margin:8px 0 8px}
 .trycard p{font-size:13.5px;line-height:1.85;color:var(--ink2);margin:0 0 8px}
@@ -1149,6 +1164,8 @@ const FEATURE_FREE_TALK=false;
 /* 2026-10-03 心の地図の自動生成化：視点ごとの「1分でふりかえる／すぷらんと深める」と、地図の中の「別の見方を探す」は表に出さない。
    true に戻すと再び使える（保存済みのメモ・会話・別の見方は、地図の材料としてそのまま使う） */
 const FEATURE_MAP_WORKS=false;
+/* 2026-10-04 独立した「今日の気持ち」チェックは出さない（気分はワークのあとに残す）。保存済みの記録・コードは残す。true で再表示 */
+const FEATURE_DAILY_CHECK=false;
 /* タブ：ホーム／心の地図（map）／きろく（rec）／ふりかえり／マイページ。心の地図ときろくは同じ画面枠（s-map）を使い分ける */
 function go(id){
   if(id==="talk" && !FEATURE_FREE_TALK) id="home";
@@ -1776,9 +1793,9 @@ function jnSave(){
   S.journals=S.journals||[];
   const ok=!!(document.getElementById("jnAi")||{}).checked; S.consent=S.consent||{}; S.consent.ai_journal=ok;
   const j={journal_id:"JN-"+Date.now().toString(36), user_id:DS_USER, created_at:nowIso(), content:t, cycle_id:S.cycle?S.cycle.weekly_cycle_id:"", ai_use:ok};
-  S.journals.push(j); workLog({journal_id:j.journal_id});
+  S.journals.push(j); const lg=workLog({journal_id:j.journal_id});
   if(RISK_RE.test(t)){ openSafety("free_text","unspecified"); return; }   // 書いた内容でも安全対応を優先（記録は残す）
-  workDone("書き出してみたね");
+  postMood(lg);
 }
 function brStart(min){
   brStop(); BR.total=min*60; BR.left=BR.total; BR.min=min;
@@ -1798,8 +1815,8 @@ function brStop(){ if(BR.timer){ clearInterval(BR.timer); BR.timer=null; } }
 function brFinish(early){
   brStop(); const done=BR.total-Math.max(0,BR.left);
   if(early && done<10){ renderWork("breathing",BR.min); return; }   // すぐやめたときは記録しない
-  workLog({breath_seconds:done, breath_planned_minutes:BR.min, ended_early:!!early});
-  workDone(early?"ここまで、おつかれさま":"呼吸に意識を向けられたね");
+  const lg=workLog({breath_seconds:done, breath_planned_minutes:BR.min, ended_early:!!early});
+  postMood(lg);
 }
 /* ══════════════════════════════════════════════════════════════
    1日の行動と気持ち（2026-10-03 活動記録UX改善）
@@ -1863,7 +1880,7 @@ function alDraftSet(){
 }
 function alCheck(){ const el=document.getElementById("alW"), b=document.getElementById("alSave"); if(b) b.disabled=!((el&&el.value.trim())||AL.mood); }
 function alMood(code){ AL.mood = AL.mood===code ? "" : code;
-  document.querySelectorAll('.alrow.open .dsb').forEach(function(b){ b.classList.toggle("sel", b.dataset.code===AL.mood); }); alDraftSet(); }
+  document.querySelectorAll('.alrow.open .m5b').forEach(function(b){ const on=+b.dataset.v===AL.mood; b.classList.toggle("on",on); b.setAttribute("aria-pressed",on); }); alDraftSet(); }
 
 /* ── 画面 ── */
 function openAL(opt){
@@ -1885,13 +1902,13 @@ function alRow(p){
     const v = d ? d.what : (r ? r.activity_content : "");
     return '<div class="alrow open" data-p="'+p+'"><div class="alh">'+p+(r?' <small>記録あり・編集中</small>':'')+'</div>'
       +'<input type="text" id="alW" maxlength="60" placeholder="何をしていた？" value="'+esc(v)+'" oninput="alDraftSet()">'
-      +'<div class="alm">'+DAILY.map(function(x){ return '<button class="dsb'+(AL.mood===x.code?' sel':'')+'" style="--c:'+x.c+'" data-code="'+x.code+'" onclick="alMood(\''+x.code+'\')">'+face(x.lv,20)+'<span>'+x.v+'</span></button>'; }).join("")+'</div>'
+      +mood5Picker("alMood", AL.mood, periodNight(p), true)
       +'<button class="btn" id="alSave" '+((v.trim()||AL.mood)?'':'disabled')+' onclick="alSaveSlot()">'+p+'の記録を'+(r?'直す':'残す')+'</button>'
       +(r||alRecs(AL.date).length?'<button class="dslink al-cancel" onclick="alCloseSlot()">とじる</button>':'')
       +'</div>';
   }
   if(r) return '<div class="alrow done" data-p="'+p+'"><div class="alh">'+p+' <span class="al-ck" aria-label="記録あり">✓</span></div>'
-    +'<div class="al-v">'+esc(r.activity_content||"（行動は書いていません）")+(r.associated_mood?'<span class="wlm">'+face(dsLevel(r.associated_mood),16)+dsLabel(r.associated_mood)+'</span>':'')+'</div>'
+    +'<div class="al-v">'+esc(r.activity_content||"（行動は書いていません）")+moodAnyHtml(r.associated_mood, periodNight(p))+'</div>'
     +'<button class="dslink" onclick="alOpenSlot(\''+p+'\')">編集</button></div>';
   return '<div class="alrow todo" data-p="'+p+'"><div class="alh">'+p+'</div><button class="dslink" onclick="alOpenSlot(\''+p+'\')">'+(d&&(d.what||d.mood)?'書きかけの続きを書く':'＋ '+p+'の記録を残す')+'</button></div>';
 }
@@ -1932,8 +1949,8 @@ function alSaveSlot(){
   S.activity_logs=S.activity_logs||[];
   let r=alSlotRec(AL.date,p); const edit=!!r;
   if(r){ (r.edit_history=r.edit_history||[]).push({activity_content:r.activity_content, associated_mood:r.associated_mood, at:r.updated_at||r.created_at});
-    r.activity_content=w; r.associated_mood=AL.mood; r.updated_at=nowIso(); }
-  else { r={activity_log_id:"AL-"+Date.now().toString(36)+"-"+AL_P.indexOf(p), user_id:DS_USER, recorded_date:AL.date, time_period:p, activity_content:w, associated_mood:AL.mood,
+    r.activity_content=w; r.associated_mood=AL.mood; if(typeof AL.mood==="number") r.mood_scale_version=MOOD_SCALE; r.updated_at=nowIso(); }
+  else { r={activity_log_id:"AL-"+Date.now().toString(36)+"-"+AL_P.indexOf(p), user_id:DS_USER, recorded_date:AL.date, time_period:p, activity_content:w, associated_mood:AL.mood, mood_scale_version:(typeof AL.mood==="number"?MOOD_SCALE:""),
       created_at:nowIso(), updated_at:nowIso(), cycle_id:alCycleId(AL.date), source:"activity_log", data_type:"activity_slot"};
     S.activity_logs.push(r); }
   if(S.al_draft) delete S.al_draft[AL.date+"|"+p];
@@ -1967,7 +1984,7 @@ function renderALReflect(){
   body.innerHTML=workHead(a)+'<div class="card wk al2">'
     +'<h2 class="al-h">'+dn+'の記録をふりかえる</h2>'
     +'<div class="spq rv"><img class="sp-m" src="assets/suplan/opt/base.png" alt="" width="56" height="56"><div class="bub2">'+dn+'の行動と気持ちを、<br>一緒に見てみよう。</div></div>'
-    +'<div class="wdlog al-tl">'+recs.map(function(r){ return '<div class="wdl"><b>'+esc(r.time_period==="時刻"?(r.time||"時刻"):r.time_period)+'</b><span>'+esc(r.activity_content||"—")+'</span><em>'+(r.associated_mood?face(dsLevel(r.associated_mood),16)+dsLabel(r.associated_mood):'')+'</em></div>'; }).join("")+'</div>'
+    +'<div class="wdlog al-tl">'+recs.map(function(r){ return '<div class="wdl"><b>'+esc(r.time_period==="時刻"?(r.time||"時刻"):r.time_period)+'</b><span>'+esc(r.activity_content||"—")+'</span><em>'+moodAnyHtml(r.associated_mood, periodNight(r.time_period,r.time))+'</em></div>'; }).join("")+'</div>'
     +'<div class="rvq"><div class="qh">'+(dn==="今日"?'今日':'この日')+'、少しでも気持ちが楽だったのはどんなとき？</div><p class="rvhint" style="margin-top:0">答えなくても大丈夫。</p>'
     +'<div class="rvchips">'+opts.map(function(o,k){ const on=AL.pick===o; return '<button class="rvchip'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="alPick('+k+')">'+esc(o)+'</button>'; }).join("")+'</div></div>'
     +'<button class="btn" onclick="alFinish()">'+dn+'の記録を終える</button>'
@@ -2492,8 +2509,8 @@ function wdDemo(D){
   if(D.demo==="journal") return '<div class="wdphone"><div class="wdp-h">思ったことを書き出す</div><div class="wdp-in">今日は仕事のことが少し気になった。明日の面談が不安なのかもしれない。<i class="wdp-cur"></i></div><div class="wdp-btn">保存する</div></div>';
   if(D.demo==="breath") return '<div class="wdphone breath"><div class="wdp-h">呼吸を整える時間をつくる</div><div class="brmins sm"><span class="rvchip">1分</span><span class="rvchip">2分</span><span class="rvchip on">3分</span></div><div class="brcirc sm"><span>すって</span></div><div class="brclock sm">3:00</div></div>';
   if(D.demo==="activity"){
-    const R=[["朝","散歩をした","somewhat_better"],["昼","仕事をした","somewhat_distressed"],["夕方","買い物に行った","somewhat_better"],["夜","テレビを見た","neutral"]];
-    return '<div class="wdlog">'+R.map(function(r){ return '<div class="wdl"><b>'+r[0]+'</b><span>'+r[1]+'</span><em>'+face(dsLevel(r[2]),16)+dsLabel(r[2])+'</em></div>'; }).join("")
+    const R=[["朝","散歩をした",4],["昼","仕事をした",2],["夕方","買い物に行った",4],["夜","テレビを見た",3]];
+    return '<div class="wdlog">'+R.map(function(r){ return '<div class="wdl"><b>'+r[0]+'</b><span>'+r[1]+'</span><em>'+moodAnyHtml(r[2], r[0]==="夜")+'</em></div>'; }).join("")
       +'<div class="wdl-note">夜に、この記録を見ながら少しふりかえります</div></div>';
   }
   return "";
@@ -2827,8 +2844,7 @@ function stepCard(){
     +(doneToday||reviewDay||isAL ? '' : planChips(a))
     +act
     +cycleProgress()
-    +'<div class="sc-sep"></div>'
-    +dailyCard()
+    +(FEATURE_DAILY_CHECK ? '<div class="sc-sep"></div>'+dailyCard() : '')
     +(paused?'':'<button class="linkbtn pauselink" onclick="openPause()">つらいときは、お休みもできます</button>')
     +'</div>';
 }
@@ -3838,13 +3854,14 @@ function pfForAI(){
 /* ワークの記録：書き出し・活動記録・呼吸を日付ごとに（今日の気持ちとは別データ） */
 function renderWorkLog(){
   const body=document.getElementById("mapBody"), items=[];
-  (S.journals||[]).forEach(function(j){ items.push({at:j.created_at, k:"書き出し", h:'<details><summary>'+esc(j.content.split("\n")[0].slice(0,30))+(j.content.length>30?"…":"")+'</summary><div class="wlj">'+esc(j.content).replace(/\n/g,"<br>")+'</div></details>'}); });
+  (S.journals||[]).forEach(function(j){ const lg=(S.act_logs||[]).filter(function(l){ return l.journal_id===j.journal_id; })[0];
+    items.push({at:j.created_at, k:"書き出し", h:'<details><summary>'+esc(j.content.split("\n")[0].slice(0,30))+(j.content.length>30?"…":"")+'</summary><div class="wlj">'+esc(j.content).replace(/\n/g,"<br>")+'</div></details>'+(lg?workMoodHtml(workMoodFor(lg.log_id)):'')}); });
   const al={}; (S.activity_logs||[]).forEach(function(r){ (al[r.recorded_date]=al[r.recorded_date]||[]).push(r); });
   Object.keys(al).forEach(function(d){ const R=al[d].filter(function(r){ return !r.deleted; }).sort(function(x,y){ return alOrder(x)-alOrder(y); }); if(!R.length) return; const inf=alDayInfo(d);
     const tail='<div class="wla wlrf">'+(inf&&inf.status==="reflected" ? '✓ 1日のふりかえり済み'+(inf.easiest?'（楽だったとき：'+esc(inf.easiest)+'）':'') : 'ふりかえりはまだ')+'</div>'
       +'<button class="dslink" onclick="alGo(\'log\',\''+d+'\')">この日の記録をひらく</button>';
-    items.push({at:new Date(dateMs(d)+20*3600000).toISOString(), k:"1日の行動と気持ち", tail:tail, h:R.map(function(r){ return '<div class="wla"><b>'+esc(r.time_period==="時刻"?(r.time||"時刻"):r.time_period)+'</b> '+esc(r.activity_content||"—")+(r.associated_mood?' <span class="wlm">'+face(dsLevel(r.associated_mood),16)+dsLabel(r.associated_mood)+'</span>':'')+'</div>'; }).join("")}); });
-  S.act_logs.filter(function(l){ return l.breath_seconds; }).forEach(function(l){ items.push({at:l.at, k:"呼吸", h:'<div class="wla">'+Math.floor(l.breath_seconds/60)+'分'+(l.breath_seconds%60?(l.breath_seconds%60)+'秒':'')+(l.ended_early?'（途中まで）':'')+'</div>'}); });
+    items.push({at:new Date(dateMs(d)+20*3600000).toISOString(), k:"1日の行動と気持ち", tail:tail, h:R.map(function(r){ return '<div class="wla"><b>'+esc(r.time_period==="時刻"?(r.time||"時刻"):r.time_period)+'</b> '+esc(r.activity_content||"—")+(r.associated_mood!==""&&r.associated_mood!=null?' '+moodAnyHtml(r.associated_mood, periodNight(r.time_period,r.time)):'')+'</div>'; }).join("")}); });
+  S.act_logs.filter(function(l){ return l.breath_seconds; }).forEach(function(l){ items.push({at:l.at, k:"呼吸", h:'<div class="wla">'+Math.floor(l.breath_seconds/60)+'分'+(l.breath_seconds%60?(l.breath_seconds%60)+'秒':'')+(l.ended_early?'（途中まで）':'')+'</div>'+workMoodHtml(workMoodFor(l.log_id))}); });
   items.sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); });
   body.innerHTML = items.length ? items.map(function(x){ return '<div class="card wlc"><div class="wlh"><span>'+x.k+'</span><small>'+fmtMD(x.at)+(x.tail?'':' '+hm(x.at))+'</small></div>'+x.h+(x.tail||'')+'</div>'; }).join("")
     : '<div class="card"><p class="lede" style="margin:0">まだワークの記録はありません。ホームの「今日の一歩」から始められます。</p></div>';
@@ -3908,7 +3925,9 @@ function mapRecords(){
   (S.journals||[]).filter(journalAiOk).forEach(function(j){ add({rid:j.journal_id, type:"journal", label:fmtMD(j.created_at)+"のジャーナリング", at:j.created_at, day:isoDate(Date.parse(j.created_at)), text:j.content, views:["thought","scene"]}); });
   (S.activity_logs||[]).forEach(function(a){ add({rid:a.activity_log_id, type:"activity", label:fmtMD(a.created_at)+"の行動の記録（"+a.time_period+"）", at:a.created_at, day:a.recorded_date, text:a.activity_content, mood:a.associated_mood, views:["behavior"]}); });
   dsAll().forEach(function(r){ if(r.optional_note) add({rid:r.record_id, type:"mood", label:fmtMD(r.recorded_at)+"の気持ちのメモ", at:r.recorded_at, day:r.date, text:r.optional_note, mood:r.daily_state, views:["feeling","scene"]}); });
-  (S.act_logs||[]).forEach(function(l){ const d=isoDate(Date.parse(l.at)), dm=dsDay(d).some(function(x){ return dsLevel(x.daily_state)<=1; });
+  (S.work_moods||[]).forEach(function(m){ const a=act(m.action_id), t=a?a.title:"ワーク";
+    if(m.optional_memo) add({rid:m.work_mood_id, type:"work_memo", label:fmtMD(m.recorded_at)+"の「"+t+"」のあとのメモ", at:m.recorded_at, day:isoDate(Date.parse(m.recorded_at)), text:m.optional_memo, mood:m.current_mood, views:["feeling"]}); });
+  (S.act_logs||[]).forEach(function(l){ const d=isoDate(Date.parse(l.at)), wm=workMoodFor(l.log_id), dm=dsDay(d).some(function(x){ return dsLevel(x.daily_state)<=1; }) || (wm && moodLow(wm.current_mood));
     /* 呼吸は実施した事実と時間だけ。やったことだけで「楽になった」「合っている」とは推測しない */
     const tx = l.breath_seconds ? "呼吸を"+(l.breath_seconds>=60?Math.floor(l.breath_seconds/60)+"分":l.breath_seconds+"秒")+"試した" : l.title+(l.feeling?"（やってみたあと："+l.feeling+"）":"");
     add({rid:l.log_id||("act-"+l.at), type:"work", label:fmtMD(l.at)+"の「"+l.title+"」", at:l.at, day:d, text:tx, title:l.title, views:["tried","strength"], hard_day:dm, good:/楽/.test(l.feeling||"")}); });
@@ -3935,7 +3954,7 @@ const HYPO_RULES=[
   {key:"B-calm", type:"B", views:["behavior","tried"], kw:/散歩|歩|外に|風呂|音楽|寝|休|ひとりの時間|一人/, needGood:true,
    text:"{x}の時間は、気持ちが比較的落ち着いていることが多いのかもしれないね。", alt:["その日はもともと調子がよかった可能性もあるね。"]},
   {key:"B-work", type:"B", views:["tried"], work:true,
-   text:"「{x}」のあとは、少し楽になることがあるみたいだね。", alt:["やった日の体調や時間帯が影響していた可能性もあるね。"]},
+   text:"「{x}」のあとに「少し楽になった」と記録した日が、何度かあったね。", alt:["やった日の体調や時間帯が影響していた可能性もあるね。","楽にならなかった日があっても、それは失敗ではないよ。"]},
   {key:"B-act", type:"B", views:["behavior","tried"], actmood:true,
    text:"{x}日は、比較的気持ちが楽だったことが多いのかもしれないね。", alt:["その日はもともと調子がよかった可能性もあるね。","記録が増えると、違う形が見えてくるかもしれないね。"]},
   {key:"C-hardday", type:"C", views:["strength","tried"], hardDay:true, min:1,
@@ -3950,13 +3969,13 @@ const HYPO_ENGINE={
     HYPO_RULES.forEach(function(rule){
       let ev=[], x="";
       if(rule.kw){ ev=recs.filter(function(r){ return ["note","reframe"].indexOf(r.type)<0 || r.type==="note" ? rule.kw.test(r.text) : false; });
-        if(rule.needGood){ ev=ev.filter(function(r){ return r.good || r.mood==="somewhat_better" || r.mood==="neutral"; }); const m=ev.length?rule.kw.exec(ev[0].text):null; x=m?m[0]:""; } }
+        if(rule.needGood){ ev=ev.filter(function(r){ return r.good || moodOkay(r.mood); }); const m=ev.length?rule.kw.exec(ev[0].text):null; x=m?m[0]:""; } }
       if(rule.work){ const by={}; recs.filter(function(r){ return r.type==="work" && r.good; }).forEach(function(r){ const t=r.title||r.text.split("（")[0]; (by[t]=by[t]||[]).push(r); });
         const k=Object.keys(by).sort(function(a,b){ return by[b].length-by[a].length; })[0]; if(k){ ev=by[k]; x=k; } }
       if(rule.actmood){
         /* 同じ行動（同じ言葉）を、別の日に2回以上。その時の気持ちが「ふつう」「少し楽」の方が多いときだけ */
         const by={}; recs.filter(function(r){ return r.type==="activity" && r.mood; }).forEach(function(r){ const k=String(r.text).replace(/[。、\s]/g,"").slice(0,12); if(k) (by[k]=by[k]||[]).push(r); });
-        let best=null; Object.keys(by).forEach(function(k){ const L=by[k], pos=L.filter(function(r){ return r.mood==="somewhat_better"||r.mood==="neutral"; });
+        let best=null; Object.keys(by).forEach(function(k){ const L=by[k], pos=L.filter(function(r){ return moodOkay(r.mood); });
           if(days(pos)>=2 && pos.length>L.length-pos.length && (!best || pos.length>best.pos.length)) best={k:k, pos:pos, neg:L.filter(function(r){ return pos.indexOf(r)<0; })}; });
         if(best){ ev=best.pos; const per=best.pos.map(function(r){ return (r.label.match(/（(.+)）/)||[])[1]; }), same=per.every(function(v){ return v && v===per[0]; });
           x=(same?per[0]+"に":"")+"「"+best.pos[0].text+"」をした"; if(best.neg.length) rule._neg="一方で、「"+best.pos[0].text+"」をしても少ししんどかった日もあるね。"; else rule._neg=""; } }
@@ -4045,7 +4064,7 @@ function viewClues(id){
   mapMaterials(id).forEach(function(m){ c.push({t:m.t, src:m.src, at:m.at}); });
   (S.map_notes||[]).filter(function(n){ return n.view===id; }).forEach(function(n){ c.push({t:n.text, src:(n.mode==="deep"?"すぷらんと深めたこと":"1分ふりかえり")+"（"+fmtMD(n.at)+"）", at:n.at, own:true, deep:n.mode==="deep"}); });
   /* 書き出し・行動の記録・気持ちのメモ・ふりかえりも、その視点の手がかりにする（本人の言葉そのまま） */
-  mapRecords().filter(function(r){ return r.views.indexOf(id)>=0 && ["journal","activity","mood","review"].indexOf(r.type)>=0; })
+  mapRecords().filter(function(r){ return r.views.indexOf(id)>=0 && ["journal","activity","mood","review","work_memo"].indexOf(r.type)>=0; })
     .forEach(function(r){ c.push({t:String(r.text).slice(0,60), src:r.label, at:r.at}); });
   insights().confirmed.filter(function(x){ return (x.type==="talk" && id==="scene") || (x.type==="daily" && id==="feeling"); })
     .forEach(function(x){ c.push({t:x.text, src:(x.type==="talk"?"話して残したこと":"記録から確かめたこと")+"（"+fmtMD(x.at)+"）", at:x.at, own:true}); });
@@ -4093,7 +4112,7 @@ function workFactLines(){
   if(jn.length===1) L.push({t:dn(jn[0].created_at)+"、最初の書き出しを試してみたね。頭の中にあることを言葉にする、一歩を踏み出したね。", src:"書き出し（"+fmtMD(jn[0].created_at)+"）", at:jn[0].created_at});
   else if(jn.length) L.push({t:"これまでに"+jn.length+"回、思ったことを書き出してみたね。", src:"書き出し", at:jn[jn.length-1].created_at});
   if(br.length){ const b=br[br.length-1], m=b.breath_seconds>=60?Math.floor(b.breath_seconds/60)+"分間":b.breath_seconds+"秒"; L.push({t:dn(b.at)+"は"+m+"、呼吸に意識を向ける時間をつくったね。"+(br.length>1?"（これまでに"+br.length+"回）":""), src:"呼吸の記録（"+fmtMD(b.at)+"）", at:b.at}); }
-  if(al.length){ const d=al[al.length-1].recorded_date, day=al.filter(function(a){ return a.recorded_date===d; }), moods=day.map(function(a){ return a.associated_mood; }).filter(Boolean).map(dsLabel).filter(function(v,i,a){ return a.indexOf(v)===i; });
+  if(al.length){ const d=al[al.length-1].recorded_date, day=al.filter(function(a){ return a.recorded_date===d; }), moods=day.map(function(a){ return a.associated_mood; }).filter(function(m){ return m!==""&&m!=null; }).map(moodAnyLabel).filter(function(v,i,a){ return a.indexOf(v)===i; });
     L.push({t:(d===today?"今日":(d===isoDate(nowMs()-DAY)?"昨日":fmtMD(new Date(dateMs(d)+12*3600000).toISOString())))+"は、"+day.filter(function(a){ return a.time_period!=="時刻"; }).map(function(a){ return a.time_period; }).join("・")+"の行動と気持ちを残したね。"+(moods.length?"記録には「"+moods.join("」「")+"」という気持ちがあるよ。":""), src:"1日の行動と気持ち", at:day[day.length-1].created_at}); }
   return L.sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); });
 }
@@ -4440,7 +4459,103 @@ function dsAddToMap(i){
 }
 function dsDismiss(i){ const x=DS_INS[i]; if(!x) return; S.ds_decided=(S.ds_decided||[]).concat([x.t]); renderMap(); }
 let DS_INS=[];
+/* ══════════════════════════════════════════════════════════════
+   気分 5段階（天気）2026-10-04
+   - 独立した「今日の気持ち」チェックは MVP から外す（FEATURE_DAILY_CHECK=false。データ・コードは残す）
+   - 書き出し・呼吸のあとに「やってみてどう？（前と比べた変化）」「今の気分（天気5段階）」「メモ」を任意で残す
+   - アイコンは β版（index.html の MOODS_DAY / MOODS_NIGHT）を再利用。昼夜で変わるのは見た目だけ。値1〜5とラベルは共通
+   - 以前の4段階（daily_states・活動記録の code）は変換せず、そのまま読めるようにする（mood_scale_version で区別）
+   ══════════════════════════════════════════════════════════════ */
+const MOOD_SCALE="weather5-v1";
+const MOOD5=[
+  {v:1, label:"つらい",     day:"⛈",  night:"⛈"},
+  {v:2, label:"少しつらい", day:"🌧",  night:"🌧"},
+  {v:3, label:"ふつう",     day:"☁️", night:"☁️"},
+  {v:4, label:"少しよい",   day:"🌤",  night:"✨"},
+  {v:5, label:"とてもよい", day:"☀️", night:"🌙"}
+];
+const PERCEIVED=["少し楽になった","あまり変わらない","少ししんどくなった","よく分からない"];
+/* 5:00〜17:59 昼／18:00〜4:59 夜 */
+function isNightAt(ms){ const h=new Date(ms).getHours(); return h>=18 || h<5; }
+/* 活動記録は「記録の対象になった時間帯」で決める（あとから入力しても、その時間帯の空で出す） */
+function periodNight(p,time){ if(p==="夜") return true; if(p==="時刻" && time){ const h=+time.split(":")[0]; return h>=18 || h<5; } return false; }
+function mood5(v){ return MOOD5[(+v||0)-1]||null; }
+function mood5Icon(v,night){ const m=mood5(v); return m ? (night?m.night:m.day) : ""; }
+/* 5段階（数値）でも、以前の4段階（code）でも、同じ見た目で読めるように */
+function moodAnyLabel(m){ return typeof m==="number" ? (mood5(m)||{}).label||"" : (m?dsLabel(m):""); }
+function moodAnyHtml(m,night,size){
+  if(m==null || m==="") return "";
+  if(typeof m==="number") return '<span class="m5tag"><i aria-hidden="true">'+mood5Icon(m,night)+'</i>'+esc(moodAnyLabel(m))+'</span>';
+  return '<span class="m5tag old">'+face(dsLevel(m),size||16)+esc(dsLabel(m))+'</span>';
+}
+/* 「ふつう」以上か（行動と気持ちの関係を探すときだけ使う。良し悪しの評価には使わない） */
+function moodOkay(m){ return typeof m==="number" ? m>=3 : (m==="somewhat_better" || m==="neutral"); }
+function moodLow(m){ return typeof m==="number" ? m<=2 : (m==="distressed" || m==="somewhat_distressed"); }
+/* 天気5段階の選択（横一列・ラベル付き・押すと選択が外れる） */
+function mood5Picker(fn,sel,night,small){
+  return '<div class="m5row'+(small?' sm':'')+'" role="group" aria-label="今の気分">'+MOOD5.map(function(m){ const on=sel===m.v;
+    return '<button class="m5b'+(on?' on':'')+'" aria-pressed="'+on+'" data-v="'+m.v+'" onclick="'+fn+'('+m.v+')"><i aria-hidden="true">'+(night?m.night:m.day)+'</i><span>'+m.label+'</span></button>'; }).join("")+'</div>';
+}
+
+/* ── 書き出し・呼吸のあと ── */
+let PM=null;
+function postMood(log){
+  PM={log:log, change:"", mood:0, night:isNightAt(nowMs())};
+  renderPostMood(); window.scrollTo(0,0);
+}
+function renderPostMood(){
+  const memo=(document.getElementById("pmMemo")||{}).value;
+  document.getElementById("actBody").innerHTML='<div class="card wk pm">'
+    +'<div class="spq rv"><img class="sp-m" src="assets/suplan/opt/happy.png" alt="" width="56" height="56"><div class="bub2"><b>今日も取り組めたね。</b><br>最後に、今の気持ちを少しだけ残してみよう。</div></div>'
+    +'<div class="pmq"><div class="qh">ワークの前と比べて、気持ちはどう？</div><div class="rvchips">'+PERCEIVED.map(function(o,i){ const on=PM.change===o;
+      return '<button class="rvchip'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="pmChange('+i+')">'+o+'</button>'; }).join("")+'</div></div>'
+    +'<div class="pmq"><div class="qh">今の気分はどう？</div>'+mood5Picker("pmMood",PM.mood,PM.night)+'</div>'
+    +'<div class="pmq"><div class="qh">何か残しておきたいことはある？<small>（任意）</small></div>'
+    +'<textarea id="pmMemo" rows="2" maxlength="200" placeholder="少し頭が整理できた気がする">'+esc(memo||"")+'</textarea></div>'
+    +'<button class="btn" onclick="pmSave()">記録を保存する</button>'
+    +'<button class="dslink pmskip" onclick="pmSkip()">回答せずに終了する</button>'
+    +'<p class="wknote" style="text-align:center;margin:8px 0 0">どれも答えなくて大丈夫。ワークの記録は、もう保存されているよ。</p></div>';
+}
+function pmChange(i){ const o=PERCEIVED[i]; PM.change = PM.change===o ? "" : o; renderPostMood(); }
+function pmMood(v){ PM.mood = PM.mood===v ? 0 : v; renderPostMood(); }
+function pmSave(){
+  const memo=((document.getElementById("pmMemo")||{}).value||"").trim();
+  if(!PM.change && !PM.mood && !memo) return pmSkip();   // 何も選んでいなければ、残さずに終える
+  const l=PM.log; S.work_moods=S.work_moods||[];
+  const r={work_mood_id:"WM-"+Date.now().toString(36), user_id:DS_USER, work_session_id:l.log_id, action_id:l.action_id, work_type:l.work_type, cycle_id:l.cycle_id,
+    recorded_at:nowIso(), perceived_change:PM.change||null, current_mood:PM.mood||null, optional_memo:memo, mood_scale_version:MOOD_SCALE,
+    icon_variant:PM.night?"night":"day", source:"post_work", data_type:"work_mood"};
+  S.work_moods.push(r); l.work_mood_id=r.work_mood_id;
+  if(PM.change) l.feeling=PM.change;   // これまでの集計（やってみたあとの反応）との互換。今の気分とは別の項目
+  saveState(); PM=null;
+  if(memo && RISK_RE.test(memo)){ openSafety("free_text","unspecified"); return; }   // メモでも安全対応を優先（記録は残す）
+  closeAction(); setTimeout(mapOpenCheck,0);
+}
+function pmSkip(){ PM=null; saveState(); closeAction(); setTimeout(mapOpenCheck,0); }
+function workMoodFor(logId){ return (S.work_moods||[]).filter(function(m){ return m.work_session_id===logId; })[0]||null; }
+function workMoodHtml(wm){
+  if(!wm) return "";
+  return '<div class="wlmood">'+(wm.current_mood?'<span class="k">気分</span>'+moodAnyHtml(wm.current_mood, wm.icon_variant==="night"):'')
+    +(wm.perceived_change?'<span class="k">前と比べて</span><span>'+esc(wm.perceived_change)+'</span>':'')+'</div>'
+    +(wm.optional_memo?'<div class="wlmemo">メモ：「'+esc(wm.optional_memo)+'」</div>':'');
+}
+/* きろく「気持ちの記録」：ワークのあとに残した気分（新）＋ 以前の気持ちチェック（4段階・そのまま） */
 function renderMoodLog(){
+  if(FEATURE_DAILY_CHECK) return renderMoodLogV1();
+  const body=document.getElementById("mapBody"), W=(S.work_moods||[]).slice().sort(function(a,b){ return Date.parse(b.recorded_at)-Date.parse(a.recorded_at); });
+  const ALm=(S.activity_logs||[]).filter(function(a){ return !a.deleted && typeof a.associated_mood==="number"; });
+  let h='<div class="mapsum"><h3>気持ちの記録</h3><div class="lede" style="margin:4px 0 0;line-height:1.85">ワークのあとや、1日の行動と一緒に残した気分です。</div></div>';
+  const items=W.map(function(m){ const a=act(m.action_id); return {at:m.recorded_at, k:a?a.title:"ワーク", h:workMoodHtml(m)}; })
+    .concat(ALm.map(function(a){ return {at:new Date(dateMs(a.recorded_date)+12*3600000).toISOString(), k:"1日の行動と気持ち（"+(a.time_period==="時刻"?(a.time||"時刻"):a.time_period)+"）", h:'<div class="wlmood">'+moodAnyHtml(a.associated_mood, periodNight(a.time_period,a.time))+(a.activity_content?'<span>'+esc(a.activity_content)+'</span>':'')+'</div>'}; }))
+    .sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); });
+  h+= items.length ? items.slice(0,30).map(function(x){ return '<div class="card wlc"><div class="wlh"><span>'+esc(x.k)+'</span><small>'+fmtMD(x.at)+'</small></div>'+x.h+'</div>'; }).join("")
+    : '<div class="card"><p class="lede" style="margin:0">気分は、毎日のワークのあとに残せます。ホームの「今日の一歩」から始めてみよう。</p></div>';
+  if(dsAll().length){
+    renderMoodLogV1();
+    body.innerHTML=h+'<div class="sech" style="margin-top:18px">これまでの気持ちチェック<span>以前の4段階の記録</span></div>'+body.innerHTML;
+  } else body.innerHTML=h;
+}
+function renderMoodLogV1(){
   const body=document.getElementById("mapBody"), hasAny=dsAll().length>0 || S.act_logs.length>0;
   if(!hasAny){
     body.innerHTML='<div class="mapsum"><h3>気持ちの記録</h3><div class="lede" style="margin:4px 0 0;line-height:1.85">毎日の気分を少しずつ残すと、<br>自分の波や傾向が見えてきます。</div></div>'
@@ -4616,7 +4731,7 @@ function myAi(){
     {k:"プロフィール", used:true, d: pfKeys.length ? "現在の状況・サポート・相談できる人・時間帯のうち、答えた項目（"+pfKeys.length+"つ）。「回答しない」は使いません。年代・性別は使いません" : "まだ答えた項目はありません", fix:"openProfile()", fixT:"確認・編集する"},
     {k:"最初に答えた3つの質問", used:true, d:"今の気持ち・気になっていること・変えてみたいこと", fix:"", fixT:""},
     {k:"心の地図", used:true, d:"あなたが確かめた流れ（"+insights().confirmed.filter(function(c){ return c.type==="pattern"; }).length+"件）。まだ確かめていない見方は使いません", fix:"S.kiroku_next='map';go('map')", fixT:"心の地図を見る"},
-    {k:"気持ちの記録", used:true, d:"今日の状態と、最近のメモ（すぷらんと話すときに3件まで）", fix:"openMoodLog()", fixT:"気持ちの記録を見る"},
+    {k:"気持ちの記録", used:true, d:"ワークのあとに残した気分とメモ（すぷらんと話すときに3件まで）", fix:"openMoodLog()", fixT:"気持ちの記録を見る"},
     {k:"やってみたことの記録", used:true, d:"今の一歩と、最近やってみた記録（5件まで）", fix:"S.kiroku_next='mood';go('rec')", fixT:"きろくを見る"},
     {k:"過去のふりかえり", used:false, d:"いまは使っていません", fix:"", fixT:""}
   ];
@@ -4768,7 +4883,8 @@ function cycleData(){
   const inC=function(l){ const t=Date.parse(l.at); return t>=from && t<=to; };
   const acts=S.act_logs.filter(inC), a=curAct();
   return {
-    moods:dsAll().filter(function(r){ const t=Date.parse(r.recorded_at); return t>=from && t<=to; }).map(function(r){ return dsLabel(r.daily_state); }),
+    moods:dsAll().filter(function(r){ const t=Date.parse(r.recorded_at); return t>=from && t<=to; }).map(function(r){ return dsLabel(r.daily_state); })
+      .concat((S.work_moods||[]).filter(function(m){ const t=Date.parse(m.recorded_at); return m.current_mood && t>=from && t<=to; }).map(function(m){ return moodAnyLabel(m.current_mood); })),
     talk_count:S.talk_logs.filter(inC).length,
     action:{ action_id:S.act_id, title:a?a.title:S.first_action, plan:a?planLabel():"",
       count:acts.filter(function(l){ return l.action_id===S.act_id; }).length,
@@ -4782,7 +4898,7 @@ function countText(list){
 function reviewRows(){
   const d=cycleData();
   return [
-    {id:"state", k:"今週の状態", v: d.moods.length ? "「今日の状態」の記録："+countText(d.moods) : "今週は「今日の状態」の記録がありませんでした。"},
+    {id:"state", k:"今週の状態", v: d.moods.length ? "記録した気分："+countText(d.moods) : "今週は、気分の記録がありませんでした。"},
     {id:"theme", k:"今週のテーマ", v: S.direction_goal||"—"},
     ...(!FEATURE_FREE_TALK && !d.talk_count ? [] : [{id:"talk", k:"すぷらんと話したこと", v: d.talk_count ? "今週は"+d.talk_count+"回話しました。"+(S.ai_conversation_summary?"<br>"+S.ai_conversation_summary:"") : "今週は、はなすは使いませんでした。"}]),
     {id:"action", k:"試したこと", v: "「"+d.action.title+"」（目安："+d.action.plan+"）<br>やってみた回数："+d.action.count+"回"},
