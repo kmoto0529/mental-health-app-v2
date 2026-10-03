@@ -905,6 +905,32 @@ nav button .lk{position:absolute;top:-3px;left:calc(50% + 5px);font-size:10px;li
 .wlc{padding:12px 14px}.wlh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}.wlh span{font-size:12px;font-weight:800;color:var(--teal-deep)}.wlh small{font-size:11.5px;color:var(--muted)}
 .wlc summary{cursor:pointer;font-size:14px;color:var(--ink)}.wlj{font-size:13.5px;line-height:1.8;margin-top:6px;color:var(--ink)}
 .wla{font-size:13px;line-height:1.8;color:var(--ink)}.wla b{display:inline-block;min-width:3em;color:var(--ink2)}.wlm{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:3px}
+.m2sum{background:linear-gradient(160deg,#FBFBF4,#EEF4E2);border:1px solid var(--teal-line);border-radius:var(--r-m);margin:4px 18px 10px;padding:14px}
+.m2h{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--teal-deep)}
+.m2t{font-size:14.5px;line-height:1.9;color:var(--ink);margin:8px 0 6px}
+.m2cnt{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.m2cnt span{font-size:11.5px;color:var(--ink2);background:var(--paper);border:1px solid var(--teal-line);border-radius:99px;padding:2px 10px}.m2cnt b{color:var(--teal-deep)}
+.m2sum textarea{width:100%;box-sizing:border-box;margin-top:6px;font-size:13px}
+.hycard{background:var(--paper);border:1.5px solid var(--teal-line);border-radius:var(--r-m);margin:0 18px 10px;padding:13px 14px}
+.hycard.tC{border-color:#E7D3A6;background:#FFFCF4}
+.hyh{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;font-weight:800;color:var(--teal-deep)}.hyh span{color:var(--muted);font-weight:700}
+.hyt{font-size:15px;font-weight:800;line-height:1.7;color:var(--ink);margin:6px 0 4px}
+.hys{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px}
+.hyq{font-size:13px;font-weight:800;color:var(--ink);margin:10px 0 6px}
+.hyst{font-size:12.5px;font-weight:800;color:var(--teal-deep);margin-top:8px}
+.hycard textarea{width:100%;box-sizing:border-box;font-size:13px}
+.hyev{background:var(--paper2);border-radius:10px;padding:8px 10px;margin:6px 0;font-size:13px;line-height:1.7}.hyev b{font-size:11.5px;color:var(--teal-deep)}
+.hyalt{font-size:13px;line-height:1.8;margin:0;padding-left:18px;color:var(--ink2)}
+.m2good{background:#FFFCF4;border:1px solid #E7D3A6;border-radius:var(--r-m);margin:0 18px 10px;padding:12px 14px}
+.m2good .k{font-size:11.5px;font-weight:800;color:#9a7a3a}.m2good .v{font-size:14.5px;line-height:1.8;color:var(--ink);margin:4px 0}.m2good .s{font-size:11px;color:var(--muted)}
+.m2new{margin:0 18px 6px;font-size:13px;line-height:1.9;color:var(--ink2)}
+.vdep{display:flex;gap:3px;margin-top:6px}.vdep i{width:14px;height:5px;border-radius:3px;background:var(--line)}.vdep i.on{background:var(--teal)}
+.vdep.big{justify-content:center}.vdep.big i{width:28px;height:7px}
+.m2view{text-align:center;margin:4px 18px 4px}.m2view .vs{font-size:12.5px;color:var(--teal-deep);font-weight:800;margin-top:6px}
+.m2acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.m2acts .btn{margin:0;font-size:14px;padding:12px 6px}.m2acts small{display:block;font-size:10.5px;font-weight:600;opacity:.8}
+.mwstep{font-size:12px;color:var(--muted);text-align:center;margin:0 0 6px}
+.rfsrc{font-size:13px;line-height:1.9;color:var(--ink);background:var(--paper2);border-radius:10px;padding:8px 10px;margin-bottom:10px}.rfsrc span{display:inline-block;min-width:7em;font-size:11.5px;color:var(--muted);font-weight:700}
+.rfalt{font-size:14px;line-height:1.8;color:var(--ink);padding:6px 0;border-bottom:1px dashed var(--teal-line)}
+input[type=range]{width:100%}
 .reccard{background:#EEF4E2;border:1.5px solid #B9CC98;border-radius:16px;padding:14px;margin:12px 18px 0;text-align:left}
 .modal .reccard{margin:12px 0 0}
 .rc-h{font-size:12.5px;font-weight:800;color:var(--teal-deep)}.rc-t{display:block;font-size:17px;margin:4px 0 2px;color:var(--ink)}
@@ -1060,7 +1086,7 @@ function go(id){
   const nav=document.getElementById("nav");
   S.entered=true; nav.hidden=false; nav.classList.remove("locked");
   if(id==="home") renderHome();
-  if(id==="map"){ MAPED=null; S.kiroku=S.kiroku_next||"map"; S.kiroku_next=null; renderMap(); }
+  if(id==="map"){ MAPED=null; MAPST.view=null; MAPST.work=null; REF=null; S.kiroku=S.kiroku_next||"map"; S.kiroku_next=null; renderMap(); }
   if(id==="gate") renderGate();
   if(id==="log"){ S.my_view=null; renderLog(); }
   if(id==="talk") renderTalk();
@@ -3138,13 +3164,13 @@ function spWho(k){ return '<div class="who"><img class="av" src="assets/suplan/o
 const SP_INTRO="こんにちは、すぷらんだよ。<br>わたしはAIで、気持ちの整理を一緒に手伝うよ。";
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 const MAP_BLOCKS=[
-  {id:"scene",    k:"心が動きやすい場面", cls:"",
+  {id:"scene",    k:"心が動く場面", cls:"",
    q:"話してくれた場面を並べてみました。<br>共通していそうなことはありますか？", stem:"＿＿＿。そういう場面で、心が動きやすいのかもしれない。",
    words:["夜","ひとりのとき","連絡を見たとき","休みの前の日","人と比べたとき","予定がないとき"]},
   {id:"thought",  k:"浮かびやすい考え", cls:"",
    q:"そのとき、頭の中ではどんな言葉が流れていそうですか？<br>自分の口ぐせのように書いてみてください。", stem:"そういうとき、「＿＿＿」と考えやすい。",
    words:["また失敗する","迷惑をかけている","ちゃんとしなきゃ","どうせ無理","自分だけが遅れている"]},
-  {id:"feeling",  k:"気持ち・身体の反応", cls:"",
+  {id:"feeling",  k:"気持ちとからだ", cls:"",
    q:"気持ちや体には、どんなことが起きていますか？<br>ぴったりの言葉がなければ、近いもので大丈夫です。", stem:"そのとき、気持ちは＿＿＿、体は＿＿＿。",
    words:["不安","焦り","落ち込み","イライラ","むなしさ","胸が苦しい","体が重い","眠れない","肩がこわばる"]},
   {id:"behavior", k:"取りやすい行動", cls:"",
@@ -3155,7 +3181,10 @@ const MAP_BLOCKS=[
   {id:"tried",    k:"試して分かったこと", cls:"good wide",
    q:"やってみた記録を並べてみました。<br>やってみて、自分について分かったことはありますか？", stem:"＿＿＿をすると、わたしは＿＿＿。",
    words:["少し楽になる","変わらない日もある","朝のほうがやりやすい","短いほうが続く"]},
-  {id:"support",  k:"自分を支えてくれるもの", cls:"res wide",
+  {id:"strength", k:"できていること・自分の工夫", cls:"good wide",
+   q:"最近、少しでもできたことはありますか？<br>小さなことで大丈夫です。", stem:"わたしは、＿＿＿ことができていた。",
+   words:["記録をつけた","休めた","人に頼れた","外に出た","自分にやさしくできた"]},
+  {id:"support",  k:"自分を支えるもの・大切なこと", cls:"res wide",
    q:"しんどいとき、少しでも支えになっているものはありますか？<br>人・場所・時間・もの、なんでも大丈夫です。", stem:"わたしを支えてくれているのは、＿＿＿。",
    words:["家族","友人","散歩","音楽","眠ること","ペット"]}
 ];
@@ -3272,6 +3301,9 @@ function renderMap(){
     return;
   }
   if(MAPED) return renderMapEditor();
+  if(REF) return renderReframe(body);
+  if(MAPST.work) return renderMapWork(body);
+  if(MAPST.view) return renderMapView(body);
   renderMapMain(body);
 }
 
@@ -3401,7 +3433,427 @@ function renderWorkLog(){
   body.innerHTML = items.length ? items.map(function(x){ return '<div class="card wlc"><div class="wlh"><span>'+x.k+'</span><small>'+fmtMD(x.at)+' '+hm(x.at)+'</small></div>'+x.h+'</div>'; }).join("")
     : '<div class="card"><p class="lede" style="margin:0">まだワークの記録はありません。ホームの「今日の一歩」から始められます。</p></div>';
 }
-function renderMapMain(body){
+/* ══════════════════════════════════════════════════════════════
+   心の地図 v2.0（2026-10-03）
+   「自分を評価・診断する場所ではなく、自分への理解と、自分なりの向き合い方を少しずつ増やしていく場所」
+   ① 自分を知る（8つの視点）② パターンに気づく（すぷらんの仮説）③ 別の向き合い方を見つける（別の見方を探す）
+   - 8視点：A 自分の反応（場面・考え・気持ちとからだ・行動）／B つながりと変化（流れ・試して分かったこと）／C 持っている力（できていること・支え）
+   - 以前の7視点のデータ（S.map の id）はそのまま使う。新設は strength（できていること・自分の工夫）
+   - 記録の収集（mapRecords）→ 仮説エンジン（HYPO_ENGINE・ルールは HYPO_RULES）→ 本人の確認、を分けておく。
+     いまはルールで照らし合わせているだけ（生成AIは呼ばない）。将来 HYPO_ENGINE.generate を LLM に差し替える
+   - 心の地図のために見た記録は、大塚さんへ自動で共有しない。毎日のワーク（S.act_id）は変えない
+   ══════════════════════════════════════════════════════════════ */
+const MAP_CATS=[["A","自分の反応を知る"],["B","つながりと変化を知る"],["C","自分の持っている力を知る"]];
+const MAP_VIEW_CAT={scene:"A",thought:"A",feeling:"A",behavior:"A",pattern:"B",tried:"B",strength:"C",support:"C"};
+const MAP_DEPTH=["まだこれから","手がかりが見つかった","少し具体的になった","つながりが見えてきた","試して理解が深まった"];
+
+/* ── 1分でふりかえる（1〜3問・選択が中心・自由記述は任意）／すぷらんと深める（3〜5分） ── */
+const MAP_QUICK={
+  scene:[{q:"最近、気持ちが動いたのはどんなとき？", multi:true, o:["仕事・学校のこと","人と話したあと","ひとりのとき","夜","朝","ほっとしたとき","うれしかったとき"], free:"どんな場面だった？（任意）"},
+         {q:"どんな動きだった？", multi:true, o:["つらかった","不安になった","イライラした","ほっとした","うれしかった"]}],
+  thought:[{q:"そのとき、どんな言葉が浮かんだ？", multi:true, o:["また失敗する","迷惑をかけている","ちゃんとしなきゃ","どうせ無理","嫌われたかも","なんとかなるかも","よくやった"], free:"自分の言葉で（任意）"}],
+  feeling:[{q:"どんな気持ちだった？", multi:true, o:["不安","焦り","落ち込み","イライラ","むなしさ","安心","うれしさ"]},
+           {q:"からだに変化はあった？", multi:true, o:["胸が苦しい","体が重い","眠れない","肩がこわばる","特になかった","ほっとゆるんだ"]}],
+  behavior:[{q:"そのとき、どう過ごした？", multi:true, o:["スマホを見た","休んだ","人に話した","散歩した","後回しにした","がんばりすぎた","好きなことをした"], free:"ほかには？（任意）"},
+            {q:"そのあと、気持ちはどうだった？", multi:false, o:["少し楽になった","変わらなかった","少ししんどくなった","分からない"]}],
+  pattern:[{q:"最近、似たような出来事はあった？", multi:false, o:["あった","少しあった","なかった","分からない"], free:"どんなことだった？（任意）"}],
+  tried:[{q:"最近のワークで気づいたことは？", multi:true, o:["短いほうが続く","朝がやりやすい","夜がやりやすい","少し楽になる","変わらない日もある","まだ分からない"], free:"ほかに気づいたこと（任意）"}],
+  strength:[{q:"最近、少しでもできたことは？", multi:true, o:["記録をつけられた","休めた","人に頼れた","外に出られた","ワークをやれた","自分にやさしくできた"], free:"ほかにもあれば（任意）"}],
+  support:[{q:"どんな人・時間・場所が助けになる？", multi:true, o:["家族","友人","ひとりの時間","散歩","音楽","眠ること","自分の部屋"], free:"ほかには？（任意）"},
+           {q:"大切にしたいことは？（任意）", multi:false, o:[], free:"たとえば「無理をしすぎない」など"}]
+};
+/* 深める：場面〜流れは、すぷらんとの対話（ミニセッション）。それ以外は過去の記録を見ながら3問 */
+const MAP_DEEP={
+  tried:[{q:"やってみて、自分に合いそうだと感じたところは？", multi:true, o:["時間が短い","やる時間を決めた","書くと整理できる","体がゆるむ","まだ分からない"]},
+         {q:"合わないと感じたところは？", multi:true, o:["時間が長い","気分が乗らない日がある","やる時間がとれない","特にない"]},
+         {q:"次に試すなら、どんな工夫をしたい？（任意）", multi:false, o:[], free:"たとえば「寝る前に1分だけ」など"}],
+  strength:[{q:"このなかで、自分でも「やれていた」と思えるものは？", multi:true, o:"__strength__"},
+            {q:"そのとき、どうしてできたと思う？", multi:true, o:["時間が短かった","誰かがいた","気分が少しよかった","前もって決めていた","分からない"]},
+            {q:"自分にかけたい言葉があれば（任意）", multi:false, o:[], free:"たとえば「よくやってる」など"}],
+  support:[{q:"最近、助けになった人・時間・場所は？", multi:true, o:["家族","友人","ひとりの時間","散歩","音楽","眠ること","職場の人"], free:"ほかには？（任意）"},
+           {q:"それがあると、どんな気持ちになる？", multi:true, o:["ほっとする","落ち着く","元気が出る","分からない"]},
+           {q:"これから大切にしたいことは？（任意）", multi:false, o:[], free:"たとえば「休むことを後回しにしない」など"}]
+};
+function mapViewDeepIsChat(id){ return ["scene","thought","feeling","behavior","pattern"].indexOf(id)>=0; }
+
+/* ── 記録を集める（心の地図のためだけに使う。共有はしない） ── */
+function mapRecords(){
+  const R=[], add=function(r){ if(r.text && String(r.text).trim()) R.push(r); };
+  if(S.current_concerns && S.current_concerns[0]) add({rid:"init-topic", type:"initial", label:"最初に話したこと", at:S.setup_completed_at, day:"init", text:S.current_concerns[0]+(S.iv_scene?"。"+S.iv_scene:""), views:["scene"]});
+  (S.mini_sessions||[]).forEach(function(m){ const d=isoDate(Date.parse(m.at));
+    if(m.scene) add({rid:m.id+"-s", type:"talk", label:"すぷらんとの会話（"+fmtMD(m.at)+"）", at:m.at, day:d, text:m.scene, views:["scene"]});
+    if(m.thought) add({rid:m.id+"-t", type:"talk", label:"すぷらんとの会話（"+fmtMD(m.at)+"）", at:m.at, day:d, text:m.thought, views:["thought"]});
+    if(m.feeling) add({rid:m.id+"-f", type:"talk", label:"すぷらんとの会話（"+fmtMD(m.at)+"）", at:m.at, day:d, text:m.feeling, views:["feeling"]});
+    if(m.behavior) add({rid:m.id+"-b", type:"talk", label:"すぷらんとの会話（"+fmtMD(m.at)+"）", at:m.at, day:d, text:m.behavior, views:["behavior"]});
+    if((m.coping_all||[]).length) add({rid:m.id+"-c", type:"talk", label:"すぷらんとの会話（"+fmtMD(m.at)+"）", at:m.at, day:d, text:m.coping_all.join("・")+(m.coping_effect?"（"+m.coping_effect+"）":""), views:["behavior","strength","tried"], good:/楽/.test(m.coping_effect||"")}); });
+  (S.journals||[]).forEach(function(j){ add({rid:j.journal_id, type:"journal", label:fmtMD(j.created_at)+"のジャーナリング", at:j.created_at, day:isoDate(Date.parse(j.created_at)), text:j.content, views:["thought","scene"]}); });
+  (S.activity_logs||[]).forEach(function(a){ add({rid:a.activity_log_id, type:"activity", label:fmtMD(a.created_at)+"の行動の記録（"+a.time_period+"）", at:a.created_at, day:a.recorded_date, text:a.activity_content, mood:a.associated_mood, views:["behavior"]}); });
+  dsAll().forEach(function(r){ if(r.optional_note) add({rid:r.record_id, type:"mood", label:fmtMD(r.recorded_at)+"の気持ちのメモ", at:r.recorded_at, day:r.date, text:r.optional_note, mood:r.daily_state, views:["feeling","scene"]}); });
+  (S.act_logs||[]).forEach(function(l){ const d=isoDate(Date.parse(l.at)), dm=dsDay(d).some(function(x){ return dsLevel(x.daily_state)<=1; });
+    add({rid:l.log_id||("act-"+l.at), type:"work", label:fmtMD(l.at)+"の「"+l.title+"」", at:l.at, day:d, text:l.title+(l.feeling?"（やってみたあと："+l.feeling+"）":""), views:["tried","strength"], hard_day:dm, good:/楽/.test(l.feeling||"")}); });
+  (S.reviews||[]).forEach(function(r){ const a=r.answers||{}; if(a.feel||a.outside) add({rid:r.review_id, type:"review", label:fmtMD(r.completed_at)+"のふりかえり", at:r.completed_at, day:isoDate(Date.parse(r.completed_at)), text:[a.feel?"ワーク："+a.feel:"",a.state?"今の調子："+a.state:"",a.outside?"アプリの外で："+a.outside:""].filter(Boolean).join("／"), views:["tried"]}); });
+  (S.map_notes||[]).forEach(function(n){ add({rid:n.note_id, type:"note", label:fmtMD(n.at)+"の"+(n.mode==="deep"?"すぷらんと深めたこと":"1分ふりかえり"), at:n.at, day:isoDate(Date.parse(n.at)), text:n.text, views:[n.view], good:n.good}); });
+  (S.reframes||[]).forEach(function(f){ add({rid:f.reframe_id, type:"reframe", label:fmtMD(f.at)+"の「別の見方」", at:f.at, day:isoDate(Date.parse(f.at)), text:f.event+"／"+f.thought, views:["thought","pattern"]}); });
+  return R;
+}
+
+/* ── 仮説エンジン（ルール）。HYPO_RULES は監修で直せるよう画面から分ける ──
+   A 思考・感情のパターン／B 行動と状態の関係／C 本人の強み・工夫
+   1つの出来事だけでパターンと言わない：A・B は「別の日の記録が2つ以上」のときだけ。反する記録があれば「ほかの可能性」に入れる */
+const HYPO_RULES=[
+  {key:"A-blame", type:"A", views:["thought","pattern"], kw:/自分のせい|迷惑|申し訳|嫌われ|評価|怒られ|ちゃんとしなきゃ|失敗/,
+   text:"相手の反応や評価が気になると、自分に原因があると考えやすい場面があるのかもしれないね。",
+   alt:["そのときの忙しさや疲れが、考え方に影響していた可能性もあるね。","相手の側に、別の事情があった場面もあるかもしれないね。"]},
+  {key:"A-future", type:"A", views:["thought","scene","pattern"], kw:/明日|この先|どうなる|将来|ずっと考え|考えてしまう|眠れ/,
+   text:"先のことを考え始めると、頭の中で考えが続きやすい時間があるのかもしれないね。",
+   alt:["実際に予定が立て込んでいた時期だった可能性もあるね。"]},
+  {key:"A-compare", type:"A", views:["thought"], kw:/比べ|自分だけ|遅れ|どうせ/,
+   text:"まわりと比べると、自分を低く見積もりやすい場面があるのかもしれないね。", alt:["比べる場面が多い環境にいた可能性もあるね。"]},
+  {key:"B-calm", type:"B", views:["behavior","tried"], kw:/散歩|歩|外に|風呂|音楽|寝|休|ひとりの時間|一人/, needGood:true,
+   text:"{x}の時間が、気持ちを少し落ち着ける助けになっているのかもしれないね。", alt:["その日はもともと調子がよかった可能性もあるね。"]},
+  {key:"B-work", type:"B", views:["tried"], work:true,
+   text:"「{x}」のあとは、少し楽になることがあるみたいだね。", alt:["やった日の体調や時間帯が影響していた可能性もあるね。"]},
+  {key:"C-hardday", type:"C", views:["strength","tried"], hardDay:true, min:1,
+   text:"しんどいと感じた日にも、「{x}」をする時間をつくっていたね。自分が少し落ち着ける方法を探そうとしているのかもしれないね。", alt:[]},
+  {key:"C-coping", type:"C", views:["strength","support"], coping:true, min:1,
+   text:"つらいときに「{x}」を試していたね。自分を助ける工夫を、もう持っているのかもしれないね。", alt:[]}
+];
+const HYPO_ENGINE={
+  version:"rule-2026-10-03",
+  generate:function(recs){
+    const out=[], days=function(list){ return new Set(list.map(function(r){ return r.day; })).size; };
+    HYPO_RULES.forEach(function(rule){
+      let ev=[], x="";
+      if(rule.kw){ ev=recs.filter(function(r){ return ["note","reframe"].indexOf(r.type)<0 || r.type==="note" ? rule.kw.test(r.text) : false; });
+        if(rule.needGood){ ev=ev.filter(function(r){ return r.good || r.mood==="somewhat_better" || r.mood==="neutral"; }); const m=ev.length?rule.kw.exec(ev[0].text):null; x=m?m[0]:""; } }
+      if(rule.work){ const by={}; recs.filter(function(r){ return r.type==="work" && r.good; }).forEach(function(r){ const t=r.text.split("（")[0]; (by[t]=by[t]||[]).push(r); });
+        const k=Object.keys(by).sort(function(a,b){ return by[b].length-by[a].length; })[0]; if(k){ ev=by[k]; x=k; } }
+      if(rule.hardDay){ ev=recs.filter(function(r){ return r.type==="work" && r.hard_day; }).slice(-3); x=ev.length?ev[0].text.split("（")[0]:""; }
+      if(rule.coping){ ev=recs.filter(function(r){ return r.type==="talk" && r.views.indexOf("strength")>=0 && r.good; }).slice(-3); x=ev.length?ev[0].text.split("（")[0]:""; }
+      const need=rule.min||2;
+      if(ev.length<need || (need>=2 && days(ev)<2)) return;   // 1つの出来事だけでは言わない
+      /* 反する記録：同じ視点で、逆の気持ち（楽・安心）が書かれているもの */
+      const contra = rule.type==="A" ? recs.filter(function(r){ return r.views.some(function(v){ return rule.views.indexOf(v)>=0; }) && /安心|なんとかなる|大丈夫|ほっと/.test(r.text); }).slice(0,1) : [];
+      out.push({key:rule.key, type:rule.type, views:rule.views, text:rule.text.replace("{x}",x), evidence:ev.slice(-4),
+        alt:rule.alt.concat(contra.length?["一方で「"+contra[0].text.slice(0,24)+"」と書いていた日もあるね。いつもそうとは限らないのかもしれないね。"]:[]),
+        confidence:Math.min(0.9, 0.3+0.15*ev.length+(days(ev)>=3?0.15:0))});
+    });
+    return out;
+  }
+};
+function hyps(){ S.hypotheses=S.hypotheses||[]; return S.hypotheses; }
+/* 新しい候補だけを「提示前」として保存する（同じルールの仮説は、根拠が増えたら更新） */
+function hypoImportMini(){
+  const H=hyps(), I=insights();
+  const put=function(x,status){ const key="mini-"+(x.session_id||"")+"-"+(x.text||"").slice(0,12); if(H.some(function(h){ return h.rule_key===key; })) return;
+    const ev=(x.evidence||[]).map(function(e){ return {rid:x.session_id||"", label:"すぷらんとの会話（"+fmtMD(x.at)+"）", text:String(e).slice(0,60), at:x.at}; });
+    H.push({hypothesis_id:"HY-m"+H.length+"-"+Date.now().toString(36), user_id:DS_USER, hypothesis_type:"A", related_perspective_ids:["pattern","thought"],
+      hypothesis_text: x.hyp ? x.hyp : "「"+x.text+"」という流れがあるのかもしれないね。", source_record_ids:[x.session_id||""], evidence_summary:ev, alternative_explanations:[],
+      internal_confidence:x.confidence||0.5, user_feedback: status==="pending"?"まだ分からない":(x.own?null:"かなり近い"), user_revision: x.own?x.text:"",
+      status:status, rule_key:key, engine:"mini-session", created_at:x.at, updated_at:x.at}); };
+  I.confirmed.filter(function(c){ return c.type==="pattern"; }).forEach(function(c){ put(c, c.own?"revised":"user_confirmed"); });
+  I.working.filter(function(w){ return w.type==="pattern"; }).forEach(function(w){ put(w,"pending"); });
+}
+function hypoRefresh(){
+  hypoImportMini();
+  const cands=HYPO_ENGINE.generate(mapRecords()), H=hyps(), now=nowIso(), added=[];
+  cands.forEach(function(c){
+    const ex=H.filter(function(h){ return h.rule_key===c.key; })[0], ids=c.evidence.map(function(e){ return e.rid; });
+    if(ex){ if(ids.some(function(id){ return ex.source_record_ids.indexOf(id)<0; }) && ex.status!=="user_confirmed"){ ex.source_record_ids=ids; ex.evidence_summary=c.evidence.map(hypoEv); ex.internal_confidence=c.confidence; ex.updated_at=now; } return; }
+    const h={hypothesis_id:"HY-"+Date.now().toString(36)+"-"+H.length, user_id:DS_USER, hypothesis_type:c.type, related_perspective_ids:c.views, hypothesis_text:c.text,
+      source_record_ids:ids, evidence_summary:c.evidence.map(hypoEv), alternative_explanations:c.alt, internal_confidence:c.confidence,
+      user_feedback:null, user_revision:"", status:"proposed", rule_key:c.key, engine:HYPO_ENGINE.version, created_at:now, updated_at:now};
+    H.push(h); added.push(h);
+  });
+  return added;
+}
+function hypoEv(r){ return {rid:r.rid, label:r.label, text:String(r.text).slice(0,60), at:r.at}; }
+function hypoById(id){ return hyps().filter(function(h){ return h.hypothesis_id===id; })[0]||null; }
+const HYPO_FB=[["かなり近い","user_confirmed"],["少し近い","user_confirmed"],["ちょっと違う","needs_revision"],["まだ分からない","pending"]];
+function hypoAnswer(id,i){
+  const h=hypoById(id); if(!h) return; h.user_feedback=HYPO_FB[i][0]; h.status=HYPO_FB[i][1]; h.updated_at=nowIso();
+  if(h.status==="needs_revision") MAPST.revise=id;
+  saveState(); renderMap();
+}
+function hypoRevise(id){
+  const h=hypoById(id), el=document.getElementById("hyRev"); if(!h) return;
+  const v=(el?el.value:"").trim();
+  if(v){ if(RISK_RE.test(v)){ openSafety("free_text","unspecified"); return; } h.user_revision=v; h.status="revised"; h.updated_at=nowIso(); }
+  MAPST.revise=null; saveState(); renderMap();
+}
+function hypoWhy(id){
+  const h=hypoById(id); if(!h) return;
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
+    +'<h3>どうしてそう考えたの？</h3><p style="font-size:12.5px">あなたが話したこと・記録したことのうち、次のものを照らし合わせたよ。</p>'
+    +h.evidence_summary.map(function(e){ return '<div class="hyev"><b>'+esc(e.label)+'</b><div>「'+esc(e.text)+'」</div></div>'; }).join("")
+    +(h.alternative_explanations.length?'<h4 style="font-size:13px;margin:12px 0 4px">ほかの可能性</h4><ul class="hyalt">'+h.alternative_explanations.map(function(a){ return '<li>'+esc(a)+'</li>'; }).join("")+'</ul>':'')
+    +'<p class="mapnote" style="margin:10px 0 0">これは仮説で、事実や診断ではないよ。いまのデモでは、決まったルールで記録を照らし合わせています。</p>'
+    +'<button class="btn" onclick="closeWhy()">とじる</button></div></div>';
+}
+function hypoCard(h,compact){
+  const lab={A:"考え・気持ちのパターン",B:"行動と状態の関係",C:"あなたの強み・工夫"}[h.hypothesis_type];
+  let x='<div class="hycard t'+h.hypothesis_type+'"><div class="hyh">すぷらんが見つけた、ひとつの仮説<span>'+lab+'</span></div>'
+    +'<div class="hyt">'+esc(h.status==="revised"&&h.user_revision?h.user_revision:h.hypothesis_text)+'</div>'
+    +(h.status==="revised"?'<div class="hys">あなたが直した見方（もとの仮説：'+esc(h.hypothesis_text)+'）</div>':'<div class="hys">これまでのいくつかのお話から、そんな共通点が少し見えてきたよ。</div>')
+    +'<button class="whybtn" onclick="hypoWhy(\''+h.hypothesis_id+'\')">どうしてそう考えたの？</button>';
+  if(h.status==="proposed" || h.status==="pending"){
+    x+='<div class="hyq">自分でも、そんな感じがする？</div><div class="rvchips">'+HYPO_FB.map(function(f,i){ return '<button class="rvchip'+(h.user_feedback===f[0]?' on':'')+'" onclick="hypoAnswer(\''+h.hypothesis_id+'\','+i+')">'+f[0]+'</button>'; }).join("")+'</div>';
+  } else if(h.status==="needs_revision" || MAPST.revise===h.hypothesis_id){
+    x+='<div class="hyq">どこが違うと感じた？（任意）</div><textarea id="hyRev" rows="2" maxlength="120" placeholder="たとえば「自分のせいというより、焦っている感じ」">'+esc(h.user_revision||"")+'</textarea>'
+      +'<div class="prow2" style="margin-top:6px"><button class="btn sm" onclick="hypoRevise(\''+h.hypothesis_id+'\')">この言葉で残す</button><button class="dslink" onclick="MAPST.revise=null;renderMap()">いまは書かない</button></div>';
+  } else x+='<div class="hyst">'+({user_confirmed:"✓ "+(h.user_feedback||"近い")+"と確かめた",revised:"✓ あなたの言葉で直した"}[h.status]||"")+'</div>';
+  return x+'</div>';
+}
+
+/* ── 視点ごとの手がかり・深まり（本人の確認・具体性・つながり・ワークによる発見から。会話の回数では増やさない） ── */
+function viewClues(id){
+  const c=[], e=mapEntry(id);
+  if(e) c.push({t:e.text, src:"あなたが書いたこと", at:e.at, own:true});
+  mapMaterials(id).forEach(function(m){ c.push({t:m.t, src:m.src, at:m.at}); });
+  (S.map_notes||[]).filter(function(n){ return n.view===id; }).forEach(function(n){ c.push({t:n.text, src:(n.mode==="deep"?"すぷらんと深めたこと":"1分ふりかえり")+"（"+fmtMD(n.at)+"）", at:n.at, own:true, deep:n.mode==="deep"}); });
+  /* 書き出し・行動の記録・気持ちのメモ・ふりかえりも、その視点の手がかりにする（本人の言葉そのまま） */
+  mapRecords().filter(function(r){ return r.views.indexOf(id)>=0 && ["journal","activity","mood","review"].indexOf(r.type)>=0; })
+    .forEach(function(r){ c.push({t:String(r.text).slice(0,60), src:r.label, at:r.at}); });
+  insights().confirmed.filter(function(x){ return (x.type==="talk" && id==="scene") || (x.type==="daily" && id==="feeling"); })
+    .forEach(function(x){ c.push({t:x.text, src:(x.type==="talk"?"話して残したこと":"記録から確かめたこと")+"（"+fmtMD(x.at)+"）", at:x.at, own:true}); });
+  if(id==="strength") strengthFacts().forEach(function(f){ c.push({t:f.t, src:f.src, at:f.at, fact:true}); });
+  return c;
+}
+function viewHyps(id){ return hyps().filter(function(h){ return h.related_perspective_ids.indexOf(id)>=0; }); }
+function viewDepth(id){
+  const c=viewClues(id), H=viewHyps(id);
+  const conf=H.some(function(h){ return h.status==="user_confirmed"||h.status==="revised"; });
+  const tried=(S.reframes||[]).some(function(f){ return (f.related_views||[]).indexOf(id)>=0; }) || H.some(function(h){ return h.status==="revised"; })
+    || (id==="tried" && (S.map_notes||[]).some(function(n){ return n.view==="tried" && n.mode==="deep"; }));
+  if(conf && tried) return 4; if(conf) return 3;
+  if(c.length>=2 || c.some(function(x){ return x.deep; })) return 2;
+  return c.length ? 1 : 0;
+}
+/* 本人の具体的な行動から見つけた工夫（評価の言葉ではなく、実際にしたこと） */
+function strengthFacts(){
+  const F=[], by={};
+  (S.act_logs||[]).forEach(function(l){ by[l.title]=(by[l.title]||0)+1; });
+  Object.keys(by).forEach(function(t){ if(by[t]>=2) F.push({t:"「"+t+"」を"+by[t]+"回、続けて記録していたね", src:"ワークの記録", at:(S.act_logs.filter(function(l){ return l.title===t; }).slice(-1)[0]||{}).at}); });
+  (S.mini_sessions||[]).forEach(function(m){ if((m.coping_all||[]).length && /楽/.test(m.coping_effect||"")) F.push({t:"つらいときに「"+m.coping_all.join("・")+"」を試していたね", src:"すぷらんとの会話（"+fmtMD(m.at)+"）", at:m.at}); });
+  (S.reviews||[]).forEach(function(r){ const o=(r.answers||{}).outside; if(o) F.push({t:"アプリの外でも「"+o.slice(0,24)+"」と工夫していたね", src:fmtMD(r.completed_at)+"のふりかえり", at:r.completed_at}); });
+  return F.filter(function(f){ return (S.map_hidden||[]).indexOf(f.t)<0; });
+}
+function mapCounts(){
+  const clues=MAP_BLOCKS.reduce(function(a,b){ return a+viewClues(b.id).length; },0);
+  const links=hyps().filter(function(h){ return h.status==="user_confirmed"||h.status==="revised"; }).length;
+  const views=(S.reframes||[]).filter(function(f){ return f.chosen_text; }).length;
+  return {clues:clues, links:links, views:views};
+}
+
+/* ── TOP：今のあなた（2〜3文）→ できていること → 最近分かったこと → 8つの視点 ── */
+function mapSummary(){
+  const out=[], ev=[];
+  /* 1文目：よく起きる場面・気になっていること（本人の言葉から） */
+  const sc=viewClues("scene").filter(function(c){ return !c.fact; }).slice(-1)[0];
+  if(sc){ out.push("「"+sc.t.slice(0,30)+(sc.t.length>30?"…":"")+"」のような場面で、気持ちが動くことがあるようです。"); ev.push(sc.src+"：「"+sc.t.slice(0,40)+"」"); }
+  else if(S.current_concerns && S.current_concerns[0] && S.current_concerns[0]!=="まだわからない"){ out.push((IV_TOPIC_P[S.current_concerns[0]]||S.current_concerns[0])+"が、いま気になっているようです。"); ev.push("最初に話したこと："+S.current_concerns[0]); }
+  /* 2文目：本人が確かめた（なければ確認待ちの）A・B の仮説。根拠が足りなければ出さない */
+  const h=hyps().filter(function(x){ return (x.hypothesis_type==="A"||x.hypothesis_type==="B") && x.status!=="needs_revision"; })
+    .sort(function(a,b){ return (b.status==="user_confirmed"||b.status==="revised")-(a.status==="user_confirmed"||a.status==="revised"); })[0];
+  if(h){ out.push(h.status==="revised"&&h.user_revision ? "「"+h.user_revision.replace(/[。.]$/,"")+"」と感じているようです。" : h.hypothesis_text.replace(/ね。$/,"。")); h.evidence_summary.forEach(function(e){ ev.push(e.label+"：「"+e.text+"」"); }); }
+  /* 3文目：できていること・支え */
+  const st=strengthFacts()[0], sp=mapEntry("support");
+  if(st){ out.push("一方で、"+st.t.replace(/ね$/,"")+"。"); ev.push(st.src+"："+st.t); }
+  else if(sp){ out.push("「"+sp.text.slice(0,24)+"」が、支えになっているようです。"); ev.push("あなたが書いたこと："+sp.text); }
+  return {lines:out.map(spTone), ev:ev};
+}
+function renderMapTop(body){
+  hypoRefresh();
+  const cnt=mapCounts(), sm=mapSummary(), pending=hyps().filter(function(h){ return h.status==="proposed"||h.status==="pending"||h.status==="needs_revision"||MAPST.revise===h.hypothesis_id; }).slice(-1)[0];
+  const last=nowMs()-7*DAY;   // 直近7日に増えたものだけ
+  const recent=[].concat((S.reframes||[]).filter(function(f){ return Date.parse(f.at)>last; }).map(function(){ return "新しい見方がひとつ増えました"; }),
+    (S.map_notes||[]).filter(function(n){ return Date.parse(n.at)>last; }).map(function(n){ return "「"+mapBlock(n.view).k+"」に手がかりが増えました"; }),
+    hyps().filter(function(x){ return Date.parse(x.created_at)>last; }).map(function(){ return "すぷらんが新しい仮説を見つけました"; }));
+  let h='<div class="m2sum"><div class="m2h"><img class="sp-xs" src="assets/suplan/opt/thinking.png" alt="" width="44" height="44"><b>すぷらんから見た、今のあなた</b></div>';
+  if(sm.lines.length){ h+='<p class="m2t">'+sm.lines.map(esc).join("<br>")+'</p>'
+      +'<div class="prow2"><button class="whybtn" onclick="mapSumWhy()">どうしてそう考えたの？</button><button class="dslink" onclick="MAPST.sumfix=!MAPST.sumfix;renderMap()">少し違うところがある</button></div>'
+      +(MAPST.sumfix?'<textarea id="smFix" rows="2" maxlength="120" placeholder="どこが違う？（任意）">'+esc(S.map_summary_fix||"")+'</textarea><button class="btn sm" style="margin-top:6px" onclick="mapSumFix()">残す</button>':'')
+      +(S.map_summary_fix?'<div class="hys">あなたのメモ：'+esc(S.map_summary_fix)+'</div>':''); }
+  else h+='<p class="m2t" style="color:var(--muted)">まだ手がかりが少ないよ。1分でふりかえってみると、少しずつ見えてくるよ。</p>';
+  h+='<div class="m2cnt"><span><b>'+cnt.clues+'</b>つの手がかり</span><span><b>'+cnt.links+'</b>つのつながり</span><span>新しい見方 <b>'+cnt.views+'</b></span></div></div>';
+  if(pending) h+=hypoCard(pending);
+  const st=strengthFacts()[0];
+  if(st) h+='<div class="m2good"><div class="k">あなたができていること</div><div class="v">'+esc(spTone(st.t))+'。</div><div class="s">'+esc(st.src)+'</div>'
+    +'<button class="dslink" onclick="mapHideFirst()">違う気がする（かくす）</button></div>';
+  if(recent.length) h+='<div class="sech">最近分かったこと</div><div class="m2new">'+recent.filter(function(v,i,a){ return a.indexOf(v)===i; }).slice(0,3).map(function(t){ return '<div>・'+esc(t)+'</div>'; }).join("")+'</div>';
+  h+=MAP_CATS.map(function(cat){ return '<div class="sech">'+cat[1]+'</div><div class="vgrid">'+MAP_BLOCKS.filter(function(b){ return MAP_VIEW_CAT[b.id]===cat[0]; }).map(function(b){ const d=viewDepth(b.id);
+      return '<div class="vcard tap'+(d?' on':'')+'" onclick="openMapView(\''+b.id+'\')"><div class="vk">'+b.k+'</div><div class="vdep">'+[1,2,3,4].map(function(i){ return '<i class="'+(i<=d?'on':'')+'"></i>'; }).join("")+'</div><div class="vs">'+MAP_DEPTH[d]+'</div></div>'; }).join("")+'</div>'; }).join("");
+  h+='<div class="mapcta2"><img class="sp-xs" src="assets/suplan/opt/bulb.png" alt="" width="52" height="52"><h3>すぷらんと、別の見方を探す</h3>'
+    +'<p>ひとつの出来事にも、ほかの捉え方があるかもしれない。<br>一緒に少し考えてみよう。</p><button class="btn" onclick="openReframe()">別の見方を探す</button></div>'
+    +'<div class="mapnote">※ これは診断ではありません。心の地図は、あなたの会話・書き出し・ワーク・気持ちの記録・ふりかえりをもとに作っています。ここで使った情報が、大塚さんに自動で届くことはありません。<br>※ いまのデモでは、すぷらんの仮説は決まったルールで記録を照らし合わせて作っています。</div>';
+  body.innerHTML=h;
+  S.map_seen_at_next=nowIso();
+}
+function mapSumWhy(){
+  const sm=mapSummary();
+  document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()"><h3>どうしてそう考えたの？</h3>'
+    +sm.ev.map(function(e){ return '<div class="hyev"><div>'+esc(e)+'</div></div>'; }).join("")+'<p class="mapnote" style="margin:10px 0 0">あなたが話したことと、すぷらんの仮説を分けて見られるよ。</p><button class="btn" onclick="closeWhy()">とじる</button></div></div>';
+}
+function mapSumFix(){ const v=((document.getElementById("smFix")||{}).value||"").trim(); if(v && RISK_RE.test(v)){ openSafety("free_text","unspecified"); return; } S.map_summary_fix=v; MAPST.sumfix=false; saveState(); renderMap(); }
+function mapHideFirst(){ const f=strengthFacts()[0]; if(!f) return; S.map_hidden=(S.map_hidden||[]).concat([f.t]); saveState(); renderMap(); }
+
+/* ── 視点の詳細 ── */
+let MAPST={view:null, work:null, revise:null, sumfix:false};
+function openMapView(id){ if(!mapUnlocked()) return; MAPST.view=id; MAPST.work=null; renderMap(); window.scrollTo(0,0); }
+function closeMapView(){ MAPST.view=null; MAPST.work=null; S.map_seen_at=S.map_seen_at_next||S.map_seen_at; renderMap(); window.scrollTo(0,0); }
+function renderMapView(body){
+  const id=MAPST.view, b=mapBlock(id), d=viewDepth(id), clues=viewClues(id), H=viewHyps(id);
+  let h='<div class="pagehead" style="margin-top:-12px"><button class="back" onclick="closeMapView()">‹</button><span class="lede">心の地図 ／ '+b.k+'</span></div>'
+    +'<div class="m2view"><div class="vdep big">'+[1,2,3,4].map(function(i){ return '<i class="'+(i<=d?'on':'')+'"></i>'; }).join("")+'</div><div class="vs">'+MAP_DEPTH[d]+'</div>'
+    +'<div class="m2acts"><button class="btn" onclick="mapWorkStart(\''+id+'\',\'quick\')">1分でふりかえる</button>'
+    +'<button class="btn ghost" onclick="mapWorkStart(\''+id+'\',\'deep\')">すぷらんと深める<small>3〜5分</small></button></div>'
+    +(["thought","pattern","tried","strength"].indexOf(id)>=0?'<button class="dslink" style="display:block;margin:8px auto 0" onclick="openReframe()">別の見方を探す</button>':'')+'</div>';
+  h+='<div class="sech">今分かっていること<span>あなたが話したこと・記録したこと</span></div>'
+    +(clues.length?clues.slice().reverse().slice(0,6).map(function(c){ return '<div class="found"><div class="v">'+(c.own?esc(c.t):'「'+esc(c.t)+'」')+'</div><div class="s">'+esc(c.src)+'</div></div>'; }).join("")
+      :'<div class="found" style="color:var(--muted)"><div class="v" style="font-size:13.5px">まだ手がかりはないよ。1分でふりかえってみよう。</div></div>');
+  if(H.length) h+='<div class="sech">すぷらんの仮説<span>事実ではなく、確かめ中の見方</span></div>'+H.map(function(x){ return hypoCard(x); }).join("");
+  h+='<button class="dslink" style="margin:6px 22px 14px" onclick="openMapEditor(\''+id+'\')">自分の言葉で書く</button>';
+  body.innerHTML=h;
+}
+
+/* ── ワーク（1分・深める）。深めるのうち、場面〜流れはすぷらんとの対話（ミニセッション）へ ── */
+function mapWorkStart(id,mode){
+  if(mode==="deep" && mapViewDeepIsChat(id)){ MAPST.view=null; return openMini("map"); }
+  const steps=(mode==="deep"?MAP_DEEP[id]:MAP_QUICK[id]).map(function(s){ const o=s.o==="__strength__"?strengthFacts().map(function(f){ return f.t; }).concat(["思いつかない"]):s.o; return Object.assign({},s,{o:o}); });
+  MAPST.work={view:id, mode:mode, steps:steps, i:0, ans:steps.map(function(){ return {sel:[], free:""}; }), before:hyps().length};
+  renderMap(); window.scrollTo(0,0);
+}
+function mapWorkCtx(id){
+  /* 深める：これまでの記録を先に見せる（すぷらんが持っている情報だけ） */
+  const c=viewClues(id).slice(-3);
+  return c.length ? '<div class="bubble">'+spWho("watering")+'<div class="txt">'+spTone("これまでに、こんなことを話してくれたね。")+'<br>'+c.map(function(x){ return '・'+esc(x.t.slice(0,40)); }).join("<br>")+'</div></div>' : '';
+}
+function renderMapWork(body){
+  const W=MAPST.work, b=mapBlock(W.view), s=W.steps[W.i], A=W.ans[W.i];
+  if(W.done) return renderMapWorkDone(body);
+  let h='<div class="pagehead" style="margin-top:-12px"><button class="back" onclick="MAPST.work=null;renderMap()">‹</button><span class="lede">'+b.k+' ／ '+(W.mode==="deep"?"すぷらんと深める":"1分でふりかえる")+'</span></div>'
+    +'<div class="mwstep">'+(W.i+1)+' / '+W.steps.length+'</div>'
+    +(W.mode==="deep"&&W.i===0?mapWorkCtx(W.view):'')
+    +'<div class="bubble">'+spWho("base")+'<div class="txt">'+spTone(s.q)+'</div></div><div class="card">';
+  if(s.o.length) h+='<div class="rvchips">'+s.o.map(function(o,i){ const on=A.sel.indexOf(o)>=0; return '<button class="rvchip'+(on?' on':'')+'" onclick="mapWorkPick('+i+')">'+esc(o)+'</button>'; }).join("")+'</div>';
+  if(s.free) h+='<textarea id="mwFree" rows="2" maxlength="160" style="margin-top:8px" placeholder="'+esc(s.free)+'" oninput="MAPST.work.ans['+W.i+'].free=this.value">'+esc(A.free)+'</textarea>';
+  h+='<button class="btn" style="margin-top:12px" onclick="mapWorkNext()">'+(W.i+1<W.steps.length?'次へ':'これで残す')+'</button>'
+    +'<button class="dslink" style="display:block;margin:10px auto 0" onclick="mapWorkNext(true)">'+(W.i+1<W.steps.length?'答えずに次へ':'答えずに終える')+'</button>'
+    +'<button class="dslink" style="display:block;margin:6px auto 0;color:var(--muted)" onclick="MAPST.work=null;renderMap()">ここでやめる</button></div>';
+  body.innerHTML=h;
+}
+function mapWorkPick(i){ const W=MAPST.work, s=W.steps[W.i], A=W.ans[W.i], o=s.o[i], k=A.sel.indexOf(o);
+  const el=document.getElementById("mwFree"); if(el) A.free=el.value;
+  if(s.multi){ if(k>=0) A.sel.splice(k,1); else A.sel.push(o); } else A.sel = k>=0?[]:[o]; renderMap(); }
+function mapWorkNext(skip){
+  const W=MAPST.work, el=document.getElementById("mwFree"); if(el) W.ans[W.i].free=el.value;
+  if(skip){ W.ans[W.i]={sel:[],free:""}; }
+  if(W.i+1<W.steps.length){ W.i++; return renderMap(); }
+  /* 保存：答えたものだけ。何も答えていなければ何も作らない（架空の発見を作らない） */
+  const parts=W.ans.map(function(a){ return a.sel.filter(function(x){ return x!=="思いつかない"; }).concat(a.free.trim()?[a.free.trim()]:[]).join("・"); }).filter(Boolean);
+  if(parts.some(function(t){ return RISK_RE.test(t); })){ MAPST.work=null; openSafety("free_text","unspecified"); return; }
+  W.saved=null;
+  if(parts.length){ S.map_notes=S.map_notes||[];
+    const n={note_id:"MN-"+Date.now().toString(36), view:W.view, mode:W.mode, text:parts.join("／"), answers:W.ans, at:nowIso(),
+      good:W.ans.some(function(a){ return a.sel.some(function(x){ return /楽|ほっと|うれし|安心|落ち着/.test(x); }); })};
+    S.map_notes.push(n); W.saved=n; }
+  W.added=hypoRefresh().filter(function(h){ return h.related_perspective_ids.indexOf(W.view)>=0; });
+  W.done=true; saveState(); renderMap(); window.scrollTo(0,0);
+}
+function renderMapWorkDone(body){
+  const W=MAPST.work, b=mapBlock(W.view);
+  let h='<div class="card tint" style="text-align:center;margin-top:12px"><img class="sp-m" src="assets/suplan/opt/'+(W.saved?'happy':'base')+'.png" alt="" width="72" height="72" style="display:block;margin:0 auto 6px">';
+  if(W.saved) h+='<h2 style="font-size:17px;margin-bottom:6px">新しい手がかりが見つかったよ</h2><p class="lede" style="margin:0 0 4px">「'+esc(b.k)+'」に「'+esc(W.saved.text.slice(0,50))+(W.saved.text.length>50?'…':'')+'」を残したよ。</p>';
+  else h+='<h2 style="font-size:17px;margin-bottom:6px">今日はここまでにしよう</h2><p class="lede" style="margin:0">何も残していないよ。また気が向いたときに。</p>';
+  h+='</div>';
+  if(W.added && W.added.length) h+=W.added.map(function(x){ return hypoCard(x); }).join("");
+  h+='<div style="margin:12px 18px"><button class="btn" onclick="MAPST.work=null;MAPST.view=null;renderMap();window.scrollTo(0,0)">心の地図を見る</button>'
+    +(["thought","pattern","tried","strength"].indexOf(W.view)>=0?'<button class="btn ghost" style="margin-top:8px" onclick="MAPST.work=null;openReframe()">別の見方も探してみる</button>':'')+'</div>';
+  body.innerHTML=h;
+}
+
+/* ══ すぷらんと、別の見方を探す（認知再構成法の考え方。前向きに変えることが目的ではない）══
+   STEP1 今の考え（保存済みの会話・地図から再利用）→ STEP2 別の見方 2〜3案（中立的なものを必ず含む）→ STEP3 本人が選ぶ（選ばなくてよい）
+   → STEP4 気持ち（任意）→ STEP5 本人が残すと決めたときだけ保存。毎日のワークは変えない */
+const REFRAME_RULES=[
+  {kw:/嫌われ|怒って|きつい|冷た|無視|返事/, alts:["相手も、そのとき何か余裕がなかったのかもしれない。","伝えたいことがあったけれど、言い方がきつくなってしまったのかもしれない。"]},
+  {kw:/失敗|どうせ|無理|できない|だめ/, alts:["うまくいかなかったのは一部で、全部ではないのかもしれない。","疲れているときは、実際より悪く見えやすいのかもしれない。"]},
+  {kw:/迷惑|申し訳|自分のせい|ちゃんとしなきゃ/, alts:["自分に原因がない部分も、あるのかもしれない。","同じことを友だちがしていたら、そこまで責めないのかもしれない。"]},
+  {kw:/明日|この先|将来|どうなる|不安/, alts:["まだ起きていないことを、先に心配しているのかもしれない。","今日できることは、思っているより小さくていいのかもしれない。"]}
+];
+function reframeAlts(ev,th){
+  const t=(ev||"")+" "+(th||""), r=REFRAME_RULES.filter(function(x){ return x.kw.test(t); })[0];
+  const base = r ? r.alts : ["同じ状況でも、別の受け取り方をする人もいるのかもしれない。","そのときの疲れや体調が、考え方に影響していたのかもしれない。"];
+  return base.slice(0,2).concat(["今の情報だけでは、"+(th?"「"+th.slice(0,16)+"」かどうかまでは":"本当のところは")+"分からない。"]);
+}
+let REF=null;
+function openReframe(){
+  if(!mapUnlocked()) return;
+  /* 保存されている場面・考え・気持ちを再利用する（毎回最初から入力させない） */
+  const m=(S.mini_sessions||[]).filter(function(x){ return x.scene||x.thought; }).slice(-1)[0];
+  const th=(mapEntry("thought")||{}).text || (m&&m.thought) || "";
+  REF={step:1, event:(m&&m.scene)||"", thought:th, feeling:(m&&m.feeling)?m.feeling.split("・")[0]:"", before:6, after:null, alts:[], pick:null, own:"", src: m?"すぷらんとの会話（"+fmtMD(m.at)+"）":""};
+  MAPST.view=null; MAPST.work=null; const keep=REF; S.kiroku_next="map"; go("map"); REF=keep; renderMap(); window.scrollTo(0,0);
+}
+function renderReframe(body){
+  const R=REF;
+  let h='<div class="pagehead" style="margin-top:-12px"><button class="back" onclick="REF=null;renderMap()">‹</button><span class="lede">すぷらんと、別の見方を探す</span></div><div class="mwstep">STEP '+R.step+' / 5</div>';
+  if(R.step===1){
+    h+='<div class="bubble">'+spWho("thinking")+'<div class="txt">'+spTone(R.src?"前に話してくれたことから、こんなふうにまとめてみたよ。違っていたら直してね。":"どんなことがあって、どんな考えが浮かんだか、教えてくれる？")+'</div></div>'
+      +'<div class="card"><div class="fld"><label>起きたこと</label><input type="text" id="rfEv" maxlength="80" value="'+esc(R.event)+'" placeholder="たとえば「友達から、少しきつい言い方をされた」"></div>'
+      +'<div class="fld"><label>そのとき浮かんだ考え</label><input type="text" id="rfTh" maxlength="80" value="'+esc(R.thought)+'" placeholder="たとえば「嫌われてしまったのかもしれない」"></div>'
+      +'<div class="fld"><label>気持ち</label><input type="text" id="rfFe" maxlength="20" value="'+esc(R.feeling)+'" placeholder="たとえば「不安」"></div>'
+      +'<div class="fld"><label>その強さ <b id="rfBv">'+R.before+'</b> / 10</label><input type="range" id="rfB" min="0" max="10" value="'+R.before+'" oninput="document.getElementById(\'rfBv\').textContent=this.value"></div>'
+      +(R.src?'<p class="wknote">もとにした記録：'+esc(R.src)+'</p>':'')
+      +'<button class="btn" onclick="rfNext1()">次へ</button></div>';
+  } else if(R.step===2||R.step===3){
+    h+='<div class="bubble">'+spWho("bulb")+'<div class="txt">'+spTone("ほかの可能性も、一緒に少し考えてみない？")+'</div></div>'
+      +'<div class="card"><div class="rfsrc"><span>起きたこと</span>'+esc(R.event)+'<br><span>浮かんだ考え</span>「'+esc(R.thought)+'」</div>'
+      +R.alts.map(function(a,i){ return '<div class="rfalt">'+"①②③"[i]+' '+esc(a)+'</div>'; }).join("")
+      +'<div class="hyq">今の自分に、少しでも近い見方はある？</div><div class="opts">'
+      +R.alts.map(function(a,i){ return '<button class="opt'+(R.pick===i?' sel':'')+'" onclick="rfPick('+i+')">'+(i<2?"①②"[i]+' かもしれない':'③ 今は分からない')+'</button>'; }).join("")
+      +'<button class="opt'+(R.pick==="none"?' sel':'')+'" onclick="rfPick(\'none\')">どれもしっくりこない</button>'
+      +'<button class="opt'+(R.pick==="own"?' sel':'')+'" onclick="rfPick(\'own\')">自分の言葉で考えてみる</button></div>'
+      +(R.pick==="own"?'<textarea id="rfOwn" rows="2" maxlength="100" style="margin-top:8px" placeholder="自分なりの見方を書いてみよう" oninput="REF.own=this.value">'+esc(R.own)+'</textarea>':'')
+      +'<button class="btn" style="margin-top:12px" '+(R.pick==null?'disabled':'')+' onclick="REF.step=4;renderMap()">次へ</button></div>';
+  } else if(R.step===4){
+    h+='<div class="bubble">'+spWho("base")+'<div class="txt">'+spTone("いまの「"+esc(R.feeling||"気持ち")+"」の強さは、どのくらい？（答えなくても大丈夫）")+'</div></div>'
+      +'<div class="card"><div class="fld"><label>はじめ '+R.before+' / 10 → いま <b id="rfAv">'+(R.after==null?R.before:R.after)+'</b> / 10</label><input type="range" id="rfA" min="0" max="10" value="'+(R.after==null?R.before:R.after)+'" oninput="document.getElementById(\'rfAv\').textContent=this.value;REF.after=+this.value"></div>'
+      +'<p class="wknote">変わらなくても大丈夫。そのまま残すよ。</p>'
+      +'<button class="btn" onclick="REF.after=REF.after==null?+document.getElementById(\'rfA\').value:REF.after;REF.step=5;renderMap()">次へ</button>'
+      +'<button class="dslink" style="display:block;margin:10px auto 0" onclick="REF.after=null;REF.step=5;renderMap()">答えずに次へ</button></div>';
+  } else if(R.step===5){
+    const chosen = R.pick==="own" ? (R.own||"").trim() : (typeof R.pick==="number" ? R.alts[R.pick] : "");
+    h+='<div class="card"><h3>心の地図に残す？</h3>'
+      +'<div class="rfsrc"><span>起きたこと</span>'+esc(R.event)+'<br><span>最初に浮かんだ考え</span>「'+esc(R.thought)+'」<br><span>選んだ見方</span>'+(chosen?esc(chosen):'（どれもしっくりこなかった）')
+      +(R.after!=null?'<br><span>気持ち</span>'+esc(R.feeling||"")+' '+R.before+' → '+R.after:'')+'</div>'
+      +'<button class="btn" onclick="rfSave()">心の地図に残す</button><button class="btn ghost" style="margin-top:8px" onclick="REF=null;renderMap()">残さずに終える</button></div>';
+  } else if(R.step===6){
+    h+='<div class="card tint" style="text-align:center"><img class="sp-m" src="assets/suplan/opt/happy.png" alt="" width="72" height="72" style="display:block;margin:0 auto 6px">'
+      +'<h2 style="font-size:17px">'+(R.saved_chosen?'新しい見方がひとつ見つかったよ':'考えたことを残したよ')+'</h2>'
+      +'<button class="btn" style="margin-top:12px" onclick="REF=null;renderMap();window.scrollTo(0,0)">心の地図を見る</button></div>';
+  }
+  body.innerHTML=h;
+}
+function rfNext1(){
+  const v=function(id){ return ((document.getElementById(id)||{}).value||"").trim(); };
+  REF.event=v("rfEv"); REF.thought=v("rfTh"); REF.feeling=v("rfFe"); REF.before=+(document.getElementById("rfB")||{value:REF.before}).value;
+  if(!REF.event && !REF.thought) return;
+  if(RISK_RE.test(REF.event+" "+REF.thought)){ REF=null; openSafety("free_text","unspecified"); return; }
+  REF.alts=reframeAlts(REF.event,REF.thought); REF.step=2; renderMap();
+}
+function rfPick(p){ const el=document.getElementById("rfOwn"); if(el) REF.own=el.value; REF.pick=p; REF.step=3; renderMap(); }
+function rfSave(){
+  const R=REF, chosen = R.pick==="own" ? (R.own||"").trim() : (typeof R.pick==="number" ? R.alts[R.pick] : "");
+  if(chosen && RISK_RE.test(chosen)){ REF=null; openSafety("free_text","unspecified"); return; }
+  S.reframes=S.reframes||[];
+  S.reframes.push({reframe_id:"RF-"+Date.now().toString(36), event:R.event, thought:R.thought, feeling:R.feeling, before:R.before, after:R.after,
+    alts:R.alts.slice(), chosen_index: typeof R.pick==="number"?R.pick:null, chosen_text:chosen, own:R.pick==="own", none:R.pick==="none", at:nowIso(), related_views:["thought","pattern"]});
+  R.saved_chosen=!!chosen; R.step=6; saveState(); renderMap();
+}
+
+function renderMapMain(body){ return renderMapTop(body); }
+function renderMapMainV1(body){
   const n=mapCount(), full=n>=MAP_N, started=mapStarted();
   const feed=mapFeed(1)[0], work=insights().working.slice(-1)[0];
   let h='<div class="mapsum"><div class="mhero">'+mapArt(84)+'<div style="min-width:0">'
@@ -3699,7 +4151,7 @@ function myData(){
   const rows=[
     ["基本プロフィール", "入力状況 "+pct+"%"],
     ["最初に答えた3つの質問", S.current_status ? "回答あり" : "まだありません"],
-    ["心の地図", "見えてきたこと "+mapCount()+" / "+MAP_N+"・あなたが確かめたこと "+I.confirmed.length+"件・確かめ中の見方 "+I.working.length+"件"],
+    ["心の地図", (function(){ const c=mapCounts(); return c.clues+"つの手がかり・"+c.links+"つのつながり・新しい見方 "+c.views; })()+"・あなたが確かめたこと "+I.confirmed.length+"件・確かめ中の見方 "+I.working.length+"件"],
     ["気持ちの記録", dsAll().length+"件（メモつき "+dsAll().filter(function(r){ return r.optional_note; }).length+"件）"],
     ["すぷらんとの会話（はなす）", S.mini_sessions.length+"回"],
     ["やってみたことの記録", S.act_logs.length+"件"],
