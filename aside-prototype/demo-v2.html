@@ -666,6 +666,7 @@ body:has(#s-flow.active .obw.night){background:#17221F}
 .dsgo{display:block;width:100%;background:none;border:none;border-top:1px dashed var(--line);margin-top:12px;padding:10px 0 0;
   font-size:12.5px;font-weight:700;color:var(--teal-deep);text-align:left;cursor:pointer;font-family:inherit}
 .ktabs{display:flex;gap:6px;margin:10px 18px 0;background:var(--paper2);border:1px solid var(--line);border-radius:99px;padding:4px}
+.ktabs[hidden]{display:none}
 .ktabs button{flex:1;border:none;background:none;border-radius:99px;padding:8px 0;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
 .ktabs button.on{background:var(--paper);color:var(--teal-deep);box-shadow:var(--shadow)}
 .moodchart{display:block;width:100%;height:auto}
@@ -818,7 +819,7 @@ textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
   background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
   display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:40}
-nav[hidden]{display:none}   /* nav{display:flex} が hidden 属性を打ち消すため明示する */
+nav[hidden],nav button[hidden]{display:none}   /* nav{display:flex} が hidden 属性を打ち消すため明示する */
 nav button{background:none;border:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;
   align-items:center;gap:3px;cursor:pointer;flex:1;padding:2px;font-family:inherit;position:relative}
 nav button .ic{font-size:18px;line-height:1}
@@ -1022,7 +1023,7 @@ input[type=range]{width:100%}
   <button class="hideable" onclick="demoLetterArrived()">手紙が届いた</button>
   <button class="hideable" onclick="advanceDays(1)">+1日</button>
   <button class="hideable" onclick="advanceToReview()">ふりかえりの日へ</button>
-  <button class="hideable" onclick="openMini('home')">ミニセッション</button>
+  <button class="hideable" id="dbMini" onclick="openMini('home')">ミニセッション</button>
   <button class="hideable" onclick="seedDaily()">記録サンプル</button>
   <button class="hideable" id="aiBtn" onclick="toggleAi()">AI: OFF</button>
   <button class="hideable" onclick="openSafety('demo','some')">リスク検知</button>
@@ -1046,7 +1047,7 @@ input[type=range]{width:100%}
     <div id="talkBody"></div></section>
 
   <section id="s-map" class="screen">
-    <div class="pagehead"><b style="font-size:16px">きろく</b><span></span></div>
+    <div class="pagehead"><b style="font-size:16px" id="mapTitle">心の地図</b><span></span></div>
     <div class="ktabs" id="kTabs"></div>
     <div id="mapBody" style="margin-top:12px"></div>
     <div class="foot" id="mapFoot">この地図は完成するものではなく、<br>あなたと一緒に少しずつ育っていくものです。</div></section>
@@ -1086,8 +1087,9 @@ input[type=range]{width:100%}
 
   <nav id="nav">
     <button data-go="home" onclick="go('home')"><span class="ic">🌿</span>ホーム</button>
-    <button data-go="talk" onclick="go('talk')"><span class="ic">💬</span>はなす</button>
-    <button data-go="map" onclick="go('map')"><span class="ic">📗</span>きろく</button>
+    <button data-go="talk" onclick="go('talk')" hidden><span class="ic">💬</span>はなす</button>
+    <button data-go="map" onclick="go('map')"><span class="ic">🗺</span>心の地図</button>
+    <button data-go="rec" onclick="go('rec')"><span class="ic">📗</span>きろく</button>
     <button data-go="gate" onclick="go('gate')"><span class="ic">✉️</span>ふりかえり<span id="navDot" class="dot" hidden></span></button>
     <button data-go="log" onclick="go('log')"><span class="ic">👤</span>マイページ</button>
   </nav>
@@ -1132,17 +1134,24 @@ const CONCERN_OPTS=["仕事のプレッシャー","人間関係","将来への�
 
 /* 初回の行動確定までは使えない画面。押されたら「一緒に決める」へ誘導する */
 const LOCKED_BEFORE_PLAN=["talk","gate","act"];
+/* 2026-10-03 ナビ再編：独立した自由チャット「はなす」は MVP から外す（コード・会話履歴は残す。true に戻すと再び使える）
+   初回3問・ワーク中のガイド・ふりかえりの整理・心の地図の対話・仮説・おたより・安全対応は、このフラグと関係なく動く */
+const FEATURE_FREE_TALK=false;
+/* タブ：ホーム／心の地図（map）／きろく（rec）／ふりかえり／マイページ。心の地図ときろくは同じ画面枠（s-map）を使い分ける */
 function go(id){
+  if(id==="talk" && !FEATURE_FREE_TALK) id="home";
+  if(id==="map" && (S.kiroku_next==="mood"||S.kiroku_next==="work")) id="rec";
   if(S.side!=="user") toggleSide();
   if(!S.initial_plan_completed && LOCKED_BEFORE_PLAN.indexOf(id)>=0) return showLock(id);
   S.screen=id;
   document.querySelectorAll("#userapp .screen").forEach(e=>e.classList.remove("active"));
-  const el=document.getElementById("s-"+id); if(el) el.classList.add("active");
+  const el=document.getElementById("s-"+(id==="rec"?"map":id)); if(el) el.classList.add("active");
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on", b.dataset.go===id));
   const nav=document.getElementById("nav");
   S.entered=true; nav.hidden=false; nav.classList.remove("locked");
   if(id==="home") renderHome();
-  if(id==="map"){ MAPED=null; MAPST.view=null; MAPST.work=null; REF=null; S.kiroku=S.kiroku_next||"map"; S.kiroku_next=null; renderMap(); }
+  if(id==="map"){ MAPED=null; MAPST.view=null; MAPST.work=null; REF=null; S.kiroku="map"; S.kiroku_next=null; renderMap(); }
+  if(id==="rec"){ MAPED=null; MAPST.view=null; MAPST.work=null; REF=null; S.kiroku=(S.kiroku_next==="mood"||S.kiroku_next==="work")?S.kiroku_next:(S.kiroku_rec||"mood"); S.kiroku_next=null; renderMap(); }
   if(id==="gate") renderGate();
   if(id==="log"){ S.my_view=null; renderLog(); }
   if(id==="talk") renderTalk();
@@ -1164,6 +1173,8 @@ function sync(){
     +(S.cycle ? " / "+S.cycle.weekly_cycle_id+": "+S.cycle.weekly_review_status : "")
     +(S.clock_offset ? " / +"+Math.round(S.clock_offset/DAY)+"日" : "");
   const d=document.getElementById("navDot"); if(d) d.hidden = !letterArrived();
+  const tb=document.querySelector('#nav button[data-go="talk"]'); if(tb) tb.hidden=!FEATURE_FREE_TALK;
+  const dm=document.getElementById("dbMini"); if(dm) dm.hidden=!FEATURE_FREE_TALK;
   document.querySelectorAll("#nav button").forEach(function(b){
     const lock = !S.initial_plan_completed && LOCKED_BEFORE_PLAN.indexOf(b.dataset.go)>=0;
     b.classList.toggle("lockd",lock);
@@ -2859,7 +2870,7 @@ function mapHomeCard(){
 }
 function mapLockInfo(){
   document.getElementById("modalRoot").innerHTML='<div class="modalbg" onclick="closeWhy()"><div class="modal" onclick="event.stopPropagation()">'
-    +'<h3>🔒 心の地図</h3><p>最初のふりかえりが終わると使えます。<br>まずは今の一歩を試してみましょう。</p>'
+    +'<h3>🔒 心の地図</h3><p>最初のふりかえりが終わったら、すぷらんと一緒に自分のことを深めていけるよ。<br>まずは今の一歩を試してみましょう。</p>'
     +'<button class="btn" onclick="closeWhy()">わかりました</button></div></div>';
 }
 /* ふりかえりまでのカウントダウン（短く） */
@@ -3004,12 +3015,19 @@ function dsEditForm(r,where){
    未回答＝答える意味と軽さ／回答後＝最新1件・時刻・メモ・編集・追加・きろくへ（縦に長くしない） */
 
 /* ── きろく ／ 気持ちの記録 ───────────────────────────── */
-function openMoodLog(){ S.kiroku_next="mood"; S.mood_day=isoDate(nowMs()); go("map"); }
+function openMoodLog(){ S.kiroku_next="mood"; S.mood_day=isoDate(nowMs()); go("rec"); }
 function kirokuTabs(){
   const el=document.getElementById("kTabs"); if(!el) return;
-  el.innerHTML=[["map","心の地図"],["mood","気持ちの記録"],["work","ワークの記録"]].map(function(t){
+  /* 2026-10-03：心の地図は独立タブ。きろくは「気持ちの記録／ワークの記録」だけを切り替える */
+  const isMap=S.kiroku!=="mood" && S.kiroku!=="work";
+  if(!isMap) S.kiroku_rec=S.kiroku;
+  el.hidden=isMap;
+  el.innerHTML=isMap ? "" : [["mood","気持ちの記録"],["work","ワークの記録"]].map(function(t){
     return '<button class="'+(S.kiroku===t[0]?'on':'')+'" onclick="S.kiroku=\''+t[0]+'\';MAPED=null;renderMap();window.scrollTo(0,0)">'+t[1]+'</button>'; }).join("");
-  const f=document.getElementById("mapFoot"); if(f) f.hidden = S.kiroku==="mood";
+  const f=document.getElementById("mapFoot"); if(f) f.hidden = !isMap;
+  const ti=document.getElementById("mapTitle"); if(ti) ti.textContent = isMap ? "心の地図" : "きろく";
+  /* 画面の中で切り替わったときも、タブの選択状態を合わせる */
+  if(S.screen==="map"||S.screen==="rec"){ S.screen=isMap?"map":"rec"; document.querySelectorAll("#nav button").forEach(function(b){ b.classList.toggle("on", b.dataset.go===S.screen); }); }
 }
 function weekStart(ms){ const d0=dayStart(ms), w=(new Date(d0).getDay()+6)%7; return d0-w*DAY; }   // 月曜はじまり
 function weekDays(off){
@@ -3127,7 +3145,7 @@ function seedDaily(){
   S.daily_states=dsAll().filter(function(r){ return r.date===today; });
   rows.forEach(function(x){ const ms=nowMs()-x[0]*DAY, at=new Date(dayStart(ms)+x[1]*3600000).toISOString();
     S.daily_states.push({record_id:dsNewId(), user_id:DS_USER, date:isoDate(ms), daily_state:dsCode(x[2]), optional_note:x[3], recorded_at:at, edited_at:null, sample:true}); });
-  if(S.screen==="map") S.kiroku_next=S.kiroku;
+  if(S.screen==="map"||S.screen==="rec") S.kiroku_next=S.kiroku;
   rerender();
 }
 
@@ -3288,7 +3306,7 @@ function skipToRegular(){
 function mapLockedHtml(){
   const c=S.cycle, left=c?daysLeft():3;
   return '<div class="maplock"><div class="lk3" aria-hidden="true">🔒</div><h3>心の地図</h3>'
-    +'<p>最初のふりかえりが終わると、使えるようになります。<br><br>まずは今の一歩を試してみましょう。<br>話したことや、やってみたことから、<br>少しずつ自分のことを知っていけます。</p>'
+    +'<p>最初のふりかえりが終わったら、<br>すぷらんと一緒に自分のことを深めていけるよ。<br><br>まずは今の一歩を試してみましょう。<br>話したことや、やってみたことから、<br>少しずつ自分のことを知っていけます。</p>'
     +'<div class="cd">'+(c && c.weekly_review_status==="available" ? '今日、最初のふりかえりができます' : '最初のふりかえりまで あと<b>'+left+'</b>日')+'</div>'
     +(c && c.weekly_review_status==="available" ? '<button class="btn" style="margin-top:12px" onclick="go(\'gate\')">ふりかえりをはじめる</button>' : '')
     +'</div>';
@@ -3759,7 +3777,7 @@ function pfSave(){
   PF_FIELDS.forEach(function(f){ if(f.id==="nickname" && !S.pf.nickname) return; S[f.id]=S.pf[f.id]; });   // ニックネームは空にしない
   S.support_past=!!S.pf.support_past; S.leave_duration=S.pf.life_status==="休職中" ? (S.pf.leave_duration||"") : "";
   S.pf=null; closeWhy();
-  if(S.screen==="log") renderLog(); else if(S.screen==="map") renderMap();
+  if(S.screen==="log") renderLog(); else if(S.screen==="map"||S.screen==="rec") renderMap();
 }
 /* AIに渡すプロフィール。「回答しない」と未回答の項目は渡さない（推測・補完させない）。性別・年代は渡さない */
 function pfForAI(){
@@ -4347,7 +4365,7 @@ function renderMoodLog(){
           +'<div class="dsrow" style="flex-wrap:wrap"><button class="btn sm" onclick="dsAddToMap('+o.i+')">近いので心の地図に加える</button>'
           +'<button class="dslink" onclick="dsDismiss('+o.i+')">ちがう気がする</button>'
           +'<button class="whybtn" onclick="msWhy({evidence:DS_INS['+o.i+'].ev})">どうしてそう思ったの？</button></div></div>'; }).join("") : '')
-    +'<div class="mapcta"><button class="btn ghost" onclick="S.kiroku=\'map\';renderMap();window.scrollTo(0,0)">心の地図でくわしく見る</button></div>';
+    +'<div class="mapcta"><button class="btn ghost" onclick="go(\'map\')">心の地図でくわしく見る</button></div>';
 }
 
 
@@ -4490,12 +4508,12 @@ function myAi(){
     {k:"プロフィール", used:true, d: pfKeys.length ? "現在の状況・サポート・相談できる人・時間帯のうち、答えた項目（"+pfKeys.length+"つ）。「回答しない」は使いません。年代・性別は使いません" : "まだ答えた項目はありません", fix:"openProfile()", fixT:"確認・編集する"},
     {k:"最初に答えた3つの質問", used:true, d:"今の気持ち・気になっていること・変えてみたいこと", fix:"", fixT:""},
     {k:"心の地図", used:true, d:"あなたが確かめた流れ（"+insights().confirmed.filter(function(c){ return c.type==="pattern"; }).length+"件）。まだ確かめていない見方は使いません", fix:"S.kiroku_next='map';go('map')", fixT:"心の地図を見る"},
-    {k:"気持ちの記録", used:true, d:"今日の状態と、最近のメモ（はなすで少し話すときに3件まで）", fix:"openMoodLog()", fixT:"気持ちの記録を見る"},
-    {k:"やってみたことの記録", used:true, d:"今の一歩と、最近やってみた記録（5件まで）", fix:"S.kiroku_next='mood';go('map')", fixT:"きろくを見る"},
+    {k:"気持ちの記録", used:true, d:"今日の状態と、最近のメモ（すぷらんと話すときに3件まで）", fix:"openMoodLog()", fixT:"気持ちの記録を見る"},
+    {k:"やってみたことの記録", used:true, d:"今の一歩と、最近やってみた記録（5件まで）", fix:"S.kiroku_next='mood';go('rec')", fixT:"きろくを見る"},
     {k:"過去のふりかえり", used:false, d:"いまは使っていません", fix:"", fixT:""}
   ];
   return myBack()+'<div class="mysub"><h2>すぷらんが参考にしている情報</h2>'
-    +'<p class="lede">はなす・心の地図で、すぷらん（AI）が参考にしている情報です。<br>すぷらんは、これらだけであなたのことを決めつけません。<br>大塚さんが毎日の会話を見ることはありません。</p>'
+    +'<p class="lede">'+(FEATURE_FREE_TALK?'はなす・':'')+'心の地図やワークで、すぷらん（AI）が参考にしている情報です。<br>すぷらんは、これらだけであなたのことを決めつけません。<br>大塚さんが毎日の会話を見ることはありません。</p>'
     +'<div class="mybox">'+rows.map(function(r){ return '<div class="myinfo"><div class="t"><b>'+r.k+'</b><span class="st'+(r.used?' on':'')+'">'+(r.used?'参考にしています':'まだ使っていません')+'</span></div>'
       +'<div class="d">'+esc(r.d)+'</div>'+(r.fix?'<button class="dslink" style="margin-top:4px" onclick="'+r.fix+'">'+r.fixT+' ›</button>':'')+'</div>'; }).join("")+'</div>'
     +'<div class="mybox" style="margin-top:10px">'+myRow("⚙️","参考にする情報を選ぶ","情報ごとにオン・オフする（準備中）","",true)+'</div></div>';
@@ -4508,7 +4526,7 @@ function myData(){
     ["最初に答えた3つの質問", S.current_status ? "回答あり" : "まだありません"],
     ["心の地図", (function(){ const c=mapCounts(); return c.clues+"つの手がかり・"+c.links+"つのつながり・新しい見方 "+c.views; })()+"・あなたが確かめたこと "+I.confirmed.length+"件・確かめ中の見方 "+I.working.length+"件"],
     ["気持ちの記録", dsAll().length+"件（メモつき "+dsAll().filter(function(r){ return r.optional_note; }).length+"件）"],
-    ["すぷらんとの会話（はなす）", S.mini_sessions.length+"回"],
+    ["すぷらんとの会話", S.mini_sessions.length+"回"],
     ["やってみたことの記録", S.act_logs.length+"件"],
     ["ふりかえり", S.reviews.length+"回（共有 "+S.reviews.filter(function(r){ return r.shared; }).length+"回）"]
   ];
@@ -4553,10 +4571,10 @@ function myConfirmReset(){
     +'<button class="btn" onclick="resetDemo()">消して最初から始める</button><button class="btn ghost" style="margin-top:8px" onclick="closeWhy()">やめる</button></div></div>';
 }
 function myGuide(){
-  const G=[["🌱","今週の小さな一歩","ホームに出ている、今週試してみることです。できる日だけで大丈夫です。合わなければ変えられます。"],
-    ["💬","すぷらんとはなす","すぷらん（AI）と一緒に、最近のことを整理したり、今週の一歩を見直したり、気持ちを少し話したりできます。大塚さんには自動で届きません。"],
-    ["🗺","心の地図","話したことや試したことから、あなたのパターンが少しずつ見えてくる地図です。完成するものではありません。"],
-    ["🌤","気持ちの記録","1日1回を目安に、今の気分を10秒で残せます。きろくで、気持ちの変化を見返せます。"],
+  const G=[["🌱","今週の小さな一歩","ホームに出ている、今週試してみることです。できる日だけで大丈夫です。合わないときは、ふりかえりで大塚さんに相談できます。"],
+    ...(FEATURE_FREE_TALK?[["💬","すぷらんとはなす","すぷらん（AI）と一緒に、最近のことを整理したり、気持ちを少し話したりできます。大塚さんには自動で届きません。"]]:[]),
+    ["🗺","心の地図","自分のことを知り、理解を深める場所です。すぷらんと一緒に、考え方や気持ち、行動のパターンや自分なりの工夫を少しずつ見つけていきます。最初のふりかえりのあとに使えます。"],
+    ["📗","きろく","これまでの気持ちの記録や、毎日のワークの記録を見返す場所です。"],
     ["✉️","ふりかえりと大塚さんへの共有","最初は3日後、そのあとは1週間ごとにふりかえります。希望すれば、内容を確認してから大塚さんに共有できます。"]];
   return myBack()+'<div class="mysub"><h2>kokoniの使い方</h2>'
     +'<div class="mybox">'+G.map(function(g){ return '<div class="myinfo"><div class="t"><b>'+g[0]+' '+g[1]+'</b></div><div class="d">'+g[2]+'</div></div>'; }).join("")+'</div></div>';
@@ -4629,7 +4647,7 @@ function advanceToReview(){
 }
 function rerender(){
   refreshCycle();
-  if(S.side==="user" && ["home","gate","map","log"].indexOf(S.screen)>=0) go(S.screen); else sync();
+  if(S.side==="user" && ["home","gate","map","rec","log"].indexOf(S.screen)>=0) go(S.screen); else sync();
 }
 function demoLetterArrived(){ const r=lastShared(); if(r && r.letter_status==="waiting") r.letter_status="arrived"; go("gate"); }
 
@@ -4655,7 +4673,7 @@ function reviewRows(){
   return [
     {id:"state", k:"今週の状態", v: d.moods.length ? "「今日の状態」の記録："+countText(d.moods) : "今週は「今日の状態」の記録がありませんでした。"},
     {id:"theme", k:"今週のテーマ", v: S.direction_goal||"—"},
-    {id:"talk", k:"すぷらんと話したこと", v: d.talk_count ? "今週は"+d.talk_count+"回話しました。"+(S.ai_conversation_summary?"<br>"+S.ai_conversation_summary:"") : "今週は、はなすは使いませんでした。"},
+    ...(!FEATURE_FREE_TALK && !d.talk_count ? [] : [{id:"talk", k:"すぷらんと話したこと", v: d.talk_count ? "今週は"+d.talk_count+"回話しました。"+(S.ai_conversation_summary?"<br>"+S.ai_conversation_summary:"") : "今週は、はなすは使いませんでした。"}]),
     {id:"action", k:"試したこと", v: "「"+d.action.title+"」（目安："+d.action.plan+"）<br>やってみた回数："+d.action.count+"回"},
     {id:"reaction", k:"やってみたあとの反応", v: d.action.feelings.length ? countText(d.action.feelings) : "まだ記録はありません。"}
   ].concat(mapRow());
@@ -5844,7 +5862,7 @@ function arDone(k,before){
 }
 function arBackBtns(){
   return '<button class="btn" onclick="go(\'home\')">ホームに戻る</button>'
-    +'<button class="btn ghost" style="margin-top:9px" onclick="go(\'talk\')">はなすに戻る</button>';
+    +'<button class="btn ghost" style="margin-top:9px" onclick="go(\'talk\')">'+(FEATURE_FREE_TALK?'はなすに戻る':'ホームに戻る')+'</button>';
 }
 
 /* ── open_talk：今の気持ちを少し話す ───────────────────────────
